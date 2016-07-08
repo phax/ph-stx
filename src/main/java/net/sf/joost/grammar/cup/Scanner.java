@@ -1,5 +1,3 @@
-//  package java_cup.runtime;
-//  change of package by Oliver Becker for integration into Joost
 package net.sf.joost.grammar.cup;
 
 /**

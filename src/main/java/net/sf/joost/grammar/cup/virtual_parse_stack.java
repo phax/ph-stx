@@ -1,5 +1,4 @@
-//  package java_cup.runtime;
-//  change of package by Oliver Becker for integration into Joost
+
 package net.sf.joost.grammar.cup;
 
 import java.util.Stack;
@@ -15,7 +14,7 @@ import java.util.Stack;
  * been modified). Since parse ahead does not execute actions, only parse state
  * is maintained on the virtual stack, not full Symbol objects.
  *
- * @see lr_parser
+ * @see java_cup.runtime.lr_parser
  * @version last updated: 7/3/96
  * @author Frank Flannery
  */

@@ -1,8 +1,12 @@
-//  package java_cup.runtime;
-//  change of package by Oliver Becker for integration into Joost
+
 package net.sf.joost.grammar.cup;
 
+import java.lang.reflect.Field;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
+
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 
 /**
  * This class implements a skeleton table driven LR parser. In general, LR
@@ -100,32 +104,68 @@ import java.util.Stack;
  * report_fatal_error("Couldn't repair and continue parse", null);
  * </dl>
  *
- * @see Symbol
- * @see virtual_parse_stack
+ * @see java_cup.runtime.Symbol
+ * @see java_cup.runtime.Symbol
+ * @see java_cup.runtime.virtual_parse_stack
  * @version last updated: 7/3/96
  * @author Frank Flannery
  */
 
 public abstract class lr_parser
 {
-
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/
   /*-----------------------------------------------------------*/
 
-  /** Simple constructor. */
+  /**
+   * Simple constructor. deprecated; The use of a SymbolFactory, e.g.
+   * Complexsymbolfactory is advised
+   */
+  @Deprecated
   public lr_parser ()
   {
-    /* nothing to do here */
+    this (new DefaultSymbolFactory ());
   }
 
-  /** Constructor that sets the default scanner. [CSA/davidm] */
+  /**
+   * Simple constructor.
+   */
+  public lr_parser (final SymbolFactory fac)
+  {
+    symbolFactory = fac;
+  }
+
+  /**
+   * Constructor that sets the default scanner. [CSA/davidm] deprecated; The use
+   * of a SymbolFactory, e.g. Complexsymbolfactory is advised
+   */
+  @Deprecated
   public lr_parser (final Scanner s)
   {
-    this (); /* in case default constructor someday does something */
+    this (s, new DefaultSymbolFactory ()); // TUM 20060327 old cup v10 Symbols
+                                           // as default
+  }
+
+  /**
+   * Constructor that sets the default scanner and a SymbolFactory
+   */
+  public lr_parser (final Scanner s, final SymbolFactory symfac)
+  {
+    this (); // in case default constructor someday does something
+    symbolFactory = symfac;
     setScanner (s);
   }
 
+  public SymbolFactory symbolFactory;
+
+  /**
+   * Whenever creation of a new Symbol is necessary, one should use this
+   * factory.
+   */
+  public SymbolFactory getSymbolFactory ()
+  {
+    return symbolFactory;
+  }
   /*-----------------------------------------------------------*/
   /*--- (Access to) Static (Class) Variables ------------------*/
   /*-----------------------------------------------------------*/
@@ -175,7 +215,7 @@ public abstract class lr_parser
    * values (one less than the production reduced by). Error entries are denoted
    * by zero.
    *
-   * @see lr_parser#get_action
+   * @see java_cup.runtime.lr_parser#get_action
    */
   public abstract short [] [] action_table ();
 
@@ -192,7 +232,7 @@ public abstract class lr_parser
    * state. This table is then indexed by that state and the LHS of the reducing
    * production to indicate where to "shift" to.
    *
-   * @see lr_parser#get_reduce
+   * @see java_cup.runtime.lr_parser#get_reduce
    */
   public abstract short [] [] reduce_table ();
 
@@ -350,7 +390,7 @@ public abstract class lr_parser
   public Symbol scan () throws java.lang.Exception
   {
     final Symbol sym = getScanner ().next_token ();
-    return (sym != null) ? sym : new Symbol (EOF_sym ());
+    return (sym != null) ? sym : getSymbolFactory ().newSymbol ("END_OF_FILE", EOF_sym ());
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -393,14 +433,26 @@ public abstract class lr_parser
    */
   public void report_error (final String message, final Object info)
   {
+    if (info instanceof ComplexSymbol)
+    {
+      final ComplexSymbol cs = (ComplexSymbol) info;
+      System.err.println (message +
+                          " for input symbol \"" +
+                          cs.getName () +
+                          "\" spanning from " +
+                          cs.getLeft () +
+                          " to " +
+                          cs.getRight ());
+      return;
+    }
+
     System.err.print (message);
+    System.err.flush ();
     if (info instanceof Symbol)
       if (((Symbol) info).left != -1)
         System.err.println (" at character " + ((Symbol) info).left + " of input");
       else
         System.err.println ("");
-    else
-      System.err.println ("");
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -416,6 +468,131 @@ public abstract class lr_parser
   public void syntax_error (final Symbol cur_token)
   {
     report_error ("Syntax error", cur_token);
+    report_expected_token_ids ();
+  }
+
+  /**
+   * We need this Method in order to resolve names for symbol IDs
+   * 
+   * @return the class that keeps all the symbols
+   */
+  public Class getSymbolContainer ()
+  {
+    return null;
+  };
+
+  protected void report_expected_token_ids ()
+  {
+    final List <Integer> ids = expected_token_ids ();
+    final LinkedList <String> list = new LinkedList <> ();
+    for (final Integer expected : ids)
+    {
+      list.add (symbl_name_from_id (expected));
+    }
+    System.out.println ("instead expected token classes are " + list);
+  }
+
+  /**
+   * Translates numerical symbol ids to the (non)terminal names from the spec
+   * 
+   * @param internal
+   *        id for (non)terminal
+   * @return (non)terminal name as string
+   */
+  public String symbl_name_from_id (final int id)
+  {
+    final Field [] fields = getSymbolContainer ().getFields ();
+    for (final Field f : fields)
+    {
+      try
+      {
+        if (f.getInt (null) == id)
+          return f.getName ();
+      }
+      catch (final IllegalArgumentException e)
+      {
+        // e.printStackTrace();
+      }
+      catch (final IllegalAccessException e)
+      {
+        // e.printStackTrace();
+      }
+    }
+    return "invalid symbol id";
+  }
+
+  /**
+   * Return the expected symbol during this state of state of the parser
+   * 
+   * @return list of integer (non)temrinal ids
+   */
+  public List <Integer> expected_token_ids ()
+  {
+    final List <Integer> ret = new LinkedList <> ();
+    final int parse_state = ((Symbol) stack.peek ()).parse_state;
+    final short [] row = action_tab[parse_state];
+    for (int i = 0; i < row.length; i += 2)
+    {
+      if (row[i] == -1)
+        continue;
+      if (!validate_expected_symbol (row[i]))
+        continue;
+      ret.add (new Integer (row[i]));
+    }
+    return ret;
+  }
+
+  private boolean validate_expected_symbol (final int id)
+  {
+    short lhs, rhs_size;
+    int act;
+    try
+    {
+      final virtual_parse_stack vstack = new virtual_parse_stack (stack);
+      /* parse until we fail or get past the lookahead input */
+      for (;;)
+      {
+        /* look up the action from the current state (on top of stack) */
+        act = get_action (vstack.top (), id);
+
+        /* if its an error, we fail */
+        if (act == 0)
+          return false;
+
+        /* > 0 encodes a shift */
+        if (act > 0)
+        {
+          /* push the new state on the stack */
+          vstack.push (act - 1);
+
+          /* advance simulated input, if we run off the end, we are done */
+          if (!advance_lookahead ())
+            return true;
+        }
+        /* < 0 encodes a reduce */
+        else
+        {
+          /* if this is a reduce with the start production we are done */
+          if ((-act) - 1 == start_production ())
+            return true;
+
+          /* get the lhs Symbol and the rhs size */
+          lhs = production_tab[(-act) - 1][0];
+          rhs_size = production_tab[(-act) - 1][1];
+          /* pop handle off the stack */
+          for (int i = 0; i < rhs_size; i++)
+            vstack.pop ();
+
+          vstack.push (get_reduce (vstack.top (), lhs));
+        }
+      }
+
+    }
+    catch (final Exception e)
+    {
+      e.printStackTrace ();
+    }
+    return true;
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -568,7 +745,7 @@ public abstract class lr_parser
 
     /* push dummy Symbol with start state to get us underway */
     stack.removeAllElements ();
-    stack.push (new Symbol (0, start_state ()));
+    stack.push (getSymbolFactory ().startSymbol ("START", 0, start_state ()));
     tos = 0;
 
     /* continue until we are told to stop */
@@ -774,7 +951,7 @@ public abstract class lr_parser
 
     /* push dummy Symbol with start state to get us underway */
     stack.removeAllElements ();
-    stack.push (new Symbol (0, start_state ()));
+    stack.push (getSymbolFactory ().startSymbol ("START", 0, start_state ()));
     tos = 0;
 
     /* continue until we are told to stop */
@@ -984,8 +1161,8 @@ public abstract class lr_parser
       debug_message ("# Finding recovery state on stack");
 
     /* Remember the right-position of the top symbol on the stack */
-    final int right_pos = ((Symbol) stack.peek ()).right;
-    int left_pos = ((Symbol) stack.peek ()).left;
+    final Symbol right = ((Symbol) stack.peek ());// TUM 20060327 removed .right
+    Symbol left = right;// TUM 20060327 removed .left
 
     /* pop down until we can shift under error Symbol */
     while (!shift_under_error ())
@@ -993,7 +1170,7 @@ public abstract class lr_parser
       /* pop the stack */
       if (debug)
         debug_message ("# Pop stack by one, state was # " + ((Symbol) stack.peek ()).parse_state);
-      left_pos = ((Symbol) stack.pop ()).left;
+      left = ((Symbol) stack.pop ()); // TUM 20060327 removed .left
       tos--;
 
       /* if we have hit bottom, we fail */
@@ -1014,7 +1191,7 @@ public abstract class lr_parser
     }
 
     /* build and shift a special error Symbol */
-    error_token = new Symbol (error_sym (), left_pos, right_pos);
+    error_token = getSymbolFactory ().newSymbol ("ERROR", error_sym (), left, right);
     error_token.parse_state = act - 1;
     error_token.used_by_parser = true;
     stack.push (error_token);

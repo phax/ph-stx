@@ -1,5 +1,3 @@
-//  package java_cup.runtime;
-//  change of package by Oliver Becker for integration into Joost
 package net.sf.joost.grammar.cup;
 
 /**
@@ -16,11 +14,32 @@ package net.sf.joost.grammar.cup;
  * what the parser expects to receive from the lexer. the token is identified as
  * follows: sym: the symbol type parse_state: the parse state. value: is the
  * lexical value of type Object left : is the left position in the original
- * input file right: is the right position in the original input file
+ * input file right: is the right position in the original input file xleft: is
+ * the left position Object in the original input file xright: is the left
+ * position Object in the original input file
  ******************************************************************/
 
 public class Symbol
 {
+
+  // TUM 20060327: Added new Constructor to provide more flexible way
+  // for location handling
+  /*******************************
+   *******************************/
+  public Symbol (final int id, final Symbol left, final Symbol right, final Object o)
+  {
+    this (id, left.left, right.right, o);
+  }
+
+  public Symbol (final int id, final Symbol left, final Symbol right)
+  {
+    this (id, left.left, right.right);
+  }
+
+  public Symbol (final int id, final Symbol left, final Object o)
+  {
+    this (id, left.right, left.right, o);
+  }
 
   /*******************************
    * Constructor for l,r values
@@ -61,7 +80,6 @@ public class Symbol
     this (sym_num, -1);
     left = -1;
     right = -1;
-    value = null;
   }
 
   /***********************************
