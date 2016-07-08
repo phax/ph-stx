@@ -1,0 +1,856 @@
+/**
+ * Copyright (C) 2014-2015 Philip Helger (www.helger.com)
+ * philip[at]helger[dot]com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+options {
+// JavaCC options
+  // LOOKAHEAD = 2;
+  CHOICE_AMBIGUITY_CHECK = 3;  // value >= 4 consumes too much memory!
+  OTHER_AMBIGUITY_CHECK = 2;
+  STATIC = false;  // to allow for multiple parser instances
+  // DEBUG_PARSER = true;
+  // DEBUG_LOOKAHEAD = true;
+  // DEBUG_TOKEN_MANAGER = true;
+  // ERROR_REPORTING = false;
+  JAVA_UNICODE_ESCAPE = true;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  // USER_TOKEN_MANAGER = true;
+  // SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+  // USER_CHAR_STREAM = true;
+  FORCE_LA_CHECK = false;
+
+// JJTree options
+  // MULTI = true;
+  // VISITOR = true;
+  // BUILD_NODE_FILES = false;
+  // NODE_DEFAULT_VOID = true;
+  NODE_CLASS = "com.helger.stx.parser.STXNode";
+  NODE_PREFIX = "";
+  // NODE_USES_PARSER = true;
+  TRACK_TOKENS = true;
+  // NODE_SCOPE_HOOK = true;
+}
+
+PARSER_BEGIN(ParserSTX)
+package com.helger.stx.parser;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.helger.commons.string.StringParser;
+import com.helger.stx.parser.ParserQName;
+import com.helger.stx.parser.STXParserHelper;
+
+public class ParserSTX
+{
+  private static final org.slf4j.Logger s_aLogger = org.slf4j.LoggerFactory.getLogger (ParserSTX.class);
+  
+  // Used when NODE_SCOPE_HOOK is true - for debugging only
+  // Package scope to avoid warning when NODE_SCOPE_HOOK is false
+  void jjtreeOpenNodeScope (final Node aNode)
+  {
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("Opening scope for " + aNode.toString ());
+  }
+  
+  void jjtreeCloseNodeScope (final Node aNode)
+  {
+    if (s_aLogger.isDebugEnabled ())
+      s_aLogger.debug ("Closing scope for " + aNode.toString ());
+  }
+}
+PARSER_END(ParserSTX)
+
+TOKEN_MGR_DECLS :
+{
+  private static final org.slf4j.Logger s_aLogger = org.slf4j.LoggerFactory.getLogger (ParserSTXTokenManager.class);
+  
+  private int commentNestingDepth = 0;
+  
+  void backup(final int nChars) { 
+    input_stream.backup(nChars);
+  } 
+}
+
+<DEFAULT>
+MORE :
+{
+  "(:" { commentNestingDepth = 1 ; } : IN_COMMENT
+}
+
+<IN_COMMENT>
+SPECIAL_TOKEN :
+{  
+  "(:" { commentNestingDepth++; } 
+}
+    
+<IN_COMMENT>
+MORE :
+{
+  < ~[] > : IN_COMMENT
+}
+
+
+<IN_COMMENT>
+SPECIAL_TOKEN : 
+{ 
+  ":)" { SwitchTo (--commentNestingDepth==0 ? DEFAULT : IN_COMMENT) ; }
+} 
+
+<DEFAULT>
+SKIP :
+{ 
+  < [" ","\t","\r","\n"] >
+}
+
+<DEFAULT>
+TOKEN :
+{
+// delimiting terminal symbols  
+  < DOLLAR: "$" >
+| < PARANTHESIS_OPEN: "(" >
+| < PARANTHESIS_CLOSE: ")" >
+| < ASTERISK: "*" >
+| < PLUS: "+" >
+| < COMMA: "," >
+| < MINUS: "-" >
+| < DOT: "." >
+| < SLASH: "/" >
+| < COLON: ":" >
+| < EXPR_LT: "<" >
+| < EXPR_EQ: "=" >
+| < EXPR_GT: ">" >
+| < QUESTION_MARK: "?" >
+| < AT: "@" >
+| < BRACKET_OPEN: "[" >
+| < BRACKET_CLOSE: "]" >
+| < PIPE: "|" >
+| < EXPR_NE: "!=" >
+| < DOT_DOT: ".." >
+| < SLASH_SLASH: "//" >
+| < COLON_COLON: "::" >
+| < EXPR_SHL: "<<" >
+| < EXPR_LE: "<=" >
+| < EXPR_GE: ">=" >
+| < EXPR_SHR: ">>" >
+| < #ESCAPE_QUOT: "\"\"" >                    
+| < #ESCAPE_APOS: "''" >
+| < AS: "as" >
+| < EQ: "eq" >
+| < GE: "ge" >
+| < GT: "gt" >
+| < IF: "if" >
+| < IN: "in" >
+| < IS: "is" >
+| < LE: "le" >
+| < LT: "lt" >
+| < NE: "ne" >
+| < OF: "of" >
+| < OR: "or" >
+| < TO: "to" >
+| < AND: "and" >
+| < DIV: "div" >
+| < FOR: "for" >
+| < MOD: "mod" >
+| < CAST: "cast" >
+| < ELSE: "else" >
+| < IDIV: "idiv" >
+| < NODE: "node" >
+| < SELF: "self" >
+| < SOME: "some" >
+| < TEXT: "text" >
+| < THEN: "then" >
+| < CDATA: "cdata" >
+| < CHILD: "child" >
+| < EVERY: "every" >
+| < TREAT: "treat" >
+| < UNION: "union" >
+| < EXCEPT: "except" >
+| < PARENT: "parent" >
+| < RETURN: "return" >
+| < COMMENT: "comment" >
+| < DOCTYPE: "doctype" >
+| < ELEMENT: "element" >
+| < ANCESTOR: "ancestor" >
+| < CASTABLE: "castable" >
+| < EXTERNAL: "external" >
+| < INSTANCE: "instance" >
+| < ATTRIBUTE: "attribute" >
+| < FOLLOWING: "following" >
+| < INTERSECT: "intersect" >
+| < NAMESPACE: "namespace" >
+| < PRECEDING: "preceding" >
+| < SATISFIES: "satisfies" >
+| < DESCENDANT: "descendant" >
+| < DOCUMENT_NODE: "document-node" >
+| < EMPTY_SEQUENCE: "empty-sequence" >
+| < SCHEMA_ELEMENT: "schema-element" >
+| < ANCESTOR_OR_SELF: "ancestor-or-self" >                    
+| < SCHEMA_ATTRIBUTE: "schema-attribute" >
+| < FOLLOWING_SIBLING: "following-sibling" >
+| < PRECEDING_SIBLING: "preceding-sibling" >
+| < DESCENDANT_OR_SELF: "descendant-or-self" >
+| < PROCESSING_INSTRUCTION: "processing-instruction" >
+
+// private reg ex (no actions possible!)
+| < #DIGITS: ( ["0"-"9"] )+ >
+| < INTEGER_LITERAL: <DIGITS> >
+| < DECIMAL_LITERAL: <DOT> <DIGITS> 
+                   | <DIGITS> <DOT> <DIGITS>
+                   | <DIGITS> <DOT> >
+| < #DOUBLE_EXPONENT: ["e", "E"] ( <PLUS> | <MINUS> )? <DIGITS> >
+| < DOUBLE_LITERAL: ( <INTEGER_LITERAL> 
+                    | <DECIMAL_LITERAL> 
+                    ) 
+                    <DOUBLE_EXPONENT> >
+| < STRING1: "\"" ( <ESCAPE_QUOT> 
+                  | ~["\""]
+                  )* "\"" >
+| < STRING2: "'" ( <ESCAPE_APOS> 
+                 | ~["'"]
+                 )* "'" >
+// +  | "\u10000"-"\uEFFFF" ]> | < #NONASCII: ["\u0080"-"\uffff"]
+// Except the ":"
+| < #NC_NAME_START_CHAR: ["A"-"Z", "_", "a"-"z", "\u00C0"-"\u00D6", "\u00D8"-"\u00F6", "\u00F8"-"\u02FF", "\u0370"-"\u037D", "\u037F"-"\u1FFF", "\u200C"-"\u200D", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] >
+| < #NC_NAME_CHAR: <NC_NAME_START_CHAR>
+                 | ["-", ".", "0"-"9", "\u00B7", "\u0300"-"\u036F", "\u203F"-"\u2040"] >
+// +  "\u10000"-"\u10FFFF"  
+| < NC_NAME1: <NC_NAME_START_CHAR> >
+| < NC_NAME2: <NC_NAME_START_CHAR> ( <NC_NAME_CHAR> )+ >
+}
+
+<*> TOKEN:
+{
+  < UNKNOWN: ~[] >
+  {
+    s_aLogger.error("Illegal character: " + image.toString());
+  }
+}
+
+BigInteger IntegerLiteral() #void : {}
+{
+  <INTEGER_LITERAL> { return StringParser.parseBigInteger (token.image); } 
+}
+
+BigDecimal DoubleLiteral() #void : {}
+{
+  <DOUBLE_LITERAL> { return StringParser.parseBigDecimal (token.image); }
+}
+
+BigDecimal DecimalLiteral() #void : {}
+{
+  <DECIMAL_LITERAL> { return StringParser.parseBigDecimal (token.image); }
+}
+
+String StringLiteral() #void : {}
+{
+  <STRING1> { return STXParserHelper.getUnescapedStringDQ (token.image); }
+| <STRING2> { return STXParserHelper.getUnescapedStringSQ (token.image); }
+}
+
+String NCName() #void : {}
+{
+( <NC_NAME1>
+| <NC_NAME2>
+// add all valid tokens here as well  
+| <AS>
+| <EQ>
+| <GE>
+| <GT>
+//| <IF>
+| <IN>
+| <IS>
+| <LE>
+| <LT>
+| <NE>
+| <OF>
+| <OR>
+| <TO>
+| <AND>
+| <DIV>
+| <FOR>
+| <MOD>
+| <CAST>
+| <ELSE>
+| <IDIV>
+//| <NODE>
+| <SELF>
+| <SOME>
+//| <TEXT>
+| <THEN>
+//| <CDATA>
+| <CHILD>
+| <EVERY>
+| <TREAT>
+| <UNION>
+| <EXCEPT>
+| <PARENT>
+| <RETURN>
+//| <COMMENT>
+//| <DOCTYPE>
+// Leads to a grammar error when using: element(person, surgeon?)
+//| <ELEMENT>
+| <ANCESTOR>
+| <CASTABLE>
+| <EXTERNAL>
+| <INSTANCE>
+//| <ATTRIBUTE>
+| <FOLLOWING>
+| <INTERSECT>
+| <NAMESPACE>
+| <PRECEDING>
+| <SATISFIES>
+| <DESCENDANT>
+//| <DOCUMENT_NODE>
+//| <EMPTY_SEQUENCE>
+//| <SCHEMA_ELEMENT>
+| <ANCESTOR_OR_SELF>
+//| <SCHEMA_ATTRIBUTE>
+| <FOLLOWING_SIBLING>
+| <PRECEDING_SIBLING>
+| <DESCENDANT_OR_SELF>
+//| <PROCESSING_INSTRUCTION>
+)
+{ return token.image; }
+}
+
+ParserQName QName() #void : {
+  String s1, s2 = null;
+}
+{
+  s1 = NCName()
+  ( <COLON> 
+    s2 = NCName()
+  )?
+  { return ParserQName.create (s1, s2); }
+}
+
+//
+// whole STXPath
+//
+// [15]    	STXPath 	   ::=    	Expr?
+STXNode STXPath() #Root : {}
+{
+  ( Expr() )?
+  <EOF>
+  { return jjtThis; }
+}
+
+// [16]    	Expr 	   ::=    	ExprSingle ("," ExprSingle)*
+void Expr() : {}
+{
+  ExprSingle() 
+  ( <COMMA>
+    ExprSingle()
+  )*
+}
+
+// [17]    	ExprSingle 	   ::=    	ForExpr | QuantifiedExpr | IfExpr | OrExpr
+void ExprSingle() #void : {}
+{
+  LOOKAHEAD(2)
+  ForExpr()
+| LOOKAHEAD(2)
+  QuantifiedExpr() 
+| LOOKAHEAD(2)
+  IfExpr() 
+| OrExpr()
+}
+
+// [18]    	ForExpr 	   ::=    	SimpleForClause "return" ExprSingle
+void ForExpr() : {}
+{
+  SimpleForClause()
+  <RETURN>
+  ExprSingle()
+}
+
+// [19]    	SimpleForClause 	   ::=    	"for" "$" VarName "in" ExprSingle ("," "$" VarName "in" ExprSingle)*
+void SimpleForClause() : {}
+{
+  <FOR>
+  <DOLLAR>
+  VarName()
+  <IN>
+  ExprSingle()
+  ( <COMMA>
+    <DOLLAR>
+    VarName()
+    <IN> 
+    ExprSingle()
+  )*
+}
+
+void OpSomeEvery() : {}
+{
+  <SOME>   { jjtThis.setText (token.image); }
+| <EVERY>  { jjtThis.setText (token.image); }
+}
+
+// [20]    	QuantifiedExpr 	   ::=    	("some" | "every") "$" VarName "in" ExprSingle ("," "$" VarName "in" ExprSingle)* "satisfies" ExprSingle
+void QuantifiedExpr() : {}
+{
+  OpSomeEvery()
+  <DOLLAR>
+  VarName()
+  <IN>
+  ExprSingle()
+  ( <COMMA>
+    <DOLLAR>
+    VarName()
+    <IN> 
+    ExprSingle()
+  )* 
+  <SATISFIES>
+  ExprSingle()
+}
+
+// [21]    	IfExpr 	   ::=    	"if" "(" Expr ")" "then" ExprSingle "else" ExprSingle
+void IfExpr() : {}
+{
+  <IF>
+  <PARANTHESIS_OPEN>
+  Expr()
+  <PARANTHESIS_CLOSE>
+  <THEN>
+  ExprSingle()
+  <ELSE>
+  ExprSingle()
+}
+
+// [22]    	OrExpr 	   ::=    	AndExpr ( "or" AndExpr )*
+void OrExpr() : {}
+{
+  AndExpr()
+  ( <OR>
+    AndExpr()
+  )*  
+}
+
+// [23]    	AndExpr 	   ::=    	ComparisonExpr ( "and" ComparisonExpr )*
+void AndExpr() : {}
+{
+  ComparisonExpr()
+  ( <AND>
+    ComparisonExpr()
+  )*  
+}
+
+// [28]    	ComparisonExpr 	   ::=    	RangeExpr ( GeneralComp RangeExpr )?
+void ComparisonExpr() : {}
+{
+  RangeExpr()
+  ( GeneralComp()
+    RangeExpr()
+  )?  
+}
+
+// [29]    	RangeExpr 	   ::=    	AdditiveExpr ( "to" AdditiveExpr )?
+void RangeExpr() : {}
+{
+  AdditiveExpr()
+  ( <TO>
+    AdditiveExpr()
+  )?  
+}
+
+void OpPlusMinus() : {}
+{
+  <PLUS>  { jjtThis.setText (token.image); }
+| <MINUS> { jjtThis.setText (token.image); }
+}
+
+// [30]    	AdditiveExpr 	   ::=    	MultiplicativeExpr ( ("+" | "-") MultiplicativeExpr )*
+void AdditiveExpr() : {}
+{
+  MultiplicativeExpr()
+  ( OpPlusMinus()
+    MultiplicativeExpr()
+  )*  
+}
+
+void OpMultiply(): {}
+{
+  <ASTERISK> { jjtThis.setText (token.image); }
+| <DIV>      { jjtThis.setText (token.image); }
+| <IDIV>     { jjtThis.setText (token.image); }
+| <MOD>      { jjtThis.setText (token.image); }
+}
+
+// [31]    	MultiplicativeExpr 	   ::=    	UnaryExpr ( ("*" | "div" | "idiv" | "mod") UnaryExpr )*
+void MultiplicativeExpr() : {}
+{
+  UnaryExpr()
+  ( OpMultiply()
+    UnaryExpr()
+  )*  
+}
+
+void OpUnionPipe() : {}
+{
+  <UNION> { jjtThis.setText (token.image); }
+| <PIPE>  { jjtThis.setText (token.image); }
+}
+
+// [33]    	UnionExpr 	   ::=    	IntersectExceptExpr
+void UnionExpr() : {}
+{
+  IntersectExceptExpr()
+}
+
+void OpIntersectExcept() : {}
+{
+  <INTERSECT> { jjtThis.setText (token.image); }
+| <EXCEPT>    { jjtThis.setText (token.image); }
+}
+
+// [34]    	IntersectExceptExpr 	   ::=    	ValueExpr
+void IntersectExceptExpr() : {}
+{
+  ValueExpr()
+}
+
+// [24]    	InstanceofExpr 	   ::=    	TreatExpr
+void InstanceofExpr() : {}
+{
+  TreatExpr()
+}
+
+// [25]    	TreatExpr 	   ::=    	CastableExpr
+void TreatExpr() : {}
+{
+  CastableExpr()
+}
+
+// [26]    	CastableExpr 	   ::=    	CastExpr
+void CastableExpr() : {}
+{
+  CastExpr()
+}
+
+// [27]    	CastExpr 	   ::=    	ComparisonExpr
+void CastExpr() : {}
+{
+  ComparisonExpr()
+}
+
+// [32]    	UnaryExpr 	   ::=    	("-" | "+")* UnionExpr
+void UnaryExpr() : {}
+{
+  ( OpPlusMinus() )*
+  UnionExpr()
+}
+
+// [35]    	ValueExpr 	   ::=    	PathExpr | FilterStep
+void ValueExpr() : {}
+{
+( LOOKAHEAD(4)
+  FilterStep()
+| PathExpr() 
+)
+}
+
+// [45]    	GeneralComp 	   ::=    	"=" | "!=" | "<" | "<=" | ">" | ">="
+void GeneralComp() : {}
+{
+( <EXPR_EQ>
+| <EXPR_NE>
+| <EXPR_LT>
+| <EXPR_LE>
+| <EXPR_GT>
+| <EXPR_GE>
+)
+  { jjtThis.setText (token.image); }
+}
+
+// [36]    	PathExpr 	   ::=    	("/" RelativePathExpr?) | ("//" RelativePathExpr) | RelativePathExpr
+void PathExpr() : {}
+{
+  <SLASH>       { jjtThis.setText (token.image); }
+  ( LOOKAHEAD(2)
+    RelativePathExpr() 
+  )? 
+| <SLASH_SLASH> { jjtThis.setText (token.image); } 
+  RelativePathExpr()
+| RelativePathExpr()
+}
+
+void OpSlash() : {}
+{
+  <SLASH>       { jjtThis.setText (token.image); }
+| <SLASH_SLASH> { jjtThis.setText (token.image); }
+}
+
+// [37]    	RelativePathExpr 	   ::=    	StepExpr (("/" | "//") StepExpr)*
+void RelativePathExpr() : {}
+{
+  StepExpr()
+  ( OpSlash() 
+    StepExpr()
+  )*
+}
+
+// [38]    	StepExpr 	   ::=    	AxisStep
+void StepExpr() : {}
+{ 
+  AxisStep()
+}
+
+// [39]    	AxisStep 	   ::=    	(ReverseStep | ForwardStep)  Predicate?
+// XXX changed "Predicate" to "Predicate?"
+void AxisStep() : {}
+{
+  ( LOOKAHEAD(2)
+    ReverseStep()
+  | ForwardStep()
+  )
+  ( Predicate() )?
+}
+
+// [48]    	ForwardStep 	   ::=    	AbbrevForwardStep
+void ForwardStep() : {}
+{
+  AbbrevForwardStep()
+}
+
+void At() : {}
+{
+  <AT>
+}
+
+// [50]    	AbbrevForwardStep 	   ::=    	"@"? NodeTest
+void AbbrevForwardStep() : {}
+{
+  ( At() )?
+  NodeTest()
+}
+
+// [49]    	ReverseStep 	   ::=    	AbbrevReverseStep
+void ReverseStep() : {}
+{
+  AbbrevReverseStep()
+}
+
+// [51]    	AbbrevReverseStep 	   ::=    	".."
+void AbbrevReverseStep() : {}
+{
+  <DOT_DOT>
+}
+
+// [54]    	NodeTest 	   ::=    	KindTest | NameTest
+void NodeTest() : {}
+{
+  LOOKAHEAD(2)
+  KindTest()
+| NameTest()
+}
+
+// [55]    	NameTest 	   ::=    	QName | Wildcard
+void NameTest() : {
+  ParserQName q;
+}
+{
+  LOOKAHEAD(3)
+  q = QName()
+  { jjtThis.setValue (q); }
+| Wildcard()
+}
+
+// [56]    	Wildcard 	   ::=    	"*" | (NCName ":" "*") | ("*" ":" NCName)
+void Wildcard() : {
+  String s;
+}
+{
+  LOOKAHEAD(2)
+  <ASTERISK>
+| s = NCName()
+  { jjtThis.setText (s); }
+  <COLON>
+  <ASTERISK>
+  { jjtThis.setValue (Boolean.FALSE); }
+| <ASTERISK>
+  { jjtThis.setValue (Boolean.TRUE); }
+  <COLON>
+  s = NCName()
+  { jjtThis.setText (s); }
+}
+
+// [40]    	FilterStep 	   ::=    	PrimaryExpr Predicate*
+void FilterStep() : {}
+{
+  PrimaryExpr()
+  ( Predicate() )*
+}
+
+// [44]    	Predicate 	   ::=    	( "[" Expr "]" )
+// XXX ph changed from (...)? to (...) without "?"
+void Predicate() : {}
+{
+  <BRACKET_OPEN>
+  Expr()
+  <BRACKET_CLOSE>
+}
+
+// [42]    	PrimaryExpr 	   ::=    	Literal | VarRef | ParenthesizedExpr | ContextItemExpr | FunctionCall
+void PrimaryExpr() : {}
+{
+  Literal()
+| VarRef()
+| ParenthesizedExpr()
+| ContextItemExpr()
+| FunctionCall()
+}
+
+// [57]    	Literal 	   ::=    	NumericLiteral | StringLiteral
+void Literal() : {
+  Object o;
+}
+{
+  o = NumericLiteral() { jjtThis.setValue (o); }
+| o = StringLiteral()  { jjtThis.setValue (o); }
+}
+
+// [58]    	NumericLiteral 	   ::=    	IntegerLiteral | DecimalLiteral | DoubleLiteral
+Number NumericLiteral() #void : {
+  Number n;
+}
+{
+( n = IntegerLiteral()
+| n = DecimalLiteral()
+| n = DoubleLiteral()
+)
+  { return n; }
+}
+
+// [43]    	VarRef 	   ::=    	"$" VarName
+void VarRef() : {}
+{
+  <DOLLAR>
+  VarName()
+}
+
+// [12]    	VarName 	   ::=    	QName
+void VarName() : {
+  ParserQName q;
+}
+{
+  q = QName()
+  { jjtThis.setValue (q); }
+}
+
+// [59]    	ParenthesizedExpr 	   ::=    	"(" Expr? ")"
+void ParenthesizedExpr() : {}
+{
+  <PARANTHESIS_OPEN>
+  ( Expr() )?
+  <PARANTHESIS_CLOSE>
+}
+
+// [41]    	ContextItemExpr 	   ::=    	"."
+void ContextItemExpr() : {}
+{
+  <DOT>
+}
+
+// [60]    	FunctionCall 	   ::=    	QName "(" (ExprSingle ("," ExprSingle)*)? ")"
+void FunctionCall() : {
+  ParserQName q;
+}
+{
+  q = QName()
+  <PARANTHESIS_OPEN>
+  ( ExprSingle()
+    ( <COMMA> 
+      ExprSingle()
+    )*
+  )?
+  <PARANTHESIS_CLOSE>
+  { jjtThis.setValue (q); } 
+}
+
+// [54]    	KindTest 	   ::=    	PITest| CommentTest| TextTest| AnyKindTest | CdataTest | DoctypeTest
+void KindTest() : {}
+{
+  PITest()
+| CommentTest()
+| TextTest()
+| AnyKindTest()
+| CdataTest()
+| DoctypeTest()
+}
+
+// [78]     AnyKindTest      ::=      "node" "(" ")"
+void AnyKindTest() : {}
+{
+  <NODE>
+  <PARANTHESIS_OPEN>
+  <PARANTHESIS_CLOSE>
+}
+
+// [78a]     CdataTest      ::=      "cdata" "(" ")"
+void CdataTest() : {}
+{
+  <CDATA>
+  <PARANTHESIS_OPEN>
+  <PARANTHESIS_CLOSE>
+}
+
+// [78b]     DoctypeTest      ::=      "doctype" "(" ")"
+void DoctypeTest() : {}
+{
+  <DOCTYPE>
+  <PARANTHESIS_OPEN>
+  <PARANTHESIS_CLOSE>
+}
+
+// [77]    	TextTest 	   ::=    	"text" "(" ")"
+void TextTest() : {}
+{
+  <TEXT>
+  <PARANTHESIS_OPEN>
+  <PARANTHESIS_CLOSE>
+}
+
+// [76]    	CommentTest 	   ::=    	"comment" "(" ")"
+void CommentTest() : {}
+{
+  <COMMENT>
+  <PARANTHESIS_OPEN>
+  <PARANTHESIS_CLOSE>
+}
+
+// Hack to determine between NCName and String literal with quoting
+void PIStringLiteral() : {
+  String s;
+}
+{
+  s = StringLiteral()
+  { jjtThis.setText(s); }
+}
+
+// [74]    	PITest 	   ::=    	"processing-instruction" "(" (NCName | StringLiteral)? ")"
+void PITest() : {
+  String s = null;
+}
+{
+  <PROCESSING_INSTRUCTION>
+  <PARANTHESIS_OPEN>
+  ( s = NCName()
+  | PIStringLiteral()
+  )?
+  <PARANTHESIS_CLOSE>
+  { jjtThis.setText (s); }
+}
