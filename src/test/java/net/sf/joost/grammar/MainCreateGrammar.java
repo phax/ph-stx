@@ -1,5 +1,6 @@
 package net.sf.joost.grammar;
 
+import java.io.File;
 import java.io.IOException;
 
 import java_cup.internal_error;
@@ -20,5 +21,13 @@ public class MainCreateGrammar
                                             // "-nowarn",
                                             sBasePath + "PatternResolved.cup" };
     java_cup.Main.main (aArgs);
+
+    final String sDst = "src/main/java/net/sf/joost/grammar/";
+    File aDst = new File (sDst, "PatternParser.java");
+    aDst.delete ();
+    new File (aDst.getName ()).renameTo (aDst);
+    aDst = new File (sDst, "Sym.java");
+    aDst.delete ();
+    new File (aDst.getName ()).renameTo (aDst);
   }
 }

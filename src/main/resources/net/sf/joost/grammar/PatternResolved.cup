@@ -111,7 +111,7 @@ non terminal Tree   Expr, AndExpr, GeneralComp,
 non terminal String Name;
 
 /* Start symbol, replaced by Ant with the grammar name (Pattern or Expr)*/
-start with @@@START-NT@@@;
+start with Pattern;
 
 
 /* Grammar */
