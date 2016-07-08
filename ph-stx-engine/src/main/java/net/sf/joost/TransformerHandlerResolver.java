@@ -33,6 +33,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.stx.Value;
+
 /**
  * Basic interface for resolving external {@link TransformerHandler} objects.
  * <p>
@@ -107,7 +109,7 @@ public interface TransformerHandlerResolver
                               String base,
                               URIResolver uriResolver,
                               ErrorListener errorListener,
-                              Hashtable <String, Object> params) throws SAXException;
+                              Hashtable <String, Value> params) throws SAXException;
 
   /**
    * Resolves a {@link TransformerHandler} object for an external
@@ -140,7 +142,7 @@ public interface TransformerHandlerResolver
                               XMLReader reader,
                               URIResolver uriResolver,
                               ErrorListener errorListener,
-                              Hashtable <String, Object> params) throws SAXException;
+                              Hashtable <String, Value> params) throws SAXException;
 
   /**
    * Determines whether a requested filter is available or not, used by the STX

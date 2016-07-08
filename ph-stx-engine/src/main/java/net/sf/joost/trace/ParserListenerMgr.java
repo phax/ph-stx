@@ -41,7 +41,7 @@ public class ParserListenerMgr implements ParserListener
 {
 
   /** list of all registered {@link ParserListener} */
-  private List parserListeners = null;
+  private List <ParserListener> parserListeners = null;
 
   /** default constructor */
   public ParserListenerMgr ()
@@ -59,7 +59,7 @@ public class ParserListenerMgr implements ParserListener
 
   /**
    * Add a parserlistener (debugging and profiling).
-   * 
+   *
    * @param newParserListener
    *        A parserlistener to be added.
    */
@@ -70,7 +70,7 @@ public class ParserListenerMgr implements ParserListener
     TransformerImpl.DEBUG_MODE = true;
     if (parserListeners == null)
     {
-      parserListeners = new ArrayList ();
+      parserListeners = new ArrayList <> ();
     }
     // add new parserlistener
     parserListeners.add (newParserListener);
@@ -78,7 +78,7 @@ public class ParserListenerMgr implements ParserListener
 
   /**
    * Remove a parserlistener.
-   * 
+   *
    * @param oldParserListener
    *        A parserlistener to be removed.
    */
@@ -102,7 +102,7 @@ public class ParserListenerMgr implements ParserListener
     {
       for (int i = 0; i < parserListeners.size (); i++)
       {
-        final ParserListener pl = (ParserListener) parserListeners.get (i);
+        final ParserListener pl = parserListeners.get (i);
         pl.nodeCreated (node);
       }
     }
@@ -115,7 +115,7 @@ public class ParserListenerMgr implements ParserListener
     {
       for (int i = 0; i < parserListeners.size (); i++)
       {
-        final ParserListener pl = (ParserListener) parserListeners.get (i);
+        final ParserListener pl = parserListeners.get (i);
         pl.parseFinished ();
       }
     }

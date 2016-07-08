@@ -34,7 +34,7 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of DescTree represent a descendant step "//" in the syntax tree of a
  * pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
@@ -59,8 +59,7 @@ final public class DescTree extends ReversableTree
       {
         if (left.matches (context, top - 1, false))
           return true;
-        else
-          top--;
+        top--;
       }
     }
     return false;
@@ -98,14 +97,14 @@ final public class DescTree extends ReversableTree
         {
           ret = v1;
           for (last = v1; last.next != null; last = last.next)
-            ;
+          {}
         }
       }
     }
     if (ret != null)
       return ret;
-    else // empty sequence
-      return Value.VAL_EMPTY;
+    // empty sequence
+    return Value.VAL_EMPTY;
   }
 
   @Override

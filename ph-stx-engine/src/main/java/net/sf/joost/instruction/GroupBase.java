@@ -34,6 +34,7 @@ import java.util.Vector;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.instruction.TemplateFactory.Instance;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
@@ -43,7 +44,7 @@ import net.sf.joost.stx.Processor;
  * <code>GroupFactory.Instance</code>) and <code>stx:transform</code> (class
  * <code>TransformFactory.Instance</code>) elements. The
  * <code>stx:transform</code> root element is also a group.
- * 
+ *
  * @version $Revision: 2.17 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -74,19 +75,19 @@ abstract public class GroupBase extends NodeBase
    * Vector of all contained public templates in this group. Used only
    * temporarily during compiling the transformation sheet.
    */
-  private final Vector containedPublicTemplates;
+  private final Vector <Instance> containedPublicTemplates;
 
   /**
    * Vector of all contained group templates in this group. Used only
    * temporarily during compiling the transformation sheet.
    */
-  private Vector containedGroupTemplates;
+  private Vector <Instance> containedGroupTemplates;
 
   /**
    * Vector of all contained global templates in this group Used only
    * temporarily during compiling the transformation sheet.
    */
-  private Vector containedGlobalTemplates;
+  private Vector <Instance> containedGlobalTemplates;
 
   /**
    * Visible templates: templates from this group and public templates from
@@ -101,22 +102,22 @@ abstract public class GroupBase extends NodeBase
    * Table of all contained public and global procedures in this group Used only
    * temporarily during compiling the transformation sheet.
    */
-  private final Hashtable containedPublicProcedures;
+  private final Hashtable <String, net.sf.joost.instruction.ProcedureFactory.Instance> containedPublicProcedures;
 
   /** Table of the group procedures visible for this group */
-  Hashtable groupProcedures;
+  Hashtable <String, NodeBase> groupProcedures;
 
   /**
    * Table of all global procedures in the transformation sheet, stems from the
    * parent group
    */
-  Hashtable globalProcedures;
+  Hashtable <String, NodeBase> globalProcedures;
 
   /**
    * Visible procedures: procedures from this group and public templates from
    * subgroups
    */
-  public Hashtable visibleProcedures;
+  public Hashtable <String, NodeBase> visibleProcedures;
 
   /** Contained groups in this group */
   protected GroupBase [] containedGroups;
@@ -125,7 +126,7 @@ abstract public class GroupBase extends NodeBase
    * Table of named groups: key = group name, value = group object. All groups
    * will have a reference to the same singleton Hashtable.
    */
-  public Hashtable namedGroups;
+  public Hashtable <String, Object> namedGroups;
 
   /** parent group */
   public GroupBase parentGroup;
@@ -137,7 +138,7 @@ abstract public class GroupBase extends NodeBase
   public String groupName;
 
   /** Vector of the children */
-  protected Vector children = new Vector ();
+  protected Vector <NodeBase> children = new Vector<> ();
 
   // Constructor
   protected GroupBase (final String qName,
@@ -152,12 +153,12 @@ abstract public class GroupBase extends NodeBase
     this.passThrough = passThrough;
     this.stripSpace = stripSpace;
     this.recognizeCdata = recognizeCdata;
-    containedPublicTemplates = new Vector ();
-    containedGroupTemplates = new Vector ();
-    containedGlobalTemplates = new Vector ();
-    visibleProcedures = new Hashtable ();
-    containedPublicProcedures = new Hashtable ();
-    groupProcedures = new Hashtable ();
+    containedPublicTemplates = new Vector<> ();
+    containedGroupTemplates = new Vector<> ();
+    containedGlobalTemplates = new Vector<> ();
+    visibleProcedures = new Hashtable<> ();
+    containedPublicProcedures = new Hashtable<> ();
+    groupProcedures = new Hashtable<> ();
     if (parentGroup != null)
     {
       namedGroups = parentGroup.namedGroups;
@@ -175,7 +176,7 @@ abstract public class GroupBase extends NodeBase
   /**
    * Determines the visible templates for this group in pass 0 and the array of
    * group templates in pass 1.
-   * 
+   *
    * @exception SAXException
    *            if conflicts were encountered
    */
@@ -197,11 +198,11 @@ abstract public class GroupBase extends NodeBase
     final Object [] objs = children.toArray ();
     final int length = children.size ();
     // template vector
-    final Vector tvec = new Vector ();
+    final Vector <Instance> tvec = new Vector<> ();
     // group vector
-    final Vector gvec = new Vector ();
+    final Vector <GroupBase> gvec = new Vector<> ();
     // variable vector
-    final Vector vvec = new Vector ();
+    final Vector <VariableBase> vvec = new Vector<> ();
 
     for (int i = 0; i < length; i++)
     {
@@ -231,7 +232,7 @@ abstract public class GroupBase extends NodeBase
         if (objs[i] instanceof ProcedureFactory.Instance)
         {
           final ProcedureFactory.Instance p = (ProcedureFactory.Instance) objs[i];
-          NodeBase node = (NodeBase) visibleProcedures.get (p.expName);
+          NodeBase node = visibleProcedures.get (p.expName);
           if (node != null)
           {
             throw new SAXParseException ("Procedure '" +
@@ -246,8 +247,7 @@ abstract public class GroupBase extends NodeBase
                                          p.lineNo,
                                          p.colNo);
           }
-          else
-            visibleProcedures.put (p.expName, p);
+          visibleProcedures.put (p.expName, p);
           if (p.isPublic)
             containedPublicProcedures.put (p.expName, p);
           if (p.visibility == TemplateBase.GROUP_VISIBLE)
@@ -256,7 +256,7 @@ abstract public class GroupBase extends NodeBase
           }
           if (p.visibility == TemplateBase.GLOBAL_VISIBLE)
           {
-            node = (NodeBase) globalProcedures.get (p.expName);
+            node = globalProcedures.get (p.expName);
             if (node != null)
             {
               throw new SAXParseException ("Global procedure '" +
@@ -271,18 +271,17 @@ abstract public class GroupBase extends NodeBase
                                            p.lineNo,
                                            p.colNo);
             }
-            else
-              globalProcedures.put (p.expName, p);
+            globalProcedures.put (p.expName, p);
             // global means also group visible
             groupProcedures.put (p.expName, p);
           }
         }
         else
           if (objs[i] instanceof GroupBase)
-            gvec.addElement (objs[i]);
+            gvec.addElement ((GroupBase) objs[i]);
           else
             if (objs[i] instanceof VariableBase)
-              vvec.addElement (objs[i]);
+              vvec.addElement ((VariableBase) objs[i]);
     }
 
     // create group array
@@ -294,14 +293,14 @@ abstract public class GroupBase extends NodeBase
     for (final GroupBase containedGroup : containedGroups)
     {
       tvec.addAll (containedGroup.containedPublicTemplates);
-      final Hashtable pubProc = containedGroup.containedPublicProcedures;
-      for (final Enumeration e = pubProc.keys (); e.hasMoreElements ();)
+      final Hashtable <String, net.sf.joost.instruction.ProcedureFactory.Instance> pubProc = containedGroup.containedPublicProcedures;
+      for (final Enumeration <String> e = pubProc.keys (); e.hasMoreElements ();)
       {
         Object o;
         if (visibleProcedures.containsKey (o = e.nextElement ()))
         {
-          final ProcedureFactory.Instance p1 = (ProcedureFactory.Instance) pubProc.get (o);
-          final NodeBase p2 = (NodeBase) visibleProcedures.get (o);
+          final ProcedureFactory.Instance p1 = pubProc.get (o);
+          final NodeBase p2 = visibleProcedures.get (o);
           throw new SAXParseException ("Public procedure '" +
                                        p1.procName +
                                        "' conflicts with the procedure definition in line " +
@@ -376,11 +375,11 @@ abstract public class GroupBase extends NodeBase
     if (context.ancestorStack.isEmpty ())
       context.groupVars.put (this, new Stack ());
     else
-      shadowed = (Hashtable) ((Stack) context.groupVars.get (this)).peek ();
+      shadowed = context.groupVars.get (this).peek ();
 
     // new variable instances
     final Hashtable varTable = new Hashtable ();
-    ((Stack) context.groupVars.get (this)).push (varTable);
+    context.groupVars.get (this).push (varTable);
 
     context.currentGroup = this;
     for (final VariableBase groupVariable : groupVariables)
@@ -398,17 +397,17 @@ abstract public class GroupBase extends NodeBase
    */
   public void exitRecursionLevel (final Context context)
   {
-    ((Stack) context.groupVars.get (this)).pop ();
+    context.groupVars.get (this).pop ();
   }
 
   /**
    * Add the templates from <code>tVec</code> to the group templates of this
    * group and all sub-groups.
-   * 
+   *
    * @param tVec
    *        a Vector containing the templates
    */
-  protected void addGroupTemplates (final Vector tVec)
+  protected void addGroupTemplates (final Vector <Instance> tVec)
   {
     containedGroupTemplates.addAll (tVec);
     for (final GroupBase containedGroup : containedGroups)
@@ -418,22 +417,22 @@ abstract public class GroupBase extends NodeBase
   /**
    * Add the procedures from <code>pTable</code> to the group procedures of this
    * group and all sub-groups.
-   * 
+   *
    * @param pTable
    *        a Hashtable containing the procedures
    * @exception SAXParseException
    *            if one of the procedures is already defined
    */
-  protected void addGroupProcedures (final Hashtable pTable) throws SAXParseException
+  protected void addGroupProcedures (final Hashtable <String, NodeBase> pTable) throws SAXParseException
   {
     // compute the real groupProcedures table
-    for (final Enumeration e = pTable.keys (); e.hasMoreElements ();)
+    for (final Enumeration <String> e = pTable.keys (); e.hasMoreElements ();)
     {
       final Object key = e.nextElement ();
       if (groupProcedures.containsKey (key))
       {
         final ProcedureFactory.Instance p1 = (ProcedureFactory.Instance) pTable.get (key);
-        final NodeBase p2 = (NodeBase) groupProcedures.get (key);
+        final NodeBase p2 = groupProcedures.get (key);
         throw new SAXParseException ("Group procedure '" +
                                      p1.procName +
                                      "' conflicts with the procedure definition in line " +
@@ -459,9 +458,9 @@ abstract public class GroupBase extends NodeBase
    * field {@link #containedGlobalTemplates} will be set to <code>null</code>
    * afterwards to allow garbage collection.
    */
-  public Vector getGlobalTemplates ()
+  public Vector <Instance> getGlobalTemplates ()
   {
-    final Vector tmp = containedGlobalTemplates;
+    final Vector <Instance> tmp = containedGlobalTemplates;
     containedGlobalTemplates = null; // for memory reasons
     return tmp;
   }

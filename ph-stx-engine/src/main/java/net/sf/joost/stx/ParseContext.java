@@ -38,7 +38,7 @@ import net.sf.joost.stx.function.FunctionFactory;
 /**
  * Instances of this class provide context information while parsing an STX
  * document.
- * 
+ *
  * @version $Revision: 2.11 $ $Date: 2006/03/21 19:25:08 $
  * @author Oliver Becker
  */
@@ -48,7 +48,7 @@ public final class ParseContext
   public Locator locator;
 
   /** The set of namespaces currently in scope */
-  public Hashtable nsSet;
+  public Hashtable <String, String> nsSet;
 
   /** The error handler for the parser */
   private ErrorHandler errorHandler;

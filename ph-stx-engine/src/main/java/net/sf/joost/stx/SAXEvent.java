@@ -25,7 +25,7 @@
 package net.sf.joost.stx;
 
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.Map;
 
 import org.xml.sax.Attributes;
 
@@ -35,7 +35,7 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
 /**
  * SAXEvent stores all information attached to an incoming SAX event, it is the
  * representation of a node in STX.
- * 
+ *
  * @version $Revision: 1.20 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
@@ -58,7 +58,7 @@ final public class SAXEvent
   public String lName;
   public String qName; // PI->target, MAPPING->prefix
   public MutableAttributes attrs;
-  public Hashtable namespaces;
+  public Map <String, String> namespaces;
   public String value = "";
   // PI->data, MAPPING->uri, TEXT, ATTRIBUTES as usual
   // ELEMENT->text look-ahead
@@ -84,7 +84,7 @@ final public class SAXEvent
                                      final String qName,
                                      final Attributes attrs,
                                      final boolean mutable,
-                                     final Hashtable inScopeNamespaces)
+                                     final Map <String, String> inScopeNamespaces)
   {
     final SAXEvent event = new SAXEvent ();
     event.type = attrs != null ? ELEMENT : ELEMENT_END;
@@ -183,7 +183,7 @@ final public class SAXEvent
 
   /**
    * Enables the counting of child nodes.
-   * 
+   *
    * @param hasChildNodes
    *        <code>true</code>, if there are really child nodes;
    *        <code>false</code>, if only the counting has to be supported (e.g.

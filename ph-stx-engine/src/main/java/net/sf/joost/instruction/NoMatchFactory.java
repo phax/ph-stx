@@ -25,7 +25,6 @@
 package net.sf.joost.instruction;
 
 import java.util.HashMap;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -37,7 +36,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>no-match</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 1.3 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -80,7 +79,7 @@ public class NoMatchFactory extends FactoryBase
     {
       super.process (context);
       // store value for the regex-group function
-      ((Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP)).push (analyzeText.noMatchStr);
+      context.localRegExGroup.push (analyzeText.noMatchStr);
       // The next instruction has been set in stx:analyze-text, but
       // this stx:no-match may be interrupted by stx:process-xxx,
       // i.e. we need to store the info of a following stx:match here:
@@ -92,7 +91,7 @@ public class NoMatchFactory extends FactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      ((Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP)).pop ();
+      context.localRegExGroup.pop ();
       // restore the values for the following stx:match
       analyzeText.capSubstr = (String []) localFieldStack.pop ();
       nodeEnd.next = (AbstractInstruction) localFieldStack.pop ();

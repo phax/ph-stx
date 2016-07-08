@@ -232,10 +232,10 @@ public class production
   /**
    * Table of all productions. Elements are stored using their index as the key.
    */
-  protected static Hashtable _all = new Hashtable ();
+  protected static Hashtable <Integer, production> _all = new Hashtable <Integer, production> ();
 
   /** Access to all productions. */
-  public static Enumeration all ()
+  public static Enumeration <production> all ()
   {
     return _all.elements ();
   }
@@ -243,7 +243,7 @@ public class production
   /** Lookup a production by index. */
   public static production find (final int indx)
   {
-    return (production) _all.get (new Integer (indx));
+    return _all.get (new Integer (indx));
   }
 
   // Hm Added clear to clear all static fields

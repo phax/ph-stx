@@ -24,8 +24,6 @@
 
 package net.sf.joost.stx.function;
 
-import java.util.Enumeration;
-
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
@@ -87,9 +85,9 @@ final public class GetInScopePrefixes implements Instance
       return Value.VAL_EMPTY;
 
     Value ret = null, last = null;
-    for (final Enumeration en = e.namespaces.keys (); en.hasMoreElements ();)
+    for (final String en : e.namespaces.values ())
     {
-      v = new Value ((String) en.nextElement ());
+      v = new Value (en);
       if (last != null)
         last.next = v;
       else
@@ -98,8 +96,7 @@ final public class GetInScopePrefixes implements Instance
     }
     if (ret != null)
       return ret;
-    else
-                     // shouldn't happen: at least "xml" is always defined
-                     return Value.VAL_EMPTY;
+    // shouldn't happen: at least "xml" is always defined
+    return Value.VAL_EMPTY;
   }
 }

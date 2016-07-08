@@ -38,7 +38,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>template</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.11 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -125,7 +125,7 @@ public final class TemplateFactory extends FactoryBase
   // -----------------------------------------------------------------------
 
   /** The inner Instance class */
-  public final class Instance extends TemplateBase implements Comparable
+  public final class Instance extends TemplateBase implements Comparable <Instance>
   {
     /** The match pattern */
     private Tree match;
@@ -172,7 +172,7 @@ public final class TemplateFactory extends FactoryBase
     /**
      * Splits a match pattern that is a union into several template instances.
      * The match pattern of the object itself loses one union.
-     * 
+     *
      * @return a template Instance object without a union in its match pattern
      *         or <code>null</code>
      */
@@ -219,9 +219,9 @@ public final class TemplateFactory extends FactoryBase
      * Compares two templates according to their inverse priorities. This
      * results in a descending natural order with java.util.Arrays.sort()
      */
-    public int compareTo (final Object o)
+    public int compareTo (final Instance o)
     {
-      final double p = ((Instance) o).priority;
+      final double p = o.priority;
       return (p < priority) ? -1 : ((p > priority) ? 1 : 0);
     }
 

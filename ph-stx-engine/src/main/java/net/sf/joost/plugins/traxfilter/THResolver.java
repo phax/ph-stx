@@ -52,6 +52,7 @@ import net.sf.joost.TransformerHandlerResolver;
 import net.sf.joost.plugins.attributes.Attribute;
 import net.sf.joost.plugins.attributes.BooleanAttribute;
 import net.sf.joost.plugins.attributes.StringAttribute;
+import net.sf.joost.stx.Value;
 import net.sf.joost.trax.TrAXConstants;
 import net.sf.joost.trax.TransformerFactoryImpl;
 
@@ -199,7 +200,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
                                      final String base,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable <String, Object> params) throws SAXException
+                                     final Hashtable <String, Value> params) throws SAXException
   {
     if (!available (method))
       throw new SAXException ("Not supported filter-method:" + method);
@@ -276,7 +277,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
                                      final XMLReader reader,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable <String, Object> params) throws SAXException
+                                     final Hashtable <String, Value> params) throws SAXException
   {
     if (!available (method))
       throw new SAXException ("Not supported filter-method:" + method);
@@ -395,7 +396,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
    */
   protected TransformerHandler newTHOutOfTrAX (final String method,
                                                final Source source,
-                                               final Hashtable <String, Object> params,
+                                               final Hashtable <String, Value> params,
                                                final ErrorListener errorListener,
                                                final URIResolver uriResolver) throws SAXException
   {
@@ -525,7 +526,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
    * Set to the SAX TrAX Factory attributes by inspecting the given parameters
    * for those which are from TrAX namespace
    */
-  protected void setTraxFactoryAttributes (final SAXTransformerFactory saxtf, final Hashtable <String, Object> params)
+  protected void setTraxFactoryAttributes (final SAXTransformerFactory saxtf, final Hashtable <String, Value> params)
   {
     // loop over all parameters
     final Enumeration <String> e = params.keys ();
@@ -554,7 +555,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
    * @param th
    * @param params
    */
-  protected void prepareTh (final TransformerHandler th, final Hashtable <String, Object> params)
+  protected void prepareTh (final TransformerHandler th, final Hashtable <String, Value> params)
   {
     if (DEBUG)
       log.debug ("prepareTh()");
@@ -587,7 +588,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
    *
    * @param params
    */
-  protected void setFilterAttributes (final Hashtable <String, Object> params)
+  protected void setFilterAttributes (final Hashtable <String, Value> params)
   {
     if (DEBUG)
       log.debug ("setFilterAttributes()");

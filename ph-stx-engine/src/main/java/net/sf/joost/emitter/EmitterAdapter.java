@@ -25,6 +25,7 @@
 package net.sf.joost.emitter;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 
@@ -43,7 +44,7 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
  * Adapter that passes events from <code>ContentHandler</code> and
  * <code>LexicalHandler</code> to {@link Emitter}. Such an intermediate object
  * is needed because {@link Emitter} itself doesn't implement these interfaces.
- * 
+ *
  * @version $Revision: 1.3 $ $Date: 2009/03/15 13:21:48 $
  * @author Oliver Becker
  */
@@ -51,7 +52,7 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
 public class EmitterAdapter implements ContentHandler, LexicalHandler
 {
   private final Emitter emitter;
-  private final Hashtable nsTable = new Hashtable ();
+  private final Map <String, String> nsTable = new Hashtable <> ();
 
   private final NodeBase instruction;
 

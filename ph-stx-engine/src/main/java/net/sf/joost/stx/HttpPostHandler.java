@@ -47,7 +47,7 @@ import net.sf.joost.emitter.XmlEmitter;
 /**
  * Implements an HTTP POST connection with a {@link TransformerHandler}
  * interface.
- * 
+ *
  * @version $Revision: 2.3 $ $Date: 2008/06/15 08:11:22 $
  * @author Oliver Becker
  */
@@ -122,9 +122,10 @@ public class HttpPostHandler extends XmlEmitter implements TransformerHandler
       conn.setRequestProperty ("Content-Type", "text/xml");
       conn.connect ();
 
-      final PrintStream ps = new PrintStream (conn.getOutputStream (), false, "UTF-8");
-      ps.print (buffer.toString ());
-      ps.close ();
+      try (final PrintStream ps = new PrintStream (conn.getOutputStream (), false, "UTF-8"))
+      {
+        ps.print (buffer.toString ());
+      }
 
       final XMLReader parser = Processor.createXMLReader ();
       parser.setContentHandler (saxResult.getHandler ());

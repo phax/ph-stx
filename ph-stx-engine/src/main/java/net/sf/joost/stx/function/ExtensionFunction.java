@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -51,10 +52,10 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
 final public class ExtensionFunction implements Instance
 {
   /** the target class, identified by the namespace */
-  private Class targetClass;
+  private Class <?> targetClass;
 
   /** possible methods, should differ at most in formal parameter types */
-  private final ArrayList <Executable> candidateMethods = new ArrayList <> ();
+  private final List <Executable> candidateMethods = new ArrayList<> ();
 
   /** the number of provided parameters in the function call */
   private int paramCount = 0;
@@ -81,7 +82,7 @@ final public class ExtensionFunction implements Instance
    */
   ExtensionFunction (final String className,
                      final String lName,
-                     Tree args,
+                     final Tree args,
                      final Locator locator) throws SAXParseException
   {
     // identify the requested class
@@ -96,12 +97,13 @@ final public class ExtensionFunction implements Instance
 
     // Count parameters in args
     // Future: use static type information to preselect candidate methods
-    if (args != null)
+    Tree aArgs = args;
+    if (aArgs != null)
     {
       paramCount = 1;
-      while (args.type == Tree.LIST)
+      while (aArgs.type == Tree.LIST)
       {
-        args = args.left;
+        aArgs = aArgs.left;
         paramCount++;
       }
     }
@@ -127,10 +129,10 @@ final public class ExtensionFunction implements Instance
               throw new SAXParseException ("Cannot create an object, class " + targetClass + " is protected", locator);
 
       // look for a matching constructor
-      final Constructor [] constructors = targetClass.getConstructors ();
-      for (final Constructor constructor : constructors)
+      final Constructor <?> [] constructors = targetClass.getConstructors ();
+      for (final Constructor <?> constructor : constructors)
       {
-        final Constructor theConstructor = constructor;
+        final Constructor <?> theConstructor = constructor;
         if (!Modifier.isPublic (theConstructor.getModifiers ()))
           continue; // constructor is not public
         if (theConstructor.getParameterTypes ().length != paramCount)
@@ -205,29 +207,30 @@ final public class ExtensionFunction implements Instance
   }
 
   /** find and call the correct Java method */
-  public Value evaluate (final Context context, final int top, Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
   {
     // evaluate current parameters
     Value [] values = null;
+    Tree aArgs = args;
     if (paramCount > 0)
     {
       values = new Value [paramCount];
 
       for (int i = paramCount - 1; i > 0; i--)
       {
-        values[i] = args.right.evaluate (context, top);
-        args = args.left;
+        values[i] = aArgs.right.evaluate (context, top);
+        aArgs = aArgs.left;
       }
-      values[0] = args.evaluate (context, top);
+      values[0] = aArgs.evaluate (context, top);
     }
 
     if (isConstructor)
     {
       // this is a constructor call
-      Constructor theConstructor = null;
+      Constructor <?> theConstructor = null;
       final int methodNum = candidateMethods.size ();
       if (methodNum == 1)
-        theConstructor = (Constructor) candidateMethods.get (0);
+        theConstructor = (Constructor <?>) candidateMethods.get (0);
       else
       {
         // choose the best constructor depending on current parameters
@@ -239,9 +242,9 @@ final public class ExtensionFunction implements Instance
         boolean ambigous = false;
         for (int i = 0; i < methodNum; i++)
         {
-          final Constructor c = (Constructor) candidateMethods.get (i);
+          final Constructor <?> c = (Constructor <?>) candidateMethods.get (i);
           double distance = 0;
-          final Class [] paramTypes = c.getParameterTypes ();
+          final Class <?> [] paramTypes = c.getParameterTypes ();
           for (int j = 0; j < paramTypes.length; j++)
             distance += values[j].getDistanceTo (paramTypes[j]);
           // better fit?
@@ -266,7 +269,7 @@ final public class ExtensionFunction implements Instance
       } // end else (choose best constructor)
 
       // set current parameters
-      final Class [] formalParams = theConstructor.getParameterTypes ();
+      final Class <?> [] formalParams = theConstructor.getParameterTypes ();
       final Object [] currentParams = new Object [formalParams.length];
       for (int i = 0; i < formalParams.length; i++)
         currentParams[i] = values[i].toJavaObject (formalParams[i]);
@@ -296,117 +299,115 @@ final public class ExtensionFunction implements Instance
                                  ": " +
                                  err3.getTargetException ().toString ());
       }
-    } // end else (constructor invocation)
+    }
 
+    // method invocation
+    Method theMethod = null;
+    final int methodNum = candidateMethods.size ();
+    if (methodNum == 1)
+      theMethod = (Method) candidateMethods.get (0);
     else
-    { // method invocation
-      Method theMethod = null;
-      final int methodNum = candidateMethods.size ();
-      if (methodNum == 1)
-        theMethod = (Method) candidateMethods.get (0);
-      else
+    {
+      // choose the best method depending on current parameters
+      // (see comment for constructors above)
+      double minDistance = -1;
+      boolean ambigous = false;
+      for (int i = 0; i < methodNum; i++)
       {
-        // choose the best method depending on current parameters
-        // (see comment for constructors above)
-        double minDistance = -1;
-        boolean ambigous = false;
-        for (int i = 0; i < methodNum; i++)
+        final Method m = (Method) candidateMethods.get (i);
+        double distance = 0;
+        final Class <?> [] paramTypes = m.getParameterTypes ();
+        if (Modifier.isStatic (m.getModifiers ()))
         {
-          final Method m = (Method) candidateMethods.get (i);
-          double distance = 0;
-          final Class [] paramTypes = m.getParameterTypes ();
-          if (Modifier.isStatic (m.getModifiers ()))
-          {
-            for (int j = 0; j < paramTypes.length; j++)
-              distance += values[j].getDistanceTo (paramTypes[j]);
-          }
-          else
-          {
-            // first argument is the target object
-            distance = values[0].getDistanceTo (targetClass);
-            for (int j = 0; j < paramTypes.length; j++)
-              distance += values[j + 1].getDistanceTo (paramTypes[j]);
-          }
-          // better fit?
-          if (distance < minDistance || minDistance < 0)
-          {
-            minDistance = distance;
-            theMethod = m;
-            ambigous = false;
-          }
-          else
-            if (distance == minDistance)
-              ambigous = true;
+          for (int j = 0; j < paramTypes.length; j++)
+            distance += values[j].getDistanceTo (paramTypes[j]);
         }
-        if (minDistance == Double.POSITIVE_INFINITY)
-          throw new EvalException ("None of the Java methods in " +
-                                   targetClass.getName () +
-                                   " matches this function call to '" +
-                                   theMethod.getName () +
-                                   "'");
-        if (ambigous)
-          throw new EvalException ("There are several Java methods in " +
-                                   targetClass.getName () +
-                                   " that match function '" +
-                                   theMethod.getName () +
-                                   "' equally well");
-      } // end else (choose best method)
-
-      // set current parameters
-      Object theInstance = null;
-      final Class [] formalParams = theMethod.getParameterTypes ();
-      final Object [] currentParams = new Object [formalParams.length];
-      if (Modifier.isStatic (theMethod.getModifiers ()))
-      {
-        for (int i = 0; i < formalParams.length; i++)
-          currentParams[i] = values[i].toJavaObject (formalParams[i]);
-      }
-      else
-      {
-        // perform this additional check for the first parameter,
-        // because otherwise the error message is a little but
-        // misleading ("Conversion to ... is not supported")
-        if (methodNum == 1 && // haven't done this check in this case
-            values[0].getDistanceTo (targetClass) == Double.POSITIVE_INFINITY)
-          throw new EvalException ("First parameter in the function call to '" +
-                                   theMethod.getName () +
-                                   "' must be the object instance");
-
-        theInstance = values[0].toJavaObject (targetClass);
-
-        if (theInstance == null)
-          throw new EvalException ("Target object (first parameter) in the function call " +
-                                   "to '" +
-                                   theMethod.getName () +
-                                   "' is null");
-
-        for (int i = 0; i < formalParams.length; i++)
+        else
         {
-          currentParams[i] = values[i + 1].toJavaObject (formalParams[i]);
+          // first argument is the target object
+          distance = values[0].getDistanceTo (targetClass);
+          for (int j = 0; j < paramTypes.length; j++)
+            distance += values[j + 1].getDistanceTo (paramTypes[j]);
         }
+        // better fit?
+        if (distance < minDistance || minDistance < 0)
+        {
+          minDistance = distance;
+          theMethod = m;
+          ambigous = false;
+        }
+        else
+          if (distance == minDistance)
+            ambigous = true;
       }
-
-      // call method
-      try
-      {
-        return new Value (theMethod.invoke (theInstance, currentParams));
-      }
-      catch (final IllegalAccessException err1)
-      {
-        throw new EvalException ("Method access is illegal " + err1.getMessage (), err1);
-      }
-      catch (final IllegalArgumentException err2)
-      {
-        throw new EvalException ("Argument is of wrong type " + err2.getMessage (), err2);
-      }
-      catch (final InvocationTargetException err3)
-      {
-        throw new EvalException ("Exception in extension method '" +
+      if (minDistance == Double.POSITIVE_INFINITY)
+        throw new EvalException ("None of the Java methods in " +
+                                 targetClass.getName () +
+                                 " matches this function call to '" +
                                  theMethod.getName () +
-                                 "': " +
-                                 err3.getTargetException ().toString (),
-                                 err3);
+                                 "'");
+      if (ambigous)
+        throw new EvalException ("There are several Java methods in " +
+                                 targetClass.getName () +
+                                 " that match function '" +
+                                 theMethod.getName () +
+                                 "' equally well");
+    } // end else (choose best method)
+
+    // set current parameters
+    Object theInstance = null;
+    final Class <?> [] formalParams = theMethod.getParameterTypes ();
+    final Object [] currentParams = new Object [formalParams.length];
+    if (Modifier.isStatic (theMethod.getModifiers ()))
+    {
+      for (int i = 0; i < formalParams.length; i++)
+        currentParams[i] = values[i].toJavaObject (formalParams[i]);
+    }
+    else
+    {
+      // perform this additional check for the first parameter,
+      // because otherwise the error message is a little but
+      // misleading ("Conversion to ... is not supported")
+      if (methodNum == 1 && // haven't done this check in this case
+          values[0].getDistanceTo (targetClass) == Double.POSITIVE_INFINITY)
+        throw new EvalException ("First parameter in the function call to '" +
+                                 theMethod.getName () +
+                                 "' must be the object instance");
+
+      theInstance = values[0].toJavaObject (targetClass);
+
+      if (theInstance == null)
+        throw new EvalException ("Target object (first parameter) in the function call " +
+                                 "to '" +
+                                 theMethod.getName () +
+                                 "' is null");
+
+      for (int i = 0; i < formalParams.length; i++)
+      {
+        currentParams[i] = values[i + 1].toJavaObject (formalParams[i]);
       }
+    }
+
+    // call method
+    try
+    {
+      return new Value (theMethod.invoke (theInstance, currentParams));
+    }
+    catch (final IllegalAccessException err1)
+    {
+      throw new EvalException ("Method access is illegal " + err1.getMessage (), err1);
+    }
+    catch (final IllegalArgumentException err2)
+    {
+      throw new EvalException ("Argument is of wrong type " + err2.getMessage (), err2);
+    }
+    catch (final InvocationTargetException err3)
+    {
+      throw new EvalException ("Exception in extension method '" +
+                               theMethod.getName () +
+                               "': " +
+                               err3.getTargetException ().toString (),
+                               err3);
     }
   }
 

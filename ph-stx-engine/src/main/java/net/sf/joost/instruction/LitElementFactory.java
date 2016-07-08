@@ -42,7 +42,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for literal result elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.16 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -90,8 +90,8 @@ final public class LitElementFactory
     private final AttributesImpl attrs;
     private Tree [] avtList;
     // the namespaces that possibly need a declaration in the output
-    private Hashtable namespaces;
-    private final Hashtable namespaceAliases;
+    private Hashtable <String, String> namespaces;
+    private final Hashtable <String, String> namespaceAliases;
 
     protected Instance (final String uri,
                         final String lName,
@@ -100,7 +100,7 @@ final public class LitElementFactory
                         final Tree [] avtList,
                         final NodeBase parent,
                         final ParseContext context,
-                        final Hashtable newNamespaces)
+                        final Hashtable <String, String> newNamespaces)
     {
       super (qName, parent, context, true);
       this.uri = uri;
@@ -112,9 +112,9 @@ final public class LitElementFactory
       if (newNamespaces.size () > 0)
       {
         namespaces = newNamespaces; // no copy required
-        for (final Enumeration keys = namespaces.keys (); keys.hasMoreElements ();)
+        for (final Enumeration <String> keys = namespaces.keys (); keys.hasMoreElements ();)
         {
-          final String key = (String) keys.nextElement ();
+          final String key = keys.nextElement ();
           // remove the namespaces from exclude-result-prefixes
           if (context.transformNode.excludedNamespaces.contains (namespaces.get (key)))
             namespaces.remove (key);
@@ -167,7 +167,7 @@ final public class LitElementFactory
                                         return false;
 
       // Change namespace URI of this element
-      String toNS = (String) namespaceAliases.get (uri);
+      String toNS = namespaceAliases.get (uri);
       if (toNS != null)
       {
         uri = toNS;
@@ -193,7 +193,7 @@ final public class LitElementFactory
         // process only prefixed attributes
         if (aURI != "")
         {
-          toNS = (String) namespaceAliases.get (aURI);
+          toNS = namespaceAliases.get (aURI);
           if (toNS != null)
           {
             attrs.setURI (i, toNS);
@@ -218,11 +218,11 @@ final public class LitElementFactory
       if (namespaces != null)
       {
         // Change namespace URIs of in-scope namespaces
-        for (final Enumeration keys = namespaces.keys (); keys.hasMoreElements ();)
+        for (final Enumeration <String> keys = namespaces.keys (); keys.hasMoreElements ();)
         {
-          final Object key = keys.nextElement ();
-          final Object value = namespaces.get (key);
-          final Object alias = namespaceAliases.get (value);
+          final String key = keys.nextElement ();
+          final String value = namespaces.get (key);
+          final String alias = namespaceAliases.get (value);
           if (alias == "" || NamespaceSupport.XMLNS.equals (alias))
             namespaces.remove (key);
           else

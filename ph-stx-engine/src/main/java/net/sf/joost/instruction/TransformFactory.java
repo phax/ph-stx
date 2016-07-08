@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -38,7 +39,7 @@ import net.sf.joost.stx.Processor;
 /**
  * Factory for <code>transform</code> elements, which are represented by the
  * inner Instance class
- * 
+ *
  * @version $Revision: 2.17 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
@@ -49,14 +50,14 @@ public class TransformFactory extends FactoryBase
   private static final String [] PASS_THROUGH_VALUES = { "none", "text", "all" };
 
   /** allowed attributes for this element. */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   private static final String EXCLUDE_RESULT_PREFIXES = "exclude-result-prefixes";
 
   // Constructor
   public TransformFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("version");
     attrNames.add ("output-encoding");
     attrNames.add ("output-method");
@@ -135,7 +136,7 @@ public class TransformFactory extends FactoryBase
     final boolean recognizeCdata = getEnumAttValue ("recognize-cdata", attrs, YESNO_VALUES, context) != NO_VALUE;
 
     final String excludedPrefixes = attrs.getValue (EXCLUDE_RESULT_PREFIXES);
-    final HashSet excludedNamespaces = new HashSet ();
+    final HashSet <String> excludedNamespaces = new HashSet<> ();
     excludedNamespaces.add (STX_NS);
     if (excludedPrefixes != null)
     {
@@ -152,13 +153,12 @@ public class TransformFactory extends FactoryBase
                                          EXCLUDE_RESULT_PREFIXES +
                                          "' attribute",
                                          context.locator);
-          else
-            excludedNamespaces.addAll (context.nsSet.values ());
+          excludedNamespaces.addAll (context.nsSet.values ());
           break; // while
         }
         if ("#default".equals (prefix))
           prefix = "";
-        final Object ns = context.nsSet.get (prefix);
+        final String ns = context.nsSet.get (prefix);
         if (ns != null)
           excludedNamespaces.add (ns);
         else
@@ -205,7 +205,7 @@ public class TransformFactory extends FactoryBase
     public String outputEncoding;
     public String outputMethod;
     public String stxpathDefaultNamespace;
-    public HashSet excludedNamespaces;
+    public Set <String> excludedNamespaces;
 
     // used to transfer the list of compilable nodes from an included
     // STX sheet to the calling Parser object
@@ -221,7 +221,7 @@ public class TransformFactory extends FactoryBase
                      final byte passThrough,
                      final boolean stripSpace,
                      final boolean recognizeCdata,
-                     final HashSet excludedNamespaces)
+                     final Set <String> excludedNamespaces)
     {
       super (qName, parent, context, passThrough, stripSpace, recognizeCdata);
       if (parent == null)

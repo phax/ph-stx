@@ -45,7 +45,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
 
     /**
      * Create a character class
-     * 
+     *
      * @param containsBmp
      *        NONE, SOME, or ALL, depending on whether the character class
      *        contains all the BMP characters, some of the BMP characters, or
@@ -65,7 +65,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     /**
      * Determine whether this character class contains NONE, SOME, or ALL of the
      * BMP characters
-     * 
+     *
      * @return NONE, SOME, or ALL
      */
 
@@ -77,7 +77,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     /**
      * Determine whether this character class contains NONE, SOME, or ALL of the
      * non-BMP characters
-     * 
+     *
      * @return NONE, SOME, or ALL
      */
 
@@ -88,7 +88,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
 
     /**
      * Output a representation of this character class to the supplied buffer
-     * 
+     *
      * @param buf
      *        the supplied buffer
      */
@@ -130,7 +130,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
             needSep = true;
             outputBmp (buf);
           }
-          final List ranges = new ArrayList (10);
+          final List <Range> ranges = new ArrayList <> (10);
           addNonBmpRanges (ranges);
           sortRangeList (ranges);
           final String hi = highSurrogateRanges (ranges);
@@ -219,7 +219,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     /**
      * Output a representation of the subset of this character class that's
      * within the BMP, to a supplied buffer
-     * 
+     *
      * @param buf
      *        the supplied buffer
      */
@@ -229,7 +229,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     /**
      * Output a representation of the complement of the subset of this character
      * class that's within the BMP, to a supplied buffer
-     * 
+     *
      * @param buf
      *        the supplied buffer
      */
@@ -238,7 +238,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
 
     /**
      * If this character class contains a single character, get that character
-     * 
+     *
      * @return the single character matched by this character class, or -1 if it
      *         matches multiple characters
      */
@@ -251,11 +251,11 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     /**
      * Add ranges of non-BMP characters that are matched by this character
      * class. Default implementation does nothing.
-     * 
+     *
      * @param ranges
      */
 
-    public void addNonBmpRanges (final List ranges)
+    public void addNonBmpRanges (final List <Range> ranges)
     {}
   }
 
@@ -388,7 +388,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     }
 
     @Override
-    public void addNonBmpRanges (final List ranges)
+    public void addNonBmpRanges (final List <Range> ranges)
     {
       ranges.add (new Range (c, c));
     }
@@ -459,7 +459,7 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     }
 
     @Override
-    public void addNonBmpRanges (final List ranges)
+    public void addNonBmpRanges (final List <Range> ranges)
     {
       if (upper >= RegexData.NONBMP_MIN)
         ranges.add (new Range (lower < RegexData.NONBMP_MIN ? RegexData.NONBMP_MIN : lower, upper));
@@ -606,15 +606,15 @@ public abstract class SurrogateRegexTranslator extends RegexTranslator
     }
 
     @Override
-    public void addNonBmpRanges (final List ranges)
+    public void addNonBmpRanges (final List <Range> ranges)
     {
-      final List tem = new ArrayList (5);
+      final List <Range> tem = new ArrayList <> (5);
       cc.addNonBmpRanges (tem);
       sortRangeList (tem);
       int c = RegexData.NONBMP_MIN;
       for (int i = 0, len = tem.size (); i < len; i++)
       {
-        final Range r = (Range) tem.get (i);
+        final Range r = tem.get (i);
         if (r.getMin () > c)
           ranges.add (new Range (c, r.getMin () - 1));
         c = r.getMax () + 1;

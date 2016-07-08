@@ -33,7 +33,7 @@ import net.sf.joost.grammar.EvalException;
 
 /**
  * Container class for concrete values (of XPath types)
- * 
+ *
  * @version $Revision: 1.26 $ $Date: 2009/08/21 14:58:42 $
  * @author Oliver Becker
  */
@@ -128,7 +128,7 @@ public class Value implements Cloneable
   /**
    * Constructs a <code>Value</code> containing a node
    * (<code>{@link SAXEvent}</code>).
-   * 
+   *
    * @param e
    *        the event
    */
@@ -268,13 +268,10 @@ public class Value implements Cloneable
             return numberFormat.format (number);
           }
         }
-        else
-        {
-          String v = Double.toString (number);
-          if (v.endsWith (".0"))
-            v = v.substring (0, v.length () - 2);
-          return v;
-        }
+        String v = Double.toString (number);
+        if (v.endsWith (".0"))
+          v = v.substring (0, v.length () - 2);
+        return v;
       case OBJECT:
         return object != null ? object.toString () : "";
       default:
@@ -349,7 +346,7 @@ public class Value implements Cloneable
   /**
    * Creates a sequence by concatenating two values (which are possibly already
    * sequences
-   * 
+   *
    * @param v1
    *        first value (first part of the resulting sequence)
    * @param v2
@@ -366,15 +363,12 @@ public class Value implements Cloneable
         ret.next = v2;
         return ret;
       }
-      else
-      {
-        Value tmp = v1;
-        while (tmp.next.next != null)
-          tmp = tmp.next;
-        tmp.next = (Value) tmp.next.clone ();
-        tmp.next.next = v2;
-        return v1;
-      }
+      Value tmp = v1;
+      while (tmp.next.next != null)
+        tmp = tmp.next;
+      tmp.next = (Value) tmp.next.clone ();
+      tmp.next.next = v2;
+      return v1;
     }
     catch (final CloneNotSupportedException e)
     {
@@ -386,13 +380,13 @@ public class Value implements Cloneable
   /**
    * Determines the conversion distance of the contained value to the specified
    * target Java class. Lower results indicate higher preferences.
-   * 
+   *
    * @param target
    *        the class to which a conversion is desired
    * @return an individual distance value, or {@link Double#POSITIVE_INFINITY}
    *         if a conversion is not possible
    */
-  public double getDistanceTo (final Class target)
+  public double getDistanceTo (final Class <?> target)
   {
     if (type == OBJECT)
     {
@@ -531,12 +525,12 @@ public class Value implements Cloneable
 
   /**
    * Converts this value to a Java object.
-   * 
+   *
    * @return a Java object representing the current value
    * @exception EvalException
    *            if the conversion is not possible
    */
-  public Object toJavaObject (final Class target) throws EvalException
+  public Object toJavaObject (final Class <?> target) throws EvalException
   {
     if (target == Object.class)
     {
@@ -568,8 +562,8 @@ public class Value implements Cloneable
         if (target == List.class)
         {
           if (type == EMPTY)
-            return new ArrayList (0);
-          final ArrayList list = new ArrayList ();
+            return new ArrayList<> (0);
+          final ArrayList <Object> list = new ArrayList<> ();
           for (Value it = this; it != null; it = it.next)
             list.add (it.toJavaObject (Object.class));
           return list;
@@ -633,10 +627,9 @@ public class Value implements Cloneable
                                 final String s = getStringValue ();
                                 if (string.length () == 1)
                                   return new Character (s.charAt (0));
-                                else
-                                  throw new EvalException ("Cannot convert string '" +
-                                                           string +
-                                                           "' to character (length is not 1)");
+                                throw new EvalException ("Cannot convert string '" +
+                                                         string +
+                                                         "' to character (length is not 1)");
                               }
                               else
                                 throw new EvalException ("Conversion to " + target.getName () + " is not supported");

@@ -38,7 +38,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>while</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -46,12 +46,12 @@ import net.sf.joost.stx.ParseContext;
 final public class WhileFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public WhileFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("test");
   }
 

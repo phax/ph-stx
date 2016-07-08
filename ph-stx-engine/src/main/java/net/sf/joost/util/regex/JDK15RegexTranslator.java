@@ -363,22 +363,22 @@ public class JDK15RegexTranslator extends RegexTranslator
 
   static class Union extends CharClass
   {
-    private final List members;
+    private final List <CharClass> members;
 
     Union (final CharClass [] v)
     {
       this (toList (v));
     }
 
-    private static List toList (final CharClass [] v)
+    private static List <CharClass> toList (final CharClass [] v)
     {
-      final List members = new ArrayList (5);
+      final List <CharClass> members = new ArrayList <> (5);
       for (final CharClass element : v)
         members.add (element);
       return members;
     }
 
-    Union (final List members)
+    Union (final List <CharClass> members)
     {
       this.members = members;
     }
@@ -389,7 +389,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       buf.append ('[');
       for (int i = 0, len = members.size (); i < len; i++)
       {
-        final CharClass cc = (CharClass) members.get (i);
+        final CharClass cc = members.get (i);
         cc.output (buf);
       }
       buf.append (']');
@@ -402,7 +402,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       final int len = members.size ();
       for (int i = 0; i < len; i++)
       {
-        final CharClass cc = (CharClass) members.get (i);
+        final CharClass cc = members.get (i);
         if (cc instanceof SimpleCharClass)
         {
           if (first)
@@ -415,7 +415,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       }
       for (int i = 0; i < len; i++)
       {
-        final CharClass cc = (CharClass) members.get (i);
+        final CharClass cc = members.get (i);
         if (!(cc instanceof SimpleCharClass))
         {
           if (first)
@@ -588,14 +588,14 @@ public class JDK15RegexTranslator extends RegexTranslator
 
   private static CharClass makeCharClass (final String categories, final String includes, final String excludeRanges)
   {
-    final List includeList = new ArrayList (5);
+    final List <CharClass> includeList = new ArrayList <> (5);
     for (int i = 0, len = categories.length (); i < len; i += 2)
       includeList.add (new Property (categories.substring (i, i + 2)));
     for (int i = 0, len = includes.length (); i < len; i++)
     {
       int j = i + 1;
       for (; j < len && includes.charAt (j) - includes.charAt (i) == j - i; j++)
-        ;
+      {}
       --j;
       if (i == j - 1)
         --j;
@@ -605,7 +605,7 @@ public class JDK15RegexTranslator extends RegexTranslator
         includeList.add (new CharRange (includes.charAt (i), includes.charAt (j)));
       i = j;
     }
-    final List excludeList = new ArrayList (5);
+    final List <CharClass> excludeList = new ArrayList <> (5);
     for (int i = 0, len = excludeRanges.length (); i < len; i += 2)
     {
       final char min = excludeRanges.charAt (i);
@@ -809,7 +809,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     {
       compl = false;
     }
-    final List members = new ArrayList (10);
+    final List <CharClass> members = new ArrayList <> (10);
     // boolean firstOrLast = true;
     do
     {
@@ -903,7 +903,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
     CharClass result;
     if (members.size () == 1)
-      result = (CharClass) members.get (0);
+      result = members.get (0);
     else
       result = new Union (members);
     if (compl)
@@ -919,7 +919,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     return result;
   }
 
-  private void addCaseVariant (final CharClass lower, final List members)
+  private void addCaseVariant (final CharClass lower, final List <CharClass> members)
   {
     if (caseBlind)
     {
@@ -982,7 +982,7 @@ public class JDK15RegexTranslator extends RegexTranslator
 
   private static CharClass computeCategoryCharClass (final char code)
   {
-    final List classes = new ArrayList (5);
+    final List <CharClass> classes = new ArrayList <> (5);
     classes.add (new Property (new String (new char [] { code })));
     for (int ci = RegexData.CATEGORY_NAMES.indexOf (code); ci >= 0; ci = RegexData.CATEGORY_NAMES.indexOf (code,
                                                                                                            ci + 1))
@@ -1004,7 +1004,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       classes.add (new Subtraction (new Property ("Cn"),
                                     new Union (new CharClass [] { new SingleChar (RegexData.UNICODE_3_1_ADD_Lu),
                                                                   new SingleChar (RegexData.UNICODE_3_1_ADD_Ll) })));
-      final List assignedRanges = new ArrayList (5);
+      final List <CharClass> assignedRanges = new ArrayList <> (5);
       for (final int [] element : RegexData.CATEGORY_RANGES)
         for (int j = 0; j < element.length; j += 2)
           assignedRanges.add (new CharRange (element[j], element[j + 1]));
@@ -1012,7 +1012,7 @@ public class JDK15RegexTranslator extends RegexTranslator
                                     new Union (assignedRanges)));
     }
     if (classes.size () == 1)
-      return (CharClass) classes.get (0);
+      return classes.get (0);
     return new Union (classes);
   }
 
@@ -1025,7 +1025,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       if (name.equals ("Cn"))
       {
         // Unassigned
-        final List assignedRanges = new ArrayList (5);
+        final List <CharClass> assignedRanges = new ArrayList <> (5);
         assignedRanges.add (new SingleChar (RegexData.UNICODE_3_1_ADD_Lu));
         assignedRanges.add (new SingleChar (RegexData.UNICODE_3_1_ADD_Ll));
         for (final int [] element : RegexData.CATEGORY_RANGES)
@@ -1042,7 +1042,7 @@ public class JDK15RegexTranslator extends RegexTranslator
         return makeCharClass (RegexData.CATEGORY_Pf);
       return base;
     }
-    final List classes = new ArrayList (5);
+    final List <CharClass> classes = new ArrayList <> (5);
     classes.add (base);
     final int [] addRanges = RegexData.CATEGORY_RANGES[sci / 2];
     for (int i = 0; i < addRanges.length; i += 2)
@@ -1066,7 +1066,7 @@ public class JDK15RegexTranslator extends RegexTranslator
 
   private static CharClass makeCharClass (final String members)
   {
-    final List list = new ArrayList (5);
+    final List <CharClass> list = new ArrayList <> (5);
     for (int i = 0, len = members.length (); i < len; i++)
       list.add (new SingleChar (members.charAt (i)));
     return new Union (list);

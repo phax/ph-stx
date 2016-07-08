@@ -26,7 +26,6 @@ package net.sf.joost.grammar.tree;
 
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -42,7 +41,7 @@ import net.sf.joost.util.VariableUtils;
 /**
  * Objects of VarTree represent variable reference ('$var') nodes in the syntax
  * tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.6 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -67,7 +66,7 @@ final public class VarTree extends Tree
     final int colon = value.indexOf (":");
     if (colon != -1)
     {
-      uri = (String) context.nsSet.get (value.substring (0, colon));
+      uri = context.nsSet.get (value.substring (0, colon));
       if (uri == null)
       {
         throw new SAXParseException ("Undeclared prefix '" + value.substring (0, colon) + "'", context.locator);
@@ -107,7 +106,7 @@ final public class VarTree extends Tree
     }
 
     final Hashtable vars = (groupScope == null) ? context.localVars
-                                                : (Hashtable) ((Stack) context.groupVars.get (groupScope)).peek ();
+                                                : (Hashtable) context.groupVars.get (groupScope).peek ();
 
     final Value v1 = (Value) vars.get (expName);
     // create a copy if the result is a sequence

@@ -43,22 +43,13 @@ import net.sf.joost.util.regex.JRegularExpression;
 /**
  * Factory for <code>analyze-text</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 1.13 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
 
 final public class AnalyzeTextFactory extends FactoryBase
 {
-  /**
-   * Name of a special pseudo-variable that contains the values for the
-   * regex-group function. (Note: "normal" variables start always with a
-   * namespace in curly braces like '<code>{uri}name</code>')
-   * 
-   * @see net.sf.joost.stx.function.RegexGroup
-   */
-  public static String REGEX_GROUP = "%REGEX-GROUP";
-
   /** allowed attributes for this element */
   private final HashSet attrNames;
 
@@ -214,7 +205,7 @@ final public class AnalyzeTextFactory extends FactoryBase
     /**
      * For the regex-group function (accessed from the stx:match and
      * stx:no-match children, so they cannot be private)
-     * 
+     *
      * @see net.sf.joost.stx.function.RegexGroup
      */
     protected String [] capSubstr, noMatchStr;
@@ -243,8 +234,8 @@ final public class AnalyzeTextFactory extends FactoryBase
         text = select.evaluate (context, this).getStringValue ();
         lastIndex = 0;
         // create a pseudo variable for regex-group()
-        if (context.localVars.get (REGEX_GROUP) == null)
-          context.localVars.put (REGEX_GROUP, new Stack ());
+        if (context.localRegExGroup == null)
+          context.localRegExGroup = new Stack <> ();
         matchers = new Matcher [matchChildren.length];
         for (int i = 0; i < matchChildren.length; i++)
         {

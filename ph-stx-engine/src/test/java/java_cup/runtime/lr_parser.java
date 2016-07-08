@@ -473,18 +473,18 @@ public abstract class lr_parser
 
   /**
    * We need this Method in order to resolve names for symbol IDs
-   * 
+   *
    * @return the class that keeps all the symbols
    */
-  public Class getSymbolContainer ()
+  public Class <?> getSymbolContainer ()
   {
     return null;
-  };
+  }
 
   protected void report_expected_token_ids ()
   {
     final List <Integer> ids = expected_token_ids ();
-    final LinkedList <String> list = new LinkedList <> ();
+    final LinkedList <String> list = new LinkedList<> ();
     for (final Integer expected : ids)
     {
       list.add (symbl_name_from_id (expected));
@@ -494,7 +494,7 @@ public abstract class lr_parser
 
   /**
    * Translates numerical symbol ids to the (non)terminal names from the spec
-   * 
+   *
    * @param internal
    *        id for (non)terminal
    * @return (non)terminal name as string
@@ -523,12 +523,12 @@ public abstract class lr_parser
 
   /**
    * Return the expected symbol during this state of state of the parser
-   * 
+   *
    * @return list of integer (non)temrinal ids
    */
   public List <Integer> expected_token_ids ()
   {
-    final List <Integer> ret = new LinkedList <> ();
+    final List <Integer> ret = new LinkedList<> ();
     final int parse_state = ((Symbol) stack.peek ()).parse_state;
     final short [] row = action_tab[parse_state];
     for (int i = 0; i < row.length; i += 2)

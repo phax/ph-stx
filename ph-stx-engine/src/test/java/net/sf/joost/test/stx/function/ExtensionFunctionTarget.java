@@ -72,6 +72,6 @@ public class ExtensionFunctionTarget
 
   public void exc ()
   {
-    throw new ExtensionFunctionException ();
+    throw new MockExtensionFunctionException ();
   }
 }

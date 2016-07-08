@@ -35,7 +35,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * already-constructed DOM Document and walking around it in a depth-first
  * traversal, calling a SAX-compliant ContentHandler to process the children as
  * it does so.
- * 
+ *
  * @author MHK, 5 Jun 1998
  * @version 20 Jan 1999 modified to use AttributeListWrapper class
  * @version 3 February 2000 modified to use AttributeCollection class
@@ -52,13 +52,13 @@ public class DOMDriver implements Locator, XMLReader
   private final AttributesImpl attlist = new AttributesImpl ();
   private final String [] parts = new String [3];
   private final String [] elparts = new String [3];
-  private final Hashtable nsDeclarations = new Hashtable ();
+  private final Hashtable <String, String> nsDeclarations = new Hashtable<> ();
   protected Node root = null;
   protected String systemId;
 
   /**
    * Set the content handler.
-   * 
+   *
    * @param handler
    *        The object to receive content events. If this also implements
    *        LexicalHandler, it will also be notified of comments.
@@ -81,7 +81,7 @@ public class DOMDriver implements Locator, XMLReader
   /**
    * <b>SAX1</b>: Sets the locale used for diagnostics; currently, only locales
    * using the English language are supported.
-   * 
+   *
    * @param locale
    *        The locale for which diagnostics will be generated
    */
@@ -118,7 +118,7 @@ public class DOMDriver implements Locator, XMLReader
 
   /**
    * <b>SAX1, SAX2</b>: Set the DTD handler for this parser.
-   * 
+   *
    * @param handler
    *        The object to receive DTD events.
    */
@@ -141,7 +141,7 @@ public class DOMDriver implements Locator, XMLReader
 
   /**
    * <b>SAX1, SAX2</b>: Set the error handler for this parser.
-   * 
+   *
    * @param handler
    *        The object to receive error events.
    */
@@ -190,7 +190,7 @@ public class DOMDriver implements Locator, XMLReader
 
   /**
    * Walk a document (traversing the nodes depth first)
-   * 
+   *
    * @exception SAXException
    *            On any error in the document
    */
@@ -214,7 +214,7 @@ public class DOMDriver implements Locator, XMLReader
 
   /**
    * Walk a node of a document (traversing the children depth first)
-   * 
+   *
    * @param node
    *        The DOM Node object to walk
    * @exception SAXException
@@ -472,10 +472,7 @@ public class DOMDriver implements Locator, XMLReader
     {
       return lexicalHandler;
     }
-    else
-    {
-      throw new SAXNotRecognizedException (name);
-    }
+    throw new SAXNotRecognizedException (name);
   }
 
   /**
@@ -486,59 +483,44 @@ public class DOMDriver implements Locator, XMLReader
                                                                     SAXNotSupportedException
   {
     if ((FEATURE + "validation").equals (featureId))
+    {
       if (on)
-      {
         throw new SAXNotSupportedException (featureId + " feature cannot be switched on");
-      }
-      else
-      {
-        return;
-      }
+      return;
+    }
 
     // external entities (both types) are currently always excluded
     if ((FEATURE + "external-general-entities").equals (featureId) ||
         (FEATURE + "external-parameter-entities").equals (featureId))
+    {
       if (on)
-      {
         throw new SAXNotSupportedException (featureId + " feature cannot be switched on");
-      }
-      else
-      {
-        return;
-      }
+      return;
+    }
 
     // element/attribute names are as namespace-sensitive
     if ((FEATURE + "namespace-prefixes").equals (featureId))
+    {
       if (on)
-      {
         throw new SAXNotSupportedException (featureId + " feature cannot be switched on");
-      }
-      else
-      {
-        return;
-      }
+      return;
+    }
 
     // report element/attribute namespaces?
     if ((FEATURE + "namespaces").equals (featureId))
+    {
       if (!on)
-      {
         throw new SAXNotSupportedException (featureId + " feature cannot be switched off");
-      }
-      else
-      {
-        return;
-      }
+      return;
+    }
 
     // always interns: no
     if ((FEATURE + "string-interning").equals (featureId))
+    {
       if (on)
-      {
         throw new SAXNotSupportedException (featureId + " feature cannot be switched on");
-      }
-      else
-      {
-        return;
-      }
+      return;
+    }
 
     throw new SAXNotRecognizedException ("Feature not recognized: " + featureId);
   }

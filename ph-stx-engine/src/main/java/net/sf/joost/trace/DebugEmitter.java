@@ -26,7 +26,7 @@ package net.sf.joost.trace;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Hashtable;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.xml.sax.Attributes;
@@ -175,7 +175,7 @@ public class DebugEmitter extends Emitter
                             final String lName,
                             final String qName,
                             final Attributes attrs,
-                            final Hashtable namespaces,
+                            final Map <String, String> namespaces,
                             final NodeBase instruction) throws SAXException
   {
     if (log.isDebugEnabled ())

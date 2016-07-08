@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import net.sf.joost.Constants;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.trax.TrAXConstants;
 
@@ -52,7 +51,7 @@ import net.sf.joost.trax.TrAXConstants;
  * @version $Revision: 1.32 $ $Date: 2008/10/06 13:31:41 $
  * @author Oliver Becker
  */
-public abstract class StreamEmitter extends StxEmitterBase implements Constants
+public abstract class StreamEmitter extends StxEmitterBase
 {
   // Logger initialization
   private static Logger log = OptionalLog.getLog (StreamEmitter.class);

@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
@@ -36,7 +37,7 @@ import net.sf.joost.stx.Processor;
 /**
  * Factory for <code>group</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.8 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
@@ -53,12 +54,12 @@ final public class GroupFactory extends FactoryBase
   private static final String [] YESNO_INHERIT_VALUES = { "yes", "no", "inherit" };
 
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public GroupFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("name");
     attrNames.add ("pass-through");
     attrNames.add ("recognize-cdata");
@@ -88,7 +89,7 @@ final public class GroupFactory extends FactoryBase
     {
       groupName = getExpandedName (nameAtt, context);
 
-      final Hashtable namedGroups = ((GroupBase) parent).namedGroups;
+      final Hashtable <String, Object> namedGroups = ((GroupBase) parent).namedGroups;
       if (namedGroups.get (groupName) != null)
         throw new SAXParseException ("Group name '" + nameAtt + "' already used", context.locator);
       else
@@ -181,7 +182,7 @@ final public class GroupFactory extends FactoryBase
 
     /**
      * Checks for allowed children before inserting them.
-     * 
+     *
      * @param node
      *        the child to adopt
      */

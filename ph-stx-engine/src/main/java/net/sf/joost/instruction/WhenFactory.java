@@ -38,7 +38,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>when</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.13 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -46,14 +46,14 @@ import net.sf.joost.stx.ParseContext;
 final public class WhenFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   //
   // Constructor
   //
   public WhenFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("test");
   }
 

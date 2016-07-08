@@ -22,7 +22,7 @@ public class non_terminal extends symbol
 
   /**
    * Full constructor.
-   * 
+   *
    * @param nm
    *        the name of the non terminal.
    * @param tp
@@ -55,7 +55,7 @@ public class non_terminal extends symbol
 
   /**
    * Constructor with default type.
-   * 
+   *
    * @param nm
    *        the name of the non terminal.
    */
@@ -72,7 +72,7 @@ public class non_terminal extends symbol
    * Table of all non-terminals -- elements are stored using name strings as the
    * key
    */
-  protected static Hashtable _all = new Hashtable ();
+  protected static Hashtable <String, non_terminal> _all = new Hashtable <> ();
 
   // Hm Added clear to clear all static fields
   public static void clear ()
@@ -84,7 +84,7 @@ public class non_terminal extends symbol
   }
 
   /** Access to all non-terminals. */
-  public static Enumeration all ()
+  public static Enumeration <non_terminal> all ()
   {
     return _all.elements ();
   }
@@ -95,20 +95,20 @@ public class non_terminal extends symbol
     if (with_name == null)
       return null;
     else
-      return (non_terminal) _all.get (with_name);
+      return _all.get (with_name);
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Table of all non terminals indexed by their index number. */
-  protected static Hashtable _all_by_index = new Hashtable ();
+  protected static Hashtable <Integer, non_terminal> _all_by_index = new Hashtable <> ();
 
   /** Lookup a non terminal by index. */
   public static non_terminal find (final int indx)
   {
     final Integer the_indx = new Integer (indx);
 
-    return (non_terminal) _all_by_index.get (the_indx);
+    return _all_by_index.get (the_indx);
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -146,7 +146,7 @@ public class non_terminal extends symbol
   /**
    * Method for creating a new uniquely named hidden non-terminal using the
    * given string as a base for the name (or "NT$" if null is passed).
-   * 
+   *
    * @param prefix
    *        base name to construct unique name from.
    */
@@ -179,7 +179,8 @@ public class non_terminal extends symbol
   {
     boolean change = true;
     non_terminal nt;
-    Enumeration e;
+    Enumeration <non_terminal> e;
+    Enumeration <production> e2;
     production prod;
 
     /* repeat this process until there is no change */
@@ -191,7 +192,7 @@ public class non_terminal extends symbol
       /* consider each non-terminal */
       for (e = all (); e.hasMoreElements ();)
       {
-        nt = (non_terminal) e.nextElement ();
+        nt = e.nextElement ();
 
         /* only look at things that aren't already marked nullable */
         if (!nt.nullable ())
@@ -206,9 +207,9 @@ public class non_terminal extends symbol
     }
 
     /* do one last pass over the productions to finalize all of them */
-    for (e = production.all (); e.hasMoreElements ();)
+    for (e2 = production.all (); e2.hasMoreElements ();)
     {
-      prod = (production) e.nextElement ();
+      prod = e2.nextElement ();
       prod.set_nullable (prod.check_nullable ());
     }
   }
@@ -222,8 +223,8 @@ public class non_terminal extends symbol
   public static void compute_first_sets () throws internal_error
   {
     boolean change = true;
-    Enumeration n;
-    Enumeration p;
+    Enumeration <non_terminal> n;
+    Enumeration <production> p;
     non_terminal nt;
     production prod;
     terminal_set prod_first;
@@ -237,12 +238,12 @@ public class non_terminal extends symbol
       /* consider each non-terminal */
       for (n = all (); n.hasMoreElements ();)
       {
-        nt = (non_terminal) n.nextElement ();
+        nt = n.nextElement ();
 
         /* consider every production of that non terminal */
         for (p = nt.productions (); p.hasMoreElements ();)
         {
-          prod = (production) p.nextElement ();
+          prod = p.nextElement ();
 
           /* get the updated first of that production */
           prod_first = prod.check_first_set ();
@@ -263,10 +264,10 @@ public class non_terminal extends symbol
   /*-----------------------------------------------------------*/
 
   /** Table of all productions with this non terminal on the LHS. */
-  protected Hashtable _productions = new Hashtable (11);
+  protected Hashtable <production, production> _productions = new Hashtable <> (11);
 
   /** Access to productions with this non terminal on the LHS. */
-  public Enumeration productions ()
+  public Enumeration <production> productions ()
   {
     return _productions.elements ();
   }
@@ -331,9 +332,9 @@ public class non_terminal extends symbol
   protected boolean looks_nullable () throws internal_error
   {
     /* look and see if any of the productions now look nullable */
-    for (final Enumeration e = productions (); e.hasMoreElements ();)
+    for (final Enumeration <production> e = productions (); e.hasMoreElements ();)
       /* if the production can go to empty, we are nullable */
-      if (((production) e.nextElement ()).check_nullable ())
+      if (e.nextElement ().check_nullable ())
         return true;
 
     /* none of the productions can go to empty, so we are not nullable */

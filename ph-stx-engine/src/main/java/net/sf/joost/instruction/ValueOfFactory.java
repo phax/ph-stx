@@ -39,7 +39,7 @@ import net.sf.joost.stx.Value;
 /**
  * Factory for <code>value-of</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -47,12 +47,12 @@ import net.sf.joost.stx.Value;
 final public class ValueOfFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public ValueOfFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("select");
     attrNames.add ("separator");
   }

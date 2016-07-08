@@ -30,8 +30,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -52,7 +51,7 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
  * Emitter acts as a filter between the Processor and the real SAX output
  * handler. It maintains a stack of in-scope namespaces and sends corresponding
  * events to the real output handler.
- * 
+ *
  * @version $Revision: 1.38 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
@@ -65,11 +64,11 @@ public class Emitter implements Constants
 
   // for namespace handling
   private final NamespaceSupport nsSupport;
-  private final Stack nsStack;
+  private final Stack <String> nsStack;
   private String nsDefault;
 
   /** Stack for emitted start events, allows well-formedness check */
-  private final Stack openedElements;
+  private final Stack <String> openedElements;
 
   /**
    * Previous emitter. A new one will be created for each new result event
@@ -89,9 +88,9 @@ public class Emitter implements Constants
   {
     nsSupport = new NamespaceSupport ();
     nsDefault = "";
-    nsStack = new Stack ();
+    nsStack = new Stack<> ();
 
-    openedElements = new Stack ();
+    openedElements = new Stack<> ();
     this.errorHandler = errorHandler;
   }
 
@@ -108,7 +107,7 @@ public class Emitter implements Constants
   /**
    * Put the current emitter object on a stack and return a new emitter, which
    * uses the given handler. This method may be overridden.
-   * 
+   *
    * @param handler
    *        the STX handler for the new emitter
    * @return a new emitter object
@@ -160,7 +159,7 @@ public class Emitter implements Constants
 
   /**
    * Adds a dynamic created attribute (via <code>stx:attribute</code>)
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -217,7 +216,7 @@ public class Emitter implements Constants
 
   /**
    * Closes a document.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -244,7 +243,7 @@ public class Emitter implements Constants
 
   /**
    * Opens a new element.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -252,7 +251,7 @@ public class Emitter implements Constants
                             final String lName,
                             final String qName,
                             final Attributes attrs,
-                            final Hashtable namespaces,
+                            final Map <String, String> namespaces,
                             final NodeBase instruction) throws SAXException
   {
     if (contH != null)
@@ -300,10 +299,10 @@ public class Emitter implements Constants
       if (namespaces != null)
       {
         // does #namespaces contain undeclared namespaces?
-        for (final Enumeration e = namespaces.keys (); e.hasMoreElements ();)
+        for (final Map.Entry <String, String> e : namespaces.entrySet ())
         {
-          final String thePrefix = (String) e.nextElement ();
-          final String theUri = (String) namespaces.get (thePrefix);
+          final String thePrefix = e.getKey ();
+          final String theUri = e.getValue ();
           if ("".equals (thePrefix))
           { // default namespace
             if (!theUri.equals (nsDefault))
@@ -332,7 +331,7 @@ public class Emitter implements Constants
 
   /**
    * Closes an element.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -357,8 +356,8 @@ public class Emitter implements Constants
                                  instruction.colNo);
         return; // if #errorHandler returns
       }
-      final String elQName = (String) openedElements.pop ();
-      final String elUri = (String) openedElements.pop ();
+      final String elQName = openedElements.pop ();
+      final String elUri = openedElements.pop ();
       if (!qName.equals (elQName))
       {
         errorHandler.fatalError ("Attempt to emit unmatched end tag '" +
@@ -394,7 +393,7 @@ public class Emitter implements Constants
 
       // send endPrefixMapping events, prefixes are on #nsStack
       nsSupport.popContext ();
-      String thePrefix = (String) nsStack.pop ();
+      String thePrefix = nsStack.pop ();
       while (thePrefix != null)
       { // null is the marker for a new context
         contH.endPrefixMapping (thePrefix);
@@ -404,14 +403,14 @@ public class Emitter implements Constants
           if (nsDefault == null)
             nsDefault = "";
         }
-        thePrefix = (String) nsStack.pop ();
+        thePrefix = nsStack.pop ();
       }
     }
   }
 
   /**
    * Emits characters.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -461,7 +460,7 @@ public class Emitter implements Constants
 
   /**
    * Creates a processing instruction.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -491,7 +490,7 @@ public class Emitter implements Constants
 
   /**
    * Creates a comment.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -522,7 +521,7 @@ public class Emitter implements Constants
 
   /**
    * Creates a CDATA section.
-   * 
+   *
    * @param instruction
    *        the instruction that causes this method invocation
    */
@@ -612,7 +611,7 @@ public class Emitter implements Constants
   /**
    * Provides a <code>Writer</code> object that will be used for
    * <code>stx:result-document</code> instructions.
-   * 
+   *
    * @param href
    *        the filename
    * @param encoding

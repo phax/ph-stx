@@ -25,6 +25,7 @@
 package net.sf.joost.stx;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -124,10 +125,10 @@ public class Processor extends XMLFilterImpl
   private SAXEvent lastElement = null;
 
   /** The namespaces of the current scope */
-  private Hashtable inScopeNamespaces;
+  private Hashtable <String, String> inScopeNamespaces;
 
   /** The namespace context as a stack */
-  private final Stack namespaceContext = new Stack ();
+  private final Stack <Hashtable <String, String>> namespaceContext = new Stack <> ();
 
   /** Flag that controls namespace contexts */
   private boolean nsContextActive = false;
@@ -140,14 +141,14 @@ public class Processor extends XMLFilterImpl
    * and removed immediately afterwards. This stack is needed for matching and
    * for position counting within the parent of each event.
    */
-  private Stack eventStack;
+  private Stack <Object> eventStack;
 
   /**
    * Stack needed for inner processing (buffers, documents). This stack stores
    * the event stack for <code>stx:process-document</code> and character data
    * that has been already read as look-ahead ({@link #collectedCharacters}).
    */
-  private final Stack innerProcStack = new Stack ();
+  private final Stack <Serializable> innerProcStack = new Stack <> ();
 
   public Properties outputProperties;
 
@@ -567,7 +568,7 @@ public class Processor extends XMLFilterImpl
    */
   private void initNamespaces ()
   {
-    inScopeNamespaces = new Hashtable ();
+    inScopeNamespaces = new Hashtable <> ();
     inScopeNamespaces.put ("xml", NamespaceSupport.XMLNS);
   }
 
@@ -704,7 +705,7 @@ public class Processor extends XMLFilterImpl
   {
     if (!name.startsWith ("{"))
       name = "{}" + name;
-    final Value param = (Value) context.globalParameters.get (name);
+    final Value param = context.globalParameters.get (name);
     try
     {
       if (param != null)
@@ -803,7 +804,7 @@ public class Processor extends XMLFilterImpl
 
     // remove Data object from startInnerProcessing()
     context.localVars = dataStack.pop ().localVars;
-    inScopeNamespaces = (Hashtable) innerProcStack.pop ();
+    inScopeNamespaces = (Hashtable <String, String>) innerProcStack.pop ();
     collectedCharacters.append (innerProcStack.pop ());
   }
 
@@ -1485,11 +1486,11 @@ public class Processor extends XMLFilterImpl
       context.targetHandler.startDocument ();
 
       // declare current namespaces
-      for (final Enumeration e = inScopeNamespaces.keys (); e.hasMoreElements ();)
+      for (final Enumeration <String> e = inScopeNamespaces.keys (); e.hasMoreElements ();)
       {
-        final String prefix = (String) e.nextElement ();
+        final String prefix = e.nextElement ();
         if (!prefix.equals ("xml"))
-          context.targetHandler.startPrefixMapping (prefix, (String) inScopeNamespaces.get (prefix));
+          context.targetHandler.startPrefixMapping (prefix, inScopeNamespaces.get (prefix));
       }
 
       // If the Map interface would be used:
@@ -1531,9 +1532,9 @@ public class Processor extends XMLFilterImpl
     try
     {
       // undeclare current namespaces
-      for (final Enumeration e = inScopeNamespaces.keys (); e.hasMoreElements ();)
+      for (final Enumeration <String> e = inScopeNamespaces.keys (); e.hasMoreElements ();)
       {
-        final String prefix = (String) e.nextElement ();
+        final String prefix = e.nextElement ();
         if (!prefix.equals ("xml"))
           context.targetHandler.endPrefixMapping (prefix);
       }
@@ -1588,7 +1589,7 @@ public class Processor extends XMLFilterImpl
     else
     { // stx:process-document
       innerProcStack.push (eventStack);
-      context.ancestorStack = eventStack = new Stack ();
+      context.ancestorStack = eventStack = new Stack <> ();
     }
 
     eventStack.push (SAXEvent.newRoot ());
@@ -1680,7 +1681,7 @@ public class Processor extends XMLFilterImpl
           context.emitter.endDocument (transformNode);
         }
         else
-          eventStack = context.ancestorStack = (Stack) innerProcStack.pop ();
+          eventStack = context.ancestorStack = (Stack <Object>) innerProcStack.pop ();
       }
     }
     else
@@ -1721,7 +1722,7 @@ public class Processor extends XMLFilterImpl
     if (!nsContextActive)
     {
       namespaceContext.push (inScopeNamespaces);
-      inScopeNamespaces = (Hashtable) inScopeNamespaces.clone ();
+      inScopeNamespaces = (Hashtable <String, String>) inScopeNamespaces.clone ();
     }
     nsContextActive = false;
   }
@@ -1839,7 +1840,7 @@ public class Processor extends XMLFilterImpl
       else
       {
         eventStack.pop ();
-        inScopeNamespaces = (Hashtable) namespaceContext.pop ();
+        inScopeNamespaces = namespaceContext.pop ();
       }
     }
   }
@@ -1907,7 +1908,7 @@ public class Processor extends XMLFilterImpl
     if (!nsContextActive)
     {
       namespaceContext.push (inScopeNamespaces);
-      inScopeNamespaces = (Hashtable) inScopeNamespaces.clone ();
+      inScopeNamespaces = (Hashtable <String, String>) inScopeNamespaces.clone ();
       nsContextActive = true;
     }
     if (uri.equals ("")) // undeclare namespace
@@ -2048,7 +2049,7 @@ public class Processor extends XMLFilterImpl
    *
    * @return the event stack
    */
-  public Stack getEventStack ()
+  public Stack <Object> getEventStack ()
   {
     return this.eventStack;
   }

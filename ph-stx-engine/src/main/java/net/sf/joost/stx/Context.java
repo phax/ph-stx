@@ -41,7 +41,7 @@ import net.sf.joost.instruction.PSiblingsFactory;
 /**
  * Instances of this class provide context information while processing an input
  * document.
- * 
+ *
  * @version $Revision: 2.21 $ $Date: 2008/12/07 19:10:40 $
  * @author Oliver Becker
  */
@@ -80,16 +80,17 @@ public final class Context implements Cloneable
    * Hashtable for Stacks of group variables (key=group instance, value=Stack of
    * Hashtables).
    */
-  public Hashtable groupVars = new Hashtable ();
+  public Hashtable <GroupBase, Stack <Hashtable <String, Value>>> groupVars = new Hashtable<> ();
 
   /** Local defined variables of a template. */
-  public Hashtable localVars = new Hashtable ();
+  public Hashtable <String, Value> localVars = new Hashtable<> ();
+  public Stack <String []> localRegExGroup;
 
   /** External parameters passed to the transformation */
-  public Hashtable globalParameters = new Hashtable ();
+  public Hashtable <String, Value> globalParameters = new Hashtable<> ();
 
   /** Parameters passed to the next template */
-  public Hashtable passedParameters = new Hashtable ();
+  public Hashtable <String, Value> passedParameters = new Hashtable<> ();
 
   /** An ErrorHandler for reporting errors and warnings */
   public ErrorHandlerImpl errorHandler = new ErrorHandlerImpl ();

@@ -107,9 +107,9 @@ public class ExtensionFunctionTest
     catch (final TransformerException ex)
     {
       Throwable t = ex.getCause ();
-      while (t != null && !(t instanceof ExtensionFunctionException))
+      while (t != null && !(t instanceof MockExtensionFunctionException))
         t = t.getCause ();
-      assertTrue (t instanceof ExtensionFunctionException);
+      assertTrue (t instanceof MockExtensionFunctionException);
     }
   }
 

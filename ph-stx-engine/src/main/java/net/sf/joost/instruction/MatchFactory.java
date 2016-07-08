@@ -26,7 +26,6 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -123,14 +122,14 @@ final public class MatchFactory extends FactoryBase
     {
       super.process (context);
       // store value for the regex-group function
-      ((Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP)).push (analyzeText.capSubstr);
+      context.localRegExGroup.push (analyzeText.capSubstr);
       return PR_CONTINUE;
     }
 
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      ((Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP)).pop ();
+      context.localRegExGroup.pop ();
       return super.processEnd (context);
     }
 

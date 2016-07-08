@@ -42,7 +42,7 @@ import net.sf.joost.stx.Value;
 /**
  * Factory for <code>params</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.12 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -149,12 +149,12 @@ final public class ParamFactory extends FactoryBase
       if (parent instanceof GroupBase)
       {
         // passed value from the outside
-        v = (Value) context.globalParameters.get (expName);
+        v = context.globalParameters.get (expName);
       }
       else
       {
         // passed value from another template via stx:with-param
-        v = (Value) context.passedParameters.get (expName);
+        v = context.passedParameters.get (expName);
       }
       if (v == null)
       {

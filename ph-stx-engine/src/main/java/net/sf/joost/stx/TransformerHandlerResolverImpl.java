@@ -254,7 +254,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
                                      final XMLReader reader,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable params) throws SAXException
+                                     final Hashtable <String, Value> params) throws SAXException
   {
     final Hashtable externalParams = createExternalParameters (params);
     if (customResolver != null)

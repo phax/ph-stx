@@ -27,7 +27,6 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -42,7 +41,7 @@ import net.sf.joost.stx.Value;
 /**
  * Factory for <code>variable</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -50,12 +49,12 @@ import net.sf.joost.stx.Value;
 final public class VariableFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public VariableFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
     attrNames.add ("keep-value");
@@ -155,9 +154,9 @@ final public class VariableFactory extends FactoryBase
     private void processVar (final Value v, final Context context) throws SAXException
     {
       // determine scope
-      Hashtable varTable;
+      Hashtable <String, Value> varTable;
       if (isGroupVar)
-        varTable = (Hashtable) ((Stack) context.groupVars.get (parent)).peek ();
+        varTable = context.groupVars.get (parent).peek ();
       else
       {
         varTable = context.localVars;

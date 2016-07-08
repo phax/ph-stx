@@ -41,7 +41,7 @@ import net.sf.joost.stx.Value;
 /**
  * Factory for <code>with-param</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -49,12 +49,12 @@ import net.sf.joost.stx.Value;
 final public class WithParamFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public WithParamFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }

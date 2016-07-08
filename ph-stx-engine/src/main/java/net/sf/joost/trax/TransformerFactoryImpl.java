@@ -678,7 +678,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   }
 
   // classloader helper
-  private Class loadClass (final String className) throws TransformerConfigurationException
+  private Class <?> loadClass (final String className) throws TransformerConfigurationException
   {
     try
     {
@@ -694,10 +694,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
           return Class.forName (className);
         }
       }
-      else
-      {
-        return Class.forName (className);
-      }
+      return Class.forName (className);
     }
     catch (final Exception e)
     {

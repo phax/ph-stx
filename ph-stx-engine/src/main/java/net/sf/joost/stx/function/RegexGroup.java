@@ -30,7 +30,6 @@ import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.Tree;
-import net.sf.joost.instruction.AnalyzeTextFactory;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -75,11 +74,11 @@ final public class RegexGroup implements Instance
     final Value v = args.evaluate (context, top);
     final double d = v.getNumberValue ();
     // access a special pseudo variable
-    final Stack s = (Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP);
+    final Stack <String []> s = context.localRegExGroup;
     if (Double.isNaN (d) || d < 0 || s == null || s.size () == 0)
       return Value.VAL_EMPTY_STRING;
 
-    final String [] capSubstr = (String []) s.peek ();
+    final String [] capSubstr = s.peek ();
     final int no = Math.round ((float) d);
     if (no >= capSubstr.length)
       return Value.VAL_EMPTY_STRING;

@@ -151,7 +151,7 @@ public abstract class RegexTranslator
   public static final String SURROGATES2_CLASS = "[\uDC00-\uDFFF]";
   public static final String NOT_ALLOWED_CLASS = "[\u0000&&[^\u0000]]";
 
-  public static final class Range implements Comparable
+  public static final class Range implements Comparable <Range>
   {
     private final int min;
     private final int max;
@@ -172,9 +172,9 @@ public abstract class RegexTranslator
       return max;
     }
 
-    public int compareTo (final Object o)
+    public int compareTo (final Range o)
     {
-      final Range other = (Range) o;
+      final Range other = o;
       if (this.min < other.min)
         return -1;
       if (this.min > other.min)
