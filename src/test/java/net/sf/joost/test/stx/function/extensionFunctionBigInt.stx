@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:t="java:net.sf.joost.test.stx.function.ExtensionFunctionTarget"
+               version="1.0">
+
+  <stx:param name="target" required="yes" />
+  
+  <stx:variable name="value" select="t:parseBigInt(42)" />
+
+  <stx:template match="/">
+    <stx:if test="t:setBigIntegerValue($target, $value)" />
+  </stx:template>
+
+</stx:transform>

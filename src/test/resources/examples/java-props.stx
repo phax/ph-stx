@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Calls to Java extension functions: print the java system properties -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:s="java:java.lang.System"
+               xmlns:p="java:java.util.Properties"
+               xmlns:e="java:java.util.Enumeration"
+               version="1.0"
+               exclude-result-prefixes="s p e">
+
+  <stx:template match="/">
+    <stx:variable name="props" select="s:get-properties()" />
+    <stx:variable name="names" select="p:property-names($props)" />
+    <system-properties>
+      <stx:text>&#xA;</stx:text>
+      <stx:while test="e:has-more-elements($names)">
+        <stx:variable name="prop-name" select="e:next-element($names)" />
+        <property name="{$prop-name}"
+                  value="{p:get-property($props, $prop-name)}" />
+        <stx:text>&#xA;</stx:text>
+      </stx:while>
+    </system-properties>
+  </stx:template>
+
+</stx:transform>

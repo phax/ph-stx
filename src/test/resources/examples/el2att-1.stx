@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Elements to attributes no 1 -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+
+  <stx:template match="root">
+    <stx:copy>
+      <stx:process-children />
+    </stx:copy>
+  </stx:template>
+
+  <stx:variable name="text" />
+  
+  <stx:template match="data">
+    <stx:process-children />
+    <stx:attribute name="cookie_{position()}" select="$text" />
+  </stx:template>
+
+  <stx:template match="data/text()">
+    <stx:assign name="text" select="." />
+  </stx:template>
+
+</stx:transform>

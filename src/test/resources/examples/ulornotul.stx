@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- Add missing <ul> parent elements -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="all">
+  
+  <stx:template match="ul">
+    <ul>
+      <stx:process-children group="li" />
+    </ul>    
+  </stx:template>
+
+  <stx:group name="li">
+
+    <stx:template match="li" public="yes">
+      <ul>
+        <stx:process-self />
+        <stx:process-siblings while="li|text()" />
+      </ul>
+    </stx:template>
+
+    <stx:template match="li" priority="2">
+      <li>
+        <stx:process-children />
+      </li>
+    </stx:template>
+    
+  </stx:group>
+  
+</stx:transform>
+
+

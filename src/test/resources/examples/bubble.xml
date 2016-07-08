@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- a list of numbers to be sorted -->
+<list>
+  <value> 127 </value>
+  <value> 126 </value>
+  <value> 130 </value>
+  <value> 124 </value>
+  <value> 128 </value>
+  <value> 131 </value>
+  <value> 134 </value>
+  <value> 132 </value>
+  <value> 133 </value>
+  <value> 123 </value>
+  <value> 135 </value>
+  <value> 136 </value>
+  <value> 125 </value>
+  <value> 129 </value>
+</list>

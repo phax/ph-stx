@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  version="1.0">
+
+  <stx:template match="data">
+    <table>
+      <stx:analyze-text select=".">
+        <stx:match regex="[ \n]+" /><!-- ignore spaces -->
+        <stx:match regex="([a-z]+)[ ]*$" flags="m">
+          <td>
+            <stx:value-of select="regex-group(1)" />
+          </td>
+          <stx:end-element name="tr" />
+        </stx:match>
+        <stx:match regex="^[ ]*([a-z]+)" flags="m">
+          <stx:text>&#xA;</stx:text>
+          <stx:start-element name="tr" />
+          <td>
+            <stx:value-of select="regex-group(1)" />
+          </td>
+        </stx:match>
+        <stx:match regex="[a-z]+">
+          <td>
+            <stx:value-of select="regex-group(0)" />
+          </td>
+        </stx:match>
+        <stx:match regex="," />
+        <stx:no-match>
+          <stx:message
+            select="concat('Encountered unmatched ', regex-group(0))" />
+        </stx:no-match>
+      </stx:analyze-text>
+      <stx:text>&#xA;</stx:text>
+    </table>
+  </stx:template>
+
+</stx:transform>

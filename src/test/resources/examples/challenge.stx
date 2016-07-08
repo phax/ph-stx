@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- test for recursive stx:process-siblings -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="all">
+
+  <stx:variable name="level" select="0" />
+
+  <stx:template match="start-element">
+    <stx:assign name="level" select="$level + 1" />  
+    <stx:variable name="local" select="$level" />
+    <stx:element name="{@name}">
+      <stx:process-siblings until="end-element[$level=$local]" />
+    </stx:element>
+    <stx:assign name="level" select="$level - 1" />
+  </stx:template>
+  
+  <stx:template match="end-element" />
+
+</stx:transform>

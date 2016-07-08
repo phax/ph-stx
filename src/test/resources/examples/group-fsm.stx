@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!-- finite state machine, states simulated by groups -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+    
+  <stx:template match="text">
+    <stx:process-children group="none" />
+  </stx:template>
+    
+  <stx:group name="none">
+    <stx:template match="bold">
+      <stx:start-element name="b" />
+      <stx:process-siblings group="b" />
+    </stx:template>
+    <stx:template match="underline">
+      <stx:start-element name="u" />
+      <stx:process-siblings group="u" />
+    </stx:template>
+  </stx:group>
+
+  <!-- the "b" state -->
+  <stx:group name="b">
+    <stx:template match="bold">
+      <stx:end-element name="b" />
+      <stx:process-siblings group="none" />
+    </stx:template>
+    <stx:template match="underline">
+      <stx:start-element name="u" />
+      <stx:process-siblings group="bu" />
+    </stx:template>
+  </stx:group>
+
+  <!-- symmetric for the "u" state -->
+  <stx:group name="u">
+    <stx:template match="underline">
+      <stx:end-element name="u" />
+      <stx:process-siblings group="none" />
+    </stx:template>
+    <stx:template match="bold">
+      <stx:start-element name="u" />
+      <stx:process-siblings group="ub" />
+    </stx:template>
+  </stx:group>
+
+  <!-- the "bu" state -->
+  <stx:group name="bu">
+    <stx:template match="bold">
+      <stx:end-element name="u" />
+      <stx:end-element name="b" />
+      <stx:start-element name="u" />
+      <stx:process-siblings group="u" />		
+    </stx:template>
+    <stx:template match="underline">
+      <stx:end-element name="u" />
+      <stx:process-siblings group="b" />		
+    </stx:template>
+  </stx:group>
+
+  <!-- symmetric for the "ub" state -->
+  <stx:group name="ub">
+    <stx:template match="underline">
+      <stx:end-element name="b" />
+      <stx:end-element name="u" />
+      <stx:start-element name="b" />
+      <stx:process-siblings group="b" />		
+    </stx:template>
+    <stx:template match="bold">
+      <stx:end-element name="b" />
+      <stx:process-siblings group="u" />		
+    </stx:template>
+  </stx:group>
+
+</stx:transform>

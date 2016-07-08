@@ -1,0 +1,144 @@
+package net.sf.joost.grammar;
+
+import net.sf.joost.grammar.cup.Symbol;
+
+%%
+
+%public
+%char
+%unicode
+
+%state CMT
+
+%function next_token
+%type Symbol
+%implements Sym, net.sf.joost.grammar.cup.Scanner
+
+%eofval{
+   return new Symbol(EOF);
+%eofval}
+
+%{
+public Symbol last = null;
+public int withinComment = 0;
+%}
+
+name = [a-zA-Z_][a-zA-Z_.0-9-]*
+
+
+%%
+
+"(:"              { yybegin(CMT); withinComment++; }
+
+<CMT>":)"         { if(--withinComment == 0) yybegin(YYINITIAL); }
+<CMT>.            { }
+<YYINITIAL>":)"   { last = new Symbol(error,yychar,yychar+1,yytext()); 
+                    return last; }
+
+<YYINITIAL>\|     { last = new Symbol(BAR,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>/      { last = new Symbol(SLASH,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>//     { last = new
+                    Symbol(DSLASH,yychar,yychar+2,yytext()); 
+                    return last; }
+<YYINITIAL>\[     { last = new
+                    Symbol(LBRACK,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>\]     { last = new
+                    Symbol(RBRACK,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>:      { last = new Symbol(COLON,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>@      { last = new Symbol(AT,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>"$"    { last = new Symbol(DOLLAR,yychar,yychar+1,yytext()); 
+                    return last; }
+
+<YYINITIAL>"."    { last = new Symbol(DOT,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>".."   { last = new Symbol(DDOT,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>"*"    { last = new Symbol(STAR,yychar,yychar+1,yytext()); 
+                    return last; }
+
+<YYINITIAL>"+"    { last = new Symbol(PLUS,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>"-"    { last = new Symbol(MINUS,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>"("    { last = new Symbol(LPAR,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>")"    { last = new Symbol(RPAR,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>","    { last = new Symbol(COMMA,yychar,yychar+1,yytext()); 
+                    return last; }
+
+<YYINITIAL>"="    { last = new Symbol(EQ,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>"<"    { last = new Symbol(LT,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>">"    { last = new Symbol(GT,yychar,yychar+1,yytext()); 
+                    return last; }
+<YYINITIAL>"<="   { last = new Symbol(LE,yychar,yychar+2,yytext()); 
+                    return last; }
+<YYINITIAL>">="   { last = new Symbol(GE,yychar,yychar+2,yytext()); 
+                    return last; }
+<YYINITIAL>"!="   { last = new Symbol(NE,yychar,yychar+2,yytext()); 
+                    return last; }
+
+<YYINITIAL>"div"  { last = new Symbol(DIV,yychar,yychar+3,yytext()); 
+                    return last; }
+<YYINITIAL>"mod"  { last = new Symbol(MOD,yychar,yychar+3,yytext()); 
+                    return last; }
+<YYINITIAL>"and"  { last = new Symbol(AND,yychar,yychar+3,yytext()); 
+                    return last; }
+<YYINITIAL>"or"   { last = new Symbol(OR,yychar,yychar+2,yytext()); 
+                    return last; }
+
+<YYINITIAL>" "+   { }
+
+<YYINITIAL>"text()"  { 
+   last = new Symbol(TEXT,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>"cdata()"  { 
+   last = new Symbol(CDATA,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>"processing-instruction("  { 
+   last = new Symbol(PI_START,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>"comment()"  {
+   last = new Symbol(COMMENT,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>"node()"  {
+   last = new Symbol(NODE,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>{name}  { 
+   last = new Symbol(NCNAME,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>{name}:{name}  { 
+   last = new Symbol(QNAME,yychar,yychar+yytext().length(),yytext()); 
+   return last; }
+
+<YYINITIAL>([0-9]+)|("."[0-9]+)|([0-9]+"."[0-9]*)|(("."[0-9]+)|([0-9]+("."[0-9]*)?))([e]|[E])([+]|[-])?[0-9]+  { 
+   last = new Symbol(NUMBER,yychar,yychar+yytext().length(),
+                     new Double(yytext())); 
+   return last; }
+
+<YYINITIAL>\"[^\"]*\"  {
+   last = new Symbol(STRING,yychar,yychar+yytext().length(),
+                     new String(yytext().substring(1,yytext().length()-1))); 
+   return last; }
+<YYINITIAL>['][^']*[']  {
+   last = new Symbol(STRING,yychar,yychar+yytext().length(),
+                     new String(yytext().substring(1,yytext().length()-1))); 
+   return last; }
+
+<YYINITIAL>.  { 
+   last = new Symbol(error,yychar,yychar+1,yytext()); 
+   return last; }

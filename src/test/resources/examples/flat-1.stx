@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- transform a flat list into a table with 4 cols and alternating
+     row attributes; version with process-siblings -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+
+  <stx:param name="cols" select="4" />
+  
+  <stx:template match="flat">
+    <html>
+      <body>
+        <table>
+          <stx:process-children />
+        </table>
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:template match="entry">
+    <tr class="{substring('evenodd',
+                          5 - (position()-1) mod (2*$cols) div $cols * 4,
+                          4)}">
+      <stx:process-self group="entry" />
+      <stx:process-siblings until="entry[(position()-1) mod $cols = 0]"
+                            group="entry" />
+    </tr>
+  </stx:template>
+
+  <stx:group name="entry">
+    <stx:template match="entry">
+      <td>
+        <stx:process-children />
+      </td>
+    </stx:template>
+  </stx:group>
+        
+</stx:transform>

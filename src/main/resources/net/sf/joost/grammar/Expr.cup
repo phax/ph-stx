@@ -1,0 +1,64 @@
+/*
+ * $Id: Expr.cup,v 1.6 2004/09/29 05:59:50 obecker Exp $
+ * 
+ * The contents of this file are subject to the Mozilla Public License 
+ * Version 1.1 (the "License"); you may not use this file except in 
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the 
+ * License.
+ *
+ * The Original Code is: this file
+ *
+ * The Initial Developer of the Original Code is Oliver Becker.
+ *
+ * Portions created by  ______________________ 
+ * are Copyright (C) ______ _______________________. 
+ * All Rights Reserved.
+ *
+ * Contributor(s): Thomas Behrends.
+ */
+
+package net.sf.joost.grammar;
+
+import net.sf.joost.grammar.tree.*;
+
+parser code {: 
+   protected net.sf.joost.stx.ParseContext j_context;
+
+   public net.sf.joost.grammar.cup.Symbol errorToken = null;
+
+   public ExprParser(net.sf.joost.grammar.cup.Scanner s, 
+                     net.sf.joost.stx.ParseContext context)
+   {
+      super(s);
+      j_context = context;
+   }
+
+   private String errMsg = "";
+   public void report_error(String msg, Object info)
+   {
+      errMsg += msg + ". ";
+      errorToken = cur_token;
+   }
+
+   public void report_fatal_error(String msg, Object info)
+      throws Exception
+   {
+      report_error(msg, info);
+      done_parsing();
+      throw new Exception(errMsg);
+   }
+:};
+
+
+/* Shared with Pattern.cup: */
+
+/* Terminals */
+#include "terminals.inc"
+
+/* Expression grammar */
+#include "expr.inc"

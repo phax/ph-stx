@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<magic>
+  <head>
+    <important path="charm[2]/@spell" />
+    <important path="charm[4]/@spell" />
+  </head>
+  <body>
+    <charm spell="Abracadabra">???</charm>
+    <charm spell="Obliviate">
+             Modifies or erases portions of a person's memory.</charm>
+    <charm spell="Peskipiksi Pesternomi">Freezing Charm?</charm>
+    <charm spell="Wingardium Leviosa">
+             Causes a feather to levitate.</charm>
+  </body>
+</magic>

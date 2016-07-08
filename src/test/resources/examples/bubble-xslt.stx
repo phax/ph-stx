@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- No, this is not bubble sort at all.
+     It uses XSLT for sorting and does something with the result just for
+     demonstration purposes. -->
+<!-- Note: for some reason this doesn't work (NullPointerException) with the
+     JDK 1.4 built-in XSLT processor (Xalan). Saxon runs pretty well, so put
+     saxon.jar on your classpath and everything should be fine. -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               version="1.0">
+
+  <!-- Transform the input with XSLT and collect the result for a
+       postprocessing step -->
+  <stx:template match="list">
+    <stx:buffer name="result">
+      <stx:process-self filter-method="http://www.w3.org/1999/XSL/Transform"
+                        filter-src="buffer(xslt-sort)" />
+    </stx:buffer>
+    <stx:process-buffer name="result" group="postprocess" />
+  </stx:template>
+
+  <!-- A buffer containing the XSLT stylesheet -->
+  <stx:buffer name="xslt-sort">
+    <xsl:stylesheet version="1.0"
+                    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+      <xsl:template match="list">
+        <xsl:copy>
+          <xsl:for-each select="value">
+            <xsl:sort data-type="number" />
+            <xsl:copy-of select="." />
+          </xsl:for-each>
+        </xsl:copy>
+      </xsl:template>
+    </xsl:stylesheet>
+  </stx:buffer>
+
+
+  <!-- Group for postprocessing the result of the XSLT transformation -->
+  <stx:group name="postprocess">
+    <stx:template match="list">
+      <entries>
+        <stx:text>&#xA;</stx:text>
+        <stx:process-children />
+      </entries>
+    </stx:template>
+
+    <stx:template match="value">
+      <entry value="{number(.)}" />
+      <stx:text>&#xA;</stx:text>
+    </stx:template>
+  </stx:group>
+
+</stx:transform>

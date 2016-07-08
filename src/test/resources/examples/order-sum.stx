@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!-- sum orders and output a table (from the xml.com article) -->
+<stx:transform version="1.0"
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  xmlns="http://www.w3.org/1999/xhtml">
+
+  <stx:variable name="sum" select="0" />
+  
+  <stx:template match="order-list">
+    <html>
+      <body>
+        <table>
+          <stx:text>&#xA;</stx:text>
+          <tr>
+            <th colspan="5">Order Summary</th>
+          </tr>
+          <stx:text>&#xA;</stx:text>
+          <tr>
+            <td>Line</td>
+            <td>Item</td>
+            <td>Quantity</td>
+            <td>Unit Price</td>
+            <td>Item Total</td>
+          </tr>
+          <stx:text>&#xA;</stx:text>
+          <stx:process-children />
+          <tr>
+            <td colspan="4">TOTAL:</td>
+            <td><b><stx:value-of select="$sum" /></b></td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:variable name="name" />
+  <stx:variable name="quantity" />
+  <stx:variable name="price" />
+  
+  <stx:template match="order">
+    <stx:assign name="quantity" select="1" />
+    <stx:process-children />
+    <stx:assign name="sum"
+      select="$sum + $quantity * $price" />
+    <tr>
+      <td><stx:value-of select="position()" /></td>
+      <td><b><stx:value-of select="$name" /></b></td>
+      <td><stx:value-of select="$quantity" /></td>
+      <td><stx:value-of select="$price" /></td>
+      <td><stx:value-of
+        select="$quantity * $price" /></td>
+    </tr>
+    <stx:text>&#xA;</stx:text>
+  </stx:template>
+
+  <stx:template match="name">
+    <stx:assign name="name" select="." />
+  </stx:template>
+
+  <stx:template match="quantity">
+    <stx:assign name="quantity" select="." />
+  </stx:template>
+
+  <stx:template match="price">
+    <stx:assign name="price" select="." />
+  </stx:template>
+
+</stx:transform>

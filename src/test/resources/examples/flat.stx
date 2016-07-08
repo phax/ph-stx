@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- transform a flat list into a table with 4 cols and alternating
+     row attributes -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+
+  <stx:template match="flat">
+    <html>
+      <body>
+        <table>
+          <tr class="odd">
+            <stx:process-children />
+          </tr>
+        </table>
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:variable name="cols" select="4" />
+
+  <stx:template match="entry">
+    <stx:if test="position() mod $cols = 1 and position() != 1">
+      <stx:end-element name="tr" />
+      <stx:start-element name="tr" />
+      <stx:attribute name="class" select="'even'" />
+      <stx:if test="position() mod (2*$cols) = 1">
+        <!-- overwrite attribute -->
+        <stx:attribute name="class" select="'odd'" />
+      </stx:if>
+    </stx:if>
+    <td>
+      <stx:process-children />
+    </td>
+  </stx:template>
+
+</stx:transform>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               version="1.0" output-method="text">
+
+  <stx:buffer name="code" />
+  
+  <stx:template match="head">
+    <stx:result-buffer name="code">
+      <xsl:stylesheet version="1.0">
+        <xsl:template match="body">
+          <stx:process-children />
+        </xsl:template>
+      </xsl:stylesheet>
+    </stx:result-buffer>
+  </stx:template>
+
+  <stx:template match="important">
+    <stx:text />No.<stx:value-of select="position()" />: <stx:text />
+    <xsl:apply-templates select="{@path}" />
+    <xsl:text><stx:text>&#xA;</stx:text></xsl:text>
+  </stx:template>
+
+  <stx:template match="body">
+    <stx:process-self filter-method="http://www.w3.org/1999/XSL/Transform"
+                      filter-src="buffer(code)" />
+  </stx:template>
+
+</stx:transform>

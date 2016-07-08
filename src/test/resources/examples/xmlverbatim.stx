@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   XML to HTML Verbatim Formatter with Syntax Highlighting
+   STX version of
+   http://www.informatik.hu-berlin.de/~obecker/XSLT/xmlverbatim/xmlverbatim.xsl
+   MPL 1.1 (c) Oliver Becker, $Date: 2003/12/09 12:37:13 $
+   obecker@informatik.hu-berlin.de
+-->
+
+<stx:transform version="1.0"
+               xmlns:stx="http://stx.sourceforge.net/2002/ns">
+
+  <!-- root -->
+  <stx:template match="/">
+    <stx:text>&#xA;</stx:text>
+    <stx:comment>
+      <stx:text> converted by xmlverbatim.stx 1.0, (c) O. Becker </stx:text>
+    </stx:comment>
+    <stx:text>&#xA;</stx:text>
+    <div class="xmlverb-default">
+      <stx:process-children />
+    </div>
+    <stx:text>&#xA;</stx:text>
+  </stx:template>
+
+  <!-- element nodes -->
+  <stx:template match="*">
+    <stx:text>&lt;</stx:text>
+
+    <stx:variable name="ns-prefix"
+                  select="substring-before(name(), ':')" />
+
+    <stx:if test="$ns-prefix != ''">
+      <span class="xmlverb-element-nsprefix">
+        <stx:value-of select="$ns-prefix"/>
+      </span>
+      <stx:text>:</stx:text>
+    </stx:if>
+    <span class="xmlverb-element-name">
+      <stx:value-of select="local-name()"/>
+    </span>
+    <stx:if test="get-namespace-uri-for-prefix('', ..) and
+                  not(get-namespace-uri-for-prefix('', .))">
+      <span class="xmlverb-ns-name">
+        <stx:text> xmlns</stx:text>
+      </span>
+      <stx:text>=&quot;&quot;</stx:text>
+    </stx:if>
+    <stx:for-each-item name="ns" select="get-in-scope-prefixes(.)">
+      <stx:if test="not(get-namespace-uri-for-prefix($ns, ..) =
+                        get-namespace-uri-for-prefix($ns, .)) and
+                    $ns != 'xml'">
+        <span class="xmlverb-ns-name">
+          <stx:text> xmlns</stx:text>
+          <stx:if test="$ns != ''">
+            <stx:text>:</stx:text>
+          </stx:if>
+          <stx:value-of select="$ns"/>
+        </span>
+        <stx:text>=&quot;</stx:text>
+        <span class="xmlverb-ns-uri">
+          <stx:value-of select="get-namespace-uri-for-prefix($ns, .)"/>
+        </span>
+        <stx:text>&quot;</stx:text>
+      </stx:if>
+    </stx:for-each-item>
+        
+    <stx:process-attributes />
+
+    <stx:choose>
+      <stx:when test="has-child-nodes()">
+        <stx:text>&gt;</stx:text>
+        <stx:process-children />
+        <stx:text>&lt;/</stx:text>
+        <stx:if test="$ns-prefix != ''">
+          <span class="xmlverb-element-nsprefix">
+            <stx:value-of select="$ns-prefix"/>
+          </span>
+          <stx:text>:</stx:text>
+        </stx:if>
+        <span class="xmlverb-element-name">
+          <stx:value-of select="local-name()"/>
+        </span>
+        <stx:text>&gt;</stx:text>
+      </stx:when>
+      <stx:otherwise>
+        <stx:text> /&gt;</stx:text>
+      </stx:otherwise>
+    </stx:choose>
+    <stx:if test="not(../..)"><br /><stx:text>&#xA;</stx:text></stx:if>
+  </stx:template>
+
+  <!-- attribute nodes -->
+  <stx:template match="@*">
+    <stx:text> </stx:text>
+    <span class="xmlverb-attr-name">
+      <stx:value-of select="name()"/>
+    </span>
+    <stx:text>=&quot;</stx:text>
+    <span class="xmlverb-attr-content">
+      <stx:call-procedure name="html-replace-entities">
+        <stx:with-param name="text" select="normalize-space(.)" />
+        <stx:with-param name="attrs" select="true()" />
+      </stx:call-procedure>
+    </span>
+    <stx:text>&quot;</stx:text>
+  </stx:template>
+
+  <!-- text nodes -->
+  <stx:template match="text()">
+    <span class="xmlverb-text">
+      <stx:variable name="tmp">
+        <stx:call-procedure name="html-replace-entities">
+          <stx:with-param name="text" select="." />
+        </stx:call-procedure>
+      </stx:variable>
+      <stx:call-procedure name="preformatted-output">
+        <stx:with-param name="text" select="$tmp" />
+      </stx:call-procedure>
+    </span>
+  </stx:template>
+  
+  <!-- comments -->
+  <stx:template match="comment()">
+    <stx:text>&lt;!--</stx:text>
+    <span class="xmlverb-comment">
+      <stx:call-procedure name="preformatted-output">
+        <stx:with-param name="text" select="." />
+      </stx:call-procedure>
+    </span>
+    <stx:text>--&gt;</stx:text>
+    <stx:if test="not(../..)"><br /><stx:text>&#xA;</stx:text></stx:if>
+  </stx:template>
+
+  <!-- processing instructions -->
+  <stx:template match="processing-instruction()">
+    <stx:text>&lt;?</stx:text>
+    <span class="xmlverb-pi-name">
+      <stx:value-of select="name()"/>
+    </span>
+    <stx:if test=".!=''">
+      <stx:text> </stx:text>
+      <span class="xmlverb-pi-content">
+        <stx:value-of select="."/>
+      </span>
+    </stx:if>
+    <stx:text>?&gt;</stx:text>
+    <stx:if test="not(../..)"><br /><stx:text>&#xA;</stx:text></stx:if>
+  </stx:template>
+
+
+  <!-- =========================================================== -->
+  <!--                    Procedures / Functions                   -->
+  <!-- =========================================================== -->
+
+  <!-- generate entities by replacing &, ", < and > in $text -->
+
+  <stx:procedure name="html-replace-entities">
+    <stx:param name="text" />
+    <stx:param name="attrs" />
+    <stx:variable name="v1">
+      <stx:call-procedure name="replace-substring">
+        <stx:with-param name="from"  select="'&amp;'" />
+        <stx:with-param name="to"    select="'&amp;amp;'" />
+        <stx:with-param name="value" select="$text" />
+      </stx:call-procedure>
+    </stx:variable>
+    <stx:variable name="v2">
+      <stx:call-procedure name="replace-substring">
+        <stx:with-param name="from" select="'&lt;'" />
+        <stx:with-param name="to" select="'&amp;lt;'" />
+        <stx:with-param name="value" select="$v1" />
+      </stx:call-procedure>
+    </stx:variable>
+    <stx:variable name="tmp">
+      <stx:call-procedure name="replace-substring">
+        <stx:with-param name="from" select="'&gt;'" />
+        <stx:with-param name="to" select="'&amp;gt;'" />
+        <stx:with-param name="value" select="$v2" />
+      </stx:call-procedure>
+    </stx:variable>
+    <stx:choose>
+      <!-- $text is an attribute value -->
+      <stx:when test="$attrs">
+        <stx:variable name="v3">
+          <stx:call-procedure name="replace-substring">
+            <stx:with-param name="from"  select="'&quot;'" />
+            <stx:with-param name="to"    select="'&amp;quot;'" />
+            <stx:with-param name="value" select="$tmp" />
+          </stx:call-procedure>
+        </stx:variable>
+        <stx:call-procedure name="replace-substring">
+          <stx:with-param name="from" select="'&#xA;'" />
+          <stx:with-param name="to" select="'&amp;#xA;'" />
+          <stx:with-param name="value" select="$v3" />
+        </stx:call-procedure>
+      </stx:when>
+      <stx:otherwise>
+        <stx:value-of select="$tmp" />
+      </stx:otherwise>
+    </stx:choose>
+  </stx:procedure>
+
+  <!-- replace in $value substring $from with $to -->
+  <stx:procedure name="replace-substring">
+    <stx:param name="value" />
+    <stx:param name="from" />
+    <stx:param name="to" />
+    <stx:choose>
+      <stx:when test="contains($value, $from)">
+        <stx:value-of select="substring-before($value, $from)" />
+        <stx:value-of select="$to" />
+        <stx:call-procedure name="replace-substring">
+          <stx:with-param name="value" 
+                          select="substring-after($value, $from)" />
+          <stx:with-param name="from" select="$from" />
+          <stx:with-param name="to" select="$to" />
+        </stx:call-procedure>
+      </stx:when>
+      <stx:otherwise>
+        <stx:value-of select="$value" />
+      </stx:otherwise>
+    </stx:choose>
+  </stx:procedure>
+
+  <!-- preformatted output: space as &nbsp;, tab as 8 &nbsp;
+                            nl as <br> -->
+  <stx:procedure name="preformatted-output">
+    <stx:param name="text" />
+    <stx:variable name="v1">
+      <stx:call-procedure name="replace-substring">
+        <stx:with-param name="value"
+                        select="translate($text, ' ', '&#xA0;')" />
+        <stx:with-param name="from" select="'&#9;'" />
+        <stx:with-param name="to" 
+                        select="'&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;'" />
+      </stx:call-procedure>
+    </stx:variable>
+    <stx:call-procedure name="output-nl">
+      <stx:with-param name="text" select="$v1" />
+    </stx:call-procedure>
+  </stx:procedure>
+
+  <!-- output nl as <br> -->
+  <stx:procedure name="output-nl">
+    <stx:param name="text" />
+    <stx:choose>
+      <stx:when test="contains($text, '&#xA;')">
+        <stx:value-of select="substring-before($text, '&#xA;')" />
+        <br />
+        <stx:text>&#xA;</stx:text>
+        <stx:call-procedure name="output-nl">
+          <stx:with-param name="text" 
+                          select="substring-after($text, '&#xA;')" />
+        </stx:call-procedure>
+      </stx:when>
+      <stx:otherwise>
+        <stx:value-of select="$text" />
+      </stx:otherwise>
+    </stx:choose>
+  </stx:procedure>
+
+</stx:transform>

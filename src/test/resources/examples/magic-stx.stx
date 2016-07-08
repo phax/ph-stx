@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:alias="urn:stx-alias"
+               version="1.0" output-method="text">
+
+  <stx:namespace-alias sheet-prefix="alias" result-prefix="stx" />
+  
+  <stx:buffer name="code" />
+  
+  <stx:template match="head">
+    <stx:result-buffer name="code">
+      <!-- Create dynamically STX code -->
+      <alias:transform version="1.0">
+        <!-- An STX template that processes the attributes as well -->
+        <alias:template match="*">
+          <alias:process-attributes />
+          <alias:process-children />
+        </alias:template>
+        <stx:process-children />
+      </alias:transform>
+    </stx:result-buffer>
+  </stx:template>
+
+  <stx:template match="important">
+    <!-- A template for every <important> element -->
+    <alias:template match="{@path}">
+      <stx:text />No.<stx:value-of select="position()" />: <stx:text />
+      <alias:value-of select="." />
+      <alias:text><stx:text>&#xA;</stx:text></alias:text>
+    </alias:template>
+  </stx:template>
+
+  <stx:template match="body">
+    <stx:process-self filter-method="http://stx.sourceforge.net/2002/ns"
+                      filter-src="buffer(code)" />
+  </stx:template>
+
+</stx:transform>

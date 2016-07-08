@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<root>
+  <start-element name="a" />
+  <x />
+  <start-element name="b" />
+  <y />
+  <foo />
+  <end-element />
+  <bar />
+  <end-element />
+</root>

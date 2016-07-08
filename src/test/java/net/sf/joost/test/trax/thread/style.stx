@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0" output-method="xml">
+    <stx:template match="/">
+        <stx:process-children/>
+    </stx:template>
+
+    <stx:template match="text()">
+        <stx:copy />
+    </stx:template>
+
+    <stx:template match="*">
+        <stx:copy attributes="@*">
+            <stx:process-self/>
+        </stx:copy>
+    </stx:template>
+    
+    <stx:template match="order[2]" priority="3">
+      <stx:process-self filter-method="http://www.w3.org/1999/XSL/Transform"
+                        filter-src="url('external.xsl')"/>
+    </stx:template>
+    
+</stx:transform>

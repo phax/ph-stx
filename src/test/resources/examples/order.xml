@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<order-list>
+  <order>
+    <name>Achillea Millefolium</name>  <!-- Garten-Schafgarbe -->
+    <quantity>50</quantity>
+    <price>2.93</price>
+  </order>
+  <order>
+    <name>Alisma Parviflora</name>  <!-- Am. Froschloeffel -->
+    <quantity>30</quantity>
+    <price>3.36</price>
+  </order>
+  <order>
+    <name>Amelanchier Laevis</name>  <!-- Haengende Felsenbirne -->
+    <quantity>15</quantity>
+    <price>23.90</price>
+  </order>
+  <order>
+    <name>Caltha Palustris</name>  <!-- Sumpf-Dotterblume -->
+    <quantity>50</quantity>
+    <price>3.36</price>
+  </order>
+  <order>
+    <name>Camelia Japonica</name>
+    <quantity>20</quantity>
+    <price>39.90</price>
+  </order>
+  <order>
+    <name>Cotoneaster Dammeri</name>  <!-- Zwergmispel -->
+    <quantity>5</quantity>
+    <price>29.90</price>
+  </order>
+  <order>
+    <name>Gaillardia Goblin</name>
+    <quantity>50</quantity>
+    <price>6.48</price>
+  </order>
+  <order>
+    <name>Ginkgo Biloba</name>
+    <price>19.90</price>
+  </order>
+  <order>
+    <name>Larix Kaempferi</name>  <!-- Japanische Laerche -->
+    <quantity>2</quantity>
+    <price>15.90</price>
+  </order>
+  <order>
+    <name>Magnolia Liliiflora</name>
+    <quantity>13</quantity>
+    <price>23.90</price>
+  </order>
+  <order>
+    <name>Picea Glauca</name>   <!-- Zuckerhut-Fichte -->
+    <quantity>7</quantity>
+    <price>14.90</price>
+  </order>
+  <order>
+    <name>Polystichum Aculeatum</name>  <!-- Glanz-Schild-Farn -->
+    <quantity>15</quantity>
+    <price>4.45</price>
+  </order>
+  <order>
+    <name>Syringa Vulgaris</name>  <!-- Flieder -->
+    <quantity>13</quantity>
+    <price>16.75</price>
+  </order>
+  <order>
+    <name>Teucrium Chamaedrys</name>
+    <quantity>81</quantity>
+    <price>0.65</price>
+  </order>
+  <order>
+    <name>Thuja Occidentalis</name> <!-- Lebensbaum -->
+    <quantity>3</quantity>
+    <price>12.90</price>
+  </order>
+</order-list>

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- Create groups of $group-size -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns="http://www.w3.org/1999/xhtml"
+               version="1.0">
+
+  <stx:param name="group-size" select="4" />
+
+  <stx:variable name="sum" select="0" />
+
+  <stx:template match="order-list">
+    <html>
+      <body>
+        <h2>Order Summary</h2>
+        <stx:process-children />
+        <hr width="25%" align="left" />
+        <p>Overall price: <stx:value-of select="$sum" /></p>
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:group>
+    
+    <stx:variable name="item-no" select="0" />
+    
+    <stx:template match="order[$item-no=0]"
+                  public="yes" new-scope="yes">
+      <ul>
+        <stx:process-self group="orders" />
+        <stx:process-siblings until="*[$item-no=$group-size]" group="orders"/>
+      </ul>
+    </stx:template>
+
+    <stx:group name="orders">
+      
+      <stx:variable name="name" />
+      <stx:variable name="quantity" select="1" />
+      <stx:variable name="price" />
+
+      <stx:template match="order" new-scope="yes">
+        <stx:process-children /> <!-- collect data -->
+        <li>
+          <stx:value-of select="$quantity" />
+          <stx:text> </stx:text>
+          <b><stx:value-of select="$name" /></b>
+          <stx:value-of select="concat(': ', $quantity * $price)" />
+        </li>
+        <stx:text>&#xA;</stx:text> <!-- for readability -->
+        <stx:assign name="sum" select="$sum + $quantity * $price" />
+        <stx:assign name="item-no" select="$item-no + 1" />
+      </stx:template>
+
+      <stx:template match="name">
+        <stx:assign name="name" select="." />
+      </stx:template>
+
+      <stx:template match="quantity">
+        <stx:assign name="quantity" select="." />
+      </stx:template>
+
+      <stx:template match="price">
+        <stx:assign name="price" select="." />
+      </stx:template>
+
+    </stx:group>
+
+  </stx:group>
+
+</stx:transform>

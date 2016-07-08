@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+
+  <stx:variable name="entered" select="false()" />
+
+  <stx:template match="/">
+    <stx:if test="$entered">
+      <stx:process-children />
+    </stx:if>
+    <stx:else>
+      <stx:assign name="entered" select="true()" />
+      <result>
+        <me>
+          <stx:text>&#xA;</stx:text>
+          <stx:process-document href="''" />
+        </me>
+        <stx:text>&#xA;</stx:text>
+        <others>
+          <stx:text>&#xA;</stx:text>
+          <stx:process-document
+             href="('urn:stream','NSFilter.stx','urn:dom')" />
+        </others>
+        <stx:text>&#xA;</stx:text>
+        <input>
+          <stx:text>&#xA;</stx:text>
+          <stx:process-children />
+        </input>
+        <stx:text>&#xA;</stx:text>
+        <filter>
+          <stx:text>&#xA;</stx:text>
+          <stx:process-document 
+            href="'urn:import'" 
+            filter-method="http://stx.sourceforge.net/2002/ns" 
+            filter-src="url('urn:import')"/>
+        </filter>
+      </result>
+    </stx:else>
+  </stx:template>
+
+  <stx:include href="urn:import" />
+
+</stx:transform>

@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!-- iterative version of the bubble sort algorithm -->
+<!-- better, because it doesn't produce an out of memory error for
+     long lists -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="all" strip-space="yes">
+
+  <!-- global variables -->
+  <stx:variable name="value" />
+  <stx:variable name="changed" select="true()" />
+
+  <!-- the sort buffer -->
+  <stx:buffer name="sorted" />
+
+
+  <stx:template match="list">
+    <!-- initial fill the buffer -->
+    <stx:result-buffer name="sorted" clear="yes">
+      <stx:process-children />
+    </stx:result-buffer>
+    <!-- sorting -->
+    <stx:variable name="counter" select="0" />
+    <stx:while test="$changed">
+      <stx:assign name="counter" select="$counter + 1" />
+      <stx:result-buffer name="sorted" clear="yes">
+        <stx:process-buffer name="sorted" group="sort" />
+      </stx:result-buffer>
+    </stx:while>
+    <!-- output -->
+    <stx:copy>
+      <stx:process-buffer name="sorted" />
+    </stx:copy>
+    <stx:value-of select="concat('&#xA;', $counter, ' iterations')" />
+  </stx:template>
+
+  <stx:group name="sort">
+    <!-- first value: store -->
+    <stx:template match="value">
+      <stx:assign name="changed" select="false()" />
+      <stx:assign name="value" select="." />
+      <stx:process-siblings while="value" group="compare" />
+      <!-- insert last stored value -->
+      <value>
+        <stx:value-of select="$value" />
+      </value>
+    </stx:template>
+  </stx:group>
+  
+  <stx:group name="compare">
+    <!-- compare current value with the stored one -->
+    <stx:template match="value">
+      <stx:copy>
+        <stx:if test=". &lt; $value">
+          <stx:value-of select="." />
+          <stx:assign name="changed" select="true()" />
+        </stx:if>
+        <stx:else>
+          <stx:value-of select="$value" />
+          <stx:assign name="value" select="." />
+        </stx:else>
+      </stx:copy>
+    </stx:template>
+  </stx:group>
+
+</stx:transform>

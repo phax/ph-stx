@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- group orders by first letter (from the xml.com article) -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+
+  <stx:variable name="sum" select="0" />
+  <stx:variable name="pieces" select="0" />
+  
+  <stx:template match="order-list">
+    <html>
+      <body>
+        <h2>Order Summary</h2>
+        <stx:process-children />
+        <stx:end-element name="ul" />
+        <hr width="20%" align="left" />
+        <p>
+          Number of plants: <stx:value-of select="$pieces" /><br />
+          Overall price: <stx:value-of select="$sum" />
+        </p>
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:group>
+    <stx:variable name="name" />
+    <stx:variable name="quantity" />
+    <stx:variable name="price" />
+    <stx:variable name="current-initial" />
+  
+    <stx:template match="order" public="yes">
+      <stx:assign name="quantity" select="1" />
+      <stx:process-children /> <!-- collect data -->
+      <stx:variable name="new-initial" select="substring($name,1,1)" />
+      <stx:if test="$new-initial != $current-initial">
+        <stx:if test="position() != 1">
+          <stx:end-element name="ul" />
+        </stx:if>
+        <stx:text>&#xA;</stx:text>
+        <h3><stx:value-of select="$new-initial" /></h3>
+        <stx:text>&#xA;</stx:text>
+        <stx:start-element name="ul" />
+        <stx:assign name="current-initial" select="$new-initial" />
+      </stx:if>
+      <stx:assign name="sum" select="$sum + $quantity * $price" />
+      <stx:assign name="pieces" select="$pieces + $quantity" />
+      <li>
+        <stx:value-of select="$quantity" />
+        <stx:text> </stx:text>
+        <b><stx:value-of select="$name" /></b>
+        <stx:value-of select="concat(': ', $quantity * $price)" />
+      </li>
+      <stx:text>&#xA;</stx:text>
+    </stx:template>
+
+    <stx:template match="name">
+      <stx:assign name="name" select="." />
+    </stx:template>
+
+    <stx:template match="quantity">
+      <stx:assign name="quantity" select="." />
+    </stx:template>
+
+    <stx:template match="price">
+      <stx:assign name="price" select="." />
+    </stx:template>
+  </stx:group>
+  
+</stx:transform>

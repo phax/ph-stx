@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- The identity transformation -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+  <stx:template match="/">
+    <stx:result-document href="foo.xml" output-encoding="iso-8859-1">
+      <bar baz="ä" />
+    </stx:result-document>
+  </stx:template>
+</stx:transform>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!-- Well, this is of course no complete transformation sheet for a
+     HTML to DocBook conversion. It simply demonstrates the generation
+     of DocBook sections -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+  
+  <stx:template match="html">
+    <article>
+      <stx:process-children />
+    </article>
+  </stx:template>
+
+  <stx:template match="head">
+    <artheader>
+      <stx:process-children />
+    </artheader>
+  </stx:template>
+
+  <stx:template match="title">
+    <title>
+      <stx:process-children />
+    </title>
+  </stx:template>
+
+  <stx:template match="p">
+    <para>
+      <stx:process-children />
+    </para>
+  </stx:template>
+
+  <stx:template match="h1">
+    <sect1>
+      <title><stx:value-of select="." /></title>
+      <stx:process-siblings until="h1" />
+    </sect1>
+  </stx:template>
+
+  <stx:template match="h2">
+    <sect2>
+      <title><stx:value-of select="." /></title>
+      <stx:process-siblings until="h2 | h1" />
+    </sect2>
+  </stx:template>
+
+</stx:transform>

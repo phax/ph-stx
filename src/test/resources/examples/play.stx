@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!-- Shakespeare -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+  
+  <stx:template match="PLAY">
+    <html>
+      <stx:process-children />
+      <stx:end-element name="body" />
+    </html>
+  </stx:template>
+  
+  <!-- put title into <head><title> *and* <h1> -->
+  <stx:variable name="title" />
+  
+  <stx:template match="PLAY/TITLE/text()">
+    <stx:assign name="title" select="." />
+  </stx:template>
+  
+  <stx:template match="PLAY/TITLE">
+    <stx:process-children />
+    <head>
+      <title>
+        <stx:value-of select="$title" />
+      </title>
+    </head>
+    <stx:start-element name="body" />
+    <h1 style="text-align: center">
+      <stx:value-of select="$title" />
+    </h1>
+  </stx:template>
+  
+  
+  <!-- ignore these elements -->
+  <stx:template match="FM | PERSONAE | SCNDESCR | PLAYSUBT" />
+  
+
+  <!-- different title sizes -->
+  <stx:template match="ACT/TITLE/text()">
+    <h2>
+      <stx:value-of select="." />
+    </h2>
+  </stx:template>
+  
+  <stx:template match="SCENE/TITLE/text()">
+    <h3>
+      <stx:value-of select="." />
+    </h3>
+  </stx:template>
+
+  
+  <!-- different stage directives -->
+  <stx:template match="SCENE/STAGEDIR">
+    <p>
+      <i>
+        <stx:process-children />
+      </i>
+    </p>
+  </stx:template>
+  
+  <stx:template match="SPEECH/STAGEDIR">
+    <br />
+    <i>
+      <stx:process-children />
+    </i>
+  </stx:template>
+
+
+  <!-- process speeches -->
+  <stx:template match="SPEECH">
+    <table>
+      <tr>
+        <stx:process-children />
+        <stx:end-element name="td" />
+      </tr>
+    </table>
+  </stx:template>
+
+  <!-- remove newlines -->
+  <stx:template match="SPEECH/text()" />
+
+  
+  <stx:template match="SPEAKER">
+    <stx:if test="position() = 1">
+      <stx:start-element name="td" />
+      <stx:attribute name="valign" select="'top'" />
+      <stx:attribute name="width" select="'210px'" />
+    </stx:if>
+    <stx:if test="position() != 1">, </stx:if>
+    <b>
+      <stx:process-children />
+    </b>
+  </stx:template>
+  
+  
+  <stx:template match="LINE">
+    <stx:if test="position()=1">
+      <stx:end-element name="td" />
+      <stx:text>&#xA;</stx:text>
+      <stx:start-element name="td" />
+    </stx:if>
+    <stx:if test="position()!=1">
+      <br />
+      <stx:text>&#xA;</stx:text>
+    </stx:if>
+    <stx:process-children />
+  </stx:template>
+
+</stx:transform>

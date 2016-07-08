@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+
+<stx:buffer name="xsl-code">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+
+<xsl:template match="/">
+
+XSLT:
+  without DOE: <xsl:text disable-output-escaping="no"><![CDATA[<>]]></xsl:text>
+  with DOE: <xsl:text disable-output-escaping="yes"><![CDATA[<>]]></xsl:text>
+</xsl:template>
+
+</xsl:stylesheet>
+</stx:buffer>
+
+
+
+<stx:template match="/">
+STX:
+  <stx:text><![CDATA[<>]]></stx:text>
+  <stx:processing-instruction name="javax.xml.transform.disable-output-escaping" />
+  ON: <stx:text><![CDATA[<>]]></stx:text>
+  <stx:processing-instruction name="javax.xml.transform.enable-output-escaping" />
+  OFF: <stx:text><![CDATA[<>]]></stx:text>
+
+  <stx:process-self filter-method="http://www.w3.org/1999/XSL/Transform"
+                    filter-src="buffer(xsl-code)" />
+</stx:template>
+
+</stx:transform>

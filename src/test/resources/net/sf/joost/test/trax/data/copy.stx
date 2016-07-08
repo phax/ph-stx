@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- The identity transformation -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+  <stx:template match="node()">
+    <stx:copy attributes="@*">
+      <stx:process-children />
+    </stx:copy>
+  </stx:template>
+</stx:transform>

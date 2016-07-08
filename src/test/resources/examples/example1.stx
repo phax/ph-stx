@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- The very first STX example -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+
+  <stx:variable name="day" select="'Monday'" />
+
+  <stx:template match="list">
+    <stx:copy attributes="@*">
+      <stx:attribute name="date" select="$day" />
+      <stx:process-children />
+    </stx:copy>
+  </stx:template>
+  
+  <stx:template match="item">
+    <item>
+      <id><stx:value-of select="@id" /></id>
+      <stx:if test="@id=2">
+        <note>the item we have been looking for</note>
+      </stx:if>
+      <stx:process-children />
+      <date><stx:value-of select="$day" /></date>
+    </item>
+  </stx:template>
+  
+  <stx:template match="item/text()">
+    <text><stx:copy /></text>
+  </stx:template>
+  
+</stx:transform>

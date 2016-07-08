@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<turing-machine version="0.1">
+
+<!-- This Turing machine (TM) implements a string length
+     function. The input tape should be a string consisting
+     of zero or more non-blank symbols. The final tape 
+     will contain the length of the string.
+
+     If this Turing machine processes the following input tape:
+         aabbcc
+     then it will produce the following final tape:
+         6
+
+     This Turing Machine Markup Language (TMML) document complies
+     with the DTD for TMML, which is available at 
+     http://www.unidex.com/turing/tmml.dtd.
+
+     This Turing machine can be executed by an XSLT stylesheet that is
+     available at http://www.unidex.com/turing/utm.xsl. This stylesheet
+     is a Universal Turing Machine.
+
+     The following Instant Saxon command will execute the Turing machine
+     described by this TMML document using the utm.xsl stylesheet:
+
+        saxon string_length_tm.xml utm.xsl tape="aaabbb"
+
+     This TMML document is available at 
+     http://www.unidex.com/turing/string_length_tm.xml.
+
+     Developed by Bob Lyons of Unidex, Inc.
+
+     Please email any comments about this TMML document to 
+     boblyons@unidex.com.
+-->
+
+<!-- COPYRIGHT NOTICE and LICENSE.
+
+     Copyright (c) 2001 Unidex, Inc. All rights reserved.
+
+     Unidex, Inc. grants you permission to copy, modify, distribute,
+     and/or use the TMML document provided that you agree to the
+     following conditions:
+
+     1. You must include this COPYRIGHT NOTICE and LICENSE
+        in all copies or substantial portions of the TMML document.
+
+     2. The TMML document is licensed to the user on an "AS IS" basis.
+        Unidex Inc. makes no warranties, either express or implied,
+        with respect to the TMML document including but not limited to any
+        warranty of merchantability or fitness for any particular
+        purpose. Unidex Inc. does not warrant that the operation
+        of the TMML document will be uninterrupted or error-free,
+        or that defects in the TMML document will be corrected.
+        You the user are solely responsible for determining the 
+        appropriateness of the TMML document for your use and accept
+        full responsibility for all risks associated with its use. 
+        Unidex Inc. is not and will not be liable for any
+        direct, indirect, special, incidental or other damages 
+        of any kind (including loss of profits or interruption of business)
+        however caused even if Unidex Inc. has been advised of the 
+        possibility of such damages.
+-->
+
+    <!-- The symbols for the Turing machine. The digits are for the
+         counter (i.e., the string length). The input
+         string may contain the symbols "a" and "b". 
+         We use the default value for the blank symbol (i.e.,
+         the space character).
+    -->
+    <symbols>0123456789ab</symbols>
+
+    <!-- The states for the Turing machine.
+         There should be one start state and one or more halt states.
+    -->
+    <states>
+        <state start="yes">start</state>
+        <state halt="yes">string_is_null</state>
+        <state>move_left_to_initialize_counter</state>
+        <state>initialize_counter</state>
+        <state>move_left_to_blank_before_input</state>
+        <state>move_right_to_blank_before_input</state>
+        <state>move_right_to_blank_after_input</state>
+        <state>move_left_to_last_symbol_in_input</state>
+        <state>increment_counter</state>
+        <state halt="yes">stop</state>
+    </states>
+
+    <!-- The transition function for the Turing machine.
+    -->
+    <transition-function>
+        <mapping>
+            <from current-state="start" current-symbol=" "/>
+            <to next-state="string_is_null" next-symbol="0" movement="none"/>
+        </mapping>
+        <mapping>
+            <from current-state="start" current-symbol="a"/>
+            <to next-state="move_left_to_initialize_counter" next-symbol="a" movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="start" current-symbol="b"/>
+            <to next-state="move_left_to_initialize_counter" next-symbol="b" movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_initialize_counter" current-symbol=" "/>
+            <to next-state="initialize_counter" next-symbol=" " movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="initialize_counter" current-symbol=" "/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="0" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="0"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="0" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="1"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="1" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="2"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="2" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="3"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="3" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="4"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="4" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="5"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="5" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="6"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="6" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="7"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="7" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="8"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="8" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol="9"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="9" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_before_input" current-symbol=" "/>
+            <to next-state="move_right_to_blank_after_input" next-symbol=" " movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_after_input" current-symbol="a"/>
+            <to next-state="move_right_to_blank_after_input" next-symbol="a" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_after_input" current-symbol="b"/>
+            <to next-state="move_right_to_blank_after_input" next-symbol="b" movement="right"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_right_to_blank_after_input" current-symbol=" "/>
+            <to next-state="move_left_to_last_symbol_in_input" next-symbol=" " movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_last_symbol_in_input" current-symbol="a"/>
+            <to next-state="move_left_to_blank_before_input" next-symbol=" " movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_last_symbol_in_input" current-symbol="b"/>
+            <to next-state="move_left_to_blank_before_input" next-symbol=" " movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_last_symbol_in_input" current-symbol=" "/>
+            <to next-state="stop" next-symbol=" " movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_blank_before_input" current-symbol="b"/>
+            <to next-state="move_left_to_blank_before_input" next-symbol="b" movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_blank_before_input" current-symbol="a"/>
+            <to next-state="move_left_to_blank_before_input" next-symbol="a" movement="left"/>
+        </mapping>
+        <mapping>
+            <from current-state="move_left_to_blank_before_input" current-symbol=" "/>
+            <to next-state="increment_counter" next-symbol=" " movement="left"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 9 to a 0 and move left. -->
+            <from current-state="increment_counter" current-symbol="9"/>
+            <to next-state="increment_counter" next-symbol="0" movement="left"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the blank to a 1. -->
+            <from current-state="increment_counter" current-symbol=" "/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="1" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 0 to a 1. -->
+            <from current-state="increment_counter" current-symbol="0"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="1" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 1 to a 2. -->
+            <from current-state="increment_counter" current-symbol="1"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="2" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 2 to a 3. -->
+            <from current-state="increment_counter" current-symbol="2"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="3" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 3 to a 4. -->
+            <from current-state="increment_counter" current-symbol="3"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="4" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 4 to a 5. -->
+            <from current-state="increment_counter" current-symbol="4"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="5" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 5 to a 6. -->
+            <from current-state="increment_counter" current-symbol="5"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="6" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 6 to a 7. -->
+            <from current-state="increment_counter" current-symbol="6"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="7" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 7 to a 8. -->
+            <from current-state="increment_counter" current-symbol="7"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="8" movement="right"/>
+        </mapping>
+        <mapping>
+	    <!-- Change the 8 to a 9. -->
+            <from current-state="increment_counter" current-symbol="8"/>
+            <to next-state="move_right_to_blank_before_input" next-symbol="9" movement="right"/>
+        </mapping>
+    </transition-function>
+</turing-machine>

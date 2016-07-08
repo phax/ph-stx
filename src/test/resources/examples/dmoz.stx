@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!DOCTYPE stx:transform [
+<!ENTITY nl "<stx:text>&#xA;</stx:text>">
+]>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:r="http://www.w3.org/TR/RDF/"
+               xmlns:d="http://purl.org/dc/elements/1.0/"  
+               xmlns:od="http://dmoz.org/rdf"
+               xmlns="http://www.w3.org/1999/xhtml"
+               version="1.0"
+               exclude-result-prefixes="#all"
+               strip-space="yes">
+
+  <stx:param name="css" select="'dmoz.css'" />
+
+  <stx:variable name="subtopics" select="true()"/>
+  
+  <stx:template match="od:RDF">
+    <html>
+      <head>
+        <link rel="stylesheet" type="text/css" href="{$css}" />
+        <title>The Open Directory</title>
+      </head>
+      <body>
+        <h2>The Open Directory</h2>
+        <p>
+          This page was created from the RDF content dump (see
+          <a href="http://rdf.dmoz.org/">http://rdf.dmoz.org/</a>).
+        </p>
+        <ul class="topics">
+          <stx:process-children />
+        </ul>
+        <hr />
+        <p class="foot">Powered by STX</p>
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:variable name="has-pages" />
+  <stx:variable name="catid" />
+  
+  <stx:template match="od:Topic">
+    <stx:param name="base" />
+    <stx:param name="ancestors" select="'.'" />
+    <stx:param name="cssfile" select="$css" />
+
+    <stx:variable name="eid" select="escape-uri(@r:id,false())" />
+    <stx:message>
+      <stx:value-of select="$eid" />
+    </stx:message>
+    <stx:variable name="filename"
+                  select="substring-after(@r:id, $base)" />
+
+    <!--
+    We're using escape-uri() to create a filename that can be used on
+    every file system without problems. But then we have to replace
+    the '%' sign with a different character to prevent a browser from
+    unescaping the filename within a link.
+    First idea: This character should be one that will be escaped normally
+    (to avoid ambiguities), but on the other hand one that can be used
+    inside a filename without problems. The '^' character seems to be a
+    reasonable choice. Unfortunately the current data in content.rdf.u8
+    produces too long file names with this approach.
+    Thus second idea: remove the '%', though this is not safe (might
+    not be unique and conflict with existing names, which admittedly
+    is rather unlikely.)
+    -->
+    <stx:variable name="efilename"
+                  select="translate(escape-uri($filename, false()),
+                                    '%', '')" />
+    
+    <stx:if test="not($subtopics)">
+      <stx:start-element name="ul" />
+      <stx:attribute name="class" select="'topics'" />
+    </stx:if>
+    <li>
+      <a href="{translate(escape-uri($ancestors, false()),
+                          '%', '')}/{$efilename}.html">
+        <stx:value-of select="$filename" />
+      </a>
+    </li>
+    &nl;
+    <stx:result-document href="{concat(translate($eid, '%', ''), '.html')}">
+      <html>
+        &nl;
+        <head>
+          <title>
+            <stx:text>DMOZ: </stx:text>
+            <stx:value-of select="@r:id" />
+          </title>
+          &nl;
+          <link rel="stylesheet" style="text/css" href="{$cssfile}" />
+        </head>
+        &nl;
+        <body>
+          <h3>
+            <stx:variable name="len" select="count($ancestors)" />
+            <stx:variable name="cnt" select="$len" />
+            <stx:for-each-item name="dummy" select="$ancestors">
+              
+              <stx:variable name="item"
+                            select="item-at($ancestors, $cnt)" />
+              <stx:if test="$len = $cnt">
+                <a href="{$item}/index.html">DMOZ</a>
+                <stx:text> | </stx:text>
+              </stx:if>
+              <stx:else>
+                <a href="../{translate(escape-uri($item, false()),
+                                       '%', '')}.html">
+                  <stx:value-of select="substring($item, $cnt*3-2)" />
+                </a>: <stx:text />
+              </stx:else>
+              <stx:assign name="cnt" select="$cnt - 1" />
+            </stx:for-each-item>
+            <stx:value-of select="$filename" />
+          </h3>
+          &nl;
+          <stx:assign name="has-pages" select="false()" />
+          <stx:process-children group="t" />
+          <p class="cat">Category id: <stx:value-of select="$catid" /></p>
+          &nl;
+          <p>All of the following data are used under the
+            <a href="http://rdf.dmoz.org/license.html">Open Directory
+              License</a>.</p>
+          &nl;
+          <stx:if test="$has-pages">
+            <dl class="pages">
+              <stx:process-siblings while="od:ExternalPage | comment()" />
+            </dl>
+            <hr />
+            &nl;
+          </stx:if>
+          <stx:assign name="subtopics" select="false()" />
+          <stx:variable name="id" select="concat(@r:id, '/')" />
+          <stx:variable name="apath" select="()" />
+          <stx:for-each-item name="a" select="$ancestors">
+            <stx:assign name="apath"
+                        select="($apath, concat('../', $a))" />
+          </stx:for-each-item>
+          <stx:process-siblings
+               until="od:Topic[not(starts-with(@r:id, $id))]">
+            <stx:with-param name="base" select="$id" />
+            <stx:with-param name="ancestors" select="($filename, $apath)" />
+            <stx:with-param name="cssfile"
+                            select="concat('../', $cssfile)" />
+          </stx:process-siblings>
+          <stx:if test="$subtopics">
+            <stx:end-element name="ul" />
+            <hr />
+          </stx:if>
+          &nl;
+
+          <div align="center">
+          <!-- Attribution copied from http://dmoz.org/become_an_editor/ -->
+<p><table border="0" bgcolor="#336600" cellpadding="3" cellspacing="0">
+<tr>
+<td>
+    <table width="100%" cellpadding="2" cellspacing="0" border="0">
+        <tr align="center">
+        <td><font face="sans-serif, Arial, Helvetica" size="2"
+            color="#FFFFFF">Help build the largest human-edited
+            directory on the web.</font></td></tr>
+        <tr bgcolor="#CCCCCC" align="center">
+        <td><font face="sans-serif, Arial, Helvetica" size="2"> <a
+            href="http://dmoz.org/cgi-bin/add.cgi?where={$eid}">Submit
+            a Site</a> - <a href="http://dmoz.org/about.html"><b>Open
+            Directory Project</b></a> -
+            <a href="http://dmoz.org/cgi-bin/apply.cgi?where={$eid}">Become
+            an Editor</a> </font>
+        </td></tr>
+    </table>
+</td>
+</tr>
+</table></p>
+          </div>
+          &nl;
+          <p class="foot">Powered by STX</p>
+          &nl;
+        </body>
+      </html>
+    </stx:result-document>
+    <stx:assign name="subtopics" select="true()" />
+  </stx:template>
+
+  <stx:group name="t">
+    <stx:template match="od:catid">
+      <stx:assign name="catid" select="." />
+    </stx:template>
+    
+    <stx:template match="od:link">
+      <stx:assign name="has-pages" select="true()" />
+    </stx:template>
+  </stx:group>
+
+  <stx:template match="d:Title">
+    <dt>
+      <strong>
+        <a href="{escape-uri(../@about, false())}" target="_blank">
+          <stx:value-of select="." />
+        </a>
+      </strong>
+    </dt>
+    &nl;
+  </stx:template>
+  
+  <stx:template match="d:Description">
+    <dd>
+      <stx:value-of select="." />
+    </dd>
+    &nl;
+  </stx:template>
+  
+</stx:transform>

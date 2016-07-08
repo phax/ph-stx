@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!-- Example from the XML Europe 2003 paper
+     "Transforming XML on the Fly", 8 May 2003, London -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:r="http://www.w3.org/TR/RDF/"
+               xmlns:d="http://purl.org/dc/elements/1.0/"  
+               xmlns:od="http://dmoz.org/rdf"
+               xmlns="http://www.w3.org/1999/xhtml"
+               version="1.0"
+               exclude-result-prefixes="#all"
+  >
+
+  <!-- Parameter for identifying the requested category -->
+  <stx:param name="catid" />
+
+  <stx:template match="od:RDF">
+    <html>
+      <body>
+        <stx:process-children />
+      </body>
+    </html>
+  </stx:template>
+
+  <stx:variable name="resources" />
+
+  <!-- Group for Topic elements -->
+  <stx:group>
+    <stx:variable name="found" select="false()" />
+
+    <stx:template match="od:Topic" public="yes">
+      <stx:assign name="resources" select="()" />
+      <stx:process-children />
+      <stx:if test="$found and $resources">
+        <!-- We found the category and there are resources -->
+        <stx:text>&#xA;</stx:text>
+        <h3>Resources in <stx:value-of select="@r:id" /></h3>
+        <stx:text>&#xA;</stx:text>
+        <dl>
+          <stx:process-siblings while="od:ExternalPage|text()"
+                                group="ep" /> 
+        </dl>
+      </stx:if>
+    </stx:template>
+
+    <stx:template match="od:catid">
+      <stx:assign name="found" select=". = $catid" />
+    </stx:template>
+
+    <stx:template match="od:link">
+      <stx:assign name="resources"
+                  select="($resources, @r:resource)" />
+    </stx:template>
+  </stx:group>
+
+  <!-- Group for ExternalPage elements -->
+  <stx:group name="ep">
+    <stx:template match="od:ExternalPage">
+      <!-- Is this page among the resources? -->
+      <stx:if test="@about = $resources">
+        <stx:process-children />
+      </stx:if>
+    </stx:template>
+
+    <!-- Output Title and Description -->
+    <stx:template match="d:Title">
+      <dt><a href="{../@about}"><stx:value-of select="." /></a></dt>
+      <stx:text>&#xA;</stx:text>
+    </stx:template>
+
+    <stx:template match="d:Description">
+      <dd><stx:value-of select="." /></dd>
+      <stx:text>&#xA;</stx:text>
+    </stx:template>
+  </stx:group>
+
+</stx:transform>

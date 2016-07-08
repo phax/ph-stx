@@ -1,0 +1,4 @@
+@@@ $Id: version.txt,v 1.5 2009/09/13 20:29:55 obecker Exp $
+Joost version @@@VERSION@@@ created on @@@DATE@@@ by Oliver Becker
+@@@ START DEBUG ONLY
+Built by @@@USER@@@ with debug info included.

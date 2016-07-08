@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- example for verbatim output -->
+<root>
+  <test xmlns:x="uri:x" att="x:value">
+    <x:test xmlns="uri:other"/>
+  </test>
+  <skip><x:all xmlns:x="uri:x2"><contained/> text </x:all></skip>
+  <or xmlns="uri:or-default">
+    <perform xmlns:one="uri:one" xmlns="">
+      <default xmlns:two="uri:two">
+        <one:test t="two:processing" xmlns:three="uri:three"/>
+      </default>
+    </perform>
+    <!-- enough? --><?almost?>
+  </or>
+  <default:test xmlns:default="uri:d" />
+</root>
+<?dummy nop?>

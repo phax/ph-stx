@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<container>
+  <title>A Test</title>
+  <foo key="a">
+    <title>The Foo</title>
+    <remark>precious</remark>
+    <bar key="b">
+      <title>The Bar</title>
+      <remark>trashy</remark>
+    </bar>
+    <baz key="c">
+      <title>The Baz</title>
+      <remark>no comment</remark>
+      <zork key="d">
+        <title>The Zork</title>
+        <remark>bland</remark>
+      </zork>
+    </baz>
+    <wombat key="e">
+      <title>The Wombat</title>
+      <remark>awesome</remark>
+    </wombat>
+  </foo>
+</container>

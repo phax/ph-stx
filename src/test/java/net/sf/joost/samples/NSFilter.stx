@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+ | $Id: NSFilter.stx,v 1.1 2007/07/15 15:32:29 obecker Exp $
+ | Self-containing example for using an external SAX filter.
+ | Since this example transforms only data from a buffer, it will
+ | produce the same result on whatever XML input.
+ | 
+ | Usage: java samples.NSFilter foo.xml NSFilter.stx
+ |
+ | Expected result: see bottom of this file.
+ | Author: Oliver Becker
+ +-->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:ns1="urn:namespace-1"
+               xmlns:ns2="urn:namespace-2"
+               version="1.0">
+
+  <stx:variable name="ns1" select="'urn:namespace-1'" />
+  <stx:variable name="ns2" select="'urn:namespace-2'" />
+
+  <stx:variable name="filter"
+                select="'http://joost.sf.net/samples/NSFilter'" />
+  
+  <stx:buffer name="data" xml:space="preserve">
+    <foo>
+      <ns1:bar>in namespace 1</ns1:bar>
+      <ns2:bar>in namespace 2</ns2:bar>
+      <bar>in no namespace</bar>
+    </foo>
+  </stx:buffer>
+  
+  <stx:template match="/">
+    <result>
+      <stx:if test="filter-available($filter)">
+        <!-- full -->
+        <stx:process-buffer name="data" filter-method="{$filter}" />
+
+        <stx:text />  filter <stx:value-of select="$ns1" />
+        <stx:process-buffer name="data" filter-method="{$filter}">
+          <stx:with-param name="uri" select="$ns1" />
+        </stx:process-buffer>
+
+        <stx:text />  filter <stx:value-of select="$ns2" />
+        <stx:process-buffer name="data" filter-method="{$filter}">
+          <stx:with-param name="uri" select="$ns2" />
+        </stx:process-buffer>
+
+        <stx:text>  filter both</stx:text>
+        <stx:buffer name="tmp">
+          <stx:process-buffer name="data" filter-method="{$filter}">
+            <stx:with-param name="uri" select="$ns1" />
+          </stx:process-buffer>
+        </stx:buffer>
+        <stx:process-buffer name="tmp" filter-method="{$filter}">
+          <stx:with-param name="uri" select="$ns2" />
+        </stx:process-buffer>
+      </stx:if>
+      <stx:else>
+        <stx:value-of select="concat('Filter ', $filter, ' not available')" />
+      </stx:else>
+    </result>
+  </stx:template>
+
+</stx:transform>
+
+
+<!-- Expected result:
+<?xml version="1.0" encoding="UTF-8"?>
+<result xmlns:ns2="urn:namespace-2" xmlns:ns1="urn:namespace-1">
+    <foo>
+      <ns1:bar>in namespace 1</ns1:bar>
+      <ns2:bar>in namespace 2</ns2:bar>
+      <bar>in no namespace</bar>
+    </foo>
+    filter urn:namespace-1
+    <foo>
+      
+      <ns2:bar>in namespace 2</ns2:bar>
+      <bar>in no namespace</bar>
+    </foo>
+    filter urn:namespace-2
+    <foo>
+      <ns1:bar>in namespace 1</ns1:bar>
+      
+      <bar>in no namespace</bar>
+    </foo>
+    filter both
+    <foo>
+      
+      
+      <bar>in no namespace</bar>
+    </foo>
+  </result>
+-->

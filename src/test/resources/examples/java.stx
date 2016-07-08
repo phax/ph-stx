@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!-- Calls to Java extension functions -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:r="java:java.util.Random"
+               xmlns:m="java:java.lang.Math"
+               xmlns:v="java:java.util.Vector"
+               xmlns:e="java:java.util.Enumeration"
+               xmlns:joost="http://joost.sf.net/extension"
+               version="1.0">
+
+  <stx:template match="init">
+    <!-- rand = new Random(987654); -->
+    <stx:variable name="rand" select="r:new(.)" />
+    <stx:variable name="min" select="101" />
+    <stx:variable name="max" select="-1" />
+    <!-- vec = new Vector() -->
+    <stx:variable name="vec" select="v:new()" />
+    <stx:for-each-item name="i" select="(1,2,3,4,5, 6, 7, 8, 9, 10)">
+      <!-- r = rand.nextInt(100); -->
+      <stx:variable name="r" select="r:next-int($rand, 100)" />
+      <stx:value-of select="$r" />, <stx:text />
+      <!-- min = Math.min(min, r); -->
+      <stx:assign name="min" select="m:min($min, $r)" />
+      <stx:assign name="max" select="m:max($max, $r)" />
+      <!-- vec.add(r); -->
+      <stx:if test="v:add($vec, $r)" />
+      <!-- or: <stx:variable name="dummy" select="v:add($vec,$r)" /> -->
+    </stx:for-each-item>
+    <stx:text>&#xA;</stx:text>
+    <!-- el = vec.elements(); -->
+    <stx:variable name="el" select="v:elements($vec)" />
+    <!-- while(el.hasMoreElements()) -->
+    <stx:while test="e:has-more-elements($el)">
+      <!-- el.nextElement(); -->
+      <stx:value-of select="e:next-element($el)" />, <stx:text />
+    </stx:while>
+    <stx:text>&#xA;</stx:text>
+    <!-- convert the array from vec.toArray() to a sequence by calling
+         the Joost extension function "sequence"
+         (stx:value-of select="v:to-array($vec)" would output a stringified
+         reference of an array, e.g. "[Ljava.lang.Object;@62dae9") -->
+    <stx:value-of select="joost:sequence(v:to-array($vec))" separator=", " />
+    <stx:text>&#xA;</stx:text>
+    <!-- convert the Vector object directly
+         (it implements the java.util.List interface) -->
+    <stx:value-of select="joost:sequence($vec)" separator=", " />
+    <stx:text />&#xA;min: <stx:value-of select="$min" />
+    <stx:text />&#xA;max: <stx:value-of select="$max" />
+  </stx:template>
+
+</stx:transform>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               version="1.0" pass-through="all">
+
+  <!-- text for one indentation level -->
+  <stx:param name="indent" select="'  '" />
+
+  <!-- setting this parameter to true will indent only on white-space nodes,
+       the value false indents also if there's no text between two elements,
+       for example <i>in this </i><b>situation</b> -->
+  <stx:param name="retain" select="false()" />
+  
+  <stx:variable name="doindent" select="false()" />
+  
+  <stx:template match="text()">
+    <stx:if test="normalize-space()">
+      <stx:value-of select="." />
+      <stx:assign name="doindent" select="false()" />
+    </stx:if>
+    <stx:else>
+      <stx:assign name="doindent" select="true()" />
+    </stx:else>
+  </stx:template>
+  
+  <stx:template match="*">
+    <stx:if test="$doindent">
+      <stx:text>&#xA;</stx:text>
+      <stx:value-of select="string-pad($indent,count(//*)-1)" />
+    </stx:if>
+    <stx:assign name="doindent" select="not($retain)" />
+    <stx:copy attributes="@*">
+      <stx:process-children />
+      <stx:if test="$doindent and has-child-nodes()">
+        <stx:text>&#xA;</stx:text>
+        <stx:value-of select="string-pad($indent,count(//*)-1)" />
+      </stx:if>
+      <stx:assign name="doindent" select="not($retain)" />
+    </stx:copy>
+  </stx:template>
+
+  <stx:template match="comment() | processing-instruction()">
+    <stx:if test="$doindent">
+      <stx:text>&#xA;</stx:text>
+      <stx:value-of select="string-pad($indent,count(//*))" />
+    </stx:if>
+    <stx:copy />
+    <stx:assign name="doindent" select="not($retain)" />
+  </stx:template>
+
+</stx:transform>

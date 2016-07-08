@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!-- Shakespeare with stx:process-siblings and without stx:xxx-element -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+  
+  <stx:template match="PLAY">
+    <html>
+      <stx:process-children />
+    </html>
+  </stx:template>
+  
+  <stx:template match="PLAY/TITLE">
+    <head>
+      <title>
+        <stx:value-of select="." />
+      </title>
+    </head>
+    <body>
+      <h1 style="text-align: center">
+        <stx:value-of select="." />
+      </h1>
+      <stx:process-siblings />
+    </body>
+  </stx:template>
+  
+  
+  <!-- ignore these elements -->
+  <stx:template match="FM | PERSONAE | SCNDESCR | PLAYSUBT" />
+  
+
+  <!-- different title sizes -->
+  <stx:template match="ACT/TITLE">
+    <h2>
+      <stx:value-of select="." />
+    </h2>
+  </stx:template>
+  
+  <stx:template match="SCENE/TITLE">
+    <h3>
+      <stx:value-of select="." />
+    </h3>
+  </stx:template>
+
+  
+  <!-- different stage directives -->
+  <stx:template match="SCENE/STAGEDIR">
+    <p>
+      <i>
+        <stx:process-children />
+      </i>
+    </p>
+  </stx:template>
+  
+  <stx:template match="SPEECH/STAGEDIR">
+    <br />
+    <i>
+      <stx:process-children />
+    </i>
+  </stx:template>
+
+
+  <!-- process speeches -->
+  <stx:template match="SPEECH">
+    <table>
+      <tr>
+        <stx:process-children />
+      </tr>
+    </table>
+  </stx:template>
+
+  <!-- remove newlines -->
+  <stx:template match="SPEECH/text()" />
+
+  <!-- there is always at least one SPEAKER; create the two columns -->
+  <stx:template match="SPEAKER[1]">
+    <td valign="top" width="210px">
+      <b><stx:value-of select="." /></b>
+      <stx:process-siblings while="SPEAKER | text()" />
+    </td>
+    <stx:text>&#xA;</stx:text>
+    <td>
+      <stx:process-siblings />
+    </td>
+  </stx:template>
+
+  
+  <stx:template match="SPEAKER">
+    <stx:text>, </stx:text>
+    <b><stx:value-of select="." /></b>
+  </stx:template>
+
+  
+  <stx:template match="LINE">
+    <stx:if test="position() != 1">
+      <br />
+      <stx:text>&#xA;</stx:text>
+    </stx:if>
+    <stx:process-children />
+  </stx:template>
+
+</stx:transform>

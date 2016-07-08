@@ -1,0 +1,27 @@
+@@@ $Id: usage.txt,v 1.3 2009/09/13 19:03:32 obecker Exp $
+Usage:
+java net.sf.joost.Main [options] xml-src stx-src [params] {stx-src [params]}
+
+Options:
+  -help            print this message
+  -version         print the version information and exit
+  -o <filename>    write the result to the file <filename>
+  -m <classname>   use a <classname> object for stx:message output
+  -nodecl          omit XML declaration in the result
+  -noext           prevent calls on Java extension functions
+  -doe             interpret processing instructions for disable-output-escaping
+                   that stem from an inner filter XSLT transformation
+  -time            print timing information on standard error output
+  -pdf             pass the result to FOP for PDF generation (requires -o)
+@@@ START DEBUG ONLY
+  -log-properties <properties-file>
+                   use the file <properties-file> for log4j initialization
+                   (default is the embedded file log4j.properties)
+  -log-level all|debug|info|warn|error|fatal|all
+                   set the log level for the root logger object
+                   (default is specified in the properties file being used)
+@@@ END DEBUG ONLY
+
+The '-' for the xml-src parameter denotes the standard input.
+Parameters for the transformation (e.g. <stx:param name="par"/>) 
+must be specified as par=value

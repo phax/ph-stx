@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- join example -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="text">
+
+  <stx:template match="root">
+    <stx:copy>
+      <stx:text>&#xA;  </stx:text>
+      <data>
+        <stx:process-children />
+      </data>
+      <stx:text>&#xA;</stx:text>
+    </stx:copy>
+  </stx:template>
+
+  <stx:template match="root/text()" />
+  
+</stx:transform>

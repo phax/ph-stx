@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0" strip-space="yes">
+
+   <stx:variable name="xslt" select="'http://www.w3.org/1999/XSL/Transform'"/>
+
+	<!-- top level elements of the result -->
+   <stx:template match="/">
+      <ROOT>
+         <stx:process-children/>
+      </ROOT>
+   </stx:template>
+
+	<!-- this block is called for each result set row and is mapped by the embedded XSLT -->
+   <stx:template match="ENTRY">
+      <stx:process-children filter-method="{$xslt}" filter-src="buffer(my_xslt_code)"/>
+   </stx:template>
+
+   <stx:buffer name="my_xslt_code">
+      <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="http://xml.apache.org/xslt/java">
+         <xsl:template match="/">
+            <COMPUTED>
+               <!-- the extension function throws an exception that should be reported to the ErrorListener -->
+               <!-- currently it's only printed to std.err, the registered ErrorListener is never called -->
+               <xsl:value-of select="java:java.text.SimpleDateFormat.new('foo')"/>
+            </COMPUTED>
+            <FIXED>shouldn't this has been aborted before?!</FIXED>
+         </xsl:template>
+      </xsl:stylesheet>
+   </stx:buffer>
+
+</stx:transform>

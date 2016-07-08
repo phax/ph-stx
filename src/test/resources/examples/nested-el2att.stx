@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Pattern for transforming children to attributes in a nested structure -->
+
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0">
+  
+  <stx:variable name="title" />
+  <stx:template match="title">
+    <stx:assign name="title" select="." />
+  </stx:template>
+
+  <stx:variable name="remark" />
+  <stx:template match="remark">
+    <stx:assign name="remark" select="." />
+  </stx:template>
+  
+  <stx:template match="*[@key]/*[1]" priority="2">
+    <stx:process-self />
+    <stx:process-siblings until="*[@key]" />
+    <stx:text>&#xA;</stx:text>
+    <entry name="{name(..)}" key="{../@key}"
+           title="{$title}" remark="{$remark}">
+      <stx:process-siblings />
+    </entry>
+    <stx:text>&#xA;</stx:text>
+  </stx:template>
+
+</stx:transform>

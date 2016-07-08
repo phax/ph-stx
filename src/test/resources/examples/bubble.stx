@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!-- sort of complicated bubble sort algorithm ... -->
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns" version="1.0"
+               pass-through="all" strip-space="yes">
+
+  <!-- global variables -->
+  <stx:variable name="value" />
+  <stx:variable name="changed" select="true()" />
+
+  <!-- the sort buffer -->
+  <stx:buffer name="sorted" />
+
+  <!-- store first value -->
+  <stx:template match="value[1]">
+    <stx:assign name="value" select="." />
+  </stx:template>
+
+  <!-- compare current value with the stored one -->
+  <stx:template match="value">
+    <stx:copy>
+      <stx:if test=". &lt; $value">
+        <stx:value-of select="." />
+        <stx:assign name="changed" select="true()" />
+      </stx:if>
+      <stx:else>
+        <stx:value-of select="$value" />
+        <stx:assign name="value" select="." />
+      </stx:else>
+    </stx:copy>
+  </stx:template>
+    
+  <stx:template match="list[$changed]">
+    <stx:assign name="changed" select="false()" /> <!-- reset -->
+    <stx:result-buffer name="sorted" clear="yes">
+      <stx:copy>
+        <stx:process-children />
+        <!-- output last stored value -->
+        <value>
+          <stx:value-of select="$value" />
+        </value>
+      </stx:copy>
+    </stx:result-buffer>
+    <stx:process-buffer name="sorted" />
+  </stx:template>
+
+  <!-- a group for outputting the sorted result -->
+  <stx:group>
+    <!-- instantiated if $changed is false() -->
+    <stx:template match="list" public="yes">
+      <stx:copy>
+        <stx:process-children /> <!-- copy children per default -->
+      </stx:copy>
+    </stx:template>
+  </stx:group>
+    
+</stx:transform>
