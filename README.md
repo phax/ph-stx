@@ -1,2 +1,13 @@
 # ph-stx
-Java STX implementation based on Joost
+Java STX implementation based on Joost 0.9.1 from http://joost.sourceforge.net/
+Licensed under Mozilla Public License 1.1
+
+Changes so far:
+* Using Maven to build
+* Integrated jflex and java_cup for consistency
+* Upgraded to JUnit 4
+
+Todos:
+* Remove unnecessary dependencies
+* Changed to a more convenient grammar
+* Modernize
