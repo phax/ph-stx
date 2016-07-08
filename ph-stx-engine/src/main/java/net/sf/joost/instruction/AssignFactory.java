@@ -27,7 +27,6 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -44,7 +43,7 @@ import net.sf.joost.util.VariableUtils;
 /**
  * Factory for <code>assign</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.12 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -52,12 +51,12 @@ import net.sf.joost.util.VariableUtils;
 final public class AssignFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public AssignFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }
@@ -152,7 +151,7 @@ final public class AssignFactory extends FactoryBase
 
     /**
      * Assigns a value to a variable.
-     * 
+     *
      * @param v
      *        the value
      * @param context
@@ -180,8 +179,8 @@ final public class AssignFactory extends FactoryBase
         scopeDetermined = true;
       }
 
-      final Hashtable vars = (groupScope == null) ? context.localVars
-                                                  : (Hashtable) ((Stack) context.groupVars.get (groupScope)).peek ();
+      final Hashtable <String, Value> vars = (groupScope == null) ? context.localVars
+                                                                  : context.groupVars.get (groupScope).peek ();
 
       // assign new value
       vars.put (expName, v);

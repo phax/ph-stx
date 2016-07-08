@@ -128,7 +128,7 @@ public class Processor extends XMLFilterImpl
   private Hashtable <String, String> inScopeNamespaces;
 
   /** The namespace context as a stack */
-  private final Stack <Hashtable <String, String>> namespaceContext = new Stack <> ();
+  private final Stack <Hashtable <String, String>> namespaceContext = new Stack<> ();
 
   /** Flag that controls namespace contexts */
   private boolean nsContextActive = false;
@@ -141,14 +141,14 @@ public class Processor extends XMLFilterImpl
    * and removed immediately afterwards. This stack is needed for matching and
    * for position counting within the parent of each event.
    */
-  private Stack <Object> eventStack;
+  private Stack <SAXEvent> eventStack;
 
   /**
    * Stack needed for inner processing (buffers, documents). This stack stores
    * the event stack for <code>stx:process-document</code> and character data
    * that has been already read as look-ahead ({@link #collectedCharacters}).
    */
-  private final Stack <Serializable> innerProcStack = new Stack <> ();
+  private final Stack <Serializable> innerProcStack = new Stack<> ();
 
   public Properties outputProperties;
 
@@ -183,10 +183,10 @@ public class Processor extends XMLFilterImpl
     private GroupBase targetGroup;
 
     /** current table of local variables in {@link #template} */
-    private Hashtable localVars;
+    private Hashtable <String, Value> localVars;
 
     /** passed parameters to {@link #template} (only for the debugging) */
-    private Hashtable passedParams;
+    private Hashtable <String, Value> passedParams;
 
     /**
      * <code>stx:process-siblings</code> instruction (for stx:process-siblings)
@@ -203,7 +203,7 @@ public class Processor extends XMLFilterImpl
     Data (final short lps,
           final TemplateFactory.Instance t,
           final AbstractInstruction i,
-          final Hashtable pp,
+          final Hashtable <String, Value> pp,
           final Context c,
           final SAXEvent se)
     {
@@ -213,7 +213,7 @@ public class Processor extends XMLFilterImpl
       currentGroup = c.currentGroup;
       contextPosition = c.position;
       targetGroup = c.targetGroup;
-      localVars = (Hashtable) c.localVars.clone ();
+      localVars = (Hashtable <String, Value>) c.localVars.clone ();
       passedParams = pp;
       psiblings = c.psiblings;
       sibEvent = se;
@@ -223,7 +223,7 @@ public class Processor extends XMLFilterImpl
     Data (final short lps,
           final TemplateFactory.Instance t,
           final AbstractInstruction i,
-          final Hashtable pp,
+          final Hashtable <String, Value> pp,
           final Context c)
     {
       lastProcStatus = lps;
@@ -232,7 +232,7 @@ public class Processor extends XMLFilterImpl
       currentGroup = c.currentGroup;
       contextPosition = c.position;
       targetGroup = c.targetGroup;
-      localVars = (Hashtable) c.localVars.clone ();
+      localVars = (Hashtable <String, Value>) c.localVars.clone ();
       passedParams = pp;
     }
 
@@ -568,7 +568,7 @@ public class Processor extends XMLFilterImpl
    */
   private void initNamespaces ()
   {
-    inScopeNamespaces = new Hashtable <> ();
+    inScopeNamespaces = new Hashtable<> ();
     inScopeNamespaces.put ("xml", NamespaceSupport.XMLNS);
   }
 
@@ -976,7 +976,7 @@ public class Processor extends XMLFilterImpl
    */
   private void processEvent () throws SAXException
   {
-    final SAXEvent event = (SAXEvent) eventStack.peek ();
+    final SAXEvent event = eventStack.peek ();
     if (DEBUG)
       if (log.isDebugEnabled ())
       {
@@ -1228,7 +1228,7 @@ public class Processor extends XMLFilterImpl
     }
 
     // put last element on the event stack
-    ((SAXEvent) eventStack.peek ()).countElement (lastElement.uri, lastElement.lName);
+    eventStack.peek ().countElement (lastElement.uri, lastElement.lName);
     eventStack.push (lastElement);
 
     lastElement = null;
@@ -1270,12 +1270,12 @@ public class Processor extends XMLFilterImpl
     SAXEvent ev;
     if (insideCDATA)
     {
-      ((SAXEvent) eventStack.peek ()).countCDATA ();
+      eventStack.peek ().countCDATA ();
       ev = SAXEvent.newCDATA (s);
     }
     else
     {
-      ((SAXEvent) eventStack.peek ()).countText ();
+      eventStack.peek ().countText ();
       ev = SAXEvent.newText (s);
     }
 
@@ -1333,7 +1333,7 @@ public class Processor extends XMLFilterImpl
       // terminates
       int stackPos = dataStack.size () - 1;
       Data data = dataStack.peek ();
-      final Hashtable storedVars = context.localVars;
+      final Hashtable <String, Value> storedVars = context.localVars;
       stopData = null;
       do
       {
@@ -1384,7 +1384,7 @@ public class Processor extends XMLFilterImpl
   private void clearProcessSiblings (final Data stopData, final boolean clearLast) throws SAXException
   {
     // replace top-most event and local variables
-    Object topEvent = null;
+    SAXEvent topEvent = null;
     // if clearLast==true then there's no event to remove,
     // because the end of of the parent has been encountered
     if (clearLast)
@@ -1404,7 +1404,7 @@ public class Processor extends XMLFilterImpl
 
       do
       {
-        inst = doProcessLoop (inst, (SAXEvent) topEvent, false);
+        inst = doProcessLoop (inst, topEvent, false);
 
         if (DEBUG)
           if (log.isDebugEnabled ())
@@ -1589,7 +1589,7 @@ public class Processor extends XMLFilterImpl
     else
     { // stx:process-document
       innerProcStack.push (eventStack);
-      context.ancestorStack = eventStack = new Stack <> ();
+      context.ancestorStack = eventStack = new Stack<> ();
     }
 
     eventStack.push (SAXEvent.newRoot ());
@@ -1628,7 +1628,7 @@ public class Processor extends XMLFilterImpl
           context.position = data.contextPosition; // restore position
           context.localVars = data.localVars;
           AbstractInstruction inst = data.instruction;
-          inst = doProcessLoop (inst, (SAXEvent) eventStack.peek (), true);
+          inst = doProcessLoop (inst, eventStack.peek (), true);
 
           switch (processStatus)
           {
@@ -1774,7 +1774,7 @@ public class Processor extends XMLFilterImpl
           context.position = data.contextPosition; // restore position
           context.localVars = data.localVars;
           AbstractInstruction inst = data.instruction;
-          inst = doProcessLoop (inst, (SAXEvent) eventStack.peek (), true);
+          inst = doProcessLoop (inst, eventStack.peek (), true);
 
           if (DEBUG)
             if (log.isDebugEnabled ())
@@ -1805,7 +1805,7 @@ public class Processor extends XMLFilterImpl
                                         inst,
                                         data.passedParams,
                                         context,
-                                        (SAXEvent) eventStack.peek ()));
+                                        eventStack.peek ()));
               break;
 
             // case PR_ATTRIBUTES: won't happen
@@ -1883,7 +1883,7 @@ public class Processor extends XMLFilterImpl
     }
 
     // don't modify the event stack after process-self
-    ((SAXEvent) eventStack.peek ()).countPI (target);
+    eventStack.peek ().countPI (target);
 
     eventStack.push (SAXEvent.newPI (target, data));
 
@@ -2031,7 +2031,7 @@ public class Processor extends XMLFilterImpl
     }
 
     // don't modify the event stack after process-self
-    ((SAXEvent) eventStack.peek ()).countComment ();
+    eventStack.peek ().countComment ();
 
     eventStack.push (SAXEvent.newComment (new String (ch, start, length)));
 
@@ -2049,7 +2049,7 @@ public class Processor extends XMLFilterImpl
    *
    * @return the event stack
    */
-  public Stack <Object> getEventStack ()
+  public Stack <SAXEvent> getEventStack ()
   {
     return this.eventStack;
   }

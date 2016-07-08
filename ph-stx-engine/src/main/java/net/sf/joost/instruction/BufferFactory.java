@@ -26,7 +26,6 @@ package net.sf.joost.instruction;
 
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -39,7 +38,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>buffer</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.6 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
@@ -104,8 +103,7 @@ final public class BufferFactory extends FactoryBase
       super.process (context);
       Hashtable varTable;
       if (parent instanceof GroupBase) // group scope
-        varTable = (Hashtable) ((Stack) context.groupVars.get (parent)).peek ();
-
+        varTable = context.groupVars.get (parent).peek ();
       else
         varTable = context.localVars;
 

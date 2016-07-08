@@ -38,7 +38,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Abstract base class for all instances of nodes in the STX transformation
  * sheet
- * 
+ *
  * @version $Revision: 2.15 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -144,10 +144,10 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
    * The names of local declared variables of this element, available only if
    * this node has stx:variable children
    */
-  protected Vector scopedVariables;
+  protected Vector <String> scopedVariables;
 
   /** Stack for storing local fields from this or derived classes */
-  protected Stack localFieldStack = new Stack ();
+  protected Stack <Object> localFieldStack = new Stack<> ();
 
   // ---------------------------------------------------------------------
 
@@ -199,7 +199,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
 
   /**
    * Insert a new node as a child of this element
-   * 
+   *
    * @param node
    *        the node to be inserted
    */
@@ -227,13 +227,13 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
 
     // create vector for variable names if necessary
     if (node instanceof VariableBase && scopedVariables == null)
-      scopedVariables = new Vector ();
+      scopedVariables = new Vector <> ();
   }
 
   /**
    * Notify this node about its end location (taken from
    * {@link ParseContext#locator} in the <code>context</code> parameter)
-   * 
+   *
    * @param context
    *        the current parse context
    */
@@ -286,7 +286,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
 
   /**
    * Store the name of a variable as local for this node.
-   * 
+   *
    * @param name
    *        the variable name
    */
@@ -306,7 +306,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
 
   /**
    * Save local variables if needed.
-   * 
+   *
    * @return {@link Constants#PR_CONTINUE}
    * @exception SAXException
    *            if an error occurs (in a derived class)
@@ -326,7 +326,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
   /**
    * Called when the end tag will be processed. This instance removes local
    * variables declared in this node.
-   * 
+   *
    * @param context
    *        the current context
    * @return {@link Constants#PR_CONTINUE}
@@ -341,7 +341,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
       final Object [] objs = scopedVariables.toArray ();
       for (final Object obj : objs)
         context.localVars.remove (obj);
-      scopedVariables = (Vector) localFieldStack.pop ();
+      scopedVariables = (Vector <String>) localFieldStack.pop ();
     }
     return PR_CONTINUE;
   }
@@ -349,7 +349,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
   /**
    * Getter for {@link #nodeEnd} used by
    * {@link net.sf.joost.stx.Processor#processEvent}.
-   * 
+   *
    * @return a final ref on <code>AbstractInstruction</code>
    */
   public final AbstractInstruction getNodeEnd ()
@@ -375,7 +375,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
     if (parent != null)
       theCopy.parent = (NodeBase) parent.deepCopy (copies);
     if (scopedVariables != null)
-      theCopy.scopedVariables = new Vector ();
+      theCopy.scopedVariables = new Vector <> ();
   }
 
   // for debugging

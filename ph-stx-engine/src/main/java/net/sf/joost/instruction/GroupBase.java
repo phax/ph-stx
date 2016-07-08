@@ -38,6 +38,7 @@ import net.sf.joost.instruction.TemplateFactory.Instance;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
+import net.sf.joost.stx.Value;
 
 /**
  * Base class for <code>stx:group</code> (class
@@ -102,22 +103,22 @@ abstract public class GroupBase extends NodeBase
    * Table of all contained public and global procedures in this group Used only
    * temporarily during compiling the transformation sheet.
    */
-  private final Hashtable <String, net.sf.joost.instruction.ProcedureFactory.Instance> containedPublicProcedures;
+  private final Hashtable <String, ProcedureFactory.Instance> containedPublicProcedures;
 
   /** Table of the group procedures visible for this group */
-  Hashtable <String, NodeBase> groupProcedures;
+  Hashtable <String, ProcedureFactory.Instance> groupProcedures;
 
   /**
    * Table of all global procedures in the transformation sheet, stems from the
    * parent group
    */
-  Hashtable <String, NodeBase> globalProcedures;
+  Hashtable <String, ProcedureFactory.Instance> globalProcedures;
 
   /**
    * Visible procedures: procedures from this group and public templates from
    * subgroups
    */
-  public Hashtable <String, NodeBase> visibleProcedures;
+  public Hashtable <String, ProcedureFactory.Instance> visibleProcedures;
 
   /** Contained groups in this group */
   protected GroupBase [] containedGroups;
@@ -371,14 +372,14 @@ abstract public class GroupBase extends NodeBase
   public void enterRecursionLevel (final Context context) throws SAXException
   {
     // shadowed variables, needed if keep-value="yes"
-    Hashtable shadowed = null;
+    Hashtable <String, Value> shadowed = null;
     if (context.ancestorStack.isEmpty ())
-      context.groupVars.put (this, new Stack ());
+      context.groupVars.put (this, new Stack<> ());
     else
       shadowed = context.groupVars.get (this).peek ();
 
     // new variable instances
-    final Hashtable varTable = new Hashtable ();
+    final Hashtable <String, Value> varTable = new Hashtable<> ();
     context.groupVars.get (this).push (varTable);
 
     context.currentGroup = this;
@@ -423,7 +424,7 @@ abstract public class GroupBase extends NodeBase
    * @exception SAXParseException
    *            if one of the procedures is already defined
    */
-  protected void addGroupProcedures (final Hashtable <String, NodeBase> pTable) throws SAXParseException
+  protected void addGroupProcedures (final Hashtable <String, ProcedureFactory.Instance> pTable) throws SAXParseException
   {
     // compute the real groupProcedures table
     for (final Enumeration <String> e = pTable.keys (); e.hasMoreElements ();)
@@ -431,7 +432,7 @@ abstract public class GroupBase extends NodeBase
       final Object key = e.nextElement ();
       if (groupProcedures.containsKey (key))
       {
-        final ProcedureFactory.Instance p1 = (ProcedureFactory.Instance) pTable.get (key);
+        final ProcedureFactory.Instance p1 = pTable.get (key);
         final NodeBase p2 = groupProcedures.get (key);
         throw new SAXParseException ("Group procedure '" +
                                      p1.procName +

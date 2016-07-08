@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -40,7 +41,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>attribute</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -48,12 +49,12 @@ import net.sf.joost.stx.ParseContext;
 final public class AttributeFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public AttributeFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("name");
     attrNames.add ("select");
     attrNames.add ("namespace");

@@ -74,12 +74,11 @@ public abstract class XMLElement
           }
         }
         else
-          if (s instanceof Symbol)
-          {
-            writer.writeStartElement ("token");
-            writer.writeCharacters (s.toString ());
-            writer.writeEndElement ();
-          }
+        {
+          writer.writeStartElement ("token");
+          writer.writeCharacters (s.toString ());
+          writer.writeEndElement ();
+        }
       }
       writer.writeEndElement ();
     }
@@ -105,12 +104,12 @@ public abstract class XMLElement
   public List <XMLElement> getChildren ()
   {
     return new LinkedList<> ();
-  };
+  }
 
   public boolean hasChildren ()
   {
     return false;
-  };
+  }
 
   public static class NonTerminal extends XMLElement
   {
@@ -288,7 +287,7 @@ public abstract class XMLElement
         ret.add (this);
       }
       return ret;
-    };
+    }
 
     Location l, r;
     Object value;

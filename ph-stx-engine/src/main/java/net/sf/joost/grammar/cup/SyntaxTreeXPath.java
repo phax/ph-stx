@@ -10,7 +10,7 @@ public class SyntaxTreeXPath
   {
     if (query.startsWith ("/"))
       query = query.substring (1);
-    return query0 (new LinkedList <> (Arrays.asList (query.split ("/"))), 0, element, 0);
+    return query0 (new LinkedList<> (Arrays.asList (query.split ("/"))), 0, element, 0);
   }
 
   private static List <XMLElement> query0 (final List <String> q,
@@ -23,10 +23,10 @@ public class SyntaxTreeXPath
     { // match deeper descendant q[1]
       return matchDeeperDescendant (q, idx + 1, element, seq);
     }
-    final List <XMLElement> l = new LinkedList <> ();
+    final List <XMLElement> l = new LinkedList<> ();
 
     if (!match (q.get (idx), element, seq))
-      return new LinkedList ();
+      return new LinkedList <> ();
     if (q.size () - 1 == idx)
       return singleton (element);
     final List <XMLElement> children = element.getChildren ();
@@ -46,7 +46,7 @@ public class SyntaxTreeXPath
     if (query.size () <= idx)
       return singleton (element);
     final boolean matches = match (query.get (idx), element, seq);
-    final List <XMLElement> l = new LinkedList <> ();
+    final List <XMLElement> l = new LinkedList<> ();
     final List <XMLElement> children = element.getChildren ();
     if (matches)
       return query0 (query, idx, element, seq);
@@ -112,7 +112,7 @@ public class SyntaxTreeXPath
 
   private static List <XMLElement> singleton (final XMLElement elem)
   {
-    final LinkedList <XMLElement> l = new LinkedList <> ();
+    final LinkedList <XMLElement> l = new LinkedList<> ();
     l.add (elem);
     return l;
   }

@@ -51,14 +51,14 @@ import net.sf.joost.util.regex.JRegularExpression;
 final public class AnalyzeTextFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   //
   // Constructor
   //
   public AnalyzeTextFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("select");
   }
 
@@ -89,7 +89,7 @@ final public class AnalyzeTextFactory extends FactoryBase
     private AbstractInstruction successor;
 
     // this instruction manages its children itself
-    private Vector mVector = new Vector ();
+    private Vector <NodeBase> mVector = new Vector <NodeBase> ();
     private MatchFactory.Instance [] matchChildren;
     private NodeBase noMatchChild;
 

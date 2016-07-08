@@ -41,7 +41,7 @@ import net.sf.joost.stx.Value;
 /**
  * Factory for <code>for-each-item</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.11 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -174,18 +174,16 @@ final public class ForEachFactory extends FactoryBase
         next = successor;
         return PR_CONTINUE;
       }
-      else
-      {
-        super.process (context); // enter new scope for local variables
-        resultStack.push (selectResult.next);
-        selectResult.next = null;
 
-        context.localVars.put (expName, selectResult);
-        declareVariable (expName);
+      super.process (context); // enter new scope for local variables
+      resultStack.push (selectResult.next);
+      selectResult.next = null;
 
-        next = contents;
-        return PR_CONTINUE;
-      }
+      context.localVars.put (expName, selectResult);
+      declareVariable (expName);
+
+      next = contents;
+      return PR_CONTINUE;
     }
 
     /**

@@ -289,7 +289,7 @@ public class TrAXHelper implements TrAXConstants
               {
                 // system id is just a filename
                 final File tmp = new File (systemId);
-                url = tmp.toURL ();
+                url = tmp.toURI ().toURL ();
                 os = new FileOutputStream (url.getFile ());
                 return StreamEmitter.newEmitter (os, outputProperties);
               }

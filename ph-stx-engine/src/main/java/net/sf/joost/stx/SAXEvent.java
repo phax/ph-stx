@@ -65,7 +65,7 @@ final public class SAXEvent
   public boolean hasChildNodes = false;
 
   /** contains the position counters */
-  private HashMap posHash;
+  private Map <Object, Counter> posHash;
 
   //
   // private constructor
@@ -193,12 +193,12 @@ final public class SAXEvent
   {
     if (hasChildNodes)
     {
-      posHash = new HashMap ();
+      posHash = new HashMap<> ();
       this.hasChildNodes = true;
     }
     else
       if (posHash == null)
-        posHash = new HashMap ();
+        posHash = new HashMap<> ();
   }
 
   // *******************************************************************
@@ -315,7 +315,7 @@ final public class SAXEvent
     Counter c;
     for (final Object key : keys)
     {
-      c = (Counter) posHash.get (key);
+      c = posHash.get (key);
       if (c == null)
         posHash.put (key, new Counter ());
       else
@@ -326,7 +326,7 @@ final public class SAXEvent
 
   public long getPositionOf (final String uri, final String lName)
   {
-    final Counter c = (Counter) posHash.get (new DoubleString (uri, lName));
+    final Counter c = posHash.get (new DoubleString (uri, lName));
     if (c == null)
     {
       // Shouldn't happen
@@ -337,7 +337,7 @@ final public class SAXEvent
 
   public long getPositionOfNode ()
   {
-    final Counter c = (Counter) posHash.get ("node()");
+    final Counter c = posHash.get ("node()");
     if (c == null)
     {
       // Shouldn't happen
@@ -348,7 +348,7 @@ final public class SAXEvent
 
   public long getPositionOfText ()
   {
-    final Counter c = (Counter) posHash.get ("text()");
+    final Counter c = posHash.get ("text()");
     if (c == null)
     {
       // Shouldn't happen
@@ -359,7 +359,7 @@ final public class SAXEvent
 
   public long getPositionOfCDATA ()
   {
-    final Counter c = (Counter) posHash.get ("cdata()");
+    final Counter c = posHash.get ("cdata()");
     if (c == null)
     {
       // Shouldn't happen
@@ -370,7 +370,7 @@ final public class SAXEvent
 
   public long getPositionOfComment ()
   {
-    final Counter c = (Counter) posHash.get ("comment()");
+    final Counter c = posHash.get ("comment()");
     if (c == null)
     {
       // Shouldn't happen
@@ -381,7 +381,7 @@ final public class SAXEvent
 
   public long getPositionOfPI (final String target)
   {
-    final Counter c = (Counter) posHash.get (new DoubleString ("pi()", target));
+    final Counter c = posHash.get (new DoubleString ("pi()", target));
     if (c == null)
     {
       // Shouldn't happen

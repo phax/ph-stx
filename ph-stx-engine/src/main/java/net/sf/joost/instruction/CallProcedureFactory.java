@@ -37,7 +37,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>call-procedure</code> elements, which are represented by
  * the inner Instance class.
- * 
+ *
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -45,14 +45,14 @@ import net.sf.joost.stx.ParseContext;
 public class CallProcedureFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   //
   // Constructor
   //
   public CallProcedureFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("group");
   }

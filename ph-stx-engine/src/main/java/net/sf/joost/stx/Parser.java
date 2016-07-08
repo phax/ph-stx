@@ -90,7 +90,7 @@ import net.sf.joost.instruction.WithParamFactory;
 /**
  * Creates the tree representation of an STX transformation sheet. The Parser
  * object acts as a SAX ContentHandler.
- * 
+ *
  * @version $Revision: 2.23 $ $Date: 2007/11/25 19:33:34 $
  * @author Oliver Becker
  */
@@ -101,31 +101,31 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
   private final ParseContext pContext;
 
   /** Stack for opened elements, contains Node instances. */
-  private final Stack openedElements;
+  private final Stack <NodeBase> openedElements;
 
   /** The current (last created) Node. */
   private NodeBase currentNode;
 
   /** Hashtable for STX factory objects, one for each type. */
-  private final Hashtable stxFactories;
+  private final Hashtable <String, FactoryBase> stxFactories;
 
   /** Hashtable for Joost extension factory objects, one for each type. */
-  private final Hashtable joostFactories;
+  private final Hashtable <String, FactoryBase> joostFactories;
 
   /** The factory for literal result elements. */
   private final LitElementFactory litFac;
 
   /** Hashtable: keys = prefixes, values = URI stacks */
-  private final Hashtable inScopeNamespaces;
+  private final Hashtable <String, Stack <String>> inScopeNamespaces;
 
   /**
    * Hashtable for newly declared namespaces between literal elements; keys =
    * prefixes, values = URIs
    */
-  private Hashtable newNamespaces;
+  private Hashtable <String, String> newNamespaces;
 
   /** List of nodes that need another call to {@link NodeBase#compile} */
-  public Vector compilableNodes = new Vector ();
+  public Vector <NodeBase> compilableNodes = new Vector<> ();
 
   /**
    * Group which had an <code>stx:include</code>, which in turn created this
@@ -196,21 +196,21 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
     joostFactories = createFactoryMap (joostFacs);
 
     litFac = new LitElementFactory ();
-    openedElements = new Stack ();
-    inScopeNamespaces = new Hashtable ();
-    newNamespaces = new Hashtable ();
+    openedElements = new Stack<> ();
+    inScopeNamespaces = new Hashtable<> ();
+    newNamespaces = new Hashtable<> ();
   }
 
   /**
    * creates hashtable and sets its initial content to the given array
-   * 
+   *
    * @param data
    *        to be filled in the map
    * @return the created hashtable
    */
-  private Hashtable createFactoryMap (final FactoryBase [] data)
+  private Hashtable <String, FactoryBase> createFactoryMap (final FactoryBase [] data)
   {
-    final Hashtable map = new Hashtable (data.length);
+    final Hashtable <String, FactoryBase> map = new Hashtable<> (data.length);
     for (final FactoryBase element : data)
       map.put (element.getName (), element);
     return map;
@@ -219,7 +219,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
   /**
    * @return the STX node factories, indexed by local name
    */
-  public Map getFactories ()
+  public Map <String, FactoryBase> getFactories ()
   {
     return stxFactories;
   }
@@ -321,7 +321,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
       pContext.nsSet = getInScopeNamespaces ();
       if (STX_NS.equals (uri))
       {
-        final FactoryBase fac = (FactoryBase) stxFactories.get (lName);
+        final FactoryBase fac = stxFactories.get (lName);
         if (fac == null)
           throw new SAXParseException ("Unknown statement '" + qName + "'", pContext.locator);
         newNode = fac.createNode (currentNode != null ? currentNode : includingGroup, qName, attrs, pContext);
@@ -346,7 +346,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
       else
         if (JOOST_EXT_NS.equals (uri))
         {
-          final FactoryBase fac = (FactoryBase) joostFactories.get (lName);
+          final FactoryBase fac = joostFactories.get (lName);
           if (fac == null)
             throw new SAXParseException ("Unknown statement '" + qName + "'", pContext.locator);
           newNode = fac.createNode (currentNode != null ? currentNode : includingGroup, qName, attrs, pContext);
@@ -356,7 +356,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
           newNode = litFac.createNode (currentNode, uri, lName, qName, attrs, pContext, newNamespaces);
           // reset these newly declared namespaces
           // newNode "consumes" the old value (without copy)
-          newNamespaces = new Hashtable ();
+          newNamespaces = new Hashtable<> ();
         }
 
       // check xml:space attribute
@@ -429,7 +429,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
       // add the compilable nodes from an included stx:transform
       if (currentNode instanceof TransformFactory.Instance && currentNode != pContext.transformNode)
         compilableNodes.addAll (((TransformFactory.Instance) currentNode).compilableNodes);
-      currentNode = (NodeBase) openedElements.pop ();
+      currentNode = openedElements.pop ();
     }
     catch (final SAXParseException ex)
     {
@@ -462,10 +462,10 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
 
   public void startPrefixMapping (final String prefix, final String uri)
   {
-    Stack nsStack = (Stack) inScopeNamespaces.get (prefix);
+    Stack <String> nsStack = inScopeNamespaces.get (prefix);
     if (nsStack == null)
     {
-      nsStack = new Stack ();
+      nsStack = new Stack<> ();
       inScopeNamespaces.put (prefix, nsStack);
     }
     nsStack.push (uri);
@@ -474,7 +474,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
 
   public void endPrefixMapping (final String prefix)
   {
-    final Stack nsStack = (Stack) inScopeNamespaces.get (prefix);
+    final Stack nsStack = inScopeNamespaces.get (prefix);
     nsStack.pop ();
     newNamespaces.remove (prefix);
   }
@@ -511,13 +511,13 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
    * Constructs a hashtable containing a mapping from all namespace prefixes in
    * scope to their URIs.
    */
-  public Hashtable getInScopeNamespaces ()
+  public Hashtable <String, String> getInScopeNamespaces ()
   {
-    final Hashtable ret = new Hashtable ();
-    for (final Enumeration e = inScopeNamespaces.keys (); e.hasMoreElements ();)
+    final Hashtable <String, String> ret = new Hashtable<> ();
+    for (final Enumeration <String> e = inScopeNamespaces.keys (); e.hasMoreElements ();)
     {
-      final Object prefix = e.nextElement ();
-      final Stack s = (Stack) inScopeNamespaces.get (prefix);
+      final String prefix = e.nextElement ();
+      final Stack <String> s = inScopeNamespaces.get (prefix);
       if (!s.isEmpty ())
         ret.put (prefix, s.peek ());
     }

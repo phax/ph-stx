@@ -39,7 +39,7 @@ import net.sf.joost.stx.Context;
  * <code>AbstractInstruction</code>) will be created: the first to be processed
  * at the beginning of the element, the second to be processed at the end (see
  * {@link NodeBase}).
- * 
+ *
  * @version $Revision: 2.3 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -71,7 +71,7 @@ public abstract class AbstractInstruction implements Cloneable
   /**
    * The method that does the actual processing. This method will be called
    * while traversing the list of nodes.
-   * 
+   *
    * @param context
    *        the current context
    * @return {@link net.sf.joost.Constants#PR_CONTINUE}, when the processing
@@ -86,14 +86,14 @@ public abstract class AbstractInstruction implements Cloneable
 
   /**
    * Creates a deep copy of this instruction
-   * 
+   *
    * @param copies
    *        the map of already copied objects
    * @return the copy of this instruction
    */
-  final public AbstractInstruction deepCopy (final HashMap copies)
+  final public AbstractInstruction deepCopy (final HashMap <AbstractInstruction, AbstractInstruction> copies)
   {
-    AbstractInstruction copy = (AbstractInstruction) copies.get (this);
+    AbstractInstruction copy = copies.get (this);
     if (copy == null)
     {
       try
@@ -114,13 +114,14 @@ public abstract class AbstractInstruction implements Cloneable
   /**
    * Callback that will be called when a clone of this instance has been
    * created. To be overridden in subclasses.
-   * 
+   *
    * @param copy
    *        the created clones
    * @param copies
    *        the map of already copied objects
    */
-  protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+  protected void onDeepCopy (final AbstractInstruction copy,
+                             final HashMap <AbstractInstruction, AbstractInstruction> copies)
   {
     if (next != null)
       copy.next = next.deepCopy (copies);
@@ -129,7 +130,7 @@ public abstract class AbstractInstruction implements Cloneable
   /**
    * Create a deep copy of a {@link Hashtable} that contains
    * {@link AbstractInstruction} instances as values
-   * 
+   *
    * @param hashtable
    *        the Hashtable to be copied
    * @param copies
@@ -154,7 +155,7 @@ public abstract class AbstractInstruction implements Cloneable
 
   /**
    * Create a deep copy of an array of STX template instances.
-   * 
+   *
    * @param templates
    *        the array to be copied
    * @param copies

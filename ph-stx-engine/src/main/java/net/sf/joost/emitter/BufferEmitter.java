@@ -24,6 +24,7 @@
 
 package net.sf.joost.emitter;
 
+import java.util.List;
 //SAX2
 import java.util.Vector;
 
@@ -35,7 +36,7 @@ import net.sf.joost.stx.SAXEvent;
 
 /**
  * This class implements a buffer for storing SAX events.
- * 
+ *
  * @version $Revision: 1.5 $ $Date: 2005/11/06 21:22:21 $
  * @author Oliver Becker
  */
@@ -44,7 +45,7 @@ public class BufferEmitter extends StxEmitterBase
 {
 
   /** the event buffer */
-  private final Vector buffer = new Vector ();
+  private final List <SAXEvent> buffer = new Vector<> ();
 
   /**
    * the event array, the old contents remains valid until this buffer is
@@ -98,12 +99,12 @@ public class BufferEmitter extends StxEmitterBase
 
   public void startPrefixMapping (final String prefix, final String uri) throws SAXException
   {
-    buffer.addElement (SAXEvent.newMapping (prefix, uri));
+    buffer.add (SAXEvent.newMapping (prefix, uri));
   }
 
   public void endPrefixMapping (final String prefix) throws SAXException
   {
-    buffer.addElement (SAXEvent.newMapping (prefix, null));
+    buffer.add (SAXEvent.newMapping (prefix, null));
   }
 
   public void startElement (final String namespaceURI,
@@ -111,23 +112,23 @@ public class BufferEmitter extends StxEmitterBase
                             final String qName,
                             final Attributes atts) throws SAXException
   {
-    buffer.addElement (SAXEvent.newElement (namespaceURI, localName, qName, atts, true, null));
+    buffer.add (SAXEvent.newElement (namespaceURI, localName, qName, atts, true, null));
   }
 
   public void endElement (final String namespaceURI, final String localName, final String qName) throws SAXException
   {
-    buffer.addElement (SAXEvent.newElement (namespaceURI, localName, qName, null, true, null));
+    buffer.add (SAXEvent.newElement (namespaceURI, localName, qName, null, true, null));
   }
 
   public void characters (final char [] ch, final int start, final int length) throws SAXException
   {
     if (insideCDATA)
     {
-      buffer.addElement (SAXEvent.newCDATA (new String (ch, start, length)));
+      buffer.add (SAXEvent.newCDATA (new String (ch, start, length)));
       charsEmitted = true;
     }
     else
-      buffer.addElement (SAXEvent.newText (new String (ch, start, length)));
+      buffer.add (SAXEvent.newText (new String (ch, start, length)));
   }
 
   /** not used */
@@ -138,7 +139,7 @@ public class BufferEmitter extends StxEmitterBase
 
   public void processingInstruction (final String target, final String data) throws SAXException
   {
-    buffer.addElement (SAXEvent.newPI (target, data));
+    buffer.add (SAXEvent.newPI (target, data));
   }
 
   /** not used */
@@ -175,11 +176,11 @@ public class BufferEmitter extends StxEmitterBase
   {
     insideCDATA = false;
     if (!charsEmitted) // no characters event: empty CDATA section
-      buffer.addElement (SAXEvent.newCDATA (""));
+      buffer.add (SAXEvent.newCDATA (""));
   }
 
   public void comment (final char [] ch, final int start, final int length) throws SAXException
   {
-    buffer.addElement (SAXEvent.newComment (new String (ch, start, length)));
+    buffer.add (SAXEvent.newComment (new String (ch, start, length)));
   }
 }

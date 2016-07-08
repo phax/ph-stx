@@ -59,18 +59,10 @@ public class CaseVariants
       final int [] result = { mono };
       return result;
     }
-    else
-    {
-      final int [] result = (int []) polyVariants.get (code);
-      if (result == null)
-      {
-        return EMPTY_INT_ARRAY;
-      }
-      else
-      {
-        return result;
-      }
-    }
+    final int [] result = (int []) polyVariants.get (code);
+    if (result == null)
+      return EMPTY_INT_ARRAY;
+    return result;
   }
 
   /**

@@ -40,7 +40,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>element</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.9 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -48,12 +48,12 @@ import net.sf.joost.stx.ParseContext;
 final public class ElementFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public ElementFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("name");
     attrNames.add ("namespace");
   }

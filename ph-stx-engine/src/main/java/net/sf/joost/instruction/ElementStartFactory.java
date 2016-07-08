@@ -48,12 +48,12 @@ import net.sf.joost.stx.ParseContext;
 final public class ElementStartFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public ElementStartFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("name");
     attrNames.add ("namespace");
   }

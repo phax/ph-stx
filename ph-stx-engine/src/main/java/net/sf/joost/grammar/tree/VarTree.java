@@ -105,8 +105,7 @@ final public class VarTree extends Tree
       scopeDetermined = true;
     }
 
-    final Hashtable vars = (groupScope == null) ? context.localVars
-                                                : (Hashtable) context.groupVars.get (groupScope).peek ();
+    final Hashtable vars = (groupScope == null) ? context.localVars : context.groupVars.get (groupScope).peek ();
 
     final Value v1 = (Value) vars.get (expName);
     // create a copy if the result is a sequence
