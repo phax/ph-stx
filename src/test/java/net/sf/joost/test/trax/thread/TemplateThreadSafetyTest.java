@@ -24,20 +24,19 @@
 
 package net.sf.joost.test.trax.thread;
 
-import java.io.IOException;
+import static org.junit.Assert.assertNull;
+
 import java.io.StringWriter;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * This test case demonstrates thread safety issue of the Templates instance The
@@ -47,78 +46,54 @@ import junit.framework.TestCase;
  *
  * @author jason
  */
-public class TemplateThreadSafetyTest extends TestCase
+public class TemplateThreadSafetyTest
 {
-   // raise this number if needed to reproduce the thread-safety problem more
-   // reliably
-   private static final int MAX_THREADS = 500;
+  // raise this number if needed to reproduce the thread-safety problem more
+  // reliably
+  private static final int MAX_THREADS = 500;
 
-   public TemplateThreadSafetyTest(String testName)
-   {
-      super(testName);
-   }
-
-   protected void setUp() throws Exception
-   {
-      super.setUp();
-   }
-
-   protected void tearDown() throws Exception
-   {
-      super.tearDown();
-   }
-
-   public void testTransform() throws IOException,
-         TransformerConfigurationException, InterruptedException
-   {
-      final Exception[] failed = new Exception[1];
-      final TransformerFactory factory = new net.sf.joost.trax.TransformerFactoryImpl();
-      factory.setURIResolver(new URIResolver() {
-
-         public Source resolve(String href, String base)
-               throws TransformerException
-         {
-            return new StreamSource(
-                  TemplateThreadSafetyTest.class.getResourceAsStream(href));
-         }
-      });
-      final StreamSource style = new StreamSource(getClass()
-            .getResourceAsStream("style.stx"));
-      final Templates templates = factory.newTemplates(style);
-      Runnable transformJob = new Runnable() {
-         public void run()
-         {
-            try {
-               StreamSource input = new StreamSource(getClass()
-                     .getResourceAsStream("input.xml"));
-               StringWriter writer = new StringWriter();
-               StreamResult result = new StreamResult(writer);
-               Transformer transformer = templates.newTransformer();
-               System.out.println("Transforming in "
-                     + Thread.currentThread().getName());
-               transformer.transform(input, result);
-               System.out.println("Finished transforming in "
-                     + Thread.currentThread().getName());
-            }
-            catch (TransformerException ex) {
-               ex.printStackTrace();
-               failed[0] = ex;
-            }
-            catch (RuntimeException ex) {
-               ex.printStackTrace();
-               failed[0] = ex;
-            }
-         }
-      };
-      Thread[] threads = new Thread[MAX_THREADS];
-      for (int i = 0; i < threads.length; i++) {
-         threads[i] = new Thread(transformJob, "Thread #" + i);
-         threads[i].start();
+  @Test
+  public void testTransform () throws TransformerConfigurationException, InterruptedException
+  {
+    final Exception [] failed = new Exception [1];
+    final TransformerFactory factory = new net.sf.joost.trax.TransformerFactoryImpl ();
+    factory.setURIResolver ( (href,
+                              base) -> new StreamSource (TemplateThreadSafetyTest.class.getResourceAsStream (href)));
+    final StreamSource style = new StreamSource (getClass ().getResourceAsStream ("style.stx"));
+    final Templates templates = factory.newTemplates (style);
+    final Runnable transformJob = () -> {
+      try
+      {
+        final StreamSource input = new StreamSource (getClass ().getResourceAsStream ("input.xml"));
+        final StringWriter writer = new StringWriter ();
+        final StreamResult result = new StreamResult (writer);
+        final Transformer transformer = templates.newTransformer ();
+        System.out.println ("Transforming in " + Thread.currentThread ().getName ());
+        transformer.transform (input, result);
+        System.out.println ("Finished transforming in " + Thread.currentThread ().getName ());
       }
-      for (int i = 0; i < threads.length; i++) {
-         threads[i].join();
+      catch (final TransformerException ex1)
+      {
+        ex1.printStackTrace ();
+        failed[0] = ex1;
       }
-      assertNull(failed[0]);
-   }
+      catch (final RuntimeException ex2)
+      {
+        ex2.printStackTrace ();
+        failed[0] = ex2;
+      }
+    };
+    final Thread [] threads = new Thread [MAX_THREADS];
+    for (int i = 0; i < threads.length; i++)
+    {
+      threads[i] = new Thread (transformJob, "Thread #" + i);
+      threads[i].start ();
+    }
+    for (final Thread thread : threads)
+    {
+      thread.join ();
+    }
+    assertNull (failed[0]);
+  }
 
 }

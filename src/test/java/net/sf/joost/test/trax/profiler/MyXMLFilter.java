@@ -33,30 +33,32 @@ import org.xml.sax.helpers.XMLFilterImpl;
 /**
  * @author Zubow
  */
-public class MyXMLFilter extends XMLFilterImpl {
+public class MyXMLFilter extends XMLFilterImpl
+{
+  private int count = 0;
 
-    private int count = 0;
+  public MyXMLFilter (final int count)
+  {
+    this.count = count;
+  }
 
-    public MyXMLFilter(int count) {
-        this.count = count;
+  @Override
+  public void parse (final InputSource dummy) throws SAXException
+  {
+    final String data = "" + new Integer ((123));
+
+    final ContentHandler h = getContentHandler ();
+    h.startDocument ();
+    h.startElement ("", "flat", "flat", new AttributesImpl ());
+
+    for (int i = 0; i < count; i++)
+    {
+      h.startElement ("", "entry", "entry", new AttributesImpl ());
+      h.characters (data.toCharArray (), 0, data.length ());
+      h.endElement ("", "entry", "entry");
     }
 
-    public void parse(InputSource dummy)
-        throws SAXException {
-
-        String data = "" + new Integer((123));
-
-        ContentHandler h = getContentHandler();
-        h.startDocument();
-        h.startElement("", "flat", "flat", new AttributesImpl());
-
-        for (int i=0; i < count; i++) {
-            h.startElement("", "entry", "entry", new AttributesImpl());
-            h.characters(data.toCharArray(), 0, data.length());
-            h.endElement("", "entry", "entry");
-        }
-
-        h.endElement("", "flat", "flat");
-        h.endDocument();
-    }
+    h.endElement ("", "flat", "flat");
+    h.endDocument ();
+  }
 }

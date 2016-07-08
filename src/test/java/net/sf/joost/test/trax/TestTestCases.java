@@ -24,386 +24,395 @@
 
 package net.sf.joost.test.trax;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Zubow
  */
-public class TestTestCases extends TestCase {
+public class TestTestCases
+{
+  @Before
+  public void setUp ()
+  {
+    // set properties
+    init ();
+  }
 
-    public TestTestCases(String s) {
-        super(s);
-        //set properties
-        //init();
-    }
+  // *****************************************************************************
+  // some Tests
 
-    protected void setUp() {
-        //set properties
-        init();
-    }
+  @Test
+  public void testRunTests0 ()
+  {
 
-    protected void tearDown() {
-    }
+    final String xmlId = "data/flat.xml";
 
+    assertTrue (TestCases.runTests0 (xmlId));
+  }
 
-//*****************************************************************************
-//some Tests
+  @Test
+  public void testRunTests1 ()
+  {
 
-    public void testRunTests0() {
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        String xmlId = "data/flat.xml";
+    assertTrue (TestCases.runTests1 (xmlId, stxId));
+  }
 
-        assertTrue(TestCases.runTests0(xmlId));
-    }
+  @Test
+  public void testRunTests2 ()
+  {
 
-    public void testRunTests1() {
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
+    final String outId = "testdata/out.xml";
+    final String check = "testdata/resultflat.xml";
 
-        String xmlId = "data/flat.xml";
-        String stxId = "data/flat.stx";
+    boolean rValue = true;
 
-        assertTrue(TestCases.runTests1(xmlId, stxId));
-    }
+    TestCases.runTests2 (xmlId, stxId, outId);
 
+    try
+    {
 
-    public void testRunTests2() {
+      final BufferedReader resultStream = new BufferedReader (new FileReader (outId));
 
-        String xmlId = "data/flat.xml";
-        String stxId = "data/flat.stx";
-        String outId = "testdata/out.xml";
-        String check = "testdata/resultflat.xml";
+      final BufferedReader checkStream = new BufferedReader (new FileReader (check));
 
-        boolean rValue = true;
-
-        TestCases.runTests2(xmlId, stxId, outId);
-
-        try {
-
-            BufferedReader resultStream = new BufferedReader(new FileReader(outId));
-
-            BufferedReader checkStream  = new BufferedReader(new FileReader(check));
-
-            while(resultStream.ready() && checkStream.ready()) {
-                if (!(resultStream.readLine().equals(checkStream.readLine()))) {
-                    rValue = false;
-                    break;
-                }
-            }
-        } catch (FileNotFoundException fE) {
-        fE.printStackTrace();
-        } catch (IOException iE) {
-        iE.printStackTrace();
+      while (resultStream.ready () && checkStream.ready ())
+      {
+        if (!(resultStream.readLine ().equals (checkStream.readLine ())))
+        {
+          rValue = false;
+          break;
         }
-
-        assertTrue(rValue);
+      }
+    }
+    catch (final FileNotFoundException fE)
+    {
+      fE.printStackTrace ();
+    }
+    catch (final IOException iE)
+    {
+      iE.printStackTrace ();
     }
 
+    assertTrue (rValue);
+  }
 
-    public void testRunTests3() {
+  @Test
+  public void testRunTests3 ()
+  {
 
-        String xmlId = "data/flat.xml";
-        String stxId = "data/flat.stx";
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        assertTrue(TestCases.runTests3(xmlId, stxId));
-    }
+    assertTrue (TestCases.runTests3 (xmlId, stxId));
+  }
 
-    public void testRunTests4() {
+  @Test
+  public void testRunTests4 ()
+  {
 
-        String xmlId = "data/flat.xml";
-        String stxId = "data/flat.stx";
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        assertTrue(TestCases.runTests4(xmlId, stxId));
-    }
+    assertTrue (TestCases.runTests4 (xmlId, stxId));
+  }
 
+  public void testRunTests5 ()
+  {
 
-    public void testRunTests5() {
+    final String xmlId1 = "data/flat.xml";
+    final String xmlId2 = "data/flat2.xml";
+    final String stxId = "data/flat.stx";
 
-        String xmlId1   = "data/flat.xml";
-        String xmlId2   = "data/flat2.xml";
-        String stxId    = "data/flat.stx";
+    assertTrue (TestCases.runTests5 (xmlId1, xmlId2, stxId));
+  }
 
-        assertTrue(TestCases.runTests5(xmlId1, xmlId2, stxId));
-    }
+  @Test
+  public void testRunTests6 ()
+  {
 
-    public void testRunTests6() {
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    assertTrue (TestCases.runTests6 (xmlId, stxId));
+  }
 
-        assertTrue(TestCases.runTests6(xmlId, stxId));
-    }
+  @Test
+  public void testRunTests7 ()
+  {
 
-    public void testRunTests7() {
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    assertTrue (TestCases.runTests7 (xmlId, stxId));
+  }
 
-        assertTrue(TestCases.runTests7(xmlId, stxId));
-    }
+  @Test
+  public void testRunTests8 ()
+  {
 
-    public void testRunTests8() {
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    assertTrue (TestCases.runTests8 (xmlId, stxId));
+  }
 
-        assertTrue(TestCases.runTests8(xmlId, stxId));
-    }
+  @Test
+  public void testRunTests9 ()
+  {
 
-    public void testRunTests9() {
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
+    final String stxId2 = "data/indent.stx";
 
-        String xmlId   = "data/flat.xml";
-        String stxId1  = "data/flat.stx";
-        String stxId2  = "data/indent.stx";
+    assertTrue (TestCases.runTests9 (xmlId, stxId1, stxId2));
+  }
 
-        assertTrue(TestCases.runTests9(xmlId, stxId1, stxId2));
-    }
+  @Test
+  public void testRunTests10 ()
+  {
 
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-    public void testRunTests10() {
+    assertTrue (TestCases.runTests10 (xmlId, stxId));
+  }
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+  @Test
+  public void testRunTests11 ()
+  {
 
-        assertTrue(TestCases.runTests10(xmlId, stxId));
-    }
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-    public void testRunTests11() {
+    assertTrue (TestCases.runTests11 (xmlId, stxId));
+  }
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+  @Test
+  public void testRunTests12 ()
+  {
 
-        assertTrue(TestCases.runTests11(xmlId, stxId));
-    }
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-    public void testRunTests12() {
+    assertTrue (TestCases.runTests12 (xmlId, stxId));
+  }
+
+  @Test
+  public void testRunTests13 ()
+  {
+
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
+
+    assertTrue (TestCases.runTests13 (xmlId, stxId));
+  }
+
+  // exampleUseAssociated --> not yet implemented in joost public void
+  @Test
+  @Ignore ("Feature not supported")
+  public void testRunTests14 ()
+  {
+    final String xmlId = "data/flat.xml";
+    assertTrue (TestCases.runTests14 (xmlId));
+  }
+
+  // @todo : fixing this error
+  @Test
+  public void testRunTests15 ()
+  {
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        assertTrue(TestCases.runTests12(xmlId, stxId));
-    }
+    assertTrue (TestCases.runTests15 (xmlId, stxId));
+  }
+
+  @Test
+  public void testRunTests16 ()
+  {
 
-    public void testRunTests13() {
+    final String xmlId = "data/flat.xml";
+    final String stxId = "data/flat.stx";
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    assertTrue (TestCases.runTests16 (xmlId, stxId));
+  }
 
-        assertTrue(TestCases.runTests13(xmlId, stxId));
-    }
+  @Test
+  public void testRunTests18 ()
+  {
 
-/*
-    //exampleUseAssociated --> not yet implemented in joost
-    public void testRunTests14() {
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
+    final String stxId2 = "data/indent.stx";
+    final String stxId3 = "data/copy.stx";
 
-        String xmlId   = "data/flat.xml";
+    assertTrue (TestCases.runTests18 (xmlId, stxId1, stxId2, stxId3));
+  }
 
-        assertTrue(TestCases.runTests14(xmlId));
-    }
-*/
+  // *****************************************************************************
+  // some DOM-Tests
 
+  /**
+   * WORKS ONLY WITHOUT ENCODINGS
+   */
+  /*
+   * public void testRunTests19() { String xmlId = "data/flat.xml"; String stxId
+   * = "data/flat.stx"; //verification result for transformation of flat.xml
+   * with flat.stx String VERIFY = "testdata/resultflatnoencoding.xml"; String
+   * result = TestCases.runTests19(xmlId, stxId); System.out.println(result);
+   * StringTokenizer tokenizer = new StringTokenizer(result, "\n"); boolean rv =
+   * true; try { //verify result BufferedReader b = new BufferedReader(new
+   * FileReader(VERIFY)); while( b.ready() && tokenizer.hasMoreElements() ) {
+   * String x = (String)tokenizer.nextElement(); String y = b.readLine();
+   * //System.out.println(x + "=" + y); if ( !(x.equals(y)) ) { rv = false;
+   * System.err.println("diff --> " + x + "=" + y); break; } } } catch
+   * (FileNotFoundException fE) { fE.printStackTrace(); } catch (IOException iE)
+   * { iE.printStackTrace(); } assertTrue(rv); }
+   */
 
-    //@todo : fixing this error
-    public void testRunTests15() {
+  @Test
+  public void testRunTests20 ()
+  {
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
-        assertTrue(TestCases.runTests15(xmlId, stxId));
-    }
+    assertTrue (TestCases.runTests20 (xmlId, stxId1));
+  }
 
+  @Test
+  public void testRunTests21 ()
+  {
 
-    public void testRunTests16() {
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
-        String xmlId   = "data/flat.xml";
-        String stxId   = "data/flat.stx";
+    assertTrue (TestCases.runTests21 (xmlId, stxId1));
+  }
 
-        assertTrue(TestCases.runTests16(xmlId, stxId));
-    }
+  @Test
+  public void testRunTests22 ()
+  {
 
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
+    assertTrue (TestCases.runTests22 (xmlId, stxId1));
+  }
 
-    public void testRunTests18() {
+  // *****************************************************************************
+  // some SAX-Tests
 
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
-        String stxId2   = "data/indent.stx";
-        String stxId3   = "data/copy.stx";
+  @Test
+  public void testRunTests23 ()
+  {
 
-        assertTrue(TestCases.runTests18(xmlId, stxId1, stxId2, stxId3));
-    }
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
+    assertTrue (TestCases.runTests23 (xmlId, stxId1));
+  }
 
-//*****************************************************************************
-//some DOM-Tests
+  @Test
+  public void testRunTests24 ()
+  {
 
-    /**
-     * WORKS ONLY WITHOUT ENCODINGS
-     *
-     */
-/*
-    public void testRunTests19() {
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
-        String xmlId    = "data/flat.xml";
-        String stxId    = "data/flat.stx";
+    assertTrue (TestCases.runTests24 (xmlId, stxId1));
+  }
 
-        //verification result for transformation of flat.xml with flat.stx
-        String VERIFY   = "testdata/resultflatnoencoding.xml";
+  @Test
+  public void testRunTests25 ()
+  {
 
-        String result = TestCases.runTests19(xmlId, stxId);
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
-        System.out.println(result);
+    assertTrue (TestCases.runTests25 (xmlId, stxId1));
+  }
 
+  @Test
+  public void testRunTests26 ()
+  {
 
-        StringTokenizer tokenizer = new StringTokenizer(result, "\n");
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
-        boolean rv = true;
+    assertTrue (TestCases.runTests26 (xmlId, stxId1));
+  }
 
-        try {
-            //verify result
-            BufferedReader b = new BufferedReader(new FileReader(VERIFY));
-            while( b.ready() && tokenizer.hasMoreElements() ) {
+  @Test
+  public void testRunTests27 ()
+  {
 
-                String x = (String)tokenizer.nextElement();
-                String y = b.readLine();
+    final String xmlId = "data/flat.xml";
+    final String stxId1 = "data/flat.stx";
 
-                //System.out.println(x + "=" + y);
+    assertTrue (TestCases.runTests27 (xmlId, stxId1));
+  }
 
-                if ( !(x.equals(y)) ) {
-                    rv = false;
-                    System.err.println("diff --> " + x + "=" + y);
-                    break;
-                }
-            }
+  @Test
+  public void testRunTests28 ()
+  {
 
-        } catch (FileNotFoundException fE) {
-            fE.printStackTrace();
-        } catch (IOException iE) {
-            iE.printStackTrace();
-        }
+    final String xmlId = "data/flat.xml";
 
-        assertTrue(rv);
-    }
-*/
+    assertTrue (TestCases.runTests28 (xmlId));
+  }
 
+  @Test
+  public void testRunTests29 ()
+  {
 
-    public void testRunTests20() {
+    final String xmlId = "data/flat.xml";
 
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
+    assertTrue (TestCases.runTests29 (xmlId));
+  }
 
-        assertTrue(TestCases.runTests20(xmlId, stxId1));
-    }
+  private void init ()
+  {
 
+    // log.info("starting TrAX-Tests ... ");
 
+    System.out.println ("setting trax-Props");
 
-    public void testRunTests21() {
+    // setting joost as transformer
+    final String key = "javax.xml.transform.TransformerFactory";
+    final String value = "net.sf.joost.trax.TransformerFactoryImpl";
 
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
+    // log.debug("Setting key " + key + " to " + value);
 
-        assertTrue(TestCases.runTests21(xmlId, stxId1));
-    }
+    // setting xerces as parser
+    final String key2 = "javax.xml.parsers.SAXParser";
+    final String value2 = "org.apache.xerces.parsers.SAXParser";
 
+    final String key3 = "org.xml.sax.driver";
+    final String value3 = "org.apache.xerces.parsers.SAXParser";
 
-    public void testRunTests22() {
+    // log.debug("Setting key " + key2 + " to " + value2);
 
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
+    final Properties props = System.getProperties ();
+    props.put (key, value);
+    props.put (key2, value2);
+    props.put (key3, value3);
 
-        assertTrue(TestCases.runTests22(xmlId, stxId1));
-    }
-
-
-//*****************************************************************************
-//some SAX-Tests
-
-    public void testRunTests23() {
-
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
-
-        assertTrue(TestCases.runTests23(xmlId, stxId1));
-    }
-
-
-    public void testRunTests24() {
-
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
-
-        assertTrue(TestCases.runTests24(xmlId, stxId1));
-    }
-
-
-    public void testRunTests25() {
-
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
-
-        assertTrue(TestCases.runTests25(xmlId, stxId1));
-    }
-
-    public void testRunTests26() {
-
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
-
-        assertTrue(TestCases.runTests26(xmlId, stxId1));
-    }
-
-    public void testRunTests27() {
-
-        String xmlId    = "data/flat.xml";
-        String stxId1   = "data/flat.stx";
-
-        assertTrue(TestCases.runTests27(xmlId, stxId1));
-    }
-
-    public void testRunTests28() {
-
-       String xmlId    = "data/flat.xml";
-
-       assertTrue(TestCases.runTests28(xmlId));
-    }
-
-    public void testRunTests29() {
-
-       String xmlId    = "data/flat.xml";
-
-       assertTrue(TestCases.runTests29(xmlId));
-    }
-
-    private void init() {
-
-        //log.info("starting TrAX-Tests ... ");
-
-        System.out.println("setting trax-Props");
-
-        //setting joost as transformer
-        String key = "javax.xml.transform.TransformerFactory";
-        String value = "net.sf.joost.trax.TransformerFactoryImpl";
-
-        //log.debug("Setting key " + key + " to " + value);
-
-        //setting xerces as parser
-        String key2 = "javax.xml.parsers.SAXParser";
-        String value2 = "org.apache.xerces.parsers.SAXParser";
-
-        String key3 = "org.xml.sax.driver";
-        String value3 = "org.apache.xerces.parsers.SAXParser";
-
-        //log.debug("Setting key " + key2 + " to " + value2);
-
-        Properties props = System.getProperties();
-        props.put(key, value);
-        props.put(key2, value2);
-        props.put(key3, value3);
-
-        System.setProperties(props);
-    }
+    System.setProperties (props);
+  }
 }

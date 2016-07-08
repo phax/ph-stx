@@ -29,47 +29,49 @@ import java.math.BigInteger;
  * @version $Revision: 1.2 $ $Date: 2009/08/21 14:58:41 $
  * @author Oliver Becker
  */
-public class ExtensionFunctionTarget {
+public class ExtensionFunctionTarget
+{
+  private int intValue = Integer.MIN_VALUE;
+  private Integer integerValue = new Integer (Integer.MIN_VALUE);
+  private BigInteger bigIntegerValue = BigInteger.ZERO;
 
-   private int intValue = Integer.MIN_VALUE;
-   private Integer integerValue = new Integer(Integer.MIN_VALUE);
-   private BigInteger bigIntegerValue = BigInteger.ZERO;
+  public int getIntValue ()
+  {
+    return intValue;
+  }
 
-   public int getIntValue()
-   {
-      return intValue;
-   }
+  public void setIntValue (final int intValue)
+  {
+    this.intValue = intValue;
+  }
 
-   public void setIntValue(int intValue)
-   {
-      this.intValue = intValue;
-   }
+  public Integer getIntegerValue ()
+  {
+    return integerValue;
+  }
 
-   public Integer getIntegerValue()
-   {
-      return integerValue;
-   }
+  public void setIntegerValue (final Integer integerValue)
+  {
+    this.integerValue = integerValue;
+  }
 
-   public void setIntegerValue(Integer integerValue)
-   {
-      this.integerValue = integerValue;
-   }
+  public BigInteger getBigIntegerValue ()
+  {
+    return bigIntegerValue;
+  }
 
-   public BigInteger getBigIntegerValue()
-   {
-      return bigIntegerValue;
-   }
+  public void setBigIntegerValue (final BigInteger bigIntegerValue)
+  {
+    this.bigIntegerValue = bigIntegerValue;
+  }
 
-   public void setBigIntegerValue(BigInteger bigIntegerValue)
-   {
-      this.bigIntegerValue = bigIntegerValue;
-   }
+  public static BigInteger parseBigInt (final long value)
+  {
+    return BigInteger.valueOf (value);
+  }
 
-   public static BigInteger parseBigInt(long value) {
-      return BigInteger.valueOf(value);
-   }
-
-   public void exc() {
-      throw new ExtensionFunctionException();
-   }
+  public void exc ()
+  {
+    throw new ExtensionFunctionException ();
+  }
 }

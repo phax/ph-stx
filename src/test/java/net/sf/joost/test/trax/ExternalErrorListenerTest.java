@@ -1,7 +1,8 @@
 package net.sf.joost.test.trax;
 
-import net.sf.joost.trax.TrAXConstants;
-import net.sf.joost.trax.TransformerFactoryImpl;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -14,100 +15,100 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ExternalErrorListenerTest extends TestCase
+import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.TransformerFactoryImpl;
+
+public class ExternalErrorListenerTest
 {
-   private Properties props;
+  private Properties props;
 
-   public static Test suite()
-   {
-      return new TestSuite(ExternalErrorListenerTest.class);
-   }
+  @Before
+  public void setUp () throws Exception
+  {
+    props = System.getProperties ();
+    System.setProperty (TrAXConstants.KEY_XSLT_FACTORY, "org.apache.xalan.processor.TransformerFactoryImpl");
+  }
 
-   protected void setUp() throws Exception
-   {
-      super.setUp();
-      props = System.getProperties();
-      System.setProperty(TrAXConstants.KEY_XSLT_FACTORY,
-                         "org.apache.xalan.processor.TransformerFactoryImpl");
-   }
+  @After
+  public void tearDown () throws Exception
+  {
+    System.setProperties (props);
+  }
 
-   protected void tearDown() throws Exception
-   {
-      System.setProperties(props);
-      super.tearDown();
-   }
+  @Test
+  public void testErrorListener () throws Exception
+  {
+    final String xmlFileString = "errorDocument.xml";
+    final String stxFileString = "errorMapping.stx";
 
-   public void testErrorListener() throws Exception
-   {
-      String xmlFileString = "errorDocument.xml";
-      String stxFileString = "errorMapping.stx";
+    final InputStream xmlStream = ExternalErrorListenerTest.class.getResourceAsStream (xmlFileString);
+    final InputStream stxStream = ExternalErrorListenerTest.class.getResourceAsStream (stxFileString);
 
-      InputStream xmlStream = ExternalErrorListenerTest.class
-            .getResourceAsStream(xmlFileString);
-      InputStream stxStream = ExternalErrorListenerTest.class
-            .getResourceAsStream(stxFileString);
+    final Source xmlSource = new StreamSource (xmlStream);
+    final Source xsltSource = new StreamSource (stxStream);
 
-      Source xmlSource = new StreamSource(xmlStream);
-      Source xsltSource = new StreamSource(stxStream);
+    final TransformerFactory transFact = new TransformerFactoryImpl ();
 
-      TransformerFactory transFact = new TransformerFactoryImpl();
+    final Listener listener1 = new Listener ();
+    transFact.setErrorListener (listener1);
 
-      Listener listener1 = new Listener();
-      transFact.setErrorListener(listener1);
+    final Transformer trans = transFact.newTransformer (xsltSource);
 
-      Transformer trans = transFact.newTransformer(xsltSource);
+    final Listener listener2 = new Listener ();
+    trans.setErrorListener (listener2);
 
-      Listener listener2 = new Listener();
-      trans.setErrorListener(listener2);
+    try
+    {
+      trans.transform (xmlSource, new StreamResult (System.out));
+      fail ();
+    }
+    catch (final TransformerException te)
+    {
+      System.err.println ("transformation aborted: " + te.getMessage ());
+    }
 
-      try {
-         trans.transform(xmlSource, new StreamResult(System.out));
-         fail();
-      }
-      catch (TransformerException te) {
-         System.err.println("transformation aborted: " + te.getMessage());
-      }
+    assertFalse (listener1.fatalCalled);
+    assertFalse (listener1.errorCalled);
+    assertFalse (listener1.warningCalled);
 
-      assertFalse(listener1.fatalCalled);
-      assertFalse(listener1.errorCalled);
-      assertFalse(listener1.warningCalled);
+    assertTrue (listener2.fatalCalled);
+    assertFalse (listener2.errorCalled); // depends on the actual XSLT impl
+    assertFalse (listener2.warningCalled);
+  }
 
-      assertTrue(listener2.fatalCalled);
-      assertFalse(listener2.errorCalled);  // depends on the actual XSLT impl
-      assertFalse(listener2.warningCalled);
-   }
+  private static class Listener implements ErrorListener
+  {
+    boolean fatalCalled, errorCalled, warningCalled;
 
-   private static class Listener implements ErrorListener
-   {
-      boolean fatalCalled, errorCalled, warningCalled;
+    public void error (final TransformerException exception) throws TransformerException
+    {
+      errorCalled = true;
+      System.err.println ("[ERROR] " + exception.getMessage ());
+      throw new TransformerException ("stylesheet aborted: " +
+                                      exception.getMessage () +
+                                      ": " +
+                                      exception.getMessage ());
+    }
 
-      public void error(TransformerException exception)
-            throws TransformerException
-      {
-         errorCalled = true;
-         System.err.println("[ERROR] " + exception.getMessage());
-         throw new TransformerException("stylesheet aborted: "
-               + exception.getMessage() + ": " + exception.getMessage());
-      }
+    public void fatalError (final TransformerException exception) throws TransformerException
+    {
+      fatalCalled = true;
+      System.err.println ("[FATAL] " + exception.getMessage ());
+      throw new TransformerException ("stylesheet aborted: " +
+                                      exception.getMessage () +
+                                      ": " +
+                                      exception.getMessage ());
+    }
 
-      public void fatalError(TransformerException exception)
-            throws TransformerException
-      {
-         fatalCalled = true;
-         System.err.println("[FATAL] " + exception.getMessage());
-         throw new TransformerException("stylesheet aborted: "
-               + exception.getMessage() + ": " + exception.getMessage());
-      }
-
-      public void warning(TransformerException exception)
-      {
-         warningCalled = true;
-         System.out.println("[WARN ] " + exception.getMessage());
-      }
-   }
+    public void warning (final TransformerException exception)
+    {
+      warningCalled = true;
+      System.out.println ("[WARN ] " + exception.getMessage ());
+    }
+  }
 
 }

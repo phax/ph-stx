@@ -23,7 +23,10 @@
  */
 package net.sf.joost.test.stx.function;
 
-import net.sf.joost.trax.TransformerFactoryImpl;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,70 +40,77 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import net.sf.joost.trax.TransformerFactoryImpl;
 
 /**
  * @version $Revision: 1.2 $ $Date: 2009/08/21 14:58:41 $
  * @author Oliver Becker
  */
-public class ExtensionFunctionTest extends TestCase
+public class ExtensionFunctionTest
 {
-   private void doTransform(ExtensionFunctionTarget target, String stxName)
-         throws TransformerException
-   {
-      TransformerFactory factory = new TransformerFactoryImpl();
-      InputStream inputStream = ExtensionFunctionTest.class
-            .getResourceAsStream(stxName);
-      Source source = new StreamSource(inputStream);
-      Transformer transformer = factory.newTransformer(source);
-      transformer.setParameter("target", target);
-      transformer.transform(
-            new StreamSource(new ByteArrayInputStream("<x/>".getBytes())),
-            new StreamResult(new OutputStream() {
-               public void write(int b) throws IOException
-               { }
-            }));
-   }
+  private void doTransform (final ExtensionFunctionTarget target, final String stxName) throws TransformerException
+  {
+    final TransformerFactory factory = new TransformerFactoryImpl ();
+    final InputStream inputStream = ExtensionFunctionTest.class.getResourceAsStream (stxName);
+    final Source source = new StreamSource (inputStream);
+    final Transformer transformer = factory.newTransformer (source);
+    transformer.setParameter ("target", target);
+    transformer.transform (new StreamSource (new ByteArrayInputStream ("<x/>".getBytes ())),
+                           new StreamResult (new OutputStream ()
+                           {
+                             @Override
+                             public void write (final int b) throws IOException
+                             {}
+                           }));
+  }
 
-   public void testIntegerValues() throws TransformerException
-   {
-      ExtensionFunctionTarget target = new ExtensionFunctionTarget();
-      doTransform(target, "extensionFunctionInt.stx");
+  @Test
+  public void testIntegerValues () throws TransformerException
+  {
+    final ExtensionFunctionTarget target = new ExtensionFunctionTarget ();
+    doTransform (target, "extensionFunctionInt.stx");
 
-      assertEquals(42, target.getIntValue());
-      assertEquals(new Integer(42), target.getIntegerValue());
-   }
+    assertEquals (42, target.getIntValue ());
+    assertEquals (new Integer (42), target.getIntegerValue ());
+  }
 
-   public void testEmptyIntegerValues() throws TransformerException
-   {
-      ExtensionFunctionTarget target = new ExtensionFunctionTarget();
-      doTransform(target, "extensionFunctionNull.stx");
+  @Test
+  public void testEmptyIntegerValues () throws TransformerException
+  {
+    final ExtensionFunctionTarget target = new ExtensionFunctionTarget ();
+    doTransform (target, "extensionFunctionNull.stx");
 
-      assertEquals(0, target.getIntValue());
-      assertNull(target.getIntegerValue());
-   }
+    assertEquals (0, target.getIntValue ());
+    assertNull (target.getIntegerValue ());
+  }
 
-   public void testBigIntegerValue() throws TransformerException
-   {
-      ExtensionFunctionTarget target = new ExtensionFunctionTarget();
-      doTransform(target, "extensionFunctionBigInt.stx");
+  @Test
+  public void testBigIntegerValue () throws TransformerException
+  {
+    final ExtensionFunctionTarget target = new ExtensionFunctionTarget ();
+    doTransform (target, "extensionFunctionBigInt.stx");
 
-      assertEquals(42, target.getBigIntegerValue().intValue());
-   }
+    assertEquals (42, target.getBigIntegerValue ().intValue ());
+  }
 
-   public void testException()
-   {
-      ExtensionFunctionTarget target = new ExtensionFunctionTarget();
-      try {
-         doTransform(target, "extensionFunctionExc.stx");
-         fail();
-      }
-      catch (TransformerException ex) {
-         Throwable t = ex.getCause();
-         while (t != null && !(t instanceof ExtensionFunctionException))
-            t = t.getCause();
-         assertTrue(t instanceof ExtensionFunctionException);
-      }
-   }
+  @Test
+  public void testException ()
+  {
+    final ExtensionFunctionTarget target = new ExtensionFunctionTarget ();
+    try
+    {
+      doTransform (target, "extensionFunctionExc.stx");
+      fail ();
+    }
+    catch (final TransformerException ex)
+    {
+      Throwable t = ex.getCause ();
+      while (t != null && !(t instanceof ExtensionFunctionException))
+        t = t.getCause ();
+      assertTrue (t instanceof ExtensionFunctionException);
+    }
+  }
 
 }

@@ -31,97 +31,106 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 /**
- * TestContentHandler for transformation over TraX with joost
- * acts as SAXResult
+ * TestContentHandler for transformation over TraX with joost acts as SAXResult
  *
  * @author Zubow
  */
-public class ExampleContentHandler implements ContentHandler {
+public class ExampleContentHandler implements ContentHandler
+{
 
-    // Define a static logger variable so that it references the
-    // Logger instance named "RunTests".
-    static Logger log = Logger.getLogger(ExampleContentHandler.class);
+  // Define a static logger variable so that it references the
+  // Logger instance named "RunTests".
+  static Logger log = Logger.getLogger (ExampleContentHandler.class);
 
-    public void setDocumentLocator(Locator locator) {
-        log.info("setDocumentLocator");
+  public void setDocumentLocator (final Locator locator)
+  {
+    log.info ("setDocumentLocator");
+  }
+
+  public void startDocument () throws SAXException
+  {
+    log.info ("ExampleContentHandler - startDocument");
+  }
+
+  public void endDocument () throws SAXException
+  {
+    log.info ("endDocument");
+  }
+
+  public void startPrefixMapping (final String prefix, final String uri) throws SAXException
+  {
+    log.info ("startPrefixMapping: " + prefix + ", " + uri);
+  }
+
+  public void endPrefixMapping (final String prefix) throws SAXException
+  {
+    log.info ("endPrefixMapping: " + prefix);
+  }
+
+  public void startElement (final String namespaceURI,
+                            final String localName,
+                            final String qName,
+                            final Attributes atts) throws SAXException
+  {
+
+    log.info ("startElement: " + namespaceURI + ", " + localName + ", " + qName);
+
+    final int n = atts.getLength ();
+
+    for (int i = 0; i < n; i++)
+    {
+      log.info (", " + atts.getQName (i) + "='" + atts.getValue (i) + "'");
     }
 
-    public void startDocument() throws SAXException {
-        log.info("ExampleContentHandler - startDocument");
+    log.info ("");
+  }
+
+  public void endElement (final String namespaceURI, final String localName, final String qName) throws SAXException
+  {
+
+    log.info ("endElement: " + namespaceURI + ", " + localName + ", " + qName);
+  }
+
+  public void characters (final char ch[], final int start, final int length) throws SAXException
+  {
+
+    final String s = new String (ch, start, (length > 30) ? 30 : length);
+
+    if (length > 30)
+    {
+      log.info ("characters: \"" + s + "\"...");
     }
-
-    public void endDocument() throws SAXException {
-        log.info("endDocument");
+    else
+    {
+      log.info ("characters: \"" + s + "\"");
     }
+  }
 
-    public void startPrefixMapping(String prefix, String uri)
-        throws SAXException {
-        log.info("startPrefixMapping: " + prefix + ", " + uri);
-    }
+  public void ignorableWhitespace (final char ch[], final int start, final int length) throws SAXException
+  {
+    log.info ("ignorableWhitespace");
+  }
 
-    public void endPrefixMapping(String prefix) throws SAXException {
-        log.info("endPrefixMapping: " + prefix);
-    }
+  public void processingInstruction (final String target, final String data) throws SAXException
+  {
+    log.info ("processingInstruction: " + target + ", " + data);
+  }
 
-    public void startElement( String namespaceURI, String localName,
-        String qName, Attributes atts)
-        throws SAXException {
+  public void skippedEntity (final String name) throws SAXException
+  {
+    log.info ("skippedEntity: " + name);
+  }
 
-        log.info("startElement: " + namespaceURI + ", "
-                         + localName + ", " + qName);
+  public static void main (final String [] args) throws Exception
+  {
+    final org.xml.sax.XMLReader parser = javax.xml.parsers.SAXParserFactory.newInstance ()
+                                                                           .newSAXParser ()
+                                                                           .getXMLReader ();
 
-        int n = atts.getLength();
+    log.error ("Parser: " + parser.getClass ());
 
-        for (int i = 0; i < n; i++) {
-            log.info(", " + atts.getQName(i) + "='" + atts.getValue(i) + "'");
-        }
+    parser.setContentHandler (new ExampleContentHandler ());
 
-        log.info("");
-    }
-
-    public void endElement(String namespaceURI, String localName, String qName)
-        throws SAXException {
-
-        log.info("endElement: " + namespaceURI + ", "
-                           + localName + ", " + qName);
-    }
-
-    public void characters(char ch[], int start, int length)
-        throws SAXException {
-
-        String s = new String(ch, start, (length > 30) ? 30 : length);
-
-        if (length > 30) {
-            log.info("characters: \"" + s + "\"...");
-        } else {
-            log.info("characters: \"" + s + "\"");
-        }
-    }
-
-    public void ignorableWhitespace(char ch[], int start, int length)
-        throws SAXException {
-        log.info("ignorableWhitespace");
-    }
-
-    public void processingInstruction(String target, String data)
-        throws SAXException {
-        log.info("processingInstruction: " + target + ", " + data);
-    }
-
-    public void skippedEntity(String name) throws SAXException {
-        log.info("skippedEntity: " + name);
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        org.xml.sax.XMLReader parser =
-            javax.xml.parsers.SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-
-        log.error("Parser: " + parser.getClass());
-
-        parser.setContentHandler(new ExampleContentHandler());
-
-        parser.parse(new java.io.File(args[0]).toURL().toString());
-    }
+    parser.parse (new java.io.File (args[0]).toURL ().toString ());
+  }
 }
-

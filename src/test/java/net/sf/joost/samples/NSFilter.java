@@ -24,9 +24,6 @@
 
 package net.sf.joost.samples;
 
-import net.sf.joost.TransformerHandlerResolver;
-import net.sf.joost.trax.TrAXConstants;
-
 import java.util.Hashtable;
 
 import javax.xml.transform.ErrorListener;
@@ -47,237 +44,232 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.XMLFilterImpl;
 
+import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.trax.TrAXConstants;
 
 /**
  * Example class that demonstrates the usage of external filters in Joost.
  * <p>
  * For simplicity this example comprises three tasks within one class:
  * <ul>
- * <li>starting the application in the main method, registering an object
- *     as a resolver for TransformerHandler objects</li>
+ * <li>starting the application in the main method, registering an object as a
+ * resolver for TransformerHandler objects</li>
  * <li>acting as a TransformerHandlerResolver, that returns itself</li>
- * <li>acting as a TransformerHandler, that removes all elements in a
- *     given namespace (passed as a parameter)</li>
+ * <li>acting as a TransformerHandler, that removes all elements in a given
+ * namespace (passed as a parameter)</li>
  * </ul>
+ *
  * @version $Revision: 1.2 $ $Date: 2009/09/22 21:13:44 $
  * @author Oliver Becker
  */
 
-public class NSFilter
-   extends XMLFilterImpl
-   implements TransformerHandler, TransformerHandlerResolver
+public class NSFilter extends XMLFilterImpl implements TransformerHandler, TransformerHandlerResolver
 {
-   public static void main(String[] args)
-   {
-      // example transformation
-      String testSTX = "NSFilter.stx";
+  public static void main (final String [] args)
+  {
+    // example transformation
+    final String testSTX = "NSFilter.stx";
 
-      // use Joost as transformation engine
-      System.setProperty("javax.xml.transform.TransformerFactory",
-                         "net.sf.joost.trax.TransformerFactoryImpl");
+    // use Joost as transformation engine
+    System.setProperty ("javax.xml.transform.TransformerFactory", "net.sf.joost.trax.TransformerFactoryImpl");
 
-      // The object that is the filter (TransformerHandler) as well as
-      // a resolver for that filter (TransformerHandlerResolver)
-      NSFilter filter = new NSFilter();
+    // The object that is the filter (TransformerHandler) as well as
+    // a resolver for that filter (TransformerHandlerResolver)
+    final NSFilter filter = new NSFilter ();
 
-      try {
-         TransformerFactory factory = TransformerFactory.newInstance();
+    try
+    {
+      final TransformerFactory factory = TransformerFactory.newInstance ();
 
-         // register the resolver
-         factory.setAttribute(TrAXConstants.KEY_TH_RESOLVER, filter);
+      // register the resolver
+      factory.setAttribute (TrAXConstants.KEY_TH_RESOLVER, filter);
 
-         Transformer transformer =
-            factory.newTransformer(
-               new StreamSource(NSFilter.class.getResourceAsStream(testSTX)));
+      final Transformer transformer = factory.newTransformer (new StreamSource (NSFilter.class.getResourceAsStream (testSTX)));
 
-         transformer.transform(new StreamSource(
-                                  NSFilter.class.getResourceAsStream(testSTX)),
-                               new StreamResult(System.out));
-      } catch (TransformerException e) {
-         SourceLocator sloc = e.getLocator();
-         if (sloc != null)
-            System.err.println(sloc.getSystemId() + ":" + sloc.getLineNumber()
-                               + ":" + sloc.getColumnNumber() + ": "
-                               + e.getMessage());
-         else
-            System.err.println(e.getMessage());
-      }
-   }
-
-
-   // ---------------------------------------------------------------------
-
-   //
-   // from interface TransformerHandlerResolver
-   //
-
-
-   /**
-    * The filter-method attribute value to be used in the STX transformation
-    * sheet
-    */
-   private static final String METHOD =
-      "http://joost.sf.net/samples/NSFilter";
-
-   public TransformerHandler resolve(String method, String href, String base,
-                                     URIResolver uriResolver,
-                                     ErrorListener errorListener,
-                                     Hashtable params)
-      throws SAXException
-   {
-      if (METHOD.equals(method)) {
-         if (href != null)
-            throw new SAXException("Specification of an external source '" +
-                                   href + "' not allowed for " + method);
-         skipUri = String.valueOf(params.get("uri"));
-         return this;
-      }
+      transformer.transform (new StreamSource (NSFilter.class.getResourceAsStream (testSTX)),
+                             new StreamResult (System.out));
+    }
+    catch (final TransformerException e)
+    {
+      final SourceLocator sloc = e.getLocator ();
+      if (sloc != null)
+        System.err.println (sloc.getSystemId () +
+                            ":" +
+                            sloc.getLineNumber () +
+                            ":" +
+                            sloc.getColumnNumber () +
+                            ": " +
+                            e.getMessage ());
       else
-         return null;
-   }
+        System.err.println (e.getMessage ());
+    }
+  }
 
-   public TransformerHandler resolve(String method, XMLReader reader,
-                                     URIResolver uriResolver,
-                                     ErrorListener errorListener,
-                                     Hashtable params)
-      throws SAXException
-   {
-      if (METHOD.equals(method))
-         throw new SAXException("Provision of internal code not allowed for "
-                                + method);
-      else
-         return null;
-   }
+  // ---------------------------------------------------------------------
 
-   public boolean available(String method)
-   {
-      return METHOD.equals(method);
-   }
+  //
+  // from interface TransformerHandlerResolver
+  //
 
-   public String[] resolves()
-   {
-      return new String[] { METHOD };
-   }
+  /**
+   * The filter-method attribute value to be used in the STX transformation
+   * sheet
+   */
+  private static final String METHOD = "http://joost.sf.net/samples/NSFilter";
 
+  public TransformerHandler resolve (final String method,
+                                     final String href,
+                                     final String base,
+                                     final URIResolver uriResolver,
+                                     final ErrorListener errorListener,
+                                     final Hashtable params) throws SAXException
+  {
+    if (METHOD.equals (method))
+    {
+      if (href != null)
+        throw new SAXException ("Specification of an external source '" + href + "' not allowed for " + method);
+      skipUri = String.valueOf (params.get ("uri"));
+      return this;
+    }
+    return null;
+  }
 
-   // ---------------------------------------------------------------------
+  public TransformerHandler resolve (final String method,
+                                     final XMLReader reader,
+                                     final URIResolver uriResolver,
+                                     final ErrorListener errorListener,
+                                     final Hashtable params) throws SAXException
+  {
+    if (METHOD.equals (method))
+      throw new SAXException ("Provision of internal code not allowed for " + method);
+    return null;
+  }
 
+  public boolean available (final String method)
+  {
+    return METHOD.equals (method);
+  }
 
-   /** This filter removes all elements in this namespace, set in resolve */
-   private String skipUri;
+  public String [] resolves ()
+  {
+    return new String [] { METHOD };
+  }
 
-   private int skipDepth = 0;
+  // ---------------------------------------------------------------------
 
+  /** This filter removes all elements in this namespace, set in resolve */
+  private String skipUri;
 
-   // ---------------------------------------------------------------------
+  private int skipDepth = 0;
 
-   //
-   // from interface ContentHandler
-   //
+  // ---------------------------------------------------------------------
 
-   public void startElement(String uri, String lName, String qName,
-                            Attributes attrs)
-      throws SAXException
-   {
-      if (skipDepth > 0 || uri.equals(skipUri)) {
-         skipDepth++;
-         return;
-      }
-      else
-         super.startElement(uri, lName, qName, attrs);
-   }
+  //
+  // from interface ContentHandler
+  //
 
-   public void endElement(String uri, String lName, String qName)
-      throws SAXException
-   {
-      if (skipDepth > 0) {
-         skipDepth--;
-         return;
-      }
-      else
-         super.endElement(uri, lName, qName);
-   }
+  @Override
+  public void startElement (final String uri,
+                            final String lName,
+                            final String qName,
+                            final Attributes attrs) throws SAXException
+  {
+    if (skipDepth > 0 || uri.equals (skipUri))
+    {
+      skipDepth++;
+    }
+    else
+      super.startElement (uri, lName, qName, attrs);
+  }
 
-   public void characters(char[] ch, int start, int length)
-      throws SAXException
-   {
-      if (skipDepth == 0)
-         super.characters(ch, start, length);
-   }
+  @Override
+  public void endElement (final String uri, final String lName, final String qName) throws SAXException
+  {
+    if (skipDepth > 0)
+    {
+      skipDepth--;
+    }
+    else
+      super.endElement (uri, lName, qName);
+  }
 
-   // ---------------------------------------------------------------------
+  @Override
+  public void characters (final char [] ch, final int start, final int length) throws SAXException
+  {
+    if (skipDepth == 0)
+      super.characters (ch, start, length);
+  }
 
-   //
-   // from interface LexicalHandler (not implemented by XMLFilterImpl)
-   //
+  // ---------------------------------------------------------------------
 
-   private LexicalHandler lexH;
+  //
+  // from interface LexicalHandler (not implemented by XMLFilterImpl)
+  //
 
-   public void startDTD(String name, String pubId, String sysId)
-   { } // not used
+  private LexicalHandler lexH;
 
-   public void endDTD()
-   { } // not used
+  public void startDTD (final String name, final String pubId, final String sysId)
+  {} // not used
 
-   public void startEntity(String name)
-   { } // not used
+  public void endDTD ()
+  {} // not used
 
-   public void endEntity(String name)
-   { } // not used
+  public void startEntity (final String name)
+  {} // not used
 
-   public void startCDATA()
-      throws SAXException
-   {
-      if (skipDepth == 0 && lexH != null)
-         lexH.startCDATA();
-   }
+  public void endEntity (final String name)
+  {} // not used
 
-   public void endCDATA()
-      throws SAXException
-   {
-      if (skipDepth == 0 && lexH != null)
-         lexH.endCDATA();
-   }
+  public void startCDATA () throws SAXException
+  {
+    if (skipDepth == 0 && lexH != null)
+      lexH.startCDATA ();
+  }
 
-   public void comment(char[] ch, int start, int length)
-      throws SAXException
-   {
-      if (skipDepth == 0 && lexH != null)
-         lexH.comment(ch, start, length);
-   }
+  public void endCDATA () throws SAXException
+  {
+    if (skipDepth == 0 && lexH != null)
+      lexH.endCDATA ();
+  }
 
+  public void comment (final char [] ch, final int start, final int length) throws SAXException
+  {
+    if (skipDepth == 0 && lexH != null)
+      lexH.comment (ch, start, length);
+  }
 
-   // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
 
-   //
-   // from interface TransformerHandler
-   //
+  //
+  // from interface TransformerHandler
+  //
 
-   public void setResult(Result result)
-   {
-      if (result instanceof SAXResult) {
-         SAXResult sresult = (SAXResult)result;
-         // to be used by XMLFilterImpl
-         setContentHandler(sresult.getHandler());
-         lexH = sresult.getLexicalHandler();
-      }
-      else {
-         // this will not happen in Joost
-      }
-   }
+  public void setResult (final Result result)
+  {
+    if (result instanceof SAXResult)
+    {
+      final SAXResult sresult = (SAXResult) result;
+      // to be used by XMLFilterImpl
+      setContentHandler (sresult.getHandler ());
+      lexH = sresult.getLexicalHandler ();
+    }
+    else
+    {
+      // this will not happen in Joost
+    }
+  }
 
-   // Never invoked by Joost
-   public void setSystemId(String id)
-   { }
+  // Never invoked by Joost
+  public void setSystemId (final String id)
+  {}
 
-   public String getSystemId()
-   {
-      return null;
-   }
+  public String getSystemId ()
+  {
+    return null;
+  }
 
-   public Transformer getTransformer()
-   {
-      return null;
-   }
+  public Transformer getTransformer ()
+  {
+    return null;
+  }
 }
-

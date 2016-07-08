@@ -23,6 +23,8 @@
  */
 package net.sf.joost.test.stx;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -37,37 +39,24 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+
 import net.sf.joost.trax.TrAXConstants;
 
 /**
  * @version $Revision: 1.3 $ $Date: 2008/10/06 13:31:42 $
  * @author Oliver Becker
  */
-public class StxTest extends TestCase
+public class StxTest
 {
   private static TransformerFactory factory;
   static
   {
     System.setProperty ("javax.xml.transform.TransformerFactory", "net.sf.joost.trax.TransformerFactoryImpl");
     factory = TransformerFactory.newInstance ();
-    // The default Xalan of Java 1.4 doesn't work
-    // Requires Saxon to be in the classpath
-    factory.setAttribute (net.sf.joost.trax.TrAXConstants.KEY_XSLT_FACTORY, "net.sf.saxon.TransformerFactoryImpl");
   }
 
-  public StxTest (final String name)
-  {
-    super (name);
-  }
-
-  public static Test suite ()
-  {
-    return new TestSuite (StxTest.class);
-  }
-
+  @Test
   public void testExamplesWithTrax ()
   {
     System.out.println ("Start testExamplesWithTrax");
