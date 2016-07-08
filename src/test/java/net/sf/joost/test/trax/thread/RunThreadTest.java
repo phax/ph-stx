@@ -24,96 +24,103 @@
 
 package net.sf.joost.test.trax.thread;
 
-
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
+
 /**
  * Thread-safety test
+ * 
  * @author Zubow
  */
-public class RunThreadTest {
+public class RunThreadTest
+{
 
+  private static String xmlId = "test/flat.xml";
+  private static String stxId = "test/flat.stx";
+  private static String outId = "testdata/out.html";
 
-    private static String xmlId = "test/flat.xml";
-    private static String stxId = "test/flat.stx";
-    private static String outId = "testdata/out.html";
+  public static void main (final String args[])
+  {
 
-    public static void main(String args[]) {
+    try
+    {
 
-        try {
+      settingProps ();
 
-            settingProps();
+      // Create a transform factory instance.
+      final String tProp = System.getProperty ("javax.xml.transform.TransformerFactory");
 
-            // Create a transform factory instance.
-            String tProp = System.getProperty("javax.xml.transform.TransformerFactory");
+      final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-            TransformerFactory tfactory = TransformerFactory.newInstance();
+      final InputStream stxIS = new BufferedInputStream (new FileInputStream (stxId));
+      final StreamSource stxSource = new StreamSource (stxIS);
+      stxSource.setSystemId (stxId);
 
-            InputStream stxIS = new BufferedInputStream(new FileInputStream(stxId));
-            StreamSource stxSource = new StreamSource(stxIS);
-            stxSource.setSystemId(stxId);
+      final Templates templates = tfactory.newTemplates (stxSource);
 
-            Templates templates = tfactory.newTemplates(stxSource);
+      final Transformer transformer = templates.newTransformer ();
 
+      // init threads - sharing Transformer
+      final TransformerThread firstThread = new TransformerThread (transformer, "first");
+      final TransformerThread secondThread = new TransformerThread (transformer, "second");
 
-            Transformer transformer = templates.newTransformer();
+      // init threads - sharing Templates
+      // TransformerThread firstThread = new TransformerThread(templates,
+      // "first");
+      // TransformerThread secondThread = new TransformerThread(templates,
+      // "second");
 
-            //init threads - sharing Transformer
-            TransformerThread firstThread = new TransformerThread(transformer, "first");
-            TransformerThread secondThread = new TransformerThread(transformer, "second");
+      // init threads - sharing transformerfactory
+      // TransformerThread firstThread = new TransformerThread(tfactory,
+      // "first");
+      // TransformerThread secondThread = new TransformerThread(tfactory,
+      // "second");
 
-
-            //init threads - sharing Templates
-            //TransformerThread firstThread = new TransformerThread(templates, "first");
-            //TransformerThread secondThread = new TransformerThread(templates, "second");
-
-            //init threads - sharing transformerfactory
-            //TransformerThread firstThread = new TransformerThread(tfactory, "first");
-            //TransformerThread secondThread = new TransformerThread(tfactory, "second");
-
-
-            //starting
-            firstThread.start();
-            secondThread.start();
-
-        } catch (FileNotFoundException fE) {
-            fE.printStackTrace();
-        } catch (TransformerConfigurationException tE) {
-            tE.printStackTrace();
-        }
+      // starting
+      firstThread.start ();
+      secondThread.start ();
 
     }
-
-
-    private static void settingProps() {
-
-        //setting joost as transformer
-        String key = "javax.xml.transform.TransformerFactory";
-        String value = "net.sf.joost.trax.TransformerFactoryImpl";
-
-        //setting xerces as parser
-        String key2 = "javax.xml.parsers.SAXParser";
-        String value2 = "org.apache.xerces.parsers.SAXParser";
-
-        //setting new
-        String key3 = "org.xml.sax.driver";
-        String value3 = "org.apache.xerces.parsers.SAXParser";
-
-
-        Properties props = System.getProperties();
-        props.put(key, value);
-        props.put(key2, value2);
-        props.put(key3, value3);
-
-        System.setProperties(props);
+    catch (final FileNotFoundException fE)
+    {
+      fE.printStackTrace ();
     }
+    catch (final TransformerConfigurationException tE)
+    {
+      tE.printStackTrace ();
+    }
+
+  }
+
+  private static void settingProps ()
+  {
+
+    // setting joost as transformer
+    final String key = "javax.xml.transform.TransformerFactory";
+    final String value = "net.sf.joost.trax.TransformerFactoryImpl";
+
+    // setting xerces as parser
+    final String key2 = "javax.xml.parsers.SAXParser";
+    final String value2 = "org.apache.xerces.parsers.SAXParser";
+
+    // setting new
+    final String key3 = "org.xml.sax.driver";
+    final String value3 = "org.apache.xerces.parsers.SAXParser";
+
+    final Properties props = System.getProperties ();
+    props.put (key, value);
+    props.put (key2, value2);
+    props.put (key3, value3);
+
+    System.setProperties (props);
+  }
 }

@@ -24,10 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
@@ -36,6 +32,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
  * Factory for <code>match</code> elements, which are represented by the inner
@@ -47,120 +46,114 @@ import org.xml.sax.SAXParseException;
 
 final public class MatchFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public MatchFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("regex");
-      attrNames.add("flags");
-   }
+  // Constructor
+  public MatchFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("regex");
+    attrNames.add ("flags");
+  }
 
+  /** @return <code>"match"</code> */
+  @Override
+  public String getName ()
+  {
+    return "match";
+  }
 
-   /** @return <code>"match"</code> */
-   public String getName()
-   {
-      return "match";
-   }
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    if (!(parent instanceof AnalyzeTextFactory.Instance))
+      throw new SAXParseException ("'" + qName + "' must be child of stx:analyze-text", context.locator);
 
+    final Tree regexAVT = parseRequiredAVT (qName, attrs, "regex", context);
 
-   public NodeBase createNode(NodeBase parent, String qName, Attributes attrs,
-                              ParseContext context)
-      throws SAXParseException
-   {
-      if (!(parent instanceof AnalyzeTextFactory.Instance))
-         throw new SAXParseException(
-            "'" + qName + "' must be child of stx:analyze-text",
-            context.locator);
+    final Tree flagsAVT = parseAVT (attrs.getValue ("flags"), context);
 
-      Tree regexAVT = parseRequiredAVT(qName, attrs, "regex", context);
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, regexAVT, flagsAVT);
+  }
 
-      Tree flagsAVT = parseAVT(attrs.getValue("flags"), context);
+  /** Represents an instance of the <code>match</code> element. */
+  final public class Instance extends NodeBase
+  {
+    /**
+     * The AVT in the <code>regex</code> attribute; it will be evaluated in the
+     * <code>stx:analyze-text</code> parent
+     */
+    protected Tree regex;
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, regexAVT, flagsAVT);
-   }
+    /**
+     * The AVT in the <code>flags</code> attribute; it will be evaluated in the
+     * <code>stx:analyze-text</code> parent
+     */
+    protected Tree flags;
 
+    /** The parent */
+    private AnalyzeTextFactory.Instance analyzeText;
 
+    protected Instance (final String qName,
+                        final NodeBase parent,
+                        final ParseContext context,
+                        final Tree regex,
+                        final Tree flags)
+    {
+      super (qName, parent, context, true);
+      this.regex = regex;
+      this.flags = flags;
+      analyzeText = (AnalyzeTextFactory.Instance) parent;
+    }
 
-   /** Represents an instance of the <code>match</code> element. */
-   final public class Instance extends NodeBase
-   {
-      /**
-       * The AVT in the <code>regex</code> attribute; it will be evaluated in
-       * the <code>stx:analyze-text</code> parent
-       */
-      protected Tree regex;
+    @Override
+    public boolean compile (final int pass, final ParseContext context) throws SAXException
+    {
+      nodeEnd.next = analyzeText.nodeEnd; // back to stx:analyze-text
+      return false;
+    }
 
-      /**
-       * The AVT in the <code>flags</code> attribute; it will be evaluated in
-       * the <code>stx:analyze-text</code> parent
-       */
-      protected Tree flags;
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      super.process (context);
+      // store value for the regex-group function
+      ((Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP)).push (analyzeText.capSubstr);
+      return PR_CONTINUE;
+    }
 
-      /** The parent */
-      private AnalyzeTextFactory.Instance analyzeText;
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      ((Stack) context.localVars.get (AnalyzeTextFactory.REGEX_GROUP)).pop ();
+      return super.processEnd (context);
+    }
 
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (analyzeText != null)
+        theCopy.analyzeText = (AnalyzeTextFactory.Instance) analyzeText.deepCopy (copies);
+      if (flags != null)
+        theCopy.flags = flags.deepCopy (copies);
+      if (regex != null)
+        theCopy.regex = regex.deepCopy (copies);
+    }
 
-      protected Instance(String qName, NodeBase parent, ParseContext context,
-                         Tree regex, Tree flags)
-      {
-         super(qName, parent, context, true);
-         this.regex = regex;
-         this.flags = flags;
-         analyzeText = (AnalyzeTextFactory.Instance)parent;
-      }
-
-
-      public boolean compile(int pass, ParseContext context)
-         throws SAXException
-      {
-         nodeEnd.next = analyzeText.nodeEnd; // back to stx:analyze-text
-         return false;
-      }
-
-
-      public short process(Context context)
-         throws SAXException
-      {
-         super.process(context);
-         // store value for the regex-group function
-         ((Stack)context.localVars.get(AnalyzeTextFactory.REGEX_GROUP))
-                                  .push(analyzeText.capSubstr);
-         return PR_CONTINUE;
-      }
-
-
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         ((Stack)context.localVars.get(AnalyzeTextFactory.REGEX_GROUP)).pop();
-         return super.processEnd(context);
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (analyzeText != null)
-            theCopy.analyzeText =
-               (AnalyzeTextFactory.Instance) analyzeText.deepCopy(copies);
-         if (flags != null)
-            theCopy.flags = flags.deepCopy(copies);
-         if (regex != null)
-            theCopy.regex = regex.deepCopy(copies);
-      }
-
-
-      //
-      // for debugging
-      //
-      public String toString()
-      {
-         return "stx:match regex='" + regex + "'";
-      }
-   }
+    //
+    // for debugging
+    //
+    @Override
+    public String toString ()
+    {
+      return "stx:match regex='" + regex + "'";
+    }
+  }
 }

@@ -28,6 +28,12 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.LocatorImpl;
+
 import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.StxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
@@ -36,262 +42,291 @@ import net.sf.joost.stx.Emitter;
 import net.sf.joost.stx.ErrorHandlerImpl;
 import net.sf.joost.stx.SAXEvent;
 
-import org.apache.commons.logging.Log;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.LocatorImpl;
-
 /**
  * Extends the {@link net.sf.joost.stx.Emitter} with debug features.
+ * 
  * @version $Revision: 1.12 $ $Date: 2006/02/03 19:04:46 $
  * @author Zubow
  */
-public class DebugEmitter extends Emitter {
+public class DebugEmitter extends Emitter
+{
 
-    /** logger */
-    private static Log log = OptionalLog.getLog(DebugEmitter.class);
+  /** logger */
+  private static Log log = OptionalLog.getLog (DebugEmitter.class);
 
-    /** for dynamic tracing */
-    private TraceManager tmgr;
+  /** for dynamic tracing */
+  private TraceManager tmgr;
 
-    /** handle locator information */
-    private LocatorImpl locator = new LocatorImpl();
+  /** handle locator information */
+  private final LocatorImpl locator = new LocatorImpl ();
 
-    public DebugWriter writer;
+  public DebugWriter writer;
 
-    /**
-     * constructor
-     * see {@link Emitter#Emitter(ErrorHandlerImpl)}
-     */
-    public DebugEmitter(ErrorHandlerImpl errorHandler) {
-        super(errorHandler);
-    }
+  /**
+   * constructor see {@link Emitter#Emitter(ErrorHandlerImpl)}
+   */
+  public DebugEmitter (final ErrorHandlerImpl errorHandler)
+  {
+    super (errorHandler);
+  }
 
-    /**
-     * Called from {@link #pushEmitter(StxEmitter)}
-     * @param prev the previous emitter
-     * @param handler the new content handler
-     */
-    private DebugEmitter(DebugEmitter prev, StxEmitter handler)
+  /**
+   * Called from {@link #pushEmitter(StxEmitter)}
+   * 
+   * @param prev
+   *        the previous emitter
+   * @param handler
+   *        the new content handler
+   */
+  private DebugEmitter (final DebugEmitter prev, final StxEmitter handler)
+  {
+    super (prev, handler);
+    this.tmgr = prev.tmgr;
+    this.writer = prev.writer;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see net.sf.joost.stx.Emitter#pushEmitter(net.sf.joost.emitter.StxEmitter)
+   */
+  @Override
+  public Emitter pushEmitter (final StxEmitter handler)
+  {
+    return new DebugEmitter (this, handler);
+  }
+
+  /**
+   * setter for {@link #tmgr} property
+   */
+  public void setTraceManager (final TraceManager tmgr)
+  {
+    this.tmgr = tmgr;
+  }
+
+  /**
+   * getter for {@link #tmgr} property
+   */
+  public TraceManager getTraceManager ()
+  {
+    return this.tmgr;
+  }
+
+  public Locator getEmitterLocator ()
+  {
+    return locator;
+  }
+
+  /**
+   * overloaded method for debug support see {@link Emitter#getResultWriter}
+   */
+  @Override
+  public Writer getResultWriter (final String href,
+                                 final String encoding,
+                                 final String publicId,
+                                 final String systemId,
+                                 final int lineNo,
+                                 final int colNo,
+                                 final boolean append) throws java.io.IOException, SAXException
+  {
+    if (log != null)
+      log.debug ("requesting writer for " + href);
+    return writer = new DebugWriter (href);
+  }
+
+  // ------------------------------------------------------------------
+  // Sax-callback methods
+  // ------------------------------------------------------------------
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void startDocument () throws SAXException
+  {
+    if (log != null)
+      log.debug ("start resultdocument");
+    // update locator
+    updateLocator (null, null, -1, -1);
+    this.tmgr.fireStartResultDocument ();
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void endDocument (final AbstractInstruction instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("end resultdocument");
+    super.endDocument (instruction);
+    // update locator
+    updateLocator (instruction.getNode ().publicId,
+                   instruction.getNode ().systemId,
+                   instruction.lineNo,
+                   instruction.colNo);
+    this.tmgr.fireEndResultDocument ();
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void startElement (final String uri,
+                            final String lName,
+                            final String qName,
+                            final Attributes attrs,
+                            final Hashtable namespaces,
+                            final NodeBase instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("start element in resultdoc");
+    SAXEvent saxevent;
+    saxevent = SAXEvent.newElement (uri, lName, qName, attrs, true, namespaces);
+
+    super.startElement (uri, lName, qName, attrs, namespaces, instruction);
+    // update locator
+    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
+    this.tmgr.fireStartResultElement (saxevent);
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void endElement (final String uri,
+                          final String lName,
+                          final String qName,
+                          final AbstractInstruction instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("end element in resultdoc");
+    SAXEvent saxevent;
+    // todo - namespace support - remove null value
+    saxevent = SAXEvent.newElement (uri, lName, qName, null, true, null);
+    // update locator
+    updateLocator (instruction.getNode ().publicId,
+                   instruction.getNode ().systemId,
+                   instruction.lineNo,
+                   instruction.colNo);
+    super.endElement (uri, lName, qName, instruction);
+    this.tmgr.fireEndResultElement (saxevent);
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void characters (final char [] ch,
+                          final int start,
+                          final int length,
+                          final NodeBase instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("characters in resultdoc");
+    SAXEvent saxevent;
+    saxevent = SAXEvent.newText (new String (ch, start, length));
+    super.characters (ch, start, length, instruction);
+    // update locator
+    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
+    this.tmgr.fireResultText (saxevent);
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void processingInstruction (final String target,
+                                     final String data,
+                                     final NodeBase instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("processingInstruction in resultdoc");
+    SAXEvent saxevent;
+    saxevent = SAXEvent.newPI (target, data);
+    super.processingInstruction (target, data, instruction);
+    // update locator
+    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
+    this.tmgr.fireResultPI (saxevent);
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void comment (final char [] ch,
+                       final int start,
+                       final int length,
+                       final NodeBase instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("comment in resultdoc");
+    SAXEvent saxevent;
+    saxevent = SAXEvent.newComment (new String (ch, start, length));
+    super.comment (ch, start, length, instruction);
+    // update locator
+    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
+    this.tmgr.fireResultComment (saxevent);
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void startCDATA (final NodeBase instruction) throws SAXException
+  {
+    if (log != null)
+      log.debug ("start CDATA in resultdoc");
+    super.startCDATA (instruction);
+    // update locator
+    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
+    this.tmgr.fireStartResultCDATA ();
+  }
+
+  /**
+   * overloaded method for debug information
+   */
+  @Override
+  public void endCDATA () throws SAXException
+  {
+    if (log != null)
+      log.debug ("end CDATA in resultdoc");
+    super.endCDATA ();
+    // update locator
+    updateLocator (null, null, -1, -1);
+    this.tmgr.fireEndResultCDATA ();
+  }
+
+  // ------------------------------------------------------------------------
+  // helper methods
+  // ------------------------------------------------------------------------
+  private void updateLocator (final String publicId, final String systemId, final int lineNo, final int colNo)
+  {
+    if (log != null)
+      log.debug ("update emitterlocator " + publicId + " " + systemId + " " + lineNo + "," + colNo);
+    locator.setPublicId (publicId);
+    locator.setSystemId (systemId);
+    locator.setLineNumber (lineNo);
+    locator.setColumnNumber (colNo);
+  }
+
+  // ------------------------------------------------------------------------
+  // Inner classes
+  // ------------------------------------------------------------------------
+
+  public class DebugWriter extends StringWriter
+  {
+
+    private final String href;
+
+    public DebugWriter (final String href)
     {
-        super(prev, handler);
-        this.tmgr = prev.tmgr;
-        this.writer = prev.writer;
+      super ();
+      this.href = href;
     }
-    
-    /* (non-Javadoc)
-     * @see net.sf.joost.stx.Emitter#pushEmitter(net.sf.joost.emitter.StxEmitter)
-     */
-    public Emitter pushEmitter(StxEmitter handler)
+
+    public String getHref ()
     {
-        return new DebugEmitter(this, handler);
+      return href;
     }
-   
-    /**
-     * setter for {@link #tmgr} property
-     */
-    public void setTraceManager(TraceManager tmgr) {
-        this.tmgr = tmgr;
-    }
-
-    /**
-     * getter for {@link #tmgr} property
-     */
-    public TraceManager getTraceManager() {
-        return this.tmgr;
-    }
-
-    public Locator getEmitterLocator() {
-        return locator;
-    }
-
-    /**
-     * overloaded method for debug support
-     * see {@link Emitter#getResultWriter}
-     */
-    public Writer getResultWriter(String href, String encoding,
-                                 String publicId, String systemId,
-                                 int lineNo, int colNo, boolean append)
-      throws java.io.IOException, SAXException {
-        if (log != null)
-            log.debug("requesting writer for " + href);
-        return writer = new DebugWriter(href);
-    }
-
-
-    // ------------------------------------------------------------------
-    // Sax-callback methods
-    // ------------------------------------------------------------------
-
-    /**
-     * overloaded method for debug information
-     */
-    public void startDocument() throws SAXException {
-        if (log != null)
-            log.debug("start resultdocument");
-        // update locator
-        updateLocator(null, null, -1, -1);
-        this.tmgr.fireStartResultDocument();
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void endDocument(AbstractInstruction instruction) 
-            throws SAXException {
-        if (log != null)
-            log.debug("end resultdocument");
-        super.endDocument(instruction);
-        // update locator
-        updateLocator(instruction.getNode().publicId, 
-                      instruction.getNode().systemId, 
-                      instruction.lineNo, instruction.colNo);
-        this.tmgr.fireEndResultDocument();
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void startElement(String uri, String lName, String qName,
-                             Attributes attrs, Hashtable namespaces,
-                             NodeBase instruction) throws SAXException {
-        if (log != null)
-            log.debug("start element in resultdoc");
-        SAXEvent saxevent;
-        saxevent = SAXEvent.newElement(uri, lName, qName, attrs, true, 
-                                       namespaces);
-
-        super.startElement(uri, lName, qName, attrs,
-                namespaces, instruction);
-        // update locator
-        updateLocator(instruction.publicId, instruction.systemId, 
-                      instruction.lineNo, instruction.colNo);
-        this.tmgr.fireStartResultElement(saxevent);
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void endElement(String uri, String lName, String qName,
-                           AbstractInstruction instruction) 
-            throws SAXException {
-        if (log != null)
-            log.debug("end element in resultdoc");
-        SAXEvent saxevent;
-        // todo - namespace support - remove null value
-        saxevent = SAXEvent.newElement(uri, lName, qName, null, true, null);
-        // update locator
-        updateLocator(instruction.getNode().publicId, 
-                      instruction.getNode().systemId, 
-                      instruction.lineNo, instruction.colNo);
-        super.endElement(uri, lName, qName, instruction);
-        this.tmgr.fireEndResultElement(saxevent);
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void characters(char[] ch, int start, int length,
-                           NodeBase instruction)
-            throws SAXException {
-        if (log != null)
-            log.debug("characters in resultdoc");
-        SAXEvent saxevent;
-        saxevent = SAXEvent.newText(new String(ch, start, length));
-        super.characters(ch, start, length, instruction);
-        // update locator
-        updateLocator(instruction.publicId, instruction.systemId, 
-                      instruction.lineNo, instruction.colNo);
-        this.tmgr.fireResultText(saxevent);
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void processingInstruction(String target, String data, 
-                                      NodeBase instruction) throws SAXException {
-        if (log != null)
-            log.debug("processingInstruction in resultdoc");
-        SAXEvent saxevent;
-        saxevent = SAXEvent.newPI(target, data);
-        super.processingInstruction(target, data, instruction);
-        // update locator
-        updateLocator(instruction.publicId, instruction.systemId, 
-                      instruction.lineNo, instruction.colNo);
-        this.tmgr.fireResultPI(saxevent);
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void comment(char[] ch, int start, int length,
-                        NodeBase instruction) throws SAXException {
-        if (log != null)
-            log.debug("comment in resultdoc");
-        SAXEvent saxevent;
-        saxevent = SAXEvent.newComment(new String(ch, start, length));
-        super.comment(ch, start, length, instruction);
-        // update locator
-        updateLocator(instruction.publicId, instruction.systemId, 
-                      instruction.lineNo, instruction.colNo);
-        this.tmgr.fireResultComment(saxevent);
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void startCDATA(NodeBase instruction) throws SAXException {
-        if (log != null)
-            log.debug("start CDATA in resultdoc");
-        super.startCDATA(instruction);
-        // update locator
-        updateLocator(instruction.publicId, instruction.systemId, 
-                      instruction.lineNo, instruction.colNo);
-        this.tmgr.fireStartResultCDATA();
-    }
-
-    /**
-     * overloaded method for debug information
-     */
-    public void endCDATA() throws SAXException {
-        if (log != null)
-            log.debug("end CDATA in resultdoc");
-        super.endCDATA();
-        // update locator
-        updateLocator(null, null, -1, -1);
-        this.tmgr.fireEndResultCDATA();
-    }
-
-    // ------------------------------------------------------------------------
-    // helper methods
-    // ------------------------------------------------------------------------
-    private void updateLocator(String publicId, String systemId,
-                               int lineNo, int colNo) {
-        if (log != null)
-            log.debug("update emitterlocator " + publicId + " "
-                             + systemId + " " + lineNo + "," + colNo);
-        locator.setPublicId(publicId);
-        locator.setSystemId(systemId);
-        locator.setLineNumber(lineNo);
-        locator.setColumnNumber(colNo);
-    }
-
-    // ------------------------------------------------------------------------
-    // Inner classes
-    // ------------------------------------------------------------------------
-
-    public class DebugWriter extends StringWriter {
-
-        private String href;
-
-        public DebugWriter(String href) {
-            super();
-            this.href = href;
-        }
-
-        public String getHref() {
-            return href;
-        }
-    }
+  }
 }

@@ -22,7 +22,6 @@
  * Contributor(s): ______________________________________.
  */
 
-
 package net.sf.joost.trax;
 
 import java.io.IOException;
@@ -30,12 +29,6 @@ import java.io.IOException;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-
-import net.sf.joost.Constants;
-import net.sf.joost.OptionalLog;
-import net.sf.joost.emitter.SAXEmitter;
-import net.sf.joost.emitter.StxEmitter;
-import net.sf.joost.stx.Processor;
 
 import org.apache.commons.logging.Log;
 import org.xml.sax.ContentHandler;
@@ -45,126 +38,162 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import net.sf.joost.Constants;
+import net.sf.joost.OptionalLog;
+import net.sf.joost.emitter.SAXEmitter;
+import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.stx.Processor;
 
 /**
  * TrAXFilter
+ * 
  * @author Zubow
  * @version 1.0
  */
-public class TrAXFilter extends XMLFilterImpl implements Constants {
+public class TrAXFilter extends XMLFilterImpl implements Constants
+{
 
+  // Define a static logger variable so that it references the
+  // Logger instance named "TransformerImpl".
+  private static Log log = OptionalLog.getLog (TrAXFilter.class);
 
-    // Define a static logger variable so that it references the
-    // Logger instance named "TransformerImpl".
-    private static Log log = OptionalLog.getLog(TrAXFilter.class);
+  private Templates templates = null;
+  private Processor processor = null;
 
-    private Templates templates = null;
-    private Processor processor = null;
+  // default ErrorListener
+  private ConfigurationErrListener configErrListener;
 
-    // default ErrorListener
-    private ConfigurationErrListener configErrListener;
+  /**
+   * Constructor
+   * 
+   * @param templates
+   *        A <code>Templates</code>
+   */
+  protected TrAXFilter (final Templates templates)
+  {
 
-    /**
-     * Constructor
-     * @param templates A <code>Templates</code>
-     */
-    protected TrAXFilter(Templates templates) {
+    if (DEBUG)
+      log.debug ("calling constructor");
+    this.templates = templates;
+    if (templates instanceof TemplatesImpl)
+    {
+      configErrListener = ((TemplatesImpl) templates).factory.defaultErrorListener;
+    }
+  }
 
-        if (DEBUG)
-            log.debug("calling constructor");
-        this.templates = templates;
-        if (templates instanceof TemplatesImpl) {
-            configErrListener =
-                    ((TemplatesImpl)templates).factory.defaultErrorListener;
-        }
+  /**
+   * Parses the <code>InputSource</code>
+   * 
+   * @param input
+   *        A <code>InputSource</code> object.
+   * @throws SAXException
+   * @throws IOException
+   */
+  @Override
+  public void parse (final InputSource input) throws SAXException, IOException
+  {
+
+    Transformer transformer = null;
+    if (DEBUG)
+    {
+      if (log.isDebugEnabled ())
+        log.debug ("parsing InputSource " + input.getSystemId ());
     }
 
-    /**
-     * Parses the <code>InputSource</code>
-     * @param input A <code>InputSource</code> object.
-     * @throws SAXException
-     * @throws IOException
-     */
-    public void parse (InputSource input)
-    	throws SAXException, IOException {
+    try
+    {
+      // get a new Transformer
+      transformer = this.templates.newTransformer ();
+      if (transformer instanceof TransformerImpl)
+      {
+        this.processor = ((TransformerImpl) transformer).getStxProcessor ();
+      }
+      else
+      {
+        final String msg = "An error is occured, because the given transformer is " +
+                           "not an instance of TransformerImpl";
+        if (log != null)
+          log.fatal (msg);
+        else
+          System.err.println ("Fatal error - " + msg);
 
-        Transformer transformer = null;
-        if (DEBUG) {
-            if (log.isDebugEnabled())
-                log.debug("parsing InputSource " + input.getSystemId());
-        }
+      }
+      XMLReader parent = this.getParent ();
 
-        try {
-            // get a new Transformer
-            transformer = this.templates.newTransformer();
-            if ( transformer instanceof TransformerImpl ) {
-                this.processor = ((TransformerImpl)transformer).getStxProcessor();
-            } else {
-                String msg = 
-                   "An error is occured, because the given transformer is " +
-                   "not an instance of TransformerImpl";
-                if (log != null)
-                    log.fatal(msg);
-                else
-                    System.err.println("Fatal error - " + msg);
-                
-            }
-            XMLReader parent = this.getParent();
+      if (parent == null)
+      {
+        parent = XMLReaderFactory.createXMLReader ();
+        setParent (parent);
+      }
+      ContentHandler handler = this.getContentHandler ();
 
-            if (parent == null) {
-                parent= XMLReaderFactory.createXMLReader();
-                setParent(parent);
-            }
-            ContentHandler handler = this.getContentHandler();
+      if (handler == null)
+      {
+        handler = parent.getContentHandler ();
+      }
+      if (handler == null)
+      {
+        throw new SAXException ("no ContentHandler registered");
+      }
+      // init StxEmitter
+      StxEmitter out = null;
 
-            if (handler == null) {
-                handler = parent.getContentHandler();
-            }
-            if (handler == null) {
-                throw new SAXException("no ContentHandler registered");
-            }
-            //init StxEmitter
-            StxEmitter out = null;
+      // SAX specific Implementation
+      out = new SAXEmitter (handler);
 
-            //SAX specific Implementation
-            out = new SAXEmitter(handler);
+      if (this.processor != null)
+      {
+        this.processor.setContentHandler (out);
+        this.processor.setLexicalHandler (out);
+      }
+      else
+      {
+        throw new SAXException ("Joost-Processor is not correct configured.");
+      }
+      if (parent == null)
+      {
+        throw new SAXException ("No parent for filter");
+      }
+      parent.setContentHandler (this.processor);
+      parent.setProperty ("http://xml.org/sax/properties/lexical-handler", this.processor);
+      parent.setEntityResolver (this);
+      parent.setDTDHandler (this);
+      parent.setErrorHandler (this);
+      parent.parse (input);
 
-            if (this.processor != null) {
-                this.processor.setContentHandler(out);
-                this.processor.setLexicalHandler(out);
-            } else {
-                throw new SAXException("Joost-Processor is not correct configured.");
-            }
-            if (parent == null) {
-               throw new SAXException("No parent for filter");
-            }
-            parent.setContentHandler(this.processor);
-            parent.setProperty("http://xml.org/sax/properties/lexical-handler",
-                             this.processor);
-            parent.setEntityResolver(this);
-            parent.setDTDHandler(this);
-            parent.setErrorHandler(this);
-            parent.parse(input);
-
-        } catch (TransformerConfigurationException tE) {
-            try {
-                configErrListener.fatalError(tE);
-            } catch (TransformerConfigurationException innerE) {
-                throw new SAXException(innerE.getMessage(), innerE);
-            }
-        } catch (SAXException sE) {
-            try {
-                configErrListener.fatalError(new TransformerConfigurationException(sE.getMessage(), sE));
-            } catch (TransformerConfigurationException innerE) {
-                throw new SAXException(innerE.getMessage(), innerE);
-            }
-        } catch (IOException iE) {
-            try {
-                configErrListener.fatalError(new TransformerConfigurationException(iE.getMessage(), iE));
-            } catch (TransformerConfigurationException innerE) {
-                throw new IOException(innerE.getMessage());
-            }
-        }
     }
+    catch (final TransformerConfigurationException tE)
+    {
+      try
+      {
+        configErrListener.fatalError (tE);
+      }
+      catch (final TransformerConfigurationException innerE)
+      {
+        throw new SAXException (innerE.getMessage (), innerE);
+      }
+    }
+    catch (final SAXException sE)
+    {
+      try
+      {
+        configErrListener.fatalError (new TransformerConfigurationException (sE.getMessage (), sE));
+      }
+      catch (final TransformerConfigurationException innerE)
+      {
+        throw new SAXException (innerE.getMessage (), innerE);
+      }
+    }
+    catch (final IOException iE)
+    {
+      try
+      {
+        configErrListener.fatalError (new TransformerConfigurationException (iE.getMessage (), iE));
+      }
+      catch (final TransformerConfigurationException innerE)
+      {
+        throw new IOException (innerE.getMessage ());
+      }
+    }
+  }
 }
-

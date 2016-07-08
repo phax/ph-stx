@@ -24,11 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.Parser;
-import net.sf.joost.stx.Processor;
-import net.sf.joost.trax.TrAXHelper;
-
 import java.net.URL;
 import java.util.HashSet;
 
@@ -43,101 +38,110 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Parser;
+import net.sf.joost.stx.Processor;
+import net.sf.joost.trax.TrAXHelper;
 
 /**
- * Factory for <code>include</code> elements, which will be replaced by
- * groups for the included transformation sheet
+ * Factory for <code>include</code> elements, which will be replaced by groups
+ * for the included transformation sheet
+ * 
  * @version $Revision: 2.14 $ $Date: 2008/06/15 08:11:23 $
  * @author Oliver Becker
  */
 
 final public class IncludeFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public IncludeFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("href");
-   }
+  // Constructor
+  public IncludeFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("href");
+  }
 
-   /** @return <code>"include"</code> */
-   public String getName()
-   {
-      return "include";
-   }
+  /** @return <code>"include"</code> */
+  @Override
+  public String getName ()
+  {
+    return "include";
+  }
 
-   /** Returns an instance of {@link TransformFactory.Instance} */
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext pContext)
-      throws SAXException
-   {
-      // check parent
-      if (parent == null)
-         throw new SAXParseException("'" + qName +
-                                     "' not allowed as root element",
-                                     pContext.locator);
-      if (!(parent instanceof GroupBase))
-         throw new SAXParseException("'" + qName +
-                                     "' not allowed as child of '" +
-                                     parent.qName + "'", pContext.locator);
+  /** Returns an instance of {@link TransformFactory.Instance} */
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext pContext) throws SAXException
+  {
+    // check parent
+    if (parent == null)
+      throw new SAXParseException ("'" + qName + "' not allowed as root element", pContext.locator);
+    if (!(parent instanceof GroupBase))
+      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", pContext.locator);
 
-      String hrefAtt = getRequiredAttribute(qName, attrs, "href", pContext);
+    final String hrefAtt = getRequiredAttribute (qName, attrs, "href", pContext);
 
-      checkAttributes(qName, attrs, attrNames, pContext);
+    checkAttributes (qName, attrs, attrNames, pContext);
 
-      Parser stxParser = new Parser(new ParseContext(pContext));
-      stxParser.includingGroup = (GroupBase)parent;
+    final Parser stxParser = new Parser (new ParseContext (pContext));
+    stxParser.includingGroup = (GroupBase) parent;
 
-      XMLReader reader = null;
-      InputSource iSource;
-      try {
-         Source source;
-         if (pContext.uriResolver != null &&
-             (source = pContext.uriResolver.resolve(
-                hrefAtt, pContext.locator.getSystemId())) != null) {
-            SAXSource saxSource = TrAXHelper.getSAXSource(source, null);
-            reader = saxSource.getXMLReader();
-            iSource = saxSource.getInputSource();
-         }
-         else {
-            iSource = new InputSource(
-               new URL(new URL(pContext.locator.getSystemId()), hrefAtt)
-                  .toExternalForm());
-         }
-         if (reader == null)
-            reader = Processor.createXMLReader();
-         reader.setContentHandler(stxParser);
-         reader.setErrorHandler(pContext.getErrorHandler());
-         reader.parse(iSource);
+    XMLReader reader = null;
+    InputSource iSource;
+    try
+    {
+      Source source;
+      if (pContext.uriResolver != null &&
+          (source = pContext.uriResolver.resolve (hrefAtt, pContext.locator.getSystemId ())) != null)
+      {
+        final SAXSource saxSource = TrAXHelper.getSAXSource (source, null);
+        reader = saxSource.getXMLReader ();
+        iSource = saxSource.getInputSource ();
       }
-      catch (java.io.IOException ex) {
-         // TODO: better error handling
-         throw new SAXParseException(ex.toString(), pContext.locator);
+      else
+      {
+        iSource = new InputSource (new URL (new URL (pContext.locator.getSystemId ()), hrefAtt).toExternalForm ());
       }
-      catch (SAXParseException ex) {
-         // propagate
-         throw ex;
+      if (reader == null)
+        reader = Processor.createXMLReader ();
+      reader.setContentHandler (stxParser);
+      reader.setErrorHandler (pContext.getErrorHandler ());
+      reader.parse (iSource);
+    }
+    catch (final java.io.IOException ex)
+    {
+      // TODO: better error handling
+      throw new SAXParseException (ex.toString (), pContext.locator);
+    }
+    catch (final SAXParseException ex)
+    {
+      // propagate
+      throw ex;
+    }
+    catch (final SAXException ex)
+    {
+      if (ex.getException () instanceof TransformerConfigurationException)
+        throw ex;
+      else
+      {
+        // will this ever happen?
+        // add locator information
+        throw new SAXParseException (ex.getMessage (), pContext.locator);
       }
-      catch (SAXException ex) {
-         if (ex.getException() instanceof TransformerConfigurationException)
-            throw ex;
-         else {
-            // will this ever happen?
-            // add locator information
-            throw new SAXParseException(ex.getMessage(), pContext.locator);
-         }
-      }
-      catch (TransformerException te) {
-         throw new SAXException(te);
-      }
+    }
+    catch (final TransformerException te)
+    {
+      throw new SAXException (te);
+    }
 
-      TransformFactory.Instance tfi = stxParser.getTransformNode();
-      // transfer compilable nodes to the calling Parser object
-      tfi.compilableNodes = stxParser.compilableNodes;
-      tfi.qName = qName; // replace name for error reporting
-      return tfi;
-   }
+    final TransformFactory.Instance tfi = stxParser.getTransformNode ();
+    // transfer compilable nodes to the calling Parser object
+    tfi.compilableNodes = stxParser.compilableNodes;
+    tfi.qName = qName; // replace name for error reporting
+    return tfi;
+  }
 }

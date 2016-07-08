@@ -24,88 +24,89 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 
 import org.xml.sax.SAXException;
 
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
  * Common base class for {@link TemplateFactory.Instance} and
  * {@link ProcedureFactory.Instance}.
+ * 
  * @version $Revision: 2.9 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 public abstract class TemplateBase extends NodeBase
 {
-   /** Visibility values */
-   public static final int
-      LOCAL_VISIBLE = 0,
-      GROUP_VISIBLE = 1,
-      GLOBAL_VISIBLE = 2;
+  /** Visibility values */
+  public static final int LOCAL_VISIBLE = 0, GROUP_VISIBLE = 1, GLOBAL_VISIBLE = 2;
 
-   /** Attribute value strings for the above visibility values */
-   protected static final String[] VISIBILITY_VALUES =
-   { "local", "group", "global" }; // note: same order required!
+  /** Attribute value strings for the above visibility values */
+  protected static final String [] VISIBILITY_VALUES = { "local", "group", "global" }; // note:
+                                                                                       // same
+                                                                                       // order
+                                                                                       // required!
 
-   /** The visibility of this template */
-   public int visibility;
+  /** The visibility of this template */
+  public int visibility;
 
-   /** Whether this template is public */
-   public boolean isPublic;
+  /** Whether this template is public */
+  public boolean isPublic;
 
-   /** Does this template establish a new scope for group variables? */
-   private boolean newScope;
+  /** Does this template establish a new scope for group variables? */
+  private final boolean newScope;
 
-   /** The parent of this template */
-   public GroupBase parentGroup;
+  /** The parent of this template */
+  public GroupBase parentGroup;
 
-   //
-   // Constructor
-   //
+  //
+  // Constructor
+  //
 
-   protected TemplateBase(String qName, NodeBase parent, ParseContext context,
-                          int visibility, boolean isPublic, boolean newScope)
-   {
-      super(qName, parent, context, true);
-      parentGroup = (GroupBase)parent;
-      this.visibility = visibility;
-      this.isPublic = isPublic;
-      this.newScope = newScope;
-   }
+  protected TemplateBase (final String qName,
+                          final NodeBase parent,
+                          final ParseContext context,
+                          final int visibility,
+                          final boolean isPublic,
+                          final boolean newScope)
+  {
+    super (qName, parent, context, true);
+    parentGroup = (GroupBase) parent;
+    this.visibility = visibility;
+    this.isPublic = isPublic;
+    this.newScope = newScope;
+  }
 
+  @Override
+  public short process (final Context context) throws SAXException
+  {
+    context.currentGroup = parentGroup;
+    if (newScope)
+    {
+      // initialize group variables
+      parentGroup.enterRecursionLevel (context);
+    }
+    return super.process (context);
+  }
 
-   public short process(Context context)
-      throws SAXException
-   {
-      context.currentGroup = parentGroup;
-      if (newScope) {
-         // initialize group variables
-         parentGroup.enterRecursionLevel(context);
-      }
-      return super.process(context);
-   }
+  @Override
+  public short processEnd (final Context context) throws SAXException
+  {
+    if (newScope)
+      parentGroup.exitRecursionLevel (context);
+    return super.processEnd (context);
+  }
 
-   public short processEnd(Context context)
-      throws SAXException
-   {
-      if (newScope)
-         parentGroup.exitRecursionLevel(context);
-      return super.processEnd(context);
-   }
-
-
-   protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-   {
-      super.onDeepCopy(copy, copies);
-      TemplateBase theCopy = (TemplateBase) copy;
-      if (parentGroup != null)
-         theCopy.parentGroup = (GroupBase) parentGroup.deepCopy(copies);
-   }
-
+  @Override
+  protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+  {
+    super.onDeepCopy (copy, copies);
+    final TemplateBase theCopy = (TemplateBase) copy;
+    if (parentGroup != null)
+      theCopy.parentGroup = (GroupBase) parentGroup.deepCopy (copies);
+  }
 
 }
-

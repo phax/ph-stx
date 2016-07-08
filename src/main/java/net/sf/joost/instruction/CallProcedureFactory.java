@@ -24,9 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -34,135 +31,142 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
- * Factory for <code>call-procedure</code> elements, which are
- * represented by the inner Instance class.
+ * Factory for <code>call-procedure</code> elements, which are represented by
+ * the inner Instance class.
+ * 
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 public class CallProcedureFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
+  //
+  // Constructor
+  //
+  public CallProcedureFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("group");
+  }
 
-   //
-   // Constructor
-   //
-   public CallProcedureFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("group");
-   }
+  /** @return <code>"call-procedure"</code> */
+  @Override
+  public String getName ()
+  {
+    return "call-procedure";
+  }
 
-   /** @return <code>"call-procedure"</code> */
-   public String getName()
-   {
-      return "call-procedure";
-   }
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
+    final String procName = getExpandedName (nameAtt, context);
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      String nameAtt = getRequiredAttribute(qName, attrs, "name", context);
-      String procName = getExpandedName(nameAtt, context);
+    final String groupAtt = attrs.getValue ("group");
 
-      String groupAtt = attrs.getValue("group");
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, nameAtt, procName, groupAtt);
+  }
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, nameAtt, procName,
-                          groupAtt);
-   }
+  /** The inner Instance class */
+  public class Instance extends ProcessBase
+  {
+    String procQName, procExpName;
+    ProcedureFactory.Instance procedure = null;
 
+    // Constructor
+    public Instance (final String qName,
+                     final NodeBase parent,
+                     final ParseContext context,
+                     final String procQName,
+                     final String procExpName,
+                     final String groupQName) throws SAXParseException
+    {
+      super (qName, parent, context, groupQName, null, null);
+      // external filter not possible here (last two params = null)
+      this.procQName = procQName;
+      this.procExpName = procExpName;
+    }
 
-   /** The inner Instance class */
-   public class Instance extends ProcessBase
-   {
-      String procQName, procExpName;
-      ProcedureFactory.Instance procedure = null;
+    /**
+     * Determine statically the target procedure.
+     */
+    @Override
+    public boolean compile (final int pass, final ParseContext context) throws SAXException
+    {
+      if (pass == 0)
+        return true; // groups not parsed completely
 
-      // Constructor
-      public Instance(String qName, NodeBase parent, ParseContext context,
-                      String procQName, String procExpName,
-                      String groupQName)
-         throws SAXParseException
+      // determine procedure object
+      // targetGroup stems from compile() in ProcessBase
+      super.compile (pass, context);
+      procedure = (ProcedureFactory.Instance) targetGroup.visibleProcedures.get (procExpName);
+      if (procedure == null)
       {
-         super(qName, parent, context, groupQName, null, null);
-         // external filter not possible here (last two params = null)
-         this.procQName = procQName;
-         this.procExpName = procExpName;
+        // not found, search group procedures
+        procedure = (ProcedureFactory.Instance) targetGroup.groupProcedures.get (procExpName);
+      }
+      if (procedure == null)
+      {
+        // still not found, search global procedures
+        procedure = (ProcedureFactory.Instance) targetGroup.globalProcedures.get (procExpName);
       }
 
-
-      /**
-       * Determine statically the target procedure.
-       */
-      public boolean compile(int pass, ParseContext context)
-         throws SAXException
+      if (procedure == null)
       {
-         if (pass == 0)
-            return true; // groups not parsed completely
-
-         // determine procedure object
-         // targetGroup stems from compile() in ProcessBase
-         super.compile(pass, context);
-         procedure = (ProcedureFactory.Instance)
-            targetGroup.visibleProcedures.get(procExpName);
-         if (procedure == null) {
-            // not found, search group procedures
-            procedure = (ProcedureFactory.Instance)
-               targetGroup.groupProcedures.get(procExpName);
-         }
-         if (procedure == null) {
-            // still not found, search global procedures
-            procedure = (ProcedureFactory.Instance)
-               targetGroup.globalProcedures.get(procExpName);
-         }
-
-         if (procedure == null) {
-            throw new SAXParseException(
-               "Unknown procedure '" + procQName + "' called with '" +
-               qName + "'",
-               publicId, systemId, lineNo, colNo);
-         }
-         lastChild.next = procedure;
-
-         return false; // done
+        throw new SAXParseException ("Unknown procedure '" +
+                                     procQName +
+                                     "' called with '" +
+                                     qName +
+                                     "'",
+                                     publicId,
+                                     systemId,
+                                     lineNo,
+                                     colNo);
       }
+      lastChild.next = procedure;
 
+      return false; // done
+    }
 
-      /**
-       * Adjust the return address of the procedure.
-       */
-      public short process(Context context)
-         throws SAXException
-      {
-         super.process(context);
+    /**
+     * Adjust the return address of the procedure.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      super.process (context);
 
-         localFieldStack.push(procedure.nodeEnd.next);
-         procedure.nodeEnd.next = nodeEnd;
-         return PR_CONTINUE;
-      }
+      localFieldStack.push (procedure.nodeEnd.next);
+      procedure.nodeEnd.next = nodeEnd;
+      return PR_CONTINUE;
+    }
 
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         procedure.nodeEnd.next =
-            (AbstractInstruction)localFieldStack.pop();
-         return super.processEnd(context);
-      }
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      procedure.nodeEnd.next = (AbstractInstruction) localFieldStack.pop ();
+      return super.processEnd (context);
+    }
 
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (procedure != null)
-            theCopy.procedure =
-               (ProcedureFactory.Instance) procedure.deepCopy(copies);
-      }
-   }
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (procedure != null)
+        theCopy.procedure = (ProcedureFactory.Instance) procedure.deepCopy (copies);
+    }
+  }
 }

@@ -24,11 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.Value;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
@@ -38,171 +33,185 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Value;
 
 /**
- * Factory for <code>for-each-item</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>for-each-item</code> elements, which are represented by the
+ * inner Instance class.
+ * 
  * @version $Revision: 2.11 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class ForEachFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public ForEachFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("select");
-   }
+  // Constructor
+  public ForEachFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("select");
+  }
 
-   /** @return <code>"for-each-item"</code> */
-   public String getName()
-   {
-      return "for-each-item";
-   }
+  /** @return <code>"for-each-item"</code> */
+  @Override
+  public String getName ()
+  {
+    return "for-each-item";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      String nameAtt = getRequiredAttribute(qName, attrs, "name", context);
-      String expName = getExpandedName(nameAtt, context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
+    final String expName = getExpandedName (nameAtt, context);
 
-      Tree selectExpr = parseRequiredExpr(qName, attrs, "select", context);
+    final Tree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, nameAtt, expName,
-                          selectExpr);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, nameAtt, expName, selectExpr);
+  }
 
+  /** Represents an instance of the <code>for-each-item</code> element. */
+  final public class Instance extends NodeBase
+  {
+    private final String varName, expName;
+    private Tree select;
 
-   /** Represents an instance of the <code>for-each-item</code> element. */
-   final public class Instance extends NodeBase
-   {
-      private String varName, expName;
-      private Tree select;
+    /**
+     * Stack that stores the remaining sequence of the select attribute in case
+     * this for-each-item was interrupted via
+     * <code>stx:process-<em>xxx</em></code>
+     */
+    private Stack resultStack = new Stack ();
 
-      /**
-       * Stack that stores the remaining sequence of the select attribute
-       * in case this for-each-item was interrupted via
-       * <code>stx:process-<em>xxx</em></code>
-       */
-      private Stack resultStack = new Stack();
+    private AbstractInstruction contents, successor;
 
-      private AbstractInstruction contents, successor;
+    /**
+     * Determines whether this instruction is encountered the first time
+     * (<code>false</code>; i.e. the <code>select</code> attribute needs to be
+     * evaluated) or during the processing (<code>true</code>; i.e. this is part
+     * of the loop)
+     */
+    private boolean continued = false;
 
+    // Constructor
+    protected Instance (final String qName,
+                        final NodeBase parent,
+                        final ParseContext context,
+                        final String varName,
+                        final String expName,
+                        final Tree select)
+    {
+      super (qName, parent, context, true);
+      this.varName = varName;
+      this.expName = expName;
+      this.select = select;
 
-      /**
-       * Determines whether this instruction is encountered the first time
-       * (<code>false</code>; i.e. the <code>select</code> attribute needs
-       * to be evaluated) or during the processing (<code>true</code>;
-       * i.e. this is part of the loop)
-       */
-      private boolean continued = false;
+      // this instruction declares a local variable
+      scopedVariables = new Vector ();
+    }
 
+    /**
+     * Create the loop by connecting the end with the start
+     */
+    @Override
+    public boolean compile (final int pass, final ParseContext context)
+    {
+      if (pass == 0) // successor not available yet
+        return true;
 
-      // Constructor
-      protected Instance(final String qName, NodeBase parent,
-                         ParseContext context,
-                         String varName, String expName, Tree select)
+      contents = next;
+      successor = nodeEnd.next;
+      nodeEnd.next = this; // loop
+      return false;
+    }
+
+    /**
+     * If {@link #continued} is <code>true</code> then take the next item from a
+     * previously computed sequence, otherwise evaluate the <code>select</code>
+     * attribute and take the first item.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      Value selectResult;
+      if (continued)
       {
-         super(qName, parent, context, true);
-         this.varName = varName;
-         this.expName = expName;
-         this.select = select;
+        selectResult = (Value) resultStack.pop ();
+        continued = false;
+      }
+      else
+      {
+        // perform this check only once per for-each-item
+        if (context.localVars.get (expName) != null)
+        {
+          context.errorHandler.fatalError ("Variable '" +
+                                           varName +
+                                           "' already declared",
+                                           publicId,
+                                           systemId,
+                                           lineNo,
+                                           colNo);
+          return PR_ERROR;// if the errorHandler returns
+        }
 
-         // this instruction declares a local variable
-         scopedVariables = new Vector();
+        selectResult = select.evaluate (context, this);
       }
 
-
-      /**
-       * Create the loop by connecting the end with the start
-       */
-      public boolean compile(int pass, ParseContext context)
+      if (selectResult == null || selectResult.type == Value.EMPTY)
       {
-         if (pass == 0) // successor not available yet
-            return true;
-
-         contents = next;
-         successor = nodeEnd.next;
-         nodeEnd.next = this; // loop
-         return false;
+        // for-each-item finished (empty sequence left)
+        next = successor;
+        return PR_CONTINUE;
       }
-
-
-      /**
-       * If {@link #continued} is <code>true</code> then take the next
-       * item from a previously computed sequence, otherwise evaluate
-       * the <code>select</code> attribute and take the first item.
-       */
-      public short process(Context context)
-         throws SAXException
+      else
       {
-         Value selectResult;
-         if (continued) {
-            selectResult = (Value)resultStack.pop();
-            continued = false;
-         }
-         else {
-            // perform this check only once per for-each-item
-            if (context.localVars.get(expName) != null) {
-               context.errorHandler.fatalError(
-                  "Variable '" + varName + "' already declared",
-                  publicId, systemId, lineNo, colNo);
-               return PR_ERROR;// if the errorHandler returns
-            }
+        super.process (context); // enter new scope for local variables
+        resultStack.push (selectResult.next);
+        selectResult.next = null;
 
-            selectResult = select.evaluate(context, this);
-         }
+        context.localVars.put (expName, selectResult);
+        declareVariable (expName);
 
-         if (selectResult == null || selectResult.type == Value.EMPTY) {
-            // for-each-item finished (empty sequence left)
-            next = successor;
-            return PR_CONTINUE;
-         }
-         else {
-            super.process(context); // enter new scope for local variables
-            resultStack.push(selectResult.next);
-            selectResult.next = null;
-
-            context.localVars.put(expName, selectResult);
-            declareVariable(expName);
-
-            next = contents;
-            return PR_CONTINUE;
-         }
+        next = contents;
+        return PR_CONTINUE;
       }
+    }
 
+    /**
+     * Sets {@link #continued} to <code>true</code> to signal the loop.
+     */
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      continued = true;
+      return super.processEnd (context);
+    }
 
-      /**
-       * Sets {@link #continued} to <code>true</code> to signal the loop.
-       */
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         continued = true;
-         return super.processEnd(context);
-      }
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (contents != null)
+        theCopy.contents = contents.deepCopy (copies);
+      if (successor != null)
+        theCopy.successor = successor.deepCopy (copies);
+      if (select != null)
+        theCopy.select = select.deepCopy (copies);
+      theCopy.continued = false;
+      theCopy.resultStack = new Stack ();
+    }
 
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (contents != null)
-            theCopy.contents = contents.deepCopy(copies);
-         if (successor != null)
-            theCopy.successor = successor.deepCopy(copies);
-         if (select != null)
-            theCopy.select = select.deepCopy(copies);
-         theCopy.continued = false;
-         theCopy.resultStack = new Stack();
-      }
-
-   }
+  }
 }

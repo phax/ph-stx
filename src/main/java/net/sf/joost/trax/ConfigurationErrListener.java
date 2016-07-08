@@ -22,130 +22,167 @@
  * Contributor(s): Oliver Becker.
  */
 
-
 package net.sf.joost.trax;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sf.joost.OptionalLog;
-
 import org.apache.commons.logging.Log;
+
+import net.sf.joost.OptionalLog;
 
 /**
  * This class acts as a default ErrorListener for the
  * {@link TransformerFactoryImpl TransformerFactory}.
  */
-public class ConfigurationErrListener implements ErrorListener {
+public class ConfigurationErrListener implements ErrorListener
+{
 
-    // Define a static logger variable so that it references the
-    // Logger instance named "ConfigurationErrListener".
-    private static Log log =
-        OptionalLog.getLog(ConfigurationErrListener.class);
+  // Define a static logger variable so that it references the
+  // Logger instance named "ConfigurationErrListener".
+  private static Log log = OptionalLog.getLog (ConfigurationErrListener.class);
 
-    private ErrorListener userErrorListener;
+  private ErrorListener userErrorListener;
 
-    /**
-     * Default constructor.
-     */
-    public ConfigurationErrListener() {}
+  /**
+   * Default constructor.
+   */
+  public ConfigurationErrListener ()
+  {}
 
-    public ErrorListener getUserErrorListener() {
-        return userErrorListener;
-    }
+  public ErrorListener getUserErrorListener ()
+  {
+    return userErrorListener;
+  }
 
-    public void setUserErrorListener(ErrorListener userErrorListener) {
-        this.userErrorListener = userErrorListener;
-    }
+  public void setUserErrorListener (final ErrorListener userErrorListener)
+  {
+    this.userErrorListener = userErrorListener;
+  }
 
-    /**
-     * Receive notification of a warning.
-     * Details {@link ErrorListener#warning}
-     */
-    public void warning(TransformerException tE)
-            throws TransformerConfigurationException {
-        if(userErrorListener != null) {
-            try {
-                userErrorListener.warning(tE);
-            } catch( TransformerException e2) {
-                if (log != null)
-                    log.warn(e2);
-                if (e2 instanceof TransformerConfigurationException) {
-                    throw (TransformerConfigurationException)tE;
-                } else {
-                    throw new TransformerConfigurationException(tE.getMessage(), tE);
-                }
-            }
-        } else {
-            if (log != null)
-                log.warn(tE);
-            // no user defined errorlistener, so throw this exception
-            if (tE instanceof TransformerConfigurationException) {
-                throw (TransformerConfigurationException)tE;
-            } else {
-                throw new TransformerConfigurationException(tE.getMessage(), tE);
-            }
+  /**
+   * Receive notification of a warning. Details {@link ErrorListener#warning}
+   */
+  public void warning (final TransformerException tE) throws TransformerConfigurationException
+  {
+    if (userErrorListener != null)
+    {
+      try
+      {
+        userErrorListener.warning (tE);
+      }
+      catch (final TransformerException e2)
+      {
+        if (log != null)
+          log.warn (e2);
+        if (e2 instanceof TransformerConfigurationException)
+        {
+          throw (TransformerConfigurationException) tE;
         }
-    }
-
-    /**
-     * Receive notification of a recoverable error.
-     * Details {@link ErrorListener#error}
-     */
-    public void error(TransformerException tE)
-            throws TransformerConfigurationException {
-        if(userErrorListener != null) {
-            try {
-                userErrorListener.error(tE);
-            } catch( TransformerException e2) {
-                if (log != null)
-                    log.error(e2);
-                if (e2 instanceof TransformerConfigurationException) {
-                    throw (TransformerConfigurationException)tE;
-                } else {
-                    throw new TransformerConfigurationException(tE.getMessage(), tE);
-                }
-            }
-        } else {
-            if (log != null)
-                log.error(tE);
-            // no user defined errorlistener, so throw this exception
-            if (tE instanceof TransformerConfigurationException) {
-                throw (TransformerConfigurationException)tE;
-            } else {
-                throw new TransformerConfigurationException(tE.getMessage(), tE);
-            }
+        else
+        {
+          throw new TransformerConfigurationException (tE.getMessage (), tE);
         }
+      }
     }
+    else
+    {
+      if (log != null)
+        log.warn (tE);
+      // no user defined errorlistener, so throw this exception
+      if (tE instanceof TransformerConfigurationException)
+      {
+        throw (TransformerConfigurationException) tE;
+      }
+      else
+      {
+        throw new TransformerConfigurationException (tE.getMessage (), tE);
+      }
+    }
+  }
 
-    /**
-     * Receive notification of a non-recoverable error.
-     * Details {@link ErrorListener#fatalError}
-     */
-    public void fatalError(TransformerException tE)
-            throws TransformerConfigurationException {
-        if(userErrorListener != null) {
-            try {
-                userErrorListener.fatalError(tE);
-            } catch( TransformerException e2) {
-                if (log != null)
-                    log.fatal(e2);
-                if (e2 instanceof TransformerConfigurationException) {
-                    throw (TransformerConfigurationException)tE;
-                } else {
-                    throw new TransformerConfigurationException(tE.getMessage(), tE);
-                }
-            }
-        } else {
-            if (log != null)
-                log.fatal(tE);
-            // no user defined errorlistener, so throw this exception
-            if (tE instanceof TransformerConfigurationException) {
-                throw (TransformerConfigurationException)tE;
-            } else {
-                throw new TransformerConfigurationException(tE.getMessage(), tE);
-            }
+  /**
+   * Receive notification of a recoverable error. Details
+   * {@link ErrorListener#error}
+   */
+  public void error (final TransformerException tE) throws TransformerConfigurationException
+  {
+    if (userErrorListener != null)
+    {
+      try
+      {
+        userErrorListener.error (tE);
+      }
+      catch (final TransformerException e2)
+      {
+        if (log != null)
+          log.error (e2);
+        if (e2 instanceof TransformerConfigurationException)
+        {
+          throw (TransformerConfigurationException) tE;
         }
+        else
+        {
+          throw new TransformerConfigurationException (tE.getMessage (), tE);
+        }
+      }
     }
+    else
+    {
+      if (log != null)
+        log.error (tE);
+      // no user defined errorlistener, so throw this exception
+      if (tE instanceof TransformerConfigurationException)
+      {
+        throw (TransformerConfigurationException) tE;
+      }
+      else
+      {
+        throw new TransformerConfigurationException (tE.getMessage (), tE);
+      }
+    }
+  }
+
+  /**
+   * Receive notification of a non-recoverable error. Details
+   * {@link ErrorListener#fatalError}
+   */
+  public void fatalError (final TransformerException tE) throws TransformerConfigurationException
+  {
+    if (userErrorListener != null)
+    {
+      try
+      {
+        userErrorListener.fatalError (tE);
+      }
+      catch (final TransformerException e2)
+      {
+        if (log != null)
+          log.fatal (e2);
+        if (e2 instanceof TransformerConfigurationException)
+        {
+          throw (TransformerConfigurationException) tE;
+        }
+        else
+        {
+          throw new TransformerConfigurationException (tE.getMessage (), tE);
+        }
+      }
+    }
+    else
+    {
+      if (log != null)
+        log.fatal (tE);
+      // no user defined errorlistener, so throw this exception
+      if (tE instanceof TransformerConfigurationException)
+      {
+        throw (TransformerConfigurationException) tE;
+      }
+      else
+      {
+        throw new TransformerConfigurationException (tE.getMessage (), tE);
+      }
+    }
+  }
 }

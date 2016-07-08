@@ -15,7 +15,7 @@ import jflex.unicode.UnicodeProperties;
 
 /**
  * CUP v0.11a beta 20060608 generated parser.
- * 
+ *
  * @version Mon Mar 16 18:27:45 CET 2015
  */
 public class LexParse extends java_cup.runtime.lr_parser
@@ -1057,7 +1057,7 @@ class CUP$LexParse$actions
   Integer stateNumber;
   Timer t = new Timer ();
   EOFActions eofActions = new EOFActions ();
-  Map <Integer, IntCharSet> preclassCache = new HashMap <> ();
+  Map <Integer, IntCharSet> preclassCache = new HashMap<> ();
 
   void fatalError (final ErrorMessages message, final int line, final int col)
   {
@@ -1293,7 +1293,7 @@ class CUP$LexParse$actions
         case sym.JLETTERDIGITCLASS:
         default:
         {
-          result = new ArrayList <> ();
+          result = new ArrayList<> ();
 
           int c = 0;
           int start = 0;
@@ -1381,7 +1381,7 @@ class CUP$LexParse$actions
 
   private RegExp makeNL ()
   {
-    final List <Interval> list = new ArrayList <> ();
+    final List <Interval> list = new ArrayList<> ();
     list.add (new Interval ('\n', '\r'));
     list.add (new Interval ('\u0085', '\u0085'));
     list.add (new Interval ('\u2028', '\u2029'));
@@ -1615,7 +1615,7 @@ class CUP$LexParse$actions
         final List <Interval> list = (List <Interval>) ((RegExp1) regex).content;
         if (null == list)
         {
-          RESULT = new ArrayList <> ();
+          RESULT = new ArrayList<> ();
         }
         else
         {
@@ -1729,7 +1729,7 @@ class CUP$LexParse$actions
         final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
         final String s = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
 
-        RESULT = new ArrayList <> ();
+        RESULT = new ArrayList<> ();
         for (int i = 0; i < s.length ();)
         {
           final int ch = s.codePointAt (i);
@@ -1913,7 +1913,7 @@ class CUP$LexParse$actions
         final int elemright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
         final Interval elem = (Interval) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
 
-        final List <Interval> list = new ArrayList <> ();
+        final List <Interval> list = new ArrayList<> ();
         list.add (elem);
         RESULT = list;
 
@@ -2912,7 +2912,7 @@ class CUP$LexParse$actions
         final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
         final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
 
-        final List <Interval> list = new ArrayList <> ();
+        final List <Interval> list = new ArrayList<> ();
         list.add (new Interval (0, charClasses.getMaxCharCode ()));
         try
         {
@@ -3032,7 +3032,7 @@ class CUP$LexParse$actions
       {
         RegExp RESULT = null;
 
-        final List <Interval> any = new ArrayList <> ();
+        final List <Interval> any = new ArrayList<> ();
         if (Options.jlex || Options.legacy_dot)
         {
           any.add (new Interval ('\n', '\n'));
@@ -3533,7 +3533,7 @@ class CUP$LexParse$actions
         final int idright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
         final String id = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
 
-        final List <Integer> list = new ArrayList <> ();
+        final List <Integer> list = new ArrayList<> ();
         stateNumber = scanner.states.getNumber (id);
         if (stateNumber != null)
           list.add (stateNumber);
@@ -3585,7 +3585,7 @@ class CUP$LexParse$actions
       case 27: // statesOPT ::=
       {
         List <Integer> RESULT = null;
-        RESULT = new ArrayList <> ();
+        RESULT = new ArrayList<> ();
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("statesOPT",
                                                                     14,
                                                                     ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()),
@@ -3836,7 +3836,7 @@ class CUP$LexParse$actions
         final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
         final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
         final Integer r = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
-        RESULT = new ArrayList <> ();
+        RESULT = new ArrayList<> ();
         RESULT.add (r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rules",
                                                                     15,

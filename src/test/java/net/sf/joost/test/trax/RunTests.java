@@ -24,146 +24,154 @@
 
 package net.sf.joost.test.trax;
 
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import java.util.Properties;
-
 
 /**
  * Class to run the tests
  *
  * @author Zubow
  */
-public class RunTests {
+public class RunTests
+{
 
-    // Define a static logger variable so that it references the
-    // Logger instance named "RunTests".
-    static Logger log = Logger.getLogger(RunTests.class);
+  // Define a static logger variable so that it references the
+  // Logger instance named "RunTests".
+  static Logger log = Logger.getLogger (RunTests.class);
 
-    private static String log4jprop = "joost/conf/log4j.properties";
+  private static String log4jprop = "joost/conf/log4j.properties";
 
-    //xml-source
-    private static String xmlId = null;
+  // xml-source
+  private static String xmlId = null;
 
-    //stx-stylesheet-source
-    private static String stxId = null;
+  // stx-stylesheet-source
+  private static String stxId = null;
 
-    //resultfilename
-    private static String outId = null;
+  // resultfilename
+  private static String outId = null;
 
+  static
+  {
+    // calling once
+    PropertyConfigurator.configure (log4jprop);
+  }
 
-    static {
-        //calling once
-        PropertyConfigurator.configure(log4jprop);
+  // mounting point
+  public static void main (final String [] args)
+  {
+
+    log.info ("starting TrAX-Tests ... ");
+
+    if (args.length == 3)
+    {
+
+      xmlId = args[0];
+      stxId = args[1];
+      outId = args[2];
+
+    }
+    else
+    {
+
+      xmlId = "test/flat.xml";
+      stxId = "test/flat.stx";
+      outId = "testdata/out.html";
     }
 
-    //mounting point
-    public static void main(String[] args) {
+    log.debug ("xmlsrc = " + xmlId);
+    log.debug ("stxsrc = " + stxId);
+    log.debug ("dest   = " + outId);
 
-        log.info("starting TrAX-Tests ... ");
+    // setting joost as transformer
+    final String key = "javax.xml.transform.TransformerFactory";
+    final String value = "net.sf.joost.trax.TransformerFactoryImpl";
 
-        if(args.length == 3) {
+    log.debug ("Setting key " + key + " to " + value);
 
-            xmlId = args[0];
-            stxId = args[1];
-            outId = args[2];
+    // setting xerces as parser
+    final String key2 = "javax.xml.parsers.SAXParser";
+    final String value2 = "org.apache.xerces.parsers.SAXParser";
 
-        } else {
+    log.debug ("Setting key " + key2 + " to " + value2);
 
-            xmlId = "test/flat.xml";
-            stxId = "test/flat.stx";
-            outId = "testdata/out.html";
-        }
+    // setting new
+    final String key3 = "org.xml.sax.driver";
+    final String value3 = "org.apache.xerces.parsers.SAXParser";
 
-        log.debug("xmlsrc = " + xmlId);
-        log.debug("stxsrc = " + stxId);
-        log.debug("dest   = " + outId);
+    log.debug ("Setting key " + key3 + " to " + value3);
 
-        //setting joost as transformer
-        String key = "javax.xml.transform.TransformerFactory";
-        String value = "net.sf.joost.trax.TransformerFactoryImpl";
+    final Properties props = System.getProperties ();
+    props.put (key, value);
+    props.put (key2, value2);
+    props.put (key3, value3);
 
-        log.debug("Setting key " + key + " to " + value);
+    System.setProperties (props);
 
-        //setting xerces as parser
-        String key2 = "javax.xml.parsers.SAXParser";
-        String value2 = "org.apache.xerces.parsers.SAXParser";
+    try
+    {
+      // run testcases
+      log.info ("Try to run runTest0 - Identity");
+      // TestCases.runTests0("test/flat.xml");
 
-        log.debug("Setting key " + key2 + " to " + value2);
+      // log.info("Try to run runTest1");
+      TestCases.runTests1 ("test/a.xml", "test/a.stx");
+      // log.info("Try to run runTest1 again");
+      // TestCases.runTests1("testdata/temp.xml", "test/sum3.stx");
 
-        //setting new
-        String key3 = "org.xml.sax.driver";
-        String value3 = "org.apache.xerces.parsers.SAXParser";
+      // TestCases.runTests2("test/othello2.xml", "test/play.stx",
+      // "testdata/output.xml");
 
-        log.debug("Setting key " + key3 + " to " + value3);
+      // TODO :
+      // TestCases.runTests2("test/error.xml", "test/error.stx",
+      // "testdata/temp.xml");
+      // TestCases.runTests2("testdata/temp.xml", "test/sum3.stx",
+      // "testdata/temp2.xml");
 
+      // test
+      // TestCases.runTests2("test/flat.xml", "test/sum3.stx",
+      // "testdata/temp3.xml");
 
-        Properties props = System.getProperties();
-        props.put(key, value);
-        props.put(key2, value2);
-        props.put(key3, value3);
+      // REVERSE
+      // TestCases.runTests2("test/flat.xml", "test/sum3.stx",
+      // "testdata/temp4.xml");
+      // TestCases.runTests2("testdata/temp4.xml", "test/flat.stx",
+      // "testdata/temp5.xml");
 
-        System.setProperties(props);
+      // TestCases.runTests15(null, null);
+      // TestCases.runTests2(null,null,null);
+      // TestCases.runTests3(null,null);
+      // TestCases.runTests4(null,null);
+      // xml1, xml2, stx
+      // TestCases.runTests5("test/sum.xml", "test/sum2.xml", "test/sum.stx");
 
-        try {
-            //run testcases
-            log.info("Try to run runTest0 - Identity");
-            //TestCases.runTests0("test/flat.xml");
+      // TEMPLATESHANDLER
+      // TestCases.runTests26(null,null);
+      // TestCases.runTests27(null,null);
 
-            //log.info("Try to run runTest1");
-            TestCases.runTests1("test/a.xml", "test/a.stx");
-            //log.info("Try to run runTest1 again");
-            //TestCases.runTests1("testdata/temp.xml", "test/sum3.stx");
+      // TestCases.runTests7(null,null);
+      // TestCases.runTests8(null,null);
 
-            //TestCases.runTests2("test/othello2.xml", "test/play.stx", "testdata/output.xml");
+      // test filterchain
+      // TestCases.runTests9("test/flat.xml", "test/flat.stx", "test/sum3.stx");
 
-            //TODO :
-            //TestCases.runTests2("test/error.xml", "test/error.stx", "testdata/temp.xml");
-            //TestCases.runTests2("testdata/temp.xml", "test/sum3.stx", "testdata/temp2.xml");
+      // reverse order
+      // TestCases.runTests9("test/flat.xml", "test/sum3.stx", "test/flat.stx");
 
-            //test
-            //TestCases.runTests2("test/flat.xml", "test/sum3.stx", "testdata/temp3.xml");
+      // TestCases.runTests19(null, null);
 
-            //REVERSE
-            //TestCases.runTests2("test/flat.xml", "test/sum3.stx", "testdata/temp4.xml");
-            //TestCases.runTests2("testdata/temp4.xml", "test/flat.stx", "testdata/temp5.xml");
+      // TestCases.runTests18(null,null,null,null);
 
+      // TestCases.runTests22(null, null);
 
-            //TestCases.runTests15(null, null);
-            //TestCases.runTests2(null,null,null);
-            //TestCases.runTests3(null,null);
-            //TestCases.runTests4(null,null);
-            //xml1, xml2, stx
-            //TestCases.runTests5("test/sum.xml", "test/sum2.xml", "test/sum.stx");
+      // anotherTest7();
 
-            //TEMPLATESHANDLER
-            //TestCases.runTests26(null,null);
-            //TestCases.runTests27(null,null);
-
-
-            //TestCases.runTests7(null,null);
-            //TestCases.runTests8(null,null);
-
-            //test filterchain
-            //TestCases.runTests9("test/flat.xml", "test/flat.stx", "test/sum3.stx");
-
-            //reverse order
-            //TestCases.runTests9("test/flat.xml", "test/sum3.stx", "test/flat.stx");
-
-            //TestCases.runTests19(null, null);
-
-            //TestCases.runTests18(null,null,null,null);
-
-            //TestCases.runTests22(null, null);
-
-            //anotherTest7();
-
-        } catch (Exception e) {
-
-            log.error("Error while executing Tests", e);
-        }
     }
+    catch (final Exception e)
+    {
+
+      log.error ("Error while executing Tests", e);
+    }
+  }
 }
-

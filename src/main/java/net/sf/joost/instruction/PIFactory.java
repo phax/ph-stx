@@ -24,11 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -36,144 +31,157 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.emitter.StringEmitter;
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
  * Factory for <code>processing-instruction</code> elements, which are
  * represented by the inner Instance class.
+ * 
  * @version $Revision: 2.9 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class PIFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public PIFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("select");
-   }
+  // Constructor
+  public PIFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("select");
+  }
 
-   /* @return <code>"processing-instruction"</code> */
-   public String getName()
-   {
-      return "processing-instruction";
-   }
+  /* @return <code>"processing-instruction"</code> */
+  @Override
+  public String getName ()
+  {
+    return "processing-instruction";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      Tree nameAVT = parseRequiredAVT(qName, attrs, "name", context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final Tree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
-      Tree selectExpr = parseExpr(attrs.getValue("select"), context);
+    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, nameAVT, selectExpr);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, nameAVT, selectExpr);
+  }
 
+  /**
+   * Represents an instance of the <code>processing-instruction</code> element.
+   */
+  final public class Instance extends NodeBase
+  {
+    private Tree name, select;
+    private StringEmitter strEmitter;
+    private StringBuffer buffer;
+    private String piName;
 
-   /**
-    * Represents an instance of the <code>processing-instruction</code>
-    * element.
-    */
-   final public class Instance extends NodeBase
-   {
-      private Tree name, select;
-      private StringEmitter strEmitter;
-      private StringBuffer buffer;
-      private String piName;
+    protected Instance (final String qName,
+                        final NodeBase parent,
+                        final ParseContext context,
+                        final Tree name,
+                        final Tree select)
+    {
+      super (qName,
+             parent,
+             context,
+             // this element must be empty if there is a select attribute
+             select == null);
+      this.name = name;
+      this.select = select;
+      init ();
+    }
 
-      protected Instance(String qName, NodeBase parent, ParseContext context,
-                         Tree name, Tree select)
+    private void init ()
+    {
+      buffer = new StringBuffer ();
+      strEmitter = new StringEmitter (buffer, "('" + qName + "' started in line " + lineNo + ")");
+    }
+
+    /**
+     * Activate a StringEmitter for collecting the data of the new PI
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      piName = name.evaluate (context, this).getString ();
+      // TO DO: is this piName valid?
+
+      if (select == null)
       {
-         super(qName, parent, context,
-               // this element must be empty if there is a select attribute
-               select == null);
-         this.name = name;
-         this.select = select;
-         init();
+        super.process (context);
+        // check for nesting of this stx:processing-instruction
+        if (context.emitter.isEmitterActive (strEmitter))
+        {
+          context.errorHandler.error ("Can't create nested processing instruction here",
+                                      publicId,
+                                      systemId,
+                                      lineNo,
+                                      colNo);
+          return PR_CONTINUE; // if the errorHandler returns
+        }
+        buffer.setLength (0);
+        context.pushEmitter (strEmitter);
       }
-
-
-      private void init()
+      else
       {
-         buffer = new StringBuffer();
-         strEmitter = new StringEmitter(buffer,
-                         "('" + qName + "' started in line " + lineNo + ")");
+        String pi = select.evaluate (context, this).getStringValue ();
+        int index = pi.lastIndexOf ("?>");
+        if (index != -1)
+        {
+          final StringBuffer piBuf = new StringBuffer (pi);
+          do
+            piBuf.insert (index + 1, ' ');
+          while ((index = pi.lastIndexOf ("?>", --index)) != -1);
+          pi = piBuf.toString ();
+        }
+        context.emitter.processingInstruction (piName, pi, this);
       }
+      return PR_CONTINUE;
+    }
 
-
-      /**
-       * Activate a StringEmitter for collecting the data of the new PI
-       */
-      public short process(Context context)
-         throws SAXException
+    /**
+     * Emits a processing-instruction to the result stream
+     */
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      context.popEmitter ();
+      int index = buffer.length ();
+      if (index != 0)
       {
-         piName = name.evaluate(context, this).getString();
-         // TO DO: is this piName valid?
-
-         if (select == null) {
-            super.process(context);
-            // check for nesting of this stx:processing-instruction
-            if (context.emitter.isEmitterActive(strEmitter)) {
-               context.errorHandler.error(
-                  "Can't create nested processing instruction here",
-                  publicId, systemId, lineNo, colNo);
-               return PR_CONTINUE; // if the errorHandler returns
-            }
-            buffer.setLength(0);
-            context.pushEmitter(strEmitter);
-         }
-         else {
-            String pi = select.evaluate(context, this).getStringValue();
-            int index = pi.lastIndexOf("?>");
-            if (index != -1) {
-               StringBuffer piBuf = new StringBuffer(pi);
-               do
-                  piBuf.insert(index+1, ' ');
-               while ((index = pi.lastIndexOf("?>", --index)) != -1);
-               pi = piBuf.toString();
-            }
-            context.emitter.processingInstruction(piName, pi, this);
-         }
-         return PR_CONTINUE;
+        // are there any "?>" in the pi data?
+        final String str = buffer.toString ();
+        while ((index = str.lastIndexOf ("?>", --index)) != -1)
+          buffer.insert (index + 1, ' ');
       }
+      context.emitter.processingInstruction (piName, buffer.toString (), this);
+      return super.processEnd (context);
+    }
 
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      theCopy.init ();
+      if (name != null)
+        theCopy.name = name.deepCopy (copies);
+      if (select != null)
+        theCopy.select = select.deepCopy (copies);
+    }
 
-      /**
-       * Emits a processing-instruction to the result stream
-       */
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         context.popEmitter();
-         int index = buffer.length();
-         if (index != 0) {
-            // are there any "?>" in the pi data?
-            String str = buffer.toString();
-            while ((index = str.lastIndexOf("?>", --index)) != -1)
-               buffer.insert(index+1, ' ');
-         }
-         context.emitter.processingInstruction(piName, buffer.toString(),
-                                               this);
-         return super.processEnd(context);
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         theCopy.init();
-         if (name != null)
-            theCopy.name = name.deepCopy(copies);
-         if (select != null)
-            theCopy.select = select.deepCopy(copies);
-      }
-
-   }
+  }
 }

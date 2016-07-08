@@ -24,6 +24,10 @@
 
 package net.sf.joost.stx.function;
 
+import java.util.regex.Matcher;
+
+import org.xml.sax.SAXException;
+
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -32,10 +36,6 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
 import net.sf.joost.util.regex.JRegularExpression;
 import net.sf.joost.util.regex.RegularExpression;
 
-import java.util.regex.Matcher;
-
-import org.xml.sax.SAXException;
-
 /**
  * The <code>tokenize</code> function.<br>
  * Breaks the first parameter string into a sequence of strings, treating any
@@ -43,69 +43,86 @@ import org.xml.sax.SAXException;
  * themselves are not returned. The optional third parameter is interpreted as
  * flags in the same way as for {@link Matches} function.
  *
- * @see <a target="xq1xp2fo"
- *      href="http://www.w3.org/TR/xpath-functions/#func-tokenize">
- *      fn:tokenize in "XQuery 1.0 and XPath 2.0 Functions and Operators"</a>
+ * @see <a target="xq1xp2fo" href=
+ *      "http://www.w3.org/TR/xpath-functions/#func-tokenize"> fn:tokenize in
+ *      "XQuery 1.0 and XPath 2.0 Functions and Operators"</a>
  * @version $Revision: 1.3 $ $Date: 2008/06/14 15:01:30 $
  * @author Oliver Becker
  */
 final public class Tokenize implements Instance
 {
-   /** @return 2 **/
-   public int getMinParCount() { return 2; }
+  /** @return 2 **/
+  public int getMinParCount ()
+  {
+    return 2;
+  }
 
-   /** @return 3 */
-   public int getMaxParCount() { return 3; }
+  /** @return 3 */
+  public int getMaxParCount ()
+  {
+    return 3;
+  }
 
-   /** @return "tokenize" */
-   public String getName() { return FunctionFactory.FNSP + "tokenize"; }
+  /** @return "tokenize" */
+  public String getName ()
+  {
+    return FunctionFactory.FNSP + "tokenize";
+  }
 
-   /** @return <code>true</code> */
-   public boolean isConstant() { return true; }
+  /** @return <code>true</code> */
+  public boolean isConstant ()
+  {
+    return true;
+  }
 
-   public Value evaluate(Context context, int top, Tree args)
-      throws SAXException, EvalException
-   {
-      String input, pattern, flags;
-      if (args.left.type == Tree.LIST) { // three parameters
-         input = args.left.left.evaluate(context, top).getStringValue();
-         pattern = args.left.right.evaluate(context, top).getStringValue();
-         flags = args.right.evaluate(context, top).getStringValue();
+  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  {
+    String input, pattern, flags;
+    if (args.left.type == Tree.LIST)
+    { // three parameters
+      input = args.left.left.evaluate (context, top).getStringValue ();
+      pattern = args.left.right.evaluate (context, top).getStringValue ();
+      flags = args.right.evaluate (context, top).getStringValue ();
+    }
+    else
+    { // two parameters
+      input = args.left.evaluate (context, top).getStringValue ();
+      pattern = args.right.evaluate (context, top).getStringValue ();
+      flags = "";
+    }
+
+    if ("".equals (input))
+      return Value.VAL_EMPTY;
+
+    final RegularExpression re = new JRegularExpression (pattern, true, flags);
+    if (re.matches (""))
+      throw new EvalException ("The regular expression in tokenize() must " +
+                               "not be one that matches a zero-length string");
+
+    final Matcher matcher = re.matcher (input);
+    int prevEnd = 0;
+    Value start = null, last = null, current;
+    do
+    {
+      if (matcher.find ())
+      {
+        current = new Value (input.subSequence (prevEnd, matcher.start ()));
+        prevEnd = matcher.end ();
       }
-      else { // two parameters
-         input = args.left.evaluate(context, top).getStringValue();
-         pattern = args.right.evaluate(context, top).getStringValue();
-         flags = "";
+      else
+      {
+        current = new Value (input.subSequence (prevEnd, input.length ()));
+        prevEnd = -1;
       }
+      if (start == null)
+        start = last = current;
+      else
+      {
+        last.next = current;
+        last = current;
+      }
+    } while (prevEnd > 0);
 
-      if ("".equals(input))
-         return Value.VAL_EMPTY;
-
-      RegularExpression re = new JRegularExpression(pattern, true, flags);
-      if (re.matches(""))
-         throw new EvalException("The regular expression in tokenize() must " +
-                                 "not be one that matches a zero-length string");
-
-      Matcher matcher = re.matcher(input);
-      int prevEnd = 0;
-      Value start = null, last = null, current;
-      do {
-         if (matcher.find()) {
-            current = new Value(input.subSequence(prevEnd, matcher.start()));
-            prevEnd = matcher.end();
-         }
-         else {
-            current = new Value(input.subSequence(prevEnd, input.length()));
-            prevEnd = -1;
-         }
-         if (start == null)
-            start = last = current;
-         else {
-            last.next = current;
-            last = current;
-         }
-      } while (prevEnd > 0);
-
-      return start;
-   }
+    return start;
+  }
 }

@@ -9,38 +9,45 @@
 
 package jflex;
 
-
 /**
- * Simple pair of integers.
- *
- * Used in NFA to represent a partial NFA by its start and end state.
+ * Simple pair of integers. Used in NFA to represent a partial NFA by its start
+ * and end state.
  *
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final class IntPair {
+final class IntPair
+{
 
   int start;
   int end;
-  
-  IntPair(int start, int end) {
+
+  IntPair (final int start, final int end)
+  {
     this.start = start;
     this.end = end;
   }
 
-  public int hashCode() {
+  @Override
+  public int hashCode ()
+  {
     return end + (start << 8);
-  }  
-  
-  public boolean equals(Object o) {
-    if ( o instanceof IntPair ) {
-      IntPair p = (IntPair) o;
+  }
+
+  @Override
+  public boolean equals (final Object o)
+  {
+    if (o instanceof IntPair)
+    {
+      final IntPair p = (IntPair) o;
       return start == p.start && end == p.end;
     }
     return false;
   }
-  
-  public String toString() {
-    return "("+start+","+end+")";
+
+  @Override
+  public String toString ()
+  {
+    return "(" + start + "," + end + ")";
   }
-} 
+}

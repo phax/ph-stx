@@ -24,6 +24,9 @@
 
 package net.sf.joost.grammar.tree;
 
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import net.sf.joost.Constants;
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.Tree;
@@ -32,70 +35,74 @@ import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory;
 
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 /**
  * Objects of FunctionTree represent function calls in the syntax tree of a
  * pattern or an STXPath expression.
+ * 
  * @version $Revision: 1.8 $ $Date: 2009/08/21 12:46:18 $
  * @author Oliver Becker
  */
 final public class FunctionTree extends Tree
 {
-   /*** the function instance */
-   private FunctionFactory.Instance func;
+  /*** the function instance */
+  private final FunctionFactory.Instance func;
 
+  /**
+   * Constructs a FunctionTree object.
+   * 
+   * @param qName
+   *        the qualified function name
+   * @param left
+   *        the parameters
+   * @param context
+   *        the parse context
+   */
+  public FunctionTree (final String qName, final Tree left, final ParseContext context) throws SAXParseException
+  {
+    super (FUNCTION, left, null);
 
-   /**
-    * Constructs a FunctionTree object.
-    * @param qName the qualified function name
-    * @param left the parameters
-    * @param context the parse context
-    */
-   public FunctionTree(String qName, Tree left, ParseContext context)
-      throws SAXParseException
-   {
-      super(FUNCTION, left, null);
-
-      int colon = qName.indexOf(":");
-      if (colon != -1) {
-         uri = (String)context.nsSet.get(qName.substring(0, colon));
-         if (uri == null) {
-            throw new SAXParseException("Undeclared prefix '" +
-                                        qName.substring(0, colon) + "'",
-                                        context.locator);
-         }
-         lName = qName.substring(colon+1);
+    final int colon = qName.indexOf (":");
+    if (colon != -1)
+    {
+      uri = (String) context.nsSet.get (qName.substring (0, colon));
+      if (uri == null)
+      {
+        throw new SAXParseException ("Undeclared prefix '" + qName.substring (0, colon) + "'", context.locator);
       }
-      else {
-         uri = Constants.FUNC_NS;
-         lName = qName;
-      }
+      lName = qName.substring (colon + 1);
+    }
+    else
+    {
+      uri = Constants.FUNC_NS;
+      lName = qName;
+    }
 
-      func = context.getFunctionFactory().getFunction(uri, lName, qName, left);
-   }
+    func = context.getFunctionFactory ().getFunction (uri, lName, qName, left);
+  }
 
-   public Value evaluate(Context context, int top)
-      throws SAXException
-   {
-      try {
-         return func.evaluate(context, top, left);
-      }
-      catch (EvalException e) {
-         context.errorHandler.error(e.getMessage(),
-                                    context.currentInstruction.publicId,
-                                    context.currentInstruction.systemId,
-                                    context.currentInstruction.lineNo,
-                                    context.currentInstruction.colNo,
-                                    e);
-         // if the errorHandler decides to continue ...
-         return Value.VAL_EMPTY;
-      }
-   }
+  @Override
+  public Value evaluate (final Context context, final int top) throws SAXException
+  {
+    try
+    {
+      return func.evaluate (context, top, left);
+    }
+    catch (final EvalException e)
+    {
+      context.errorHandler.error (e.getMessage (),
+                                  context.currentInstruction.publicId,
+                                  context.currentInstruction.systemId,
+                                  context.currentInstruction.lineNo,
+                                  context.currentInstruction.colNo,
+                                  e);
+      // if the errorHandler decides to continue ...
+      return Value.VAL_EMPTY;
+    }
+  }
 
-   public boolean isConstant()
-   {
-      return func.isConstant() && (left == null || left.isConstant());
-   }
+  @Override
+  public boolean isConstant ()
+  {
+    return func.isConstant () && (left == null || left.isConstant ());
+  }
 }

@@ -24,108 +24,101 @@
 
 package net.sf.joost.emitter;
 
+import java.io.OutputStream;
+
 import org.apache.avalon.framework.logger.ConsoleLogger;
 import org.apache.fop.apps.Driver;
 import org.apache.fop.messaging.MessageHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.XMLFilterImpl;
 
-import java.io.OutputStream;
-
-
 /**
  * Wrapper class which passes SAX events to
  * <a href="http://xml.apache.org/fop">FOP</a>
- * @version $Revision: 1.3 $ $Date: 2005/03/13 17:12:48 $,
- * tested with FOP 0.20.4
+ * 
+ * @version $Revision: 1.3 $ $Date: 2005/03/13 17:12:48 $, tested with FOP
+ *          0.20.4
  * @author Oliver Becker
  */
 public class FOPEmitter extends XMLFilterImpl implements StxEmitter
 {
-   /** The system identifier required by {@link StxEmitter} */
-   private String systemId;
-   
-   /**
-    * Constructs a new FOPEmitter wrapper object.
-    * @param os the stream to which the PDF output will be written by FOP
-    */
-   public FOPEmitter(OutputStream os)
-   {
-      setContentHandler(getFOPContentHandler(os));
-   }
+  /** The system identifier required by {@link StxEmitter} */
+  private String systemId;
 
+  /**
+   * Constructs a new FOPEmitter wrapper object.
+   * 
+   * @param os
+   *        the stream to which the PDF output will be written by FOP
+   */
+  public FOPEmitter (final OutputStream os)
+  {
+    setContentHandler (getFOPContentHandler (os));
+  }
 
-   /**
-    * @param os the stream to which the PDF output will be written by FOP
-    * @return the content handler of a FOP Driver object which is used
-    *         to process FO data
-    */
-   public static ContentHandler getFOPContentHandler(OutputStream os)
-   {
-      Driver fop = new Driver();
+  /**
+   * @param os
+   *        the stream to which the PDF output will be written by FOP
+   * @return the content handler of a FOP Driver object which is used to process
+   *         FO data
+   */
+  public static ContentHandler getFOPContentHandler (final OutputStream os)
+  {
+    final Driver fop = new Driver ();
 
-      // Avalon logging framework
-      ConsoleLogger log = new ConsoleLogger(ConsoleLogger.LEVEL_WARN);
-      MessageHandler.setScreenLogger(log);
-      fop.setLogger(log);
+    // Avalon logging framework
+    final ConsoleLogger log = new ConsoleLogger (ConsoleLogger.LEVEL_WARN);
+    MessageHandler.setScreenLogger (log);
+    fop.setLogger (log);
 
-      // Default: produce PDF
-      fop.setRenderer(Driver.RENDER_PDF);
-      fop.setOutputStream(os);
+    // Default: produce PDF
+    fop.setRenderer (Driver.RENDER_PDF);
+    fop.setOutputStream (os);
 
-      return fop.getContentHandler();
-   }
+    return fop.getContentHandler ();
+  }
 
+  //
+  // Methods from interface LexicalHandler
+  // no need to pass them to FOP: provide emtpy implementations
+  //
 
+  public void startDTD (final String name, final String pubId, final String sysId)
+  {}
 
+  public void endDTD ()
+  {}
 
+  public void startEntity (final String name)
+  {}
 
-   //
-   // Methods from interface LexicalHandler
-   // no need to pass them to FOP: provide emtpy implementations
-   //
+  public void endEntity (final String name)
+  {}
 
-   public void startDTD(String name, String pubId, String sysId)
-   {
-   }
+  public void startCDATA ()
+  {}
 
-   public void endDTD()
-   {
-   }
+  public void endCDATA ()
+  {}
 
-   public void startEntity(String name)
-   {
-   }
+  public void comment (final char [] ch, final int start, final int length)
+  {}
 
-   public void endEntity(String name)
-   {
-   }
+  /*
+   * (non-Javadoc)
+   * @see net.sf.joost.emitter.StxEmitter#getSystemId()
+   */
+  public String getSystemId ()
+  {
+    return systemId;
+  }
 
-   public void startCDATA()
-   {
-   }
-
-   public void endCDATA()
-   {
-   }
-
-   public void comment(char[] ch, int start, int length)
-   {
-   }
-   
-   /* (non-Javadoc)
-    * @see net.sf.joost.emitter.StxEmitter#getSystemId()
-    */
-   public String getSystemId()
-   {
-      return systemId;
-   }
-   
-   /* (non-Javadoc)
-    * @see net.sf.joost.emitter.StxEmitter#setSystemId(java.lang.String)
-    */
-   public void setSystemId(String systemId)
-   {
-      this.systemId = systemId;
-   }
+  /*
+   * (non-Javadoc)
+   * @see net.sf.joost.emitter.StxEmitter#setSystemId(java.lang.String)
+   */
+  public void setSystemId (final String systemId)
+  {
+    this.systemId = systemId;
+  }
 }

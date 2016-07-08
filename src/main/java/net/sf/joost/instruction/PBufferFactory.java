@@ -24,14 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.stx.BufferReader;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.Processor;
-import net.sf.joost.stx.SAXEvent;
-import net.sf.joost.util.VariableNotFoundException;
-import net.sf.joost.util.VariableUtils;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -41,186 +33,201 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.stx.BufferReader;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Processor;
+import net.sf.joost.stx.SAXEvent;
+import net.sf.joost.util.VariableNotFoundException;
+import net.sf.joost.util.VariableUtils;
 
 /**
- * Factory for <code>process-buffer</code> elements, which are
- * represented by the inner Instance class.
+ * Factory for <code>process-buffer</code> elements, which are represented by
+ * the inner Instance class.
+ * 
  * @version $Revision: 2.17 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
 
 public class PBufferFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
+  //
+  // Constructor
+  //
+  public PBufferFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("group");
+    attrNames.add ("filter-method");
+    attrNames.add ("filter-src");
+  }
 
-   //
-   // Constructor
-   //
-   public PBufferFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("group");
-      attrNames.add("filter-method");
-      attrNames.add("filter-src");
-   }
+  /** @return <code>"process-buffer"</code> */
+  @Override
+  public String getName ()
+  {
+    return "process-buffer";
+  }
 
-   /** @return <code>"process-buffer"</code> */
-   public String getName()
-   {
-      return "process-buffer";
-   }
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
+    // buffers are special variables with an "@" prefix
+    final String bufName = "@" + getExpandedName (nameAtt, context);
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      String nameAtt = getRequiredAttribute(qName, attrs, "name", context);
-      // buffers are special variables with an "@" prefix
-      String bufName = "@" + getExpandedName(nameAtt, context);
+    final String groupAtt = attrs.getValue ("group");
 
-      String groupAtt = attrs.getValue("group");
+    final String filterMethodAtt = attrs.getValue ("filter-method");
 
-      String filterMethodAtt = attrs.getValue("filter-method");
+    if (groupAtt != null && filterMethodAtt != null)
+      throw new SAXParseException ("It's not allowed to use both 'group' and 'filter-method' attributes",
+                                   context.locator);
 
-      if (groupAtt != null && filterMethodAtt != null)
-         throw new SAXParseException(
-            "It's not allowed to use both 'group' and 'filter-method' attributes",
-            context.locator);
+    final String filterSrcAtt = attrs.getValue ("filter-src");
 
-      String filterSrcAtt = attrs.getValue("filter-src");
+    if (filterSrcAtt != null && filterMethodAtt == null)
+      throw new SAXParseException ("Missing 'filter-method' attribute in '" +
+                                   qName +
+                                   "' ('filter-src' is present)",
+                                   context.locator);
 
-      if (filterSrcAtt != null && filterMethodAtt == null)
-         throw new SAXParseException(
-            "Missing 'filter-method' attribute in '" + qName +
-            "' ('filter-src' is present)",
-            context.locator);
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, nameAtt, bufName, groupAtt, filterMethodAtt, filterSrcAtt);
+  }
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, nameAtt, bufName,
-                          groupAtt, filterMethodAtt, filterSrcAtt);
-   }
+  /** The inner Instance class */
+  public class Instance extends ProcessBase
+  {
+    private final String bufName, expName;
+    private boolean scopeDetermined = false;
+    private GroupBase groupScope = null;
 
+    // Constructor
+    public Instance (final String qName,
+                     final NodeBase parent,
+                     final ParseContext context,
+                     final String bufName,
+                     final String expName,
+                     final String groupQName,
+                     final String method,
+                     final String src) throws SAXParseException
+    {
+      super (qName, parent, context, groupQName, method, src);
+      this.bufName = bufName;
+      this.expName = expName;
+    }
 
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      this.localFieldStack.push (context.targetGroup);
+      return super.process (context);
+    }
 
-   /** The inner Instance class */
-   public class Instance extends ProcessBase
-   {
-      private String bufName, expName;
-      private boolean scopeDetermined = false;
-      private GroupBase groupScope = null;
+    /**
+     * Processes a buffer.
+     */
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      context.currentInstruction = this;
 
-      // Constructor
-      public Instance(String qName, NodeBase parent, ParseContext context,
-                      String bufName, String expName, String groupQName,
-                      String method, String src)
-         throws SAXParseException
+      if (!scopeDetermined)
       {
-         super(qName, parent, context, groupQName, method, src);
-         this.bufName = bufName;
-         this.expName = expName;
+        try
+        {
+          groupScope = VariableUtils.findVariableScope (context, expName);
+        }
+        catch (final VariableNotFoundException e)
+        {
+          context.errorHandler.error ("Can't process an undeclared buffer '" +
+                                      bufName +
+                                      "'",
+                                      publicId,
+                                      systemId,
+                                      lineNo,
+                                      colNo);
+          // if the error handler returns
+          return PR_ERROR;
+        }
+        scopeDetermined = true;
       }
 
+      final BufferReader br = new BufferReader (context, expName, groupScope, publicId, systemId);
 
-      public short process(Context context) throws SAXException
+      if (filter != null)
       {
-         this.localFieldStack.push(context.targetGroup);
-         return super.process(context);
+        // use external SAX filter (TransformerHandler)
+        final TransformerHandler handler = getProcessHandler (context);
+        if (handler == null)
+          return PR_ERROR;
+
+        try
+        {
+          handler.startDocument ();
+          br.parse (handler, handler);
+          handler.endDocument ();
+        }
+        catch (final SAXException e)
+        {
+          // add locator information
+          context.errorHandler.fatalError (e.getMessage (), publicId, systemId, lineNo, colNo, e);
+          return PR_ERROR;
+        }
+        // catch any unchecked exception
+        catch (final RuntimeException e)
+        {
+          // wrap exception
+          java.io.StringWriter sw = null;
+          sw = new java.io.StringWriter ();
+          e.printStackTrace (new java.io.PrintWriter (sw));
+          context.errorHandler.fatalError ("External processing failed: " + sw, publicId, systemId, lineNo, colNo, e);
+          return PR_ERROR;
+        }
       }
-
-
-      /**
-       * Processes a buffer.
-       */
-      public short processEnd(Context context)
-         throws SAXException
+      else
       {
-         context.currentInstruction = this;
+        // process the events using STX instructions
 
-         if (!scopeDetermined) {
-            try {
-               groupScope = VariableUtils.findVariableScope(context, expName);
-            }
-            catch (VariableNotFoundException e) {
-               context.errorHandler.error(
-                  "Can't process an undeclared buffer '" + bufName + "'",
-                  publicId, systemId, lineNo, colNo);
-               // if the error handler returns
-               return PR_ERROR;
-            }
-            scopeDetermined = true;
-         }
+        // store current group
+        final GroupBase prevGroup = context.currentGroup;
 
-         BufferReader br = new BufferReader(context, expName, groupScope,
-                                            publicId, systemId);
+        // ensure, that position counters on the top most event are
+        // available
+        ((SAXEvent) context.ancestorStack.peek ()).enableChildNodes (false);
 
-         if (filter != null) {
-            // use external SAX filter (TransformerHandler)
-            TransformerHandler handler = getProcessHandler(context);
-            if (handler == null)
-               return PR_ERROR;
+        final Processor proc = context.currentProcessor;
+        proc.startInnerProcessing ();
 
-            try {
-               handler.startDocument();
-               br.parse(handler, handler);
-               handler.endDocument();
-            }
-            catch (SAXException e) {
-               // add locator information
-               context.errorHandler.fatalError(e.getMessage(),
-                                               publicId, systemId,
-                                               lineNo, colNo,
-                                               e);
-               return PR_ERROR;
-            }
-            // catch any unchecked exception
-            catch (RuntimeException e) {
-               // wrap exception
-               java.io.StringWriter sw = null;
-               sw = new java.io.StringWriter();
-               e.printStackTrace(new java.io.PrintWriter(sw));
-               context.errorHandler.fatalError(
-                  "External processing failed: " + sw,
-                  publicId, systemId, lineNo, colNo, e);
-               return PR_ERROR;
-            }
-         }
-         else {
-            // process the events using STX instructions
+        // call parse method with the two handler objects directly
+        // (no startDocument, endDocument events!)
+        br.parse (proc, proc);
 
-            // store current group
-            GroupBase prevGroup = context.currentGroup;
-
-            // ensure, that position counters on the top most event are
-            // available
-            ((SAXEvent)context.ancestorStack.peek()).enableChildNodes(false);
-
-            Processor proc = context.currentProcessor;
-            proc.startInnerProcessing();
-
-            // call parse method with the two handler objects directly
-            // (no startDocument, endDocument events!)
-            br.parse(proc, proc);
-
-            proc.endInnerProcessing();
-            // restore current group
-            context.currentGroup = prevGroup;
-         }
-         context.targetGroup = (GroupBase) localFieldStack.pop();
-
-         return super.processEnd(context);
+        proc.endInnerProcessing ();
+        // restore current group
+        context.currentGroup = prevGroup;
       }
+      context.targetGroup = (GroupBase) localFieldStack.pop ();
 
+      return super.processEnd (context);
+    }
 
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (groupScope != null)
-            theCopy.groupScope = (GroupBase) groupScope.deepCopy(copies);
-      }
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (groupScope != null)
+        theCopy.groupScope = (GroupBase) groupScope.deepCopy (copies);
+    }
 
-   }
+  }
 }

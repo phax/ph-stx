@@ -24,10 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -35,121 +31,125 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
- * Factory for <code>if</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>if</code> elements, which are represented by the inner
+ * Instance class.
+ * 
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class IfFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public IfFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("test");
-   }
+  // Constructor
+  public IfFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("test");
+  }
 
-   /** @return <code>"if"</code> */
-   public String getName()
-   {
-      return "if";
-   }
+  /** @return <code>"if"</code> */
+  @Override
+  public String getName ()
+  {
+    return "if";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      Tree testExpr = parseRequiredExpr(qName, attrs, "test", context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final Tree testExpr = parseRequiredExpr (qName, attrs, "test", context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, testExpr);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, testExpr);
+  }
 
+  /** Represents an instance of the <code>if</code> element. */
+  final public class Instance extends NodeBase
+  {
+    /** the parsed <code>select</code> expression */
+    private Tree test;
 
-   /** Represents an instance of the <code>if</code> element. */
-   final public class Instance extends NodeBase
-   {
-      /** the parsed <code>select</code> expression */
-      private Tree test;
+    /** next instruction if the test evaluates to true */
+    private AbstractInstruction trueNext;
 
-      /** next instruction if the test evaluates to true */
-      private AbstractInstruction trueNext;
+    /** next instruction if the test evaluates to false */
+    private AbstractInstruction falseNext;
 
-      /** next instruction if the test evaluates to false */
-      private AbstractInstruction falseNext;
+    protected Instance (final String qName, final NodeBase parent, final ParseContext context, final Tree test)
+    {
+      super (qName, parent, context, true);
+      this.test = test;
+    }
 
-      protected Instance(String qName, NodeBase parent, ParseContext context,
-                         Tree test)
+    /**
+     * Assign {@link #trueNext} and {@link #falseNext}
+     */
+    @Override
+    public boolean compile (final int pass, final ParseContext context) throws SAXException
+    {
+      if (pass == 0) // nodeEnd.next not available yet
+        return true;
+
+      // adjust true and false branches
+      trueNext = next;
+      falseNext = nodeEnd.next;
+      if (falseNext instanceof ElseFactory.Instance)
+        nodeEnd.next = ((ElseFactory.Instance) falseNext).nodeEnd.next;
+
+      return false; // done
+    }
+
+    /**
+     * Evaluates the expression given in the test attribute and change the value
+     * of the <code>next</code> instruction.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      if (test.evaluate (context, this).getBooleanValue ())
       {
-         super(qName, parent, context, true);
-         this.test = test;
+        super.process (context);
+        next = trueNext;
       }
-
-
-      /**
-       * Assign {@link #trueNext} and {@link #falseNext}
-       */
-      public boolean compile(int pass, ParseContext context)
-         throws SAXException
+      else
       {
-         if (pass == 0) // nodeEnd.next not available yet
-            return true;
-
-         // adjust true and false branches
-         trueNext = next;
-         falseNext = nodeEnd.next;
-         if (falseNext instanceof ElseFactory.Instance)
-            nodeEnd.next =
-               ((ElseFactory.Instance)falseNext).nodeEnd.next;
-
-         return false; // done
+        // skip if instruction
+        next = falseNext;
       }
+      return PR_CONTINUE;
+    }
 
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (test != null)
+        theCopy.test = test.deepCopy (copies);
+      if (trueNext != null)
+        theCopy.trueNext = trueNext.deepCopy (copies);
+      if (falseNext != null)
+        theCopy.falseNext = falseNext.deepCopy (copies);
+    }
 
-      /**
-       * Evaluates the expression given in the test attribute and
-       * change the value of the <code>next</code> instruction.
-       */
-      public short process(Context context)
-         throws SAXException
-      {
-         if (test.evaluate(context, this).getBooleanValue()) {
-            super.process(context);
-            next = trueNext;
-         }
-         else {
-            // skip if instruction
-            next = falseNext;
-         }
-         return PR_CONTINUE;
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (test != null)
-            theCopy.test = test.deepCopy(copies);
-         if (trueNext != null)
-            theCopy.trueNext = trueNext.deepCopy(copies);
-         if (falseNext != null)
-            theCopy.falseNext = falseNext.deepCopy(copies);
-      }
-
-
-      //
-      // for debugging
-      //
-      public String toString()
-      {
-         return "stx:if test='" + test + "'";
-      }
-   }
+    //
+    // for debugging
+    //
+    @Override
+    public String toString ()
+    {
+      return "stx:if test='" + test + "'";
+    }
+  }
 }

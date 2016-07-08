@@ -32,7 +32,7 @@ import javax.xml.transform.TransformerException;
  * This interface defines an OutputURIResolver. This is a counterpart to the
  * JAXP URIResolver, but is used to map the URI of a secondary result document
  * to a Result object which acts as the destination for the new document.
- * 
+ *
  * @author Michael H. Kay
  * @author Oliver Becker
  */
@@ -40,40 +40,47 @@ import javax.xml.transform.TransformerException;
 public interface OutputURIResolver
 {
 
-   /**
-    * Resolve an output URI.
-    * 
-    * @param href The relative URI of the output document. This corresponds to
-    *        the <code>href</code> attribute of the
-    *        <code>stx:result-document</code> instruction.
-    * @param base The base URI that should be used. This is the base URI of the
-    *        element that contained the href attribute. It may be null if no
-    *        systemID was supplied for the stylesheet.
-    * @param outputProperties The output properties that are in scope for the
-    *        output document. These are the properties of the main
-    *        transformation plus the values of the optional attributes
-    *        <code>output-encoding</code> and <code>output-method</code>.
-    * @param append If set to <code>true</code> then the result should be
-    *        appended to a possibly already existing document.
-    * @return a Result object representing the destination for the XML document.
-    *         The method can also return null, in which case the standard output
-    *         URI resolver will be used to create a Result object.
-    */
+  /**
+   * Resolve an output URI.
+   * 
+   * @param href
+   *        The relative URI of the output document. This corresponds to the
+   *        <code>href</code> attribute of the <code>stx:result-document</code>
+   *        instruction.
+   * @param base
+   *        The base URI that should be used. This is the base URI of the
+   *        element that contained the href attribute. It may be null if no
+   *        systemID was supplied for the stylesheet.
+   * @param outputProperties
+   *        The output properties that are in scope for the output document.
+   *        These are the properties of the main transformation plus the values
+   *        of the optional attributes <code>output-encoding</code> and
+   *        <code>output-method</code>.
+   * @param append
+   *        If set to <code>true</code> then the result should be appended to a
+   *        possibly already existing document.
+   * @return a Result object representing the destination for the XML document.
+   *         The method can also return null, in which case the standard output
+   *         URI resolver will be used to create a Result object.
+   */
 
-   public Result resolve(String href, String base, Properties outputProperties,
+  public Result resolve (String href,
+                         String base,
+                         Properties outputProperties,
                          boolean append) throws TransformerException;
 
-   /**
-    * Signal completion of the result document. This method is called by the
-    * system when the result document has been successfully written. It allows
-    * the resolver to perform tidy-up actions such as closing output streams, or
-    * firing off processes that take this result tree as input. Note that the
-    * OutputURIResolver is stateless, so the the original Result object is
-    * supplied to identify the document that has been completed.
-    * 
-    * @param result The result object returned by the previous call of resolve()
-    */
+  /**
+   * Signal completion of the result document. This method is called by the
+   * system when the result document has been successfully written. It allows
+   * the resolver to perform tidy-up actions such as closing output streams, or
+   * firing off processes that take this result tree as input. Note that the
+   * OutputURIResolver is stateless, so the the original Result object is
+   * supplied to identify the document that has been completed.
+   * 
+   * @param result
+   *        The result object returned by the previous call of resolve()
+   */
 
-   public void close(Result result) throws TransformerException;
+  public void close (Result result) throws TransformerException;
 
 }

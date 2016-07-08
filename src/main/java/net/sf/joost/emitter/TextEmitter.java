@@ -27,86 +27,90 @@ package net.sf.joost.emitter;
 import java.io.IOException;
 import java.io.Writer;
 
-import net.sf.joost.OptionalLog;
-
 import org.apache.commons.logging.Log;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import net.sf.joost.OptionalLog;
+
 /**
  * This class implements an emitter that uses the <code>text</code> output
  * method for byte or character streams.
+ * 
  * @version $Revision: 1.4 $ $Date: 2007/11/25 14:18:02 $
  * @author Oliver Becker, Anatolij Zubow
  */
-public class TextEmitter extends StreamEmitter 
+public class TextEmitter extends StreamEmitter
 {
-   // Log initialization
-   private static Log log = OptionalLog.getLog(TextEmitter.class);
+  // Log initialization
+  private static Log log = OptionalLog.getLog (TextEmitter.class);
 
+  /** Constructor */
+  public TextEmitter (final Writer writer, final String encoding)
+  {
+    super (writer, encoding);
+  }
 
-   /** Constructor */
-   public TextEmitter(Writer writer, String encoding)
-   {
-      super(writer, encoding);
-   }
+  /**
+   * Does nothing
+   */
+  public void startDocument ()
+  {}
 
-   /** 
-    * Does nothing
-    */
-   public void startDocument()
-   { }
+  /**
+   * Flushes the output writer
+   */
+  public void endDocument () throws SAXException
+  {
+    try
+    {
+      writer.flush ();
+    }
+    catch (final IOException ex)
+    {
+      if (log != null)
+        log.error (ex);
+      throw new SAXException (ex);
+    }
+  }
 
-   /**
-    * Flushes the output writer 
-    */
-   public void endDocument() throws SAXException 
-   {
-      try {
-         writer.flush();
-      } 
-      catch (IOException ex) {
-         if (log != null)
-            log.error(ex);
-         throw new SAXException(ex);
-      }
-   }
+  /**
+   * Does nothing
+   */
+  public void startElement (final String uri, final String lName, final String qName, final Attributes attrs)
+  {}
 
-   /**
-    * Does nothing
-    */
-   public void startElement(String uri, String lName, String qName,
-                            Attributes attrs)
-   { }
+  /**
+   * Does nothing
+   */
+  public void endElement (final String uri, final String lName, final String qName)
+  {}
 
-   /** 
-    * Does nothing
-    */
-   public void endElement(String uri, String lName, String qName)
-   { }
+  /**
+   * Outputs characters.
+   */
+  public void characters (final char [] ch, final int start, final int length) throws SAXException
+  {
+    // Check that the characters can be represented in the current encoding
+    for (int i = 0; i < length; i++)
+      if (!charsetEncoder.canEncode (ch[start + i]))
+        throw new SAXException ("Cannot output character with code " +
+                                (int) ch[start + i] +
+                                " in the encoding '" +
+                                encoding +
+                                "'");
 
-   /**
-    * Outputs characters.
-    */
-   public void characters(char[] ch, int start, int length)
-      throws SAXException 
-   {
-      // Check that the characters can be represented in the current encoding
-      for (int i=0; i<length; i++)
-         if (!charsetEncoder.canEncode(ch[start+i]))
-            throw new SAXException("Cannot output character with code " + 
-                                   (int)ch[start+i] + 
-                                   " in the encoding '" + encoding + "'");
-         
-      try {
-         writer.write(ch, start, length);
-         if (DEBUG)
-            log.debug("'" + new String(ch, start, length) + "'");
-      } 
-      catch (IOException ex) {
-         if (log != null)
-            log.error(ex);
-         throw new SAXException(ex);
-      }
-   }
+    try
+    {
+      writer.write (ch, start, length);
+      if (DEBUG)
+        log.debug ("'" + new String (ch, start, length) + "'");
+    }
+    catch (final IOException ex)
+    {
+      if (log != null)
+        log.error (ex);
+      throw new SAXException (ex);
+    }
+  }
 }

@@ -119,7 +119,7 @@ public class DataStore
   public static void main (final String [] args)
   {
     // example data (taken from http://www.hp-lexicon.org/)
-    final Set <DataStore> teachers = new HashSet <> ();
+    final Set <DataStore> teachers = new HashSet<> ();
     teachers.add (new DataStore ("Minerva", "McGonagall", "Transfiguration", "Gryffindor"));
     teachers.add (new DataStore ("Severus", "Snape", "Potions", "Slytherin"));
     teachers.add (new DataStore ("Filius", "Flitwick", "Charms", "Ravenclaw"));

@@ -30,86 +30,99 @@ import org.apache.commons.logging.Log;
 /**
  * Provides a helper class that optionally initializes the Commons Logging
  * facility. If <code>org.apache.commons.logging.LogFactory</code> is present
- * the {@link #getLog(Class)} method returns a normal <code>Log</code> object 
- * that must be converted (via a type cast) before using it. Otherwise the 
+ * the {@link #getLog(Class)} method returns a normal <code>Log</code> object
+ * that must be converted (via a type cast) before using it. Otherwise the
  * method returns <code>null</code>. This approach prevents a
  * <code>NoClassDefFoundError</code> in case logging is not available.
- *  
+ *
  * @version $Revision: 1.3 $ $Date: 2004/11/06 13:08:51 $
  * @author Oliver Becker
  */
 public final class OptionalLog
 {
-   private static Method getLogMethodClass, getLogMethodString;
-   static {
-      try {
-         Class c = Class.forName("org.apache.commons.logging.LogFactory");
-         try {
-            // look for getLog(Class _class)
-            Class[] declaredParams = { Class.class };
-            getLogMethodClass = c.getDeclaredMethod("getLog", declaredParams);
-            // one trial invocation
-            Object[] actualParams  = { OptionalLog.class };
-            getLogMethodClass.invoke(null, actualParams);
-         }
-         catch (Throwable t) {
-            // Something went wrong, logging is not available
-            getLogMethodClass = null;
-         }
-         try {
-            // look for getLog(String name)
-            Class[] declaredParams = { String.class };
-            getLogMethodString = c.getDeclaredMethod("getLog", declaredParams);
-            // one trial invocation
-            Object[] actualParamsString  = { OptionalLog.class.getName() };
-            getLogMethodString.invoke(null, actualParamsString);
-         }
-         catch (Throwable t) {
-            // Something went wrong, logging is not available
-            getLogMethodString = null;
-         }
+  private static Method getLogMethodClass;
+  private static Method getLogMethodString;
+  static
+  {
+    try
+    {
+      final Class c = Class.forName ("org.apache.commons.logging.LogFactory");
+      try
+      {
+        // look for getLog(Class _class)
+        final Class [] declaredParams = { Class.class };
+        getLogMethodClass = c.getDeclaredMethod ("getLog", declaredParams);
+        // one trial invocation
+        final Object [] actualParams = { OptionalLog.class };
+        getLogMethodClass.invoke (null, actualParams);
       }
-      catch (Throwable t) {
-         // Class not found, logging is not available
-         getLogMethodClass = null;
-         getLogMethodString = null;
+      catch (final Throwable t)
+      {
+        // Something went wrong, logging is not available
+        getLogMethodClass = null;
       }
-   }
-   
-   /** 
-    * Returns a <code>org.apache.commons.logging.Log</log> object if this
-    * class is available, otherwise <code>null</code>
-    */
-   public static Log getLog(Class _class)
-   {
-      if (getLogMethodClass != null) {
-         Object[] params = { _class };
-         try {
-            return (Log)getLogMethodClass.invoke(null, params);
-         }
-         catch (Throwable t) {
-            // Shouldn't happen ...
-         }
+      try
+      {
+        // look for getLog(String name)
+        final Class [] declaredParams = { String.class };
+        getLogMethodString = c.getDeclaredMethod ("getLog", declaredParams);
+        // one trial invocation
+        final Object [] actualParamsString = { OptionalLog.class.getName () };
+        getLogMethodString.invoke (null, actualParamsString);
       }
-      return null;
-   }
+      catch (final Throwable t)
+      {
+        // Something went wrong, logging is not available
+        getLogMethodString = null;
+      }
+    }
+    catch (final Throwable t)
+    {
+      // Class not found, logging is not available
+      getLogMethodClass = null;
+      getLogMethodString = null;
+    }
+  }
 
-   
-   /** 
-    * Returns a <code>org.apache.commons.logging.Log</log> object if this
-    * class is available, otherwise <code>null</code>
-    */
-   public static Log getLog(String name)
-   {
-      if (getLogMethodString != null) {
-         Object[] params = { name };
-         try {
-            return (Log)getLogMethodString.invoke(null, params);
-         }
-         catch (Throwable t) {
-            // Shouldn't happen ...
-         }
+  /**
+   * Returns a <code>org.apache.commons.logging.Log</log> object if this
+   * class is available, otherwise <code>null</code>
+   */
+  public static Log getLog (final Class _class)
+  {
+    if (getLogMethodClass != null)
+    {
+      final Object [] params = { _class };
+      try
+      {
+        return (Log) getLogMethodClass.invoke (null, params);
       }
-      return null;
-   }
+      catch (final Throwable t)
+      {
+        // Shouldn't happen ...
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns a <code>org.apache.commons.logging.Log</log> object if this
+   * class is available, otherwise <code>null</code>
+   */
+  public static Log getLog (final String name)
+  {
+    if (getLogMethodString != null)
+    {
+      final Object [] params = { name };
+      try
+      {
+        return (Log) getLogMethodString.invoke (null, params);
+      }
+      catch (final Throwable t)
+      {
+        // Shouldn't happen ...
+      }
+    }
+    return null;
+  }
 }

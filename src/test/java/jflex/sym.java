@@ -7,7 +7,8 @@
 package jflex;
 
 /** CUP generated interface containing symbol constants. */
-public interface sym {
+public interface sym
+{
   /* terminals */
   public static final int WORDCLASSNOT = 33;
   public static final int DELIMITER = 9;
@@ -70,4 +71,3 @@ public interface sym {
   public static final int ASCII = 16;
   public static final int UNICODE = 18;
 }
-

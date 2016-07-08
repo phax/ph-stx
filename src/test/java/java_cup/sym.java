@@ -7,7 +7,8 @@
 package java_cup;
 
 /** CUP generated interface containing symbol constants. */
-public interface sym {
+public interface sym
+{
   /* terminals */
   public static final int WITH = 11;
   public static final int CODE_STRING = 35;
@@ -108,4 +109,3 @@ public interface sym {
   static final int NT$5 = 51;
   static final int NT$4 = 50;
 }
-

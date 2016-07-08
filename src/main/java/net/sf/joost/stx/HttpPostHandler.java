@@ -24,8 +24,6 @@
 
 package net.sf.joost.stx;
 
-import net.sf.joost.emitter.XmlEmitter;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,159 +42,164 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.emitter.XmlEmitter;
 
 /**
  * Implements an HTTP POST connection with a {@link TransformerHandler}
  * interface.
+ * 
  * @version $Revision: 2.3 $ $Date: 2008/06/15 08:11:22 $
  * @author Oliver Becker
  */
 
-public class HttpPostHandler
-   extends XmlEmitter implements TransformerHandler
+public class HttpPostHandler extends XmlEmitter implements TransformerHandler
 {
-   /** event sink for this transformer */
-   private SAXResult saxResult;
+  /** event sink for this transformer */
+  private SAXResult saxResult;
 
-   /** the character buffer */
-   private StringBuffer buffer;
+  /** the character buffer */
+  private final StringBuffer buffer;
 
-   /** the target URL for the POST request */
-   private String targetURL;
+  /** the target URL for the POST request */
+  private final String targetURL;
 
+  // Constructor
+  public HttpPostHandler (final String targetURL)
+  {
+    super (null, DEFAULT_ENCODING, null); // postpone writer initialization
+    writer = new StringWriter (); // catch up here
+    buffer = ((StringWriter) writer).getBuffer ();
+    this.targetURL = targetURL;
+  }
 
-   // Constructor
-   public HttpPostHandler(String targetURL)
-   {
-      super(null, DEFAULT_ENCODING, null); // postpone writer initialization
-      writer = new StringWriter();         // catch up here
-      buffer = ((StringWriter)writer).getBuffer();
-      this.targetURL = targetURL;
-   }
+  // ---------------------------------------------------------------------
 
+  //
+  // from interface DTDHandler (inherited in TransformerHandler)
+  // (empty methods)
+  //
 
-   // ---------------------------------------------------------------------
+  public void notationDecl (final String name, final String publicId, final String systemId)
+  {}
 
-   //
-   // from interface DTDHandler (inherited in TransformerHandler)
-   // (empty methods)
-   //
+  public void unparsedEntityDecl (final String name,
+                                  final String publicId,
+                                  final String systemId,
+                                  final String notationName)
+  {}
 
-   public void notationDecl(String name, String publicId, String systemId)
-   { }
+  // ---------------------------------------------------------------------
 
-   public void unparsedEntityDecl(String name,
-                                  String publicId, String systemId,
-                                  String notationName)
-   { }
+  // ---------------------------------------------------------------------
 
-   // ---------------------------------------------------------------------
+  //
+  // from interface ContentHandler
+  //
 
+  /**
+   * Sends the collected XML fragment to the specified target URL and passes the
+   * return stream to an {@link XMLReader} object, which is connected to the
+   * {@link Result} object of this {@link TransformerHandler}
+   */
+  @Override
+  public void endDocument () throws SAXException
+  {
+    super.endDocument ();
 
-   // ---------------------------------------------------------------------
+    if (saxResult == null) // Shouldn't happen
+      throw new SAXException ("No result set");
 
-   //
-   // from interface ContentHandler
-   //
+    HttpURLConnection conn = null;
+    try
+    {
+      // create HTTP connection
+      final URL url = new URL (targetURL);
+      // HttpURLConnection
+      conn = (HttpURLConnection) url.openConnection ();
+      conn.setRequestMethod ("POST");
+      conn.setDoInput (true);
+      conn.setDoOutput (true);
+      conn.setRequestProperty ("Content-Type", "text/xml");
+      conn.connect ();
 
-   /**
-    * Sends the collected XML fragment to the specified target URL and
-    * passes the return stream to an {@link XMLReader} object, which is
-    * connected to the {@link Result} object of this
-    * {@link TransformerHandler}
-    */
-   public void endDocument()
-      throws SAXException
-   {
-      super.endDocument();
+      final PrintStream ps = new PrintStream (conn.getOutputStream (), false, "UTF-8");
+      ps.print (buffer.toString ());
+      ps.close ();
 
-      if (saxResult == null) // Shouldn't happen
-         throw new SAXException("No result set");
-
-      HttpURLConnection conn = null;
-      try {
-         // create HTTP connection
-         URL url = new URL(targetURL);
-         //HttpURLConnection
-         conn = (HttpURLConnection)url.openConnection();
-         conn.setRequestMethod("POST");
-         conn.setDoInput(true);
-         conn.setDoOutput(true);
-         conn.setRequestProperty("Content-Type", "text/xml");
-         conn.connect();
-
-         PrintStream ps =
-            new PrintStream(conn.getOutputStream(), false, "UTF-8");
-         ps.print(buffer.toString());
-         ps.close();
-
-         XMLReader parser = Processor.createXMLReader();
-         parser.setContentHandler(saxResult.getHandler());
-         try {
-            parser.setProperty("http://xml.org/sax/properties/lexical-handler",
-                               saxResult.getLexicalHandler());
-         }
-         catch (SAXException ex) { }
-
-         parser.parse(new InputSource(conn.getInputStream()));
+      final XMLReader parser = Processor.createXMLReader ();
+      parser.setContentHandler (saxResult.getHandler ());
+      try
+      {
+        parser.setProperty ("http://xml.org/sax/properties/lexical-handler", saxResult.getLexicalHandler ());
       }
-      catch (IOException ex) {
-         System.err.println(ex);
-         InputStream is = conn.getErrorStream();
-         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-         try {
-         String line = br.readLine();
-         while (line != null) {
-            System.err.println(line);
-            line = br.readLine();
-         }
-         }
-         catch (IOException ex2) { }
+      catch (final SAXException ex)
+      {}
 
-//          try {
-//          InputStreamReader err = new InputStreamReader(conn.getInputStream());
-//          OutputStreamWriter o = new OutputStreamWriter(System.err);
-//          int c;
-//          System.err.println(">>>");
-//          while ((c = err.read()) != -1)
-//             o.write(c);
-//          err.close();
-//          o.close();
-//          System.err.println("<<<");
-//          }
-//          catch (IOException ex2) { }
-         throw new SAXException(ex.toString());
+      parser.parse (new InputSource (conn.getInputStream ()));
+    }
+    catch (final IOException ex)
+    {
+      System.err.println (ex);
+      final InputStream is = conn.getErrorStream ();
+      final BufferedReader br = new BufferedReader (new InputStreamReader (is));
+      try
+      {
+        String line = br.readLine ();
+        while (line != null)
+        {
+          System.err.println (line);
+          line = br.readLine ();
+        }
       }
-   }
+      catch (final IOException ex2)
+      {}
 
+      // try {
+      // InputStreamReader err = new InputStreamReader(conn.getInputStream());
+      // OutputStreamWriter o = new OutputStreamWriter(System.err);
+      // int c;
+      // System.err.println(">>>");
+      // while ((c = err.read()) != -1)
+      // o.write(c);
+      // err.close();
+      // o.close();
+      // System.err.println("<<<");
+      // }
+      // catch (IOException ex2) { }
+      throw new SAXException (ex.toString ());
+    }
+  }
 
-   // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
 
-   //
-   // from interface TransformerHandler
-   //
+  //
+  // from interface TransformerHandler
+  //
 
-   public void setResult(Result result)
-   {
-      if (result instanceof SAXResult)
-         saxResult = (SAXResult)result;
-      else {
-         // this will not happen in Joost
-         throw new IllegalArgumentException("result must be a SAXResult");
-      }
-   }
+  public void setResult (final Result result)
+  {
+    if (result instanceof SAXResult)
+      saxResult = (SAXResult) result;
+    else
+    {
+      // this will not happen in Joost
+      throw new IllegalArgumentException ("result must be a SAXResult");
+    }
+  }
 
-   // Never invoked by Joost
-   public void setSystemId(String id)
-   { }
+  // Never invoked by Joost
+  @Override
+  public void setSystemId (final String id)
+  {}
 
-   public String getSystemId()
-   {
-      return null;
-   }
+  @Override
+  public String getSystemId ()
+  {
+    return null;
+  }
 
-   public Transformer getTransformer()
-   {
-      return null;
-   }
+  public Transformer getTransformer ()
+  {
+    return null;
+  }
 }

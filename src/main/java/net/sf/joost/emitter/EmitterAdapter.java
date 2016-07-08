@@ -24,11 +24,6 @@
 
 package net.sf.joost.emitter;
 
-import net.sf.joost.instruction.NodeBase;
-import net.sf.joost.stx.Emitter;
-import net.sf.joost.stx.helpers.MutableAttributes;
-import net.sf.joost.stx.helpers.MutableAttributesImpl;
-
 import java.util.Hashtable;
 
 import javax.xml.XMLConstants;
@@ -39,129 +34,126 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.stx.Emitter;
+import net.sf.joost.stx.helpers.MutableAttributes;
+import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
 /**
  * Adapter that passes events from <code>ContentHandler</code> and
- * <code>LexicalHandler</code> to {@link Emitter}. Such an intermediate
- * object is needed because {@link Emitter} itself doesn't implement
- * these interfaces.
+ * <code>LexicalHandler</code> to {@link Emitter}. Such an intermediate object
+ * is needed because {@link Emitter} itself doesn't implement these interfaces.
+ * 
  * @version $Revision: 1.3 $ $Date: 2009/03/15 13:21:48 $
  * @author Oliver Becker
  */
 
 public class EmitterAdapter implements ContentHandler, LexicalHandler
 {
-   private Emitter emitter;
-   private Hashtable nsTable = new Hashtable();
+  private final Emitter emitter;
+  private final Hashtable nsTable = new Hashtable ();
 
-   private NodeBase instruction;
+  private final NodeBase instruction;
 
-   public EmitterAdapter(Emitter emitter, NodeBase instruction)
-   {
-      this.emitter = emitter;
-      this.instruction = instruction;
-   }
+  public EmitterAdapter (final Emitter emitter, final NodeBase instruction)
+  {
+    this.emitter = emitter;
+    this.instruction = instruction;
+  }
 
+  //
+  // from interface ContentHandler
+  //
 
-   //
-   // from interface ContentHandler
-   //
+  public void setDocumentLocator (final Locator locator)
+  {} // ignore
 
-   public void setDocumentLocator(Locator locator)
-   { } // ignore
+  public void startDocument ()
+  {} // ignore
 
-   public void startDocument()
-   { } // ignore
+  public void endDocument ()
+  {} // ignore
 
-   public void endDocument()
-   { } // ignore
+  public void startPrefixMapping (final String prefix, final String uri)
+  {
+    nsTable.put (prefix, uri);
+  }
 
-   public void startPrefixMapping(String prefix, String uri)
-   {
-      nsTable.put(prefix, uri);
-   }
+  public void endPrefixMapping (final String prefix)
+  {} // nothing to do
 
-   public void endPrefixMapping(String prefix)
-   { } // nothing to do
+  public void startElement (final String uri,
+                            final String lName,
+                            final String qName,
+                            final Attributes atts) throws SAXException
+  {
+    // remove namespace declarations that might appear in the attributes
+    final MutableAttributes filteredAtts = new MutableAttributesImpl (null, 0);
+    for (int i = 0; i < atts.getLength (); i++)
+    {
+      if (!XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals (atts.getURI (i)))
+        filteredAtts.addAttribute (atts.getURI (i),
+                                   atts.getLocalName (i),
+                                   atts.getQName (i),
+                                   atts.getType (i),
+                                   atts.getValue (i));
+    }
 
-   public void startElement(String uri, String lName, String qName,
-                            Attributes atts)
-      throws SAXException
-   {
-      // remove namespace declarations that might appear in the attributes
-      MutableAttributes filteredAtts =
-         new MutableAttributesImpl(null, 0);
-      for (int i=0; i< atts.getLength(); i++) {
-         if (!XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(atts.getURI(i)))
-               filteredAtts.addAttribute(atts.getURI(i), atts.getLocalName(i),
-                                         atts.getQName(i), atts.getType(i),
-                                         atts.getValue(i));
-      }
+    emitter.startElement (uri, lName, qName, filteredAtts, nsTable, instruction);
+    nsTable.clear ();
+  }
 
-      emitter.startElement(uri, lName, qName, filteredAtts, nsTable,
-                           instruction);
-      nsTable.clear();
-   }
+  public void endElement (final String uri, final String lName, final String qName) throws SAXException
+  {
+    emitter.endElement (uri, lName, qName, instruction);
+  }
 
-   public void endElement(String uri, String lName, String qName)
-      throws SAXException
-   {
-      emitter.endElement(uri, lName, qName, instruction);
-   }
+  public void characters (final char [] ch, final int start, final int length) throws SAXException
+  {
+    emitter.characters (ch, start, length, instruction);
+  }
 
-   public void characters(char[] ch, int start, int length)
-      throws SAXException
-   {
-      emitter.characters(ch, start, length, instruction);
-   }
+  public void ignorableWhitespace (final char [] ch, final int start, final int length) throws SAXException
+  {
+    emitter.characters (ch, start, length, instruction);
+  }
 
-   public void ignorableWhitespace(char[] ch, int start, int length)
-      throws SAXException
-   {
-      emitter.characters(ch, start, length, instruction);
-   }
+  public void processingInstruction (final String target, final String data) throws SAXException
+  {
+    emitter.processingInstruction (target, data, instruction);
+  }
 
-   public void processingInstruction(String target, String data)
-      throws SAXException
-   {
-      emitter.processingInstruction(target, data, instruction);
-   }
+  public void skippedEntity (final String name)
+  {} // ignore
 
-   public void skippedEntity(String name)
-   { } // ignore
+  //
+  // from interface LexicalHandler
+  //
 
+  public void startDTD (final String name, final String pubId, final String sysId)
+  {} // ignore
 
-   //
-   // from interface LexicalHandler
-   //
+  public void endDTD ()
+  {} // ignore
 
-   public void startDTD(String name, String pubId, String sysId)
-   { } // ignore
+  public void startEntity (final String name)
+  {} // ignore
 
-   public void endDTD()
-   { } // ignore
+  public void endEntity (final String name)
+  {} // ignore
 
-   public void startEntity(String name)
-   { } // ignore
+  public void startCDATA () throws SAXException
+  {
+    emitter.startCDATA (instruction);
+  }
 
-   public void endEntity(String name)
-   { } // ignore
+  public void endCDATA () throws SAXException
+  {
+    emitter.endCDATA ();
+  }
 
-   public void startCDATA()
-      throws SAXException
-   {
-      emitter.startCDATA(instruction);
-   }
-
-   public void endCDATA()
-      throws SAXException
-   {
-      emitter.endCDATA();
-   }
-
-   public void comment(char[] ch, int start, int length)
-      throws SAXException
-   {
-      emitter.comment(ch, start, length, instruction);
-   }
+  public void comment (final char [] ch, final int start, final int length) throws SAXException
+  {
+    emitter.comment (ch, start, length, instruction);
+  }
 }

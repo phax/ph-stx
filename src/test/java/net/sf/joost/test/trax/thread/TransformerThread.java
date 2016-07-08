@@ -24,103 +24,121 @@
 
 package net.sf.joost.test.trax.thread;
 
-
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 /**
- *  Transformationthread
+ * Transformationthread
+ * 
  * @author Zubow
  */
 
-public class TransformerThread extends Thread{
+public class TransformerThread extends Thread
+{
 
-    //private Templates templates;
-    private Transformer transformer;
-    private String name;
+  // private Templates templates;
+  private Transformer transformer;
+  private final String name;
 
-    private final static String xmlId = "test/flat.xml";
-    private final static String out   = "testdata/thread/";
-    private final static String stxId = "test/flat.stx";
+  private final static String xmlId = "test/flat.xml";
+  private final static String out = "testdata/thread/";
+  private final static String stxId = "test/flat.stx";
 
-    private int counter;
+  private int counter;
 
-    //sharing a Transformer object
-    //result : ok !!!
-    public TransformerThread(Transformer transformer, String name) {
-        super(name);
-        this.transformer = transformer;
-        this.name = name;
-        this.counter = 0;
+  // sharing a Transformer object
+  // result : ok !!!
+  public TransformerThread (final Transformer transformer, final String name)
+  {
+    super (name);
+    this.transformer = transformer;
+    this.name = name;
+    this.counter = 0;
+
+  }
+
+  // sharing a Templates object
+  // result : failed !!!
+  public TransformerThread (final Templates templates, final String name)
+  {
+    super (name);
+    this.name = name;
+    this.counter = 0;
+
+    try
+    {
+
+      this.transformer = templates.newTransformer ();
 
     }
-
-    //sharing a Templates object
-    //result : failed !!!
-    public TransformerThread(Templates templates, String name) {
-        super(name);
-        this.name = name;
-        this.counter = 0;
-
-        try {
-
-            this.transformer = templates.newTransformer();
-
-        }
-        catch (TransformerConfigurationException ex) {
-            ex.printStackTrace();
-        }
+    catch (final TransformerConfigurationException ex)
+    {
+      ex.printStackTrace ();
     }
+  }
 
-    //sharing a TransformerFactory object
-    public TransformerThread(TransformerFactory tfactory, String name) {
-        super(name);
-        this.name = name;
-        this.counter = 0;
+  // sharing a TransformerFactory object
+  public TransformerThread (final TransformerFactory tfactory, final String name)
+  {
+    super (name);
+    this.name = name;
+    this.counter = 0;
 
-        try {
+    try
+    {
 
-            InputStream stxIS = new BufferedInputStream(new FileInputStream(stxId));
-            StreamSource stxSource = new StreamSource(stxIS);
-            stxSource.setSystemId(stxId);
+      final InputStream stxIS = new BufferedInputStream (new FileInputStream (stxId));
+      final StreamSource stxSource = new StreamSource (stxIS);
+      stxSource.setSystemId (stxId);
 
-            //get Transformer from Factory
-            this.transformer = tfactory.newTransformer(stxSource);
+      // get Transformer from Factory
+      this.transformer = tfactory.newTransformer (stxSource);
 
-            //Templates templates = tfactory.newTemplates(stxSource);
+      // Templates templates = tfactory.newTemplates(stxSource);
 
-            //this.transformer = templates.newTransformer();
+      // this.transformer = templates.newTransformer();
 
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
-
-    //Transform some stuff
-    public void run() {
-
-        while(counter < 5) {
-
-            System.out.println("-->" + name);
-
-            String filename = out + name + (new Integer(counter)).toString() + ".xml";
-
-            try {
-
-                // Transform the source XML to System.out.
-                transformer.transform( new StreamSource(xmlId),
-                                       new StreamResult(filename));
-            }
-            catch (TransformerException ex) {
-                ex.printStackTrace();
-            }
-
-            counter++;
-        }
+    catch (final Exception ex)
+    {
+      ex.printStackTrace ();
     }
+  }
+
+  // Transform some stuff
+  @Override
+  public void run ()
+  {
+
+    while (counter < 5)
+    {
+
+      System.out.println ("-->" + name);
+
+      final String filename = out + name + (new Integer (counter)).toString () + ".xml";
+
+      try
+      {
+
+        // Transform the source XML to System.out.
+        transformer.transform (new StreamSource (xmlId), new StreamResult (filename));
+      }
+      catch (final TransformerException ex)
+      {
+        ex.printStackTrace ();
+      }
+
+      counter++;
+    }
+  }
 
 }

@@ -24,112 +24,131 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.stx.ParseContext;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.stx.ParseContext;
 
 /**
- * Factory for <code>choose</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>choose</code> elements, which are represented by the inner
+ * Instance class.
+ * 
  * @version $Revision: 2.7 $ $Date: 2008/05/17 17:01:03 $
  * @author Oliver Becker
  */
 
 final public class ChooseFactory extends FactoryBase
 {
-   /** @return <code>"choose"</code> */
-   public String getName()
-   {
-      return "choose";
-   }
+  /** @return <code>"choose"</code> */
+  @Override
+  public String getName ()
+  {
+    return "choose";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      checkAttributes(qName, attrs, null, context);
-      return new Instance(qName, parent, context);
-   }
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    checkAttributes (qName, attrs, null, context);
+    return new Instance (qName, parent, context);
+  }
 
+  /** Represents an instance of the <code>choose</code> element. */
+  final public class Instance extends NodeBase
+  {
+    private boolean otherwisePresent;
 
+    protected Instance (final String qName, final NodeBase parent, final ParseContext context)
+    {
+      super (qName, parent, context, true);
+      otherwisePresent = false;
+    }
 
-   /** Represents an instance of the <code>choose</code> element. */
-   final public class Instance extends NodeBase
-   {
-      private boolean otherwisePresent;
-
-      protected Instance(String qName, NodeBase parent, ParseContext context)
+    /**
+     * Ensures that only <code>stx:when</code> and <code>stx:otherwise</code>
+     * children will be inserted.
+     */
+    @Override
+    public void insert (final NodeBase node) throws SAXParseException
+    {
+      if (node instanceof TextNode)
       {
-         super(qName, parent, context, true);
-         otherwisePresent = false;
+        if (((TextNode) node).isWhitespaceNode ())
+          return;
+        else
+          throw new SAXParseException ("'" +
+                                       qName +
+                                       "' may only contain stx:when and stx:otherwise children " +
+                                       "(encountered text)",
+                                       node.publicId,
+                                       node.systemId,
+                                       node.lineNo,
+                                       node.colNo);
       }
 
+      if (!(node instanceof WhenFactory.Instance || node instanceof OtherwiseFactory.Instance))
+        throw new SAXParseException ("'" +
+                                     qName +
+                                     "' may only contain stx:when and stx:otherwise children " +
+                                     "(encountered '" +
+                                     node.qName +
+                                     "')",
+                                     node.publicId,
+                                     node.systemId,
+                                     node.lineNo,
+                                     node.colNo);
 
-      /**
-       * Ensures that only <code>stx:when</code> and
-       * <code>stx:otherwise</code> children will be inserted.
-       */
-      public void insert(NodeBase node)
-         throws SAXParseException
+      if (otherwisePresent)
+        throw new SAXParseException ("'" +
+                                     qName +
+                                     "' must not have more children after stx:otherwise",
+                                     node.publicId,
+                                     node.systemId,
+                                     node.lineNo,
+                                     node.colNo);
+
+      if (node instanceof OtherwiseFactory.Instance)
       {
-         if (node instanceof TextNode) {
-            if (((TextNode)node).isWhitespaceNode())
-               return;
-            else
-               throw new SAXParseException(
-                  "'" + qName +
-                  "' may only contain stx:when and stx:otherwise children " +
-                  "(encountered text)",
-                  node.publicId, node.systemId, node.lineNo, node.colNo);
-         }
-
-         if (!(node instanceof WhenFactory.Instance ||
-               node instanceof OtherwiseFactory.Instance))
-            throw new SAXParseException(
-               "'" + qName +
-               "' may only contain stx:when and stx:otherwise children " +
-               "(encountered '" + node.qName + "')",
-               node.publicId, node.systemId, node.lineNo, node.colNo);
-
-         if (otherwisePresent)
-            throw new SAXParseException(
-               "'" + qName +
-               "' must not have more children after stx:otherwise",
-               node.publicId, node.systemId, node.lineNo, node.colNo);
-
-         if (node instanceof OtherwiseFactory.Instance) {
-            if (lastChild == this) {
-               throw new SAXParseException(
-                  "'" + qName + "' must have at least one stx:when child " +
-                  "before stx:otherwise",
-                  node.publicId, node.systemId, node.lineNo, node.colNo);
-            }
-            otherwisePresent = true;
-         }
-
-         super.insert(node);
+        if (lastChild == this)
+        {
+          throw new SAXParseException ("'" +
+                                       qName +
+                                       "' must have at least one stx:when child " +
+                                       "before stx:otherwise",
+                                       node.publicId,
+                                       node.systemId,
+                                       node.lineNo,
+                                       node.colNo);
+        }
+        otherwisePresent = true;
       }
 
+      super.insert (node);
+    }
 
-      /**
-       * Check if there is at least one child.
-       */
-      public boolean compile(int pass, ParseContext context)
-         throws SAXParseException
-      {
-         if (lastChild == this)
-            throw new SAXParseException(
-               "'" + qName + "' must have at least one stx:when child",
-               publicId, systemId, lineNo, colNo);
+    /**
+     * Check if there is at least one child.
+     */
+    @Override
+    public boolean compile (final int pass, final ParseContext context) throws SAXParseException
+    {
+      if (lastChild == this)
+        throw new SAXParseException ("'" +
+                                     qName +
+                                     "' must have at least one stx:when child",
+                                     publicId,
+                                     systemId,
+                                     lineNo,
+                                     colNo);
 
-         mayDropEnd();
-         return false;
-      }
+      mayDropEnd ();
+      return false;
+    }
 
-
-      // No specific process and processEnd methods necessary.
-      // The magic of stx:choose is completely in WhenFactory.Instance.compile
-   }
+    // No specific process and processEnd methods necessary.
+    // The magic of stx:choose is completely in WhenFactory.Instance.compile
+  }
 }

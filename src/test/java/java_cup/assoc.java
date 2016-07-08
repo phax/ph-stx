@@ -5,7 +5,8 @@ package java_cup;
  * @author  Frank Flannery
  */
 
-public class assoc {
+public class assoc
+{
 
   /* various associativities, no_prec being the default value */
   public final static int left = 0;

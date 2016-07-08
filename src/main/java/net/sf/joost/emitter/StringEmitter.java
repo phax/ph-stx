@@ -19,7 +19,7 @@
  * are Copyright (C) ______ _______________________.
  * All Rights Reserved.
  *
- * Contributor(s): ______________________________________. 
+ * Contributor(s): ______________________________________.
  */
 
 package net.sf.joost.emitter;
@@ -28,169 +28,147 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-
 /**
  * This class implements an emitter that collects characters events
+ * 
  * @version $Revision: 1.9 $ $Date: 2007/11/25 14:18:02 $
  * @author Oliver Becker
  */
 
 final public class StringEmitter extends StxEmitterBase
 {
-   /** the string buffer */
-   private StringBuffer buffer;
+  /** the string buffer */
+  private StringBuffer buffer;
 
-   /** 
-    * additional info for error messages, <code>null</code> means:
-    * don't report errors 
-    */
-   private String errorInfo;
+  /**
+   * additional info for error messages, <code>null</code> means: don't report
+   * errors
+   */
+  private String errorInfo;
 
+  //
+  // Default constructor
+  //
+  public StringEmitter ()
+  {}
 
-   //
-   // Default constructor
-   //
-   public StringEmitter() {}
+  //
+  // Constructor
+  //
+  public StringEmitter (final StringBuffer buffer, final String errorInfo)
+  {
+    this.buffer = buffer;
+    this.errorInfo = errorInfo;
+  }
 
-   //
-   // Constructor
-   //
-   public StringEmitter(StringBuffer buffer, String errorInfo)
-   {
-      this.buffer = buffer;
-      this.errorInfo = errorInfo;
-   }
+  /** @return the string buffer for this emitter */
+  public StringBuffer getBuffer ()
+  {
+    return buffer;
+  }
 
+  //
+  // SAX ContentHandler interface
+  //
 
-   /** @return the string buffer for this emitter */
-   public StringBuffer getBuffer()
-   {
-      return buffer;
-   }
+  /** not used */
+  public void setDocumentLocator (final Locator locator)
+  {}
 
+  /** do nothing */
+  public void startDocument () throws SAXException
+  {}
 
-   //
-   // SAX ContentHandler interface
-   //
+  /** do nothing */
+  public void endDocument () throws SAXException
+  {}
 
-   /** not used */
-   public void setDocumentLocator(Locator locator)
-   { }
+  /** do nothing */
+  public void startPrefixMapping (final String prefix, final String uri) throws SAXException
+  {}
 
-   /** do nothing */
-   public void startDocument()
-      throws SAXException
-   { }
+  /** do nothing */
+  public void endPrefixMapping (final String prefix) throws SAXException
+  {}
 
-   /** do nothing */
-   public void endDocument()
-      throws SAXException
-   { }
+  /** not allowed */
+  public void startElement (final String namespaceURI,
+                            final String localName,
+                            final String qName,
+                            final Attributes atts) throws SAXException
+  {
+    if (errorInfo != null)
+      throw new SAXException ("Can't create element '" + qName + "' here " + errorInfo);
+  }
 
-   /** do nothing */
-   public void startPrefixMapping(String prefix, String uri)
-      throws SAXException
-   { }
+  /** not allowed */
+  public void endElement (final String namespaceURI, final String localName, final String qName) throws SAXException
+  {
+    // no exception thrown here, because there must have been be a
+    // startElement event before
+  }
 
-   /** do nothing */
-   public void endPrefixMapping(String prefix)
-      throws SAXException
-   { }
+  /** Add the characters to the internal buffer */
+  public void characters (final char [] ch, final int start, final int length) throws SAXException
+  {
+    buffer.append (ch, start, length);
+  }
 
-   /** not allowed */
-   public void startElement(String namespaceURI, String localName,
-                            String qName, Attributes atts)
-      throws SAXException
-   {
-      if (errorInfo != null)
-         throw new SAXException("Can't create element '" + qName + "' here " +
-                                errorInfo);
-   }
+  /** not used */
+  public void ignorableWhitespace (final char [] ch, final int start, final int length) throws SAXException
+  {
+    characters (ch, start, length); // just to be sure ...
+  }
 
-   /** not allowed */
-   public void endElement(String namespaceURI, String localName,
-                          String qName)
-      throws SAXException
-   {
-      // no exception thrown here, because there must have been be a
-      // startElement event before
-   }
+  /** not allowed */
+  public void processingInstruction (final String target, final String data) throws SAXException
+  {
+    if (errorInfo != null)
+      throw new SAXException ("Can't create processing instruction '" + target + "' here " + errorInfo);
+  }
 
-   /** Add the characters to the internal buffer */
-   public void characters(char[] ch, int start, int length)
-      throws SAXException
-   {
-      buffer.append(ch, start, length);
-   }
+  /** not used */
+  public void skippedEntity (final String name) throws SAXException
+  {}
 
-   /** not used */
-   public void ignorableWhitespace(char[] ch, int start, int length)
-      throws SAXException
-   {
-      characters(ch, start, length); // just to be sure ...
-   }
+  //
+  // SAX LexicalHandler interface
+  //
 
-   /** not allowed */
-   public void processingInstruction(String target, String data)
-      throws SAXException
-   {
-      if (errorInfo != null)
-         throw new SAXException("Can't create processing instruction '" + 
-                                target + "' here " + errorInfo);
-   }
+  /** not used */
+  public void startDTD (final String name, final String publicId, final String systemId) throws SAXException
+  {}
 
-   /** not used */
-   public void skippedEntity(String name)
-      throws SAXException
-   { }
+  /** not used */
+  public void endDTD () throws SAXException
+  {}
 
+  /** not used */
+  public void startEntity (final String name) throws SAXException
+  {}
 
-   //
-   // SAX LexicalHandler interface
-   //
+  /** not used */
+  public void endEntity (final String name) throws SAXException
+  {}
 
-   /** not used */
-   public void startDTD(String name, String publicId, String systemId)
-      throws SAXException
-   { }
+  /** not allowed */
+  public void startCDATA () throws SAXException
+  {
+    if (errorInfo != null)
+      throw new SAXException ("Can't create CDATA section here " + errorInfo);
+  }
 
-   /** not used */
-   public void endDTD()
-      throws SAXException
-   { }
+  /** not allowed */
+  public void endCDATA () throws SAXException
+  {
+    // no exception thrown here, because there must have been be a
+    // startElement event before
+  }
 
-   /** not used */
-   public void startEntity(String name)
-      throws SAXException
-   { }
-
-   /** not used */
-   public void endEntity(String name)
-      throws SAXException
-   { }
-
-   /** not allowed */
-   public void startCDATA()
-      throws SAXException
-   { 
-      if (errorInfo != null)
-         throw new SAXException("Can't create CDATA section here " + 
-                                errorInfo);
-   }
-
-   /** not allowed */
-   public void endCDATA()
-      throws SAXException
-   { 
-      // no exception thrown here, because there must have been be a
-      // startElement event before
-   }
-
-   /** not allowed */
-   public void comment(char[] ch, int start, int length)
-      throws SAXException
-   {
-      if (errorInfo != null)
-         throw new SAXException("Can't create comment here " + errorInfo);
-   }
+  /** not allowed */
+  public void comment (final char [] ch, final int start, final int length) throws SAXException
+  {
+    if (errorInfo != null)
+      throw new SAXException ("Can't create comment here " + errorInfo);
+  }
 }

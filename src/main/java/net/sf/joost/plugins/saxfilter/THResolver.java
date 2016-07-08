@@ -24,10 +24,6 @@
 
 package net.sf.joost.plugins.saxfilter;
 
-import net.sf.joost.Constants;
-import net.sf.joost.OptionalLog;
-import net.sf.joost.TransformerHandlerResolver;
-
 import java.util.Hashtable;
 
 import javax.xml.transform.ErrorListener;
@@ -38,107 +34,90 @@ import org.apache.commons.logging.Log;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.Constants;
+import net.sf.joost.OptionalLog;
+import net.sf.joost.TransformerHandlerResolver;
 
 /**
- * Implementation of SAX as Trax filter.
- *
- * Filter URI: http://xml.org/sax
- *
- * Example:
- *    ...
- *    <stx:process-self
- *        filter-method="http://xml.org/sax"
- *           filter-src="url('your-file.stx')"
- *    />
- *    ...
+ * Implementation of SAX as Trax filter. Filter URI: http://xml.org/sax Example:
+ * ... <stx:process-self filter-method="http://xml.org/sax" filter-src=
+ * "url('your-file.stx')" /> ...
  *
  * @version $Revision: 1.4 $ $Date: 2009/09/22 21:13:44 $
  * @author Oliver Becker, Nikolay Fiykov
  */
 
-public final class THResolver
-    implements TransformerHandlerResolver
+public final class THResolver implements TransformerHandlerResolver
 {
-   /** The URI identifying an STX transformation */
-   public static final String SAX_METHOD = "http://xml.org/sax";
+  /** The URI identifying an STX transformation */
+  public static final String SAX_METHOD = "http://xml.org/sax";
 
-   /** logging object */
-   private static Log log = OptionalLog.getLog(THResolver.class);
+  /** logging object */
+  private static Log log = OptionalLog.getLog (THResolver.class);
 
-   /**
-    * It return supported URIs, in this case @SAX_METHOD
-    */
-   public String[] resolves() {
-       final String[] uris = { SAX_METHOD };
-       return uris;
-   }
+  /**
+   * It return supported URIs, in this case @SAX_METHOD
+   */
+  public String [] resolves ()
+  {
+    final String [] uris = { SAX_METHOD };
+    return uris;
+  }
 
-   /**
-    * If given method is {@link #SAX_METHOD} return cached (or new)
-    * Trax compatible instance.
-    * otherwise return <code>null</code>.
-    */
-   public TransformerHandler resolve(
-       String method,
-       String href,
-       String base,
-       URIResolver uriResolver,
-       ErrorListener errorListener,
-       Hashtable params
-   ) throws SAXException
-   {
-      return resolve(method, href, base, null, params);
-   }
+  /**
+   * If given method is {@link #SAX_METHOD} return cached (or new) Trax
+   * compatible instance. otherwise return <code>null</code>.
+   */
+  public TransformerHandler resolve (final String method,
+                                     final String href,
+                                     final String base,
+                                     final URIResolver uriResolver,
+                                     final ErrorListener errorListener,
+                                     final Hashtable params) throws SAXException
+  {
+    return resolve (method, href, base, null, params);
+  }
 
+  /**
+   * If given method is {@link #SAX_METHOD} return cached (or new) Trax
+   * compatible instance. otherwise return <code>null</code>.
+   */
+  public TransformerHandler resolve (final String method,
+                                     final XMLReader reader,
+                                     final URIResolver uriResolver,
+                                     final ErrorListener errorListener,
+                                     final Hashtable params) throws SAXException
+  {
+    return resolve (method, null, null, reader, params);
+  }
 
-   /**
-    * If given method is {@link #SAX_METHOD} return cached (or new)
-    * Trax compatible instance.
-    * otherwise return <code>null</code>.
-    */
-   public TransformerHandler resolve(
-       String method,
-       XMLReader reader,
-       URIResolver uriResolver,
-       ErrorListener errorListener,
-       Hashtable params
-   ) throws SAXException
-   {
-      return resolve(method, null, null, reader, params);
-   }
+  /**
+   * If given method is @SAX_METHOD return cached (or new) Trax compatible
+   * instance. otherwise return null.
+   */
+  private TransformerHandler resolve (final String method,
+                                      final String href,
+                                      final String base,
+                                      final XMLReader reader,
+                                      final Hashtable params) throws SAXException
+  {
+    if (Constants.DEBUG)
+      log.debug ("sax-filter : resolve '" + method + "'");
 
+    if (!available (method))
+      throw new SAXException ("Not supported filter-method!");
 
-   /**
-    * If given method is @SAX_METHOD return cached (or new)
-    * Trax compatible instance.
-    * otherwise return null.
-    */
-   private TransformerHandler resolve(
-       String method,
-       String href,
-       String base,
-       XMLReader reader,
-       Hashtable params
-   ) throws SAXException
-   {
-       if (Constants.DEBUG)
-           log.debug("sax-filter : resolve '"+method+"'");
+    if ((reader != null) || (href != null))
+      throw new SAXException ("Attribute 'filter-src' not allowed for method '" + method + "'");
 
-       if ( ! available(method) )
-           throw new SAXException("Not supported filter-method!");
+    return new SAXWrapperHandler ();
+  }
 
-       if ( (reader != null) || (href != null) )
-           throw new SAXException("Attribute 'filter-src' not allowed for method '" + method + "'");
-
-       return new SAXWrapperHandler();
-   }
-
-   /**
-    * Return true if given method is equal to @SAX_METHOD,
-    * otherwise false
-    */
-   public boolean available(String method)
-   {
-       return SAX_METHOD.equals(method);
-   }
+  /**
+   * Return true if given method is equal to @SAX_METHOD, otherwise false
+   */
+  public boolean available (final String method)
+  {
+    return SAX_METHOD.equals (method);
+  }
 }

@@ -19,20 +19,28 @@ import java.util.Hashtable;
 
 /**
  * created on Mar 9, 2005
+ * 
  * @author fiykov
  * @version $Revision: 1.1 $
- * @since 
+ * @since
  */
-public class BooleanAttribute extends Attribute {
+public class BooleanAttribute extends Attribute
+{
 
-    public BooleanAttribute(String name, String defVal, Hashtable col) {
-        super(name, new String[] {"true","false"}, defVal, col);
-    }
+  public BooleanAttribute (final String name, final String defVal, final Hashtable col)
+  {
+    super (name, new String [] { "true", "false" }, defVal, col);
+  }
 
-    public Object newValue(String value) { 
-        return new Boolean(value.toLowerCase()); 
-    }
-    
-    public boolean booleanValue() { return ((Boolean)value).booleanValue(); }
+  @Override
+  public Object newValue (final String value)
+  {
+    return new Boolean (value.toLowerCase ());
+  }
+
+  public boolean booleanValue ()
+  {
+    return ((Boolean) value).booleanValue ();
+  }
 
 }

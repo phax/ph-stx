@@ -24,104 +24,100 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.Emitter;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.emitter.StringEmitter;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.Emitter;
+import net.sf.joost.stx.ParseContext;
 
 /**
- * Factory for <code>cdata</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>cdata</code> elements, which are represented by the inner
+ * Instance class.
+ * 
  * @version $Revision: 2.5 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class CdataFactory extends FactoryBase
 {
-   /** @return <code>"cdata"</code> */
-   public String getName()
-   {
-      return "cdata";
-   }
+  /** @return <code>"cdata"</code> */
+  @Override
+  public String getName ()
+  {
+    return "cdata";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      checkAttributes(qName, attrs, null, context);
-      return new Instance(qName, parent, context);
-   }
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    checkAttributes (qName, attrs, null, context);
+    return new Instance (qName, parent, context);
+  }
 
+  /** The inner Instance class */
+  public class Instance extends NodeBase
+  {
+    private StringEmitter strEmitter;
+    private StringBuffer buffer;
 
-   /** The inner Instance class */
-   public class Instance extends NodeBase
-   {
-      private StringEmitter strEmitter;
-      private StringBuffer buffer;
+    public Instance (final String qName, final NodeBase parent, final ParseContext context)
+    {
+      super (qName, parent, context, true);
+      init ();
+    }
 
-      public Instance(String qName, NodeBase parent, ParseContext context)
+    private void init ()
+    {
+      buffer = new StringBuffer ();
+      strEmitter = new StringEmitter (buffer, "('" + qName + "' started in line " + lineNo + ")");
+    }
+
+    /**
+     * Starts a CDATA section.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      if (context.emitter.isEmitterActive (strEmitter))
       {
-         super(qName, parent, context, true);
-         init();
+        context.errorHandler.error ("Can't create nested CDATA section here", publicId, systemId, lineNo, colNo);
+        return PR_CONTINUE; // if the errorHandler returns
       }
+      super.process (context);
+      buffer.setLength (0);
+      context.pushEmitter (strEmitter);
+      return PR_CONTINUE;
+    }
 
+    /**
+     * Ends a CDATA section
+     */
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      context.popEmitter ();
+      final Emitter emitter = context.emitter;
+      emitter.startCDATA (this);
+      emitter.characters (buffer.toString ().toCharArray (), 0, buffer.length (), this);
+      emitter.endCDATA ();
+      return super.processEnd (context);
+    }
 
-      private void init()
-      {
-         buffer = new StringBuffer();
-         strEmitter = new StringEmitter(buffer,
-                         "('" + qName + "' started in line " + lineNo + ")");
-      }
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      theCopy.init ();
+    }
 
-
-      /**
-       * Starts a CDATA section.
-       */
-      public short process(Context context)
-         throws SAXException
-      {
-         if (context.emitter.isEmitterActive(strEmitter)) {
-            context.errorHandler.error(
-               "Can't create nested CDATA section here",
-               publicId, systemId, lineNo, colNo);
-            return PR_CONTINUE; // if the errorHandler returns
-         }
-         super.process(context);
-         buffer.setLength(0);
-         context.pushEmitter(strEmitter);
-         return PR_CONTINUE;
-      }
-
-
-      /**
-       * Ends a CDATA section
-       */
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         context.popEmitter();
-         Emitter emitter = context.emitter;
-         emitter.startCDATA(this);
-         emitter.characters(buffer.toString().toCharArray(),
-                            0, buffer.length(), this);
-         emitter.endCDATA();
-         return super.processEnd(context);
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         theCopy.init();
-      }
-
-   }
+  }
 }

@@ -23,33 +23,33 @@
  */
 package net.sf.joost.emitter;
 
-
 /**
- * Abstract base StxEmitter implementation class that provides 
+ * Abstract base StxEmitter implementation class that provides
  * {@link #setSystemId(String)} and {@link #getSystemId()}.
- * 
+ *
  * @version $Revision: 1.1 $ $Date: 2005/03/13 17:12:49 $
  * @author Oliver Becker
  */
 public abstract class StxEmitterBase implements StxEmitter
 {
-   /** The system identifier of this STX emitter (optional) */
-   private String systemId;
+  /** The system identifier of this STX emitter (optional) */
+  private String systemId;
 
+  /*
+   * (non-Javadoc)
+   * @see net.sf.joost.emitter.StxEmitter#setSystemId(java.lang.String)
+   */
+  public void setSystemId (final String systemId)
+  {
+    this.systemId = systemId;
+  }
 
-   /* (non-Javadoc)
-    * @see net.sf.joost.emitter.StxEmitter#setSystemId(java.lang.String)
-    */
-   public void setSystemId(String systemId)
-   {
-      this.systemId = systemId;
-   }
-
-   /* (non-Javadoc)
-    * @see net.sf.joost.emitter.StxEmitter#getSystemId()
-    */
-   public String getSystemId()
-   {
-      return systemId;
-   }
+  /*
+   * (non-Javadoc)
+   * @see net.sf.joost.emitter.StxEmitter#getSystemId()
+   */
+  public String getSystemId ()
+  {
+    return systemId;
+  }
 }

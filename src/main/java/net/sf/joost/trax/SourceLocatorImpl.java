@@ -22,106 +22,120 @@
  * Contributor(s): ______________________________________.
  */
 
-
 package net.sf.joost.trax;
+
+import javax.xml.transform.SourceLocator;
 
 //jaxp
 import org.xml.sax.Locator;
 
-import javax.xml.transform.SourceLocator;
-
-
 /**
  * Implementation of the {@link javax.xml.transform.SourceLocator}
+ * 
  * @version $Revision: 1.5 $ $Date: 2005/01/23 19:47:30 $
  * @author Anatolij Zubow
  */
-public class SourceLocatorImpl implements SourceLocator {
+public class SourceLocatorImpl implements SourceLocator
+{
 
-    /**
-     * Unique public key
-     */
-    private String publicId;
+  /**
+   * Unique public key
+   */
+  private String publicId;
 
-    /**
-     * Unique system key
-     */
-    private String systemId;
+  /**
+   * Unique system key
+   */
+  private String systemId;
 
-    /**
-     * Indicates the line number in the document
-     */
-    private int lineNo = -1;
+  /**
+   * Indicates the line number in the document
+   */
+  private int lineNo = -1;
 
-    /**
-     * Indicates the column number in the document
-     */
-    private int columnNo = -1;
+  /**
+   * Indicates the column number in the document
+   */
+  private int columnNo = -1;
 
+  /**
+   * Constructor
+   * 
+   * @param locator
+   *        {@link org.xml.sax.Locator}
+   */
+  public SourceLocatorImpl (final Locator locator)
+  {
 
-    /**
-     * Constructor
-     * @param locator {@link org.xml.sax.Locator}
-     */
-    public SourceLocatorImpl(Locator locator) {
-
-        if ( locator != null ) {
-            this.publicId   = locator.getPublicId();
-            this.systemId   = locator.getSystemId();
-            this.lineNo     = locator.getLineNumber();
-            this.columnNo   = locator.getColumnNumber();
-        }
+    if (locator != null)
+    {
+      this.publicId = locator.getPublicId ();
+      this.systemId = locator.getSystemId ();
+      this.lineNo = locator.getLineNumber ();
+      this.columnNo = locator.getColumnNumber ();
     }
+  }
 
+  /**
+   * Constructor
+   * 
+   * @param publicId
+   *        Unique public key
+   * @param systemId
+   *        Unique system key for path resolution
+   * @param lineNo
+   *        Line number
+   * @param colNo
+   *        Column number
+   */
+  public SourceLocatorImpl (final String publicId, final String systemId, final int lineNo, final int colNo)
+  {
 
-    /**
-     * Constructor
-     * @param publicId Unique public key
-     * @param systemId  Unique system key for path resolution
-     * @param lineNo    Line number
-     * @param colNo     Column number
-     */
-    public SourceLocatorImpl(String publicId, String systemId, int lineNo,
-        int colNo) {
+    this.publicId = publicId;
+    this.systemId = systemId;
+    this.lineNo = lineNo;
+    this.columnNo = colNo;
+  }
 
-        this.publicId   = publicId;
-        this.systemId   = systemId;
-        this.lineNo     = lineNo;
-        this.columnNo   = colNo;
-    }
+  /**
+   * Getting the attribute {@link #publicId}
+   * 
+   * @return A string containing the public identifier, or null if none is
+   *         available
+   */
+  public String getPublicId ()
+  {
+    return this.publicId;
+  }
 
+  /**
+   * Getting the attribute {@link #systemId}
+   * 
+   * @return A string containing the system identifier, or null if none is
+   *         available
+   */
+  public String getSystemId ()
+  {
+    return this.systemId;
+  }
 
-    /**
-     * Getting the attribute {@link #publicId}
-     * @return A string containing the public identifier, or null if none is
-     * available
-     */
-    public String getPublicId() {
-        return this.publicId;
-    }
+  /**
+   * Getting the attribute {@link #lineNo}
+   * 
+   * @return The line number, or -1 if none is available
+   */
+  public int getLineNumber ()
+  {
+    return this.lineNo;
+  }
 
-    /**
-     * Getting the attribute {@link #systemId}
-     * @return A string containing the system identifier, or null if none is
-     * available
-     */
-    public String getSystemId() {
-        return this.systemId;
-    }
-
-    /**
-     * Getting the attribute {@link #lineNo}
-     * @return The line number, or -1 if none is available
-     */
-    public int getLineNumber() {
-        return this.lineNo;
-    }
-
-    /**
-     * Getting the attribute {@link #columnNo}
-     * @return The column number, or -1 if none is available
-     */
-    public int getColumnNumber() {
-        return this.columnNo;
-    }
+  /**
+   * Getting the attribute {@link #columnNo}
+   * 
+   * @return The column number, or -1 if none is available
+   */
+  public int getColumnNumber ()
+  {
+    return this.columnNo;
+  }
 }

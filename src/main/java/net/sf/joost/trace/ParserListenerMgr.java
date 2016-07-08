@@ -32,75 +32,92 @@ import net.sf.joost.stx.ParserListener;
 import net.sf.joost.trax.TransformerImpl;
 
 /**
- * This class implements the {@link ParserListener}-Interface for
- * static debug purpose (e.g. validation of breakpoints).
+ * This class implements the {@link ParserListener}-Interface for static debug
+ * purpose (e.g. validation of breakpoints).
  *
  * @author Zubow
  */
-public class ParserListenerMgr implements ParserListener {
+public class ParserListenerMgr implements ParserListener
+{
 
-    /** list of all registered {@link ParserListener} */
-    private List parserListeners = null;
+  /** list of all registered {@link ParserListener} */
+  private List parserListeners = null;
 
-    /** default constructor */
-    public ParserListenerMgr() {}
+  /** default constructor */
+  public ParserListenerMgr ()
+  {}
 
-    /**
-     * Check if parserlisteners are available.
-     *
-     * @return True if there are registered parserlisteners
-     */
-    public boolean hasParseListeners() {
-        return (parserListeners != null);
+  /**
+   * Check if parserlisteners are available.
+   *
+   * @return True if there are registered parserlisteners
+   */
+  public boolean hasParseListeners ()
+  {
+    return (parserListeners != null);
+  }
+
+  /**
+   * Add a parserlistener (debugging and profiling).
+   * 
+   * @param newParserListener
+   *        A parserlistener to be added.
+   */
+  public void addParseListener (final ParserListener newParserListener)
+  {
+    // set Joost-Transformer in debug-mode
+    // todo think about this ???
+    TransformerImpl.DEBUG_MODE = true;
+    if (parserListeners == null)
+    {
+      parserListeners = new ArrayList ();
     }
+    // add new parserlistener
+    parserListeners.add (newParserListener);
+  }
 
-    /**
-     * Add a parserlistener (debugging and profiling).
-     * @param newParserListener A parserlistener to be added.
-     */
-    public void addParseListener(ParserListener newParserListener) {
-        // set Joost-Transformer in debug-mode
-        // todo think about this ???
-        TransformerImpl.DEBUG_MODE = true;
-        if (parserListeners == null) {
-            parserListeners = new ArrayList();
-        }
-        // add new parserlistener
-        parserListeners.add(newParserListener);
+  /**
+   * Remove a parserlistener.
+   * 
+   * @param oldParserListener
+   *        A parserlistener to be removed.
+   */
+  public void removeParseListener (final ParserListener oldParserListener)
+  {
+    if (parserListeners != null)
+    {
+      // remove the given parserlistener
+      parserListeners.remove (oldParserListener);
     }
+  }
 
-    /**
-     * Remove a parserlistener.
-     * @param oldParserListener A parserlistener to be removed.
-     */
-    public void removeParseListener(ParserListener oldParserListener) {
-        if (parserListeners != null) {
-            // remove the given parserlistener
-            parserListeners.remove(oldParserListener);
-        }
+  // ----------------------------------------------------------------------
+  // Callback methods
+  // ----------------------------------------------------------------------
+
+  /** see {@link ParserListener#nodeCreated} */
+  public void nodeCreated (final NodeBase node)
+  {
+    if (hasParseListeners ())
+    {
+      for (int i = 0; i < parserListeners.size (); i++)
+      {
+        final ParserListener pl = (ParserListener) parserListeners.get (i);
+        pl.nodeCreated (node);
+      }
     }
+  }
 
-    // ----------------------------------------------------------------------
-    // Callback methods
-    // ----------------------------------------------------------------------
-
-    /** see {@link ParserListener#nodeCreated} */
-    public void nodeCreated(NodeBase node) {
-        if (hasParseListeners()) {
-            for (int i = 0; i < parserListeners.size(); i++) {
-                ParserListener pl = (ParserListener) parserListeners.get(i);
-                pl.nodeCreated(node);
-            }
-        }
+  /** see {@link ParserListener#parseFinished} */
+  public void parseFinished ()
+  {
+    if (hasParseListeners ())
+    {
+      for (int i = 0; i < parserListeners.size (); i++)
+      {
+        final ParserListener pl = (ParserListener) parserListeners.get (i);
+        pl.parseFinished ();
+      }
     }
-
-    /** see {@link ParserListener#parseFinished} */
-    public void parseFinished() {
-        if (hasParseListeners()) {
-            for (int i = 0; i < parserListeners.size(); i++) {
-                ParserListener pl = (ParserListener) parserListeners.get(i);
-                pl.parseFinished();
-            }
-        }
-    }
+  }
 }

@@ -7,7 +7,8 @@
 package net.sf.joost.grammar;
 
 /** CUP generated interface containing symbol constants. */
-public interface Sym {
+public interface Sym
+{
   /* terminals */
   public static final int PI_START = 16;
   public static final int GE = 28;
@@ -47,4 +48,3 @@ public interface Sym {
   public static final int NODE = 13;
   public static final int CDATA = 15;
 }
-

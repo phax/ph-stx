@@ -24,12 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.Value;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -39,147 +33,152 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.emitter.StringEmitter;
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Value;
 
 /**
- * Factory for <code>variable</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>variable</code> elements, which are represented by the
+ * inner Instance class.
+ * 
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class VariableFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public VariableFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("select");
-      attrNames.add("keep-value");
-   }
+  // Constructor
+  public VariableFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("select");
+    attrNames.add ("keep-value");
+  }
 
-   /** @return <code>"variable"</code> */
-   public String getName()
-   {
-      return "variable";
-   }
+  /** @return <code>"variable"</code> */
+  @Override
+  public String getName ()
+  {
+    return "variable";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      String nameAtt = getRequiredAttribute(qName, attrs, "name", context);
-      String varName = getExpandedName(nameAtt, context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
+    final String varName = getExpandedName (nameAtt, context);
 
-      Tree selectExpr = parseExpr(attrs.getValue("select"), context);
+    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
-      int keepValueIndex = getEnumAttValue("keep-value", attrs, YESNO_VALUES,
-                                           context);
-      if (keepValueIndex != -1 && !(parent instanceof GroupBase))
-         throw new SAXParseException(
-            "Attribute 'keep-value' is not allowed for local variables",
-            context.locator);
+    final int keepValueIndex = getEnumAttValue ("keep-value", attrs, YESNO_VALUES, context);
+    if (keepValueIndex != -1 && !(parent instanceof GroupBase))
+      throw new SAXParseException ("Attribute 'keep-value' is not allowed for local variables", context.locator);
 
-      // default is "no" (false)
-      boolean keepValue = (keepValueIndex == YES_VALUE);
+    // default is "no" (false)
+    final boolean keepValue = (keepValueIndex == YES_VALUE);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, context, nameAtt, varName, selectExpr,
-                          keepValue, parent);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, context, nameAtt, varName, selectExpr, keepValue, parent);
+  }
 
+  /** Represents an instance of the <code>variable</code> element. */
+  public class Instance extends VariableBase
+  {
+    private final String varName;
+    private Tree select;
+    private final String errorMessage;
+    private final boolean isGroupVar;
 
-   /** Represents an instance of the <code>variable</code> element. */
-   public class Instance extends VariableBase
-   {
-      private String varName;
-      private Tree select;
-      private String errorMessage;
-      private final boolean isGroupVar;
+    protected Instance (final String qName,
+                        final ParseContext context,
+                        final String varName,
+                        final String expName,
+                        final Tree select,
+                        final boolean keepValue,
+                        final NodeBase parent)
+    {
+      super (qName,
+             parent,
+             context,
+             expName,
+             keepValue,
+             // this element must be empty if there is a select attribute
+             select == null);
+      this.varName = varName;
+      this.select = select;
+      this.keepValue = keepValue;
+      this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
+      this.isGroupVar = parent instanceof GroupBase;
+    }
 
-
-      protected Instance(String qName, ParseContext context, String varName,
-                         String expName, Tree select, boolean keepValue,
-                         NodeBase parent)
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      // does this variable have a select attribute?
+      if (select != null)
       {
-         super(qName, parent, context, expName, keepValue,
-               // this element must be empty if there is a select attribute
-               select == null);
-         this.varName = varName;
-         this.select = select;
-         this.keepValue = keepValue;
-         this.errorMessage =
-            "('" + qName + "' started in line " + lineNo + ")";
-         this.isGroupVar = parent instanceof GroupBase;
+        // select attribute present
+        final Value v = select.evaluate (context, this);
+        processVar (v, context);
+      }
+      else
+      {
+        // endInstruction present
+        super.process (context);
+        // create a new StringEmitter for this instance and put it
+        // on the emitter stack
+        context.pushEmitter (new StringEmitter (new StringBuffer (), errorMessage));
+      }
+      return PR_CONTINUE;
+    }
+
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      final Value v = new Value (((StringEmitter) context.popEmitter ()).getBuffer ().toString ());
+
+      processVar (v, context);
+
+      return super.processEnd (context);
+    }
+
+    /** Declares a variable */
+    private void processVar (final Value v, final Context context) throws SAXException
+    {
+      // determine scope
+      Hashtable varTable;
+      if (isGroupVar)
+        varTable = (Hashtable) ((Stack) context.groupVars.get (parent)).peek ();
+      else
+      {
+        varTable = context.localVars;
+        parent.declareVariable (expName);
       }
 
-
-      public short process(Context context)
-         throws SAXException
+      if (varTable.get (expName) != null)
       {
-         // does this variable have a select attribute?
-         if (select != null) {
-            // select attribute present
-            Value v = select.evaluate(context, this);
-            processVar(v, context);
-         }
-         else {
-            // endInstruction present
-            super.process(context);
-            // create a new StringEmitter for this instance and put it
-            // on the emitter stack
-            context.pushEmitter(
-               new StringEmitter(new StringBuffer(), errorMessage));
-         }
-         return PR_CONTINUE;
+        context.errorHandler.error ("Variable '" + varName + "' already declared", publicId, systemId, lineNo, colNo);
+        return; // if the errorHandler returns
       }
+      varTable.put (expName, v);
+    }
 
-
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         Value v = new Value(((StringEmitter)context.popEmitter())
-                                                    .getBuffer().toString());
-
-         processVar(v, context);
-
-         return super.processEnd(context);
-      }
-
-
-      /** Declares a variable */
-      private void processVar(Value v, Context context)
-         throws SAXException
-      {
-         // determine scope
-         Hashtable varTable;
-         if (isGroupVar)
-            varTable = (Hashtable)((Stack)context.groupVars.get(parent))
-                                          .peek();
-         else {
-            varTable = context.localVars;
-            parent.declareVariable(expName);
-         }
-
-         if (varTable.get(expName) != null) {
-            context.errorHandler.error(
-               "Variable '" + varName + "' already declared",
-               publicId, systemId, lineNo, colNo);
-            return; // if the errorHandler returns
-         }
-         varTable.put(expName, v);
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (select != null)
-            theCopy.select = select.deepCopy(copies);
-      }
-   }
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (select != null)
+        theCopy.select = select.deepCopy (copies);
+    }
+  }
 }

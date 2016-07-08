@@ -24,10 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -35,92 +31,100 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
- * Factory for <code>doctype</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>doctype</code> elements, which are represented by the inner
+ * Instance class.
+ * 
  * @version $Revision: 1.4 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 public class DoctypeFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   public DoctypeFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("public-id");
-      attrNames.add("system-id");
-   }
+  public DoctypeFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("public-id");
+    attrNames.add ("system-id");
+  }
 
-   /** @return <code>"doctype"</code> */
-   public String getName()
-   {
-      return "doctype";
-   }
+  /** @return <code>"doctype"</code> */
+  @Override
+  public String getName ()
+  {
+    return "doctype";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      Tree nameAVT = parseRequiredAVT(qName, attrs, "name", context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final Tree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
-      Tree publicAVT = parseAVT(attrs.getValue("public-id"), context);
-      Tree systemAVT = parseAVT(attrs.getValue("system-id"), context);
+    final Tree publicAVT = parseAVT (attrs.getValue ("public-id"), context);
+    final Tree systemAVT = parseAVT (attrs.getValue ("system-id"), context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context,
-                          nameAVT, publicAVT, systemAVT);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, nameAVT, publicAVT, systemAVT);
+  }
 
+  /** Represents an instance of the <code>doctype</code> element. */
+  public class Instance extends NodeBase
+  {
+    private Tree nameAVT, publicAVT, systemAVT;
 
-   /** Represents an instance of the <code>doctype</code> element. */
-   public class Instance extends NodeBase
-   {
-      private Tree nameAVT, publicAVT, systemAVT;
+    public Instance (final String qName,
+                     final NodeBase parent,
+                     final ParseContext context,
+                     final Tree nameAVT,
+                     final Tree publicAVT,
+                     final Tree systemAVT)
+    {
+      super (qName,
+             parent,
+             context,
+             // current restriction: this element must be empty
+             false);
+      this.nameAVT = nameAVT;
+      this.publicAVT = publicAVT;
+      this.systemAVT = systemAVT;
+    }
 
-      public Instance(String qName, NodeBase parent, ParseContext context,
-                      Tree nameAVT, Tree publicAVT, Tree systemAVT)
-      {
-         super(qName, parent, context,
-               // current restriction: this element must be empty
-               false);
-         this.nameAVT = nameAVT;
-         this.publicAVT = publicAVT;
-         this.systemAVT = systemAVT;
-      }
+    /**
+     * Create a document type definition.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      context.emitter.createDTD (this,
+                                 nameAVT.evaluate (context, this).getStringValue (),
+                                 publicAVT != null ? publicAVT.evaluate (context, this).getStringValue () : null,
+                                 systemAVT != null ? systemAVT.evaluate (context, this).getStringValue () : null);
+      return PR_CONTINUE;
+    }
 
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (nameAVT != null)
+        theCopy.nameAVT = nameAVT.deepCopy (copies);
+      if (publicAVT != null)
+        theCopy.publicAVT = publicAVT.deepCopy (copies);
+      if (systemAVT != null)
+        theCopy.systemAVT = systemAVT.deepCopy (copies);
+    }
 
-      /**
-       * Create a document type definition.
-       */
-      public short process(Context context)
-         throws SAXException
-      {
-         context.emitter.createDTD(this,
-               nameAVT.evaluate(context, this).getStringValue(),
-               publicAVT != null
-                  ? publicAVT.evaluate(context, this).getStringValue() : null,
-               systemAVT != null
-                  ? systemAVT.evaluate(context, this).getStringValue() : null);
-         return PR_CONTINUE;
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (nameAVT != null)
-            theCopy.nameAVT = nameAVT.deepCopy(copies);
-         if (publicAVT != null)
-            theCopy.publicAVT = publicAVT.deepCopy(copies);
-         if (systemAVT != null)
-            theCopy.systemAVT = systemAVT.deepCopy(copies);
-      }
-
-   }
+  }
 }

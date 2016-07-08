@@ -28,122 +28,123 @@ import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.stx.SAXEvent;
 
 /**
- * The STX processor calls this interface when it matches a source node,
- * selects a set of source nodes, or generates a result node.
- * To react on trace events you have to register your own object on the
+ * The STX processor calls this interface when it matches a source node, selects
+ * a set of source nodes, or generates a result node. To react on trace events
+ * you have to register your own object on the
  * {@link net.sf.joost.trax.TransformerImpl} with the help of the
  * {@link net.sf.joost.trace.TraceManager}
  * {@link net.sf.joost.trax.TransformerImpl#getTraceManager()}.
+ * 
  * @version $Revision: 1.5 $ $Date: 2004/09/19 13:36:42 $
  * @author Zubow
  */
-public interface TraceListener {
+public interface TraceListener
+{
 
-    //----------------------------------------------
-    // Source events
-    //----------------------------------------------
+  // ----------------------------------------------
+  // Source events
+  // ----------------------------------------------
 
-    /**
-     * Called at the start of processing.
-     */
-    void startSourceDocument();
+  /**
+   * Called at the start of processing.
+   */
+  void startSourceDocument ();
 
-    /**
-     * Called at end of processing.
-     */
-    void endSourceDocument();
+  /**
+   * Called at end of processing.
+   */
+  void endSourceDocument ();
 
-    /**
-     * Called when a start element event of the source was received.
-     */
-    void startSourceElement(SAXEvent saxevent);
+  /**
+   * Called when a start element event of the source was received.
+   */
+  void startSourceElement (SAXEvent saxevent);
 
-    /**
-     * Called when a end element event of the source was received.
-     */
-    void endSourceElement(SAXEvent saxevent);
+  /**
+   * Called when a end element event of the source was received.
+   */
+  void endSourceElement (SAXEvent saxevent);
 
-    /**
-     * Called when a text event of the source was received.
-     */
-    void sourceText(SAXEvent saxevent);
+  /**
+   * Called when a text event of the source was received.
+   */
+  void sourceText (SAXEvent saxevent);
 
-    /**
-     * Called when a PI event of the source was received.
-     */
-    void sourcePI(SAXEvent saxevent);
+  /**
+   * Called when a PI event of the source was received.
+   */
+  void sourcePI (SAXEvent saxevent);
 
-    /**
-     * Called when a ns mapping of the source was received.
-     */
-    void sourceMapping(SAXEvent saxevent);
+  /**
+   * Called when a ns mapping of the source was received.
+   */
+  void sourceMapping (SAXEvent saxevent);
 
-    /**
-     * Called when a comment of the source was received.
-     */
-    void sourceComment(SAXEvent saxevent);
+  /**
+   * Called when a comment of the source was received.
+   */
+  void sourceComment (SAXEvent saxevent);
 
-    //----------------------------------------------
-    // Transformation sheet events
-    //----------------------------------------------
+  // ----------------------------------------------
+  // Transformation sheet events
+  // ----------------------------------------------
 
-    /**
-     * Called when an element of the stylesheet gets processed.
-     */
-    void enterInstructionNode(AbstractInstruction inst, SAXEvent event);
+  /**
+   * Called when an element of the stylesheet gets processed.
+   */
+  void enterInstructionNode (AbstractInstruction inst, SAXEvent event);
 
-    /**
-     * Called after an element of the stylesheet got processed.
-     */
-    void leaveInstructionNode(AbstractInstruction inst, SAXEvent event);
+  /**
+   * Called after an element of the stylesheet got processed.
+   */
+  void leaveInstructionNode (AbstractInstruction inst, SAXEvent event);
 
+  // ----------------------------------------------
+  // Emitter events
+  // ----------------------------------------------
 
-    //----------------------------------------------
-    // Emitter events
-    //----------------------------------------------
+  /**
+   * Called for emitter start document event.
+   */
+  void startResultDocument ();
 
-    /**
-     * Called for emitter start document event.
-     */
-    void startResultDocument();
+  /**
+   * Called for emitter end document event.
+   */
+  void endResultDocument ();
 
-    /**
-     * Called for emitter end document event.
-     */
-    void endResultDocument();
+  /**
+   * Called for emitter start element event.
+   */
+  void startResultElement (SAXEvent saxevent);
 
-    /**
-     * Called for emitter start element event.
-     */
-    void startResultElement(SAXEvent saxevent);
+  /**
+   * Called for emitter end element event.
+   */
+  void endResultElement (SAXEvent saxevent);
 
-    /**
-     * Called for emitter end element event.
-     */
-    void endResultElement(SAXEvent saxevent);
+  /**
+   * Called for emitter text event.
+   */
+  void resultText (SAXEvent saxevent);
 
-    /**
-     * Called for emitter text event.
-     */
-    void resultText(SAXEvent saxevent);
+  /**
+   * Called for emitter PI event.
+   */
+  void resultPI (SAXEvent saxevent);
 
-    /**
-     * Called for emitter PI event.
-     */
-    void resultPI(SAXEvent saxevent);
+  /**
+   * Called for emitter comment event.
+   */
+  void resultComment (SAXEvent saxevent);
 
-    /**
-     * Called for emitter comment event.
-     */
-    void resultComment(SAXEvent saxevent);
+  /**
+   * Called for emitter start CDATA event.
+   */
+  void startResultCDATA ();
 
-    /**
-     * Called for emitter start CDATA event.
-     */
-    void startResultCDATA();
-
-    /**
-     * Called for emitter end CDATA event.
-     */
-    void endResultCDATA();
+  /**
+   * Called for emitter end CDATA event.
+   */
+  void endResultCDATA ();
 }

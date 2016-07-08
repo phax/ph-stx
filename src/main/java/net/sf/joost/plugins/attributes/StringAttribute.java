@@ -19,20 +19,28 @@ import java.util.Hashtable;
 
 /**
  * created on Mar 9, 2005
+ * 
  * @author fiykov
  * @version $Revision: 1.1 $
- * @since 
+ * @since
  */
-public class StringAttribute extends Attribute {
+public class StringAttribute extends Attribute
+{
 
-    public StringAttribute(String name, String[] validValues, String defVal, Hashtable col) {
-        super(name, validValues, defVal, col);
-    }
+  public StringAttribute (final String name, final String [] validValues, final String defVal, final Hashtable col)
+  {
+    super (name, validValues, defVal, col);
+  }
 
-    public StringAttribute(String name, String defVal, Hashtable col) {
-        this(name, new String[] {}, defVal, col);
-    }
-    
-    public Object newValue(String value) { return value; }
+  public StringAttribute (final String name, final String defVal, final Hashtable col)
+  {
+    this (name, new String [] {}, defVal, col);
+  }
+
+  @Override
+  public Object newValue (final String value)
+  {
+    return value;
+  }
 
 }

@@ -22,115 +22,134 @@
  * Contributor(s): Oliver Becker.
  */
 
-
 package net.sf.joost.trax;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
-import net.sf.joost.OptionalLog;
-
 import org.apache.commons.logging.Log;
 
+import net.sf.joost.OptionalLog;
+
 /**
- * This class acts as a default ErrorListener for the
- * {@link TransformerImpl TransformerImpl}.
+ * This class acts as a default ErrorListener for the {@link TransformerImpl
+ * TransformerImpl}.
  */
-public class TransformationErrListener implements ErrorListener {
+public class TransformationErrListener implements ErrorListener
+{
 
-    // Define a static logger variable so that it references the
-    // Logger instance named "TransformationErrListener".
-    private static Log log =
-        OptionalLog.getLog(TransformationErrListener.class);
+  // Define a static logger variable so that it references the
+  // Logger instance named "TransformationErrListener".
+  private static Log log = OptionalLog.getLog (TransformationErrListener.class);
 
-    private ErrorListener userErrorListener;
+  private ErrorListener userErrorListener;
 
-    /**
-     * Default constructor.
-     */
-    public TransformationErrListener() {}
+  /**
+   * Default constructor.
+   */
+  public TransformationErrListener ()
+  {}
 
-    public ErrorListener getUserErrorListener() {
-        return userErrorListener;
+  public ErrorListener getUserErrorListener ()
+  {
+    return userErrorListener;
+  }
+
+  public void setUserErrorListener (final ErrorListener userErrorListener)
+  {
+    this.userErrorListener = userErrorListener;
+  }
+
+  /**
+   * Receive notification of a warning. Details {@link ErrorListener#warning}
+   */
+  public void warning (final TransformerException tE) throws TransformerException
+  {
+    if (userErrorListener != null)
+    {
+      try
+      {
+        userErrorListener.warning (tE);
+      }
+      catch (final TransformerException e2)
+      {
+        if (log != null)
+          log.warn (e2);
+        else
+          System.err.println ("Warning - " + e2);
+        throw e2;
+      }
     }
-
-    public void setUserErrorListener(ErrorListener userErrorListener) {
-        this.userErrorListener = userErrorListener;
+    else
+    {
+      if (log != null)
+        log.warn (tE);
+      else
+        System.err.println ("Warning - " + tE);
     }
+  }
 
-    /**
-     * Receive notification of a warning.
-     * Details {@link ErrorListener#warning}
-     */
-    public void warning(TransformerException tE)
-            throws TransformerException {
-        if(userErrorListener != null) {
-            try {
-                userErrorListener.warning(tE);
-            } catch( TransformerException e2) {
-                if (log != null)
-                    log.warn(e2);
-                else
-                    System.err.println("Warning - " + e2);
-                throw e2;
-            }
-        } else {
-            if (log != null)
-                log.warn(tE);
-            else
-                System.err.println("Warning - " + tE);
-        }
+  /**
+   * Receive notification of a recoverable error. Details
+   * {@link ErrorListener#error}
+   */
+  public void error (final TransformerException tE) throws TransformerException
+  {
+    if (userErrorListener != null)
+    {
+      try
+      {
+        userErrorListener.error (tE);
+      }
+      catch (final TransformerException e2)
+      {
+        if (log != null)
+          log.error (e2);
+        else
+          System.err.println ("Error - " + e2);
+        throw e2;
+      }
     }
+    else
+    {
+      if (log != null)
+        log.error (tE);
+      else
+        System.err.println ("Error - " + tE);
+      // no user defined errorlistener, so throw this exception
+      throw tE;
+    }
+  }
 
-    /**
-     * Receive notification of a recoverable error.
-     * Details {@link ErrorListener#error}
-     */
-    public void error(TransformerException tE)
-            throws TransformerException {
-        if(userErrorListener != null) {
-            try {
-                userErrorListener.error(tE);
-            } catch( TransformerException e2) {
-                if (log != null)
-                    log.error(e2);
-                else
-                    System.err.println("Error - " + e2);
-                throw e2;
-            }
-        } else {
-            if (log != null)
-                log.error(tE);
-            else
-                System.err.println("Error - " + tE);
-            // no user defined errorlistener, so throw this exception
-            throw tE;
-        }
+  /**
+   * Receive notification of a non-recoverable error. Details
+   * {@link ErrorListener#fatalError}
+   */
+  public void fatalError (final TransformerException tE) throws TransformerException
+  {
+    if (userErrorListener != null)
+    {
+      try
+      {
+        userErrorListener.fatalError (tE);
+      }
+      catch (final TransformerException e2)
+      {
+        if (log != null)
+          log.fatal (e2);
+        else
+          System.err.println ("Fatal error - " + e2);
+        throw e2;
+      }
     }
-
-    /**
-     * Receive notification of a non-recoverable error.
-     * Details {@link ErrorListener#fatalError}
-     */
-    public void fatalError(TransformerException tE)
-            throws TransformerException {
-        if(userErrorListener != null) {
-            try {
-                userErrorListener.fatalError(tE);
-            } catch( TransformerException e2) {
-                if (log != null)
-                    log.fatal(e2);
-                else
-                    System.err.println("Fatal error - " + e2);
-                throw e2;
-            }
-        } else {
-            if (log != null)
-                log.fatal(tE);
-            else
-                System.err.print("Fatal error - " + tE);
-            // no user defined errorlistener, so throw this exception
-            throw tE;
-        }
+    else
+    {
+      if (log != null)
+        log.fatal (tE);
+      else
+        System.err.print ("Fatal error - " + tE);
+      // no user defined errorlistener, so throw this exception
+      throw tE;
     }
+  }
 }

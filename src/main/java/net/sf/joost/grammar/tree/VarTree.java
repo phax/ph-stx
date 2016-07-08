@@ -24,6 +24,13 @@
 
 package net.sf.joost.grammar.tree;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Stack;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.instruction.GroupBase;
 import net.sf.joost.stx.Context;
@@ -32,98 +39,95 @@ import net.sf.joost.stx.Value;
 import net.sf.joost.util.VariableNotFoundException;
 import net.sf.joost.util.VariableUtils;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Stack;
-
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 /**
- * Objects of VarTree represent variable reference ('$var') nodes in the
- * syntax tree of a pattern or an STXPath expression.
+ * Objects of VarTree represent variable reference ('$var') nodes in the syntax
+ * tree of a pattern or an STXPath expression.
+ * 
  * @version $Revision: 1.6 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 final public class VarTree extends Tree
 {
-   /** The expanded name of the variable */
-   private final String expName;
+  /** The expanded name of the variable */
+  private final String expName;
 
-   private boolean scopeDetermined = false;
-   private GroupBase groupScope = null;
+  private boolean scopeDetermined = false;
+  private GroupBase groupScope = null;
 
-   /*
-    * Constructs a Tree object with a String value. If the type is a
-    * {@link #NAME_TEST} then {@link #uri} and
-    * {@link #lName} will be initialized appropriately
-    * according to the mapping given in {@link ParseContext#nsSet}.
-    */
-   public VarTree(String value, ParseContext context)
-      throws SAXParseException
-   {
-      super(VAR, value);
+  /*
+   * Constructs a Tree object with a String value. If the type is a {@link
+   * #NAME_TEST} then {@link #uri} and {@link #lName} will be initialized
+   * appropriately according to the mapping given in {@link ParseContext#nsSet}.
+   */
+  public VarTree (final String value, final ParseContext context) throws SAXParseException
+  {
+    super (VAR, value);
 
-      // value contains the qualified name
-      int colon = value.indexOf(":");
-      if (colon != -1) {
-         uri = (String)context.nsSet.get(value.substring(0, colon));
-         if (uri == null) {
-            throw new SAXParseException("Undeclared prefix '" +
-                                        value.substring(0, colon) + "'",
-                                        context.locator);
-         }
-         lName = value.substring(colon+1);
+    // value contains the qualified name
+    final int colon = value.indexOf (":");
+    if (colon != -1)
+    {
+      uri = (String) context.nsSet.get (value.substring (0, colon));
+      if (uri == null)
+      {
+        throw new SAXParseException ("Undeclared prefix '" + value.substring (0, colon) + "'", context.locator);
       }
-      else {
-         uri = "";
-         lName = value;
+      lName = value.substring (colon + 1);
+    }
+    else
+    {
+      uri = "";
+      lName = value;
+    }
+    expName = "{" + uri + "}" + lName;
+  }
+
+  @Override
+  public Value evaluate (final Context context, final int top) throws SAXException
+  {
+    if (!scopeDetermined)
+    {
+      try
+      {
+        groupScope = VariableUtils.findVariableScope (context, expName);
       }
-      expName = "{" + uri + "}" + lName;
-   }
-
-
-   public Value evaluate(Context context, int top)
-      throws SAXException
-   {
-      if (!scopeDetermined) {
-         try {
-            groupScope = VariableUtils.findVariableScope(context, expName);
-         }
-         catch (VariableNotFoundException e) {
-            context.errorHandler.error("Undeclared variable '" + value + "'",
-                  context.currentInstruction.publicId,
-                  context.currentInstruction.systemId,
-                  context.currentInstruction.lineNo,
-                  context.currentInstruction.colNo);
-            // if the errorHandler decides to continue ...
-            return Value.VAL_EMPTY;
-         }
-         scopeDetermined = true;
+      catch (final VariableNotFoundException e)
+      {
+        context.errorHandler.error ("Undeclared variable '" +
+                                    value +
+                                    "'",
+                                    context.currentInstruction.publicId,
+                                    context.currentInstruction.systemId,
+                                    context.currentInstruction.lineNo,
+                                    context.currentInstruction.colNo);
+        // if the errorHandler decides to continue ...
+        return Value.VAL_EMPTY;
       }
+      scopeDetermined = true;
+    }
 
-      Hashtable vars = (groupScope == null)
-         ? context.localVars
-         : (Hashtable)((Stack)context.groupVars.get(groupScope)).peek();
+    final Hashtable vars = (groupScope == null) ? context.localVars
+                                                : (Hashtable) ((Stack) context.groupVars.get (groupScope)).peek ();
 
-      Value v1 = (Value)vars.get(expName);
-      // create a copy if the result is a sequence
-      return v1.next == null ? v1 : v1.copy();
-   }
+    final Value v1 = (Value) vars.get (expName);
+    // create a copy if the result is a sequence
+    return v1.next == null ? v1 : v1.copy ();
+  }
 
+  @Override
+  public boolean isConstant ()
+  {
+    return false;
+  }
 
-   public boolean isConstant()
-   {
-      return false;
-   }
-
-
-   public Tree deepCopy(HashMap copies)
-   {
-      VarTree copy = (VarTree) super.deepCopy(copies);
-      if (scopeDetermined && groupScope != null) {
-         copy.groupScope = (GroupBase) groupScope.deepCopy(copies);
-      }
-      return copy;
-   }
+  @Override
+  public Tree deepCopy (final HashMap copies)
+  {
+    final VarTree copy = (VarTree) super.deepCopy (copies);
+    if (scopeDetermined && groupScope != null)
+    {
+      copy.groupScope = (GroupBase) groupScope.deepCopy (copies);
+    }
+    return copy;
+  }
 }

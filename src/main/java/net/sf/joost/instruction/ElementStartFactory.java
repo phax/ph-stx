@@ -24,10 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -37,123 +33,146 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
 
 /**
- * Factory for <code>start-element</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>start-element</code> elements, which are represented by the
+ * inner Instance class.
+ * 
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class ElementStartFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public ElementStartFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("namespace");
-   }
+  // Constructor
+  public ElementStartFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("namespace");
+  }
 
-   /* @return <code>"start-element"</code> */
-   public String getName()
-   {
-      return "start-element";
-   }
+  /* @return <code>"start-element"</code> */
+  @Override
+  public String getName ()
+  {
+    return "start-element";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      Tree nameAVT = parseRequiredAVT(qName, attrs, "name", context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final Tree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
-      Tree namespaceAVT = parseAVT(attrs.getValue("namespace"), context);
+    final Tree namespaceAVT = parseAVT (attrs.getValue ("namespace"), context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, nameAVT, namespaceAVT);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, nameAVT, namespaceAVT);
+  }
 
+  /** Represents an instance of the <code>start-element</code> element. */
+  final public class Instance extends NodeBase
+  {
+    private Tree name, namespace;
+    private final Hashtable nsSet;
 
-   /** Represents an instance of the <code>start-element</code> element. */
-   final public class Instance extends NodeBase
-   {
-      private Tree name, namespace;
-      private Hashtable nsSet;
+    protected Instance (final String qName,
+                        final NodeBase parent,
+                        final ParseContext context,
+                        final Tree name,
+                        final Tree namespace)
+    {
+      super (qName, parent, context, false);
+      this.nsSet = (Hashtable) context.nsSet.clone ();
+      this.name = name;
+      this.namespace = namespace;
+    }
 
-      protected Instance(String qName, NodeBase parent, ParseContext context,
-                         Tree name, Tree namespace)
-      {
-         super(qName, parent, context, false);
-         this.nsSet = (Hashtable)context.nsSet.clone();
-         this.name = name;
-         this.namespace = namespace;
+    /**
+     * Emits a startElement event to the emitter.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      String elName, elUri, elLocal;
+      elName = name.evaluate (context, this).getString ();
+      final int colon = elName.indexOf (':');
+      if (colon != -1)
+      { // prefixed name
+        final String prefix = elName.substring (0, colon);
+        elLocal = elName.substring (colon + 1);
+        if (namespace != null)
+        { // namespace attribute present
+          elUri = namespace.evaluate (context, this).getString ();
+          if (elUri.equals (""))
+          {
+            context.errorHandler.fatalError ("Can't create element '" +
+                                             elName +
+                                             "' in the null namespace",
+                                             publicId,
+                                             systemId,
+                                             lineNo,
+                                             colNo);
+            return PR_CONTINUE; // if the errorHandler returns
+          }
+        }
+        else
+        {
+          // look into the set of in-scope namespaces
+          // (of the transformation sheet)
+          elUri = (String) nsSet.get (prefix);
+          if (elUri == null)
+          {
+            context.errorHandler.fatalError ("Attempt to create element '" +
+                                             elName +
+                                             "' with undeclared prefix '" +
+                                             prefix +
+                                             "'",
+                                             publicId,
+                                             systemId,
+                                             lineNo,
+                                             colNo);
+            return PR_CONTINUE; // if the errorHandler returns
+          }
+        }
+      }
+      else
+      { // unprefixed name
+        elLocal = elName;
+        if (namespace != null) // namespace attribute present
+          elUri = namespace.evaluate (context, this).getString ();
+        else
+        {
+          // no namespace attribute, see above
+          elUri = (String) nsSet.get ("");
+          if (elUri == null)
+            elUri = "";
+        }
       }
 
-      /**
-       * Emits a startElement event to the emitter.
-       */
-      public short process(Context context)
-         throws SAXException
-      {
-         String elName, elUri, elLocal;
-         elName = name.evaluate(context, this).getString();
-         int colon = elName.indexOf(':');
-         if (colon != -1) { // prefixed name
-            String prefix = elName.substring(0, colon);
-            elLocal = elName.substring(colon+1);
-            if (namespace != null) { // namespace attribute present
-               elUri = namespace.evaluate(context, this).getString();
-               if (elUri.equals("")) {
-                  context.errorHandler.fatalError(
-                     "Can't create element '" + elName +
-                     "' in the null namespace",
-                     publicId, systemId, lineNo, colNo);
-                  return PR_CONTINUE; // if the errorHandler returns
-               }
-            }
-            else {
-               // look into the set of in-scope namespaces
-               // (of the transformation sheet)
-               elUri = (String)nsSet.get(prefix);
-               if (elUri == null) {
-                  context.errorHandler.fatalError(
-                     "Attempt to create element '" + elName +
-                     "' with undeclared prefix '" + prefix + "'",
-                     publicId, systemId, lineNo, colNo);
-                  return PR_CONTINUE; // if the errorHandler returns
-               }
-            }
-         }
-         else { // unprefixed name
-            elLocal = elName;
-            if (namespace != null) // namespace attribute present
-               elUri = namespace.evaluate(context, this).getString();
-            else {
-               // no namespace attribute, see above
-               elUri = (String)nsSet.get("");
-               if (elUri == null)
-                  elUri = "";
-            }
-         }
+      context.emitter.startElement (elUri, elLocal, elName, new AttributesImpl (), null, this);
 
-         context.emitter.startElement(elUri, elLocal, elName,
-                                      new AttributesImpl(), null, this);
+      return PR_CONTINUE;
+    }
 
-         return PR_CONTINUE;
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (name != null)
-            theCopy.name = name.deepCopy(copies);
-         if (namespace != null)
-            theCopy.namespace = namespace.deepCopy(copies);
-      }
-   }
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (name != null)
+        theCopy.name = name.deepCopy (copies);
+      if (namespace != null)
+        theCopy.namespace = namespace.deepCopy (copies);
+    }
+  }
 }

@@ -24,12 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.Value;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -38,122 +32,131 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.emitter.StringEmitter;
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Value;
 
 /**
- * Factory for <code>with-param</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>with-param</code> elements, which are represented by the
+ * inner Instance class.
+ * 
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class WithParamFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public WithParamFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("name");
-      attrNames.add("select");
-   }
+  // Constructor
+  public WithParamFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("name");
+    attrNames.add ("select");
+  }
 
-   /** @return <code>"with-param"</code> */
-   public String getName()
-   {
-      return "with-param";
-   }
+  /** @return <code>"with-param"</code> */
+  @Override
+  public String getName ()
+  {
+    return "with-param";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      if (parent == null || !(parent instanceof ProcessBase)) {
-         throw new SAXParseException(
-            "'" + qName + "' must be used only as a child of " +
-            "stx:call-procedure or an stx:process-... instruction",
-            context.locator);
-      }
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    if (parent == null || !(parent instanceof ProcessBase))
+    {
+      throw new SAXParseException ("'" +
+                                   qName +
+                                   "' must be used only as a child of " +
+                                   "stx:call-procedure or an stx:process-... instruction",
+                                   context.locator);
+    }
 
-      String nameAtt = getRequiredAttribute(qName, attrs, "name", context);
-      String expName = getExpandedName(nameAtt, context);
+    final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
+    final String expName = getExpandedName (nameAtt, context);
 
-      // Check for uniqueness
-      Vector siblings = ((ProcessBase)parent).children;
-      if (siblings != null)
-         for (int i=0; i<siblings.size(); i++)
-            if (((Instance)siblings.elementAt(i)).expName.equals(expName))
-               throw new SAXParseException(
-                  "Parameter '" + nameAtt + "' already passed in line " +
-                  ((NodeBase)siblings.elementAt(i)).lineNo,
-                  context.locator);
+    // Check for uniqueness
+    final Vector siblings = ((ProcessBase) parent).children;
+    if (siblings != null)
+      for (int i = 0; i < siblings.size (); i++)
+        if (((Instance) siblings.elementAt (i)).expName.equals (expName))
+          throw new SAXParseException ("Parameter '" +
+                                       nameAtt +
+                                       "' already passed in line " +
+                                       ((NodeBase) siblings.elementAt (i)).lineNo,
+                                       context.locator);
 
-      Tree selectExpr = parseExpr(attrs.getValue("select"), context);
+    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, expName, selectExpr);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, expName, selectExpr);
+  }
 
+  /** Represents an instance of the <code>with-param</code> element. */
+  public class Instance extends NodeBase
+  {
+    private final String expName;
+    private Tree select;
+    private final String errorMessage;
 
-   /** Represents an instance of the <code>with-param</code> element. */
-   public class Instance extends NodeBase
-   {
-      private String expName;
-      private Tree select;
-      private String errorMessage;
+    protected Instance (final String qName,
+                        final NodeBase parent,
+                        final ParseContext context,
+                        final String expName,
+                        final Tree select)
+    {
+      super (qName,
+             parent,
+             context,
+             // this element may have children if there is no select attr
+             select == null);
+      this.expName = expName;
+      this.select = select;
+      this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
+    }
 
-      protected Instance(String qName, NodeBase parent, ParseContext context,
-                         String expName, Tree select)
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      if (select == null)
       {
-         super(qName, parent, context,
-               // this element may have children if there is no select attr
-               select == null);
-         this.expName = expName;
-         this.select = select;
-         this.errorMessage =
-            "('" + qName + "' started in line " + lineNo + ")";
+        super.process (context);
+        // create a new StringEmitter for this instance and put it
+        // on the emitter stack
+        context.pushEmitter (new StringEmitter (new StringBuffer (), errorMessage));
       }
+      else
+        context.passedParameters.put (expName, select.evaluate (context, this));
 
+      return PR_CONTINUE;
+    }
 
-      public short process(Context context)
-         throws SAXException
-      {
-         if (select == null) {
-            super.process(context);
-            // create a new StringEmitter for this instance and put it
-            // on the emitter stack
-            context.pushEmitter(
-               new StringEmitter(new StringBuffer(), errorMessage));
-         }
-         else
-            context.passedParameters.put(
-               expName,
-               select.evaluate(context, this));
+    @Override
+    public short processEnd (final Context context) throws SAXException
+    {
+      context.passedParameters.put (expName,
+                                    new Value (((StringEmitter) context.popEmitter ()).getBuffer ().toString ()));
 
-         return PR_CONTINUE;
-      }
+      return super.processEnd (context);
+    }
 
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (select != null)
+        theCopy.select = select.deepCopy (copies);
+    }
 
-      public short processEnd(Context context)
-         throws SAXException
-      {
-         context.passedParameters.put(
-            expName,
-            new Value(((StringEmitter)context.popEmitter())
-                                             .getBuffer().toString()));
-
-         return super.processEnd(context);
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (select != null)
-            theCopy.select = select.deepCopy(copies);
-      }
-
-   }
+  }
 }

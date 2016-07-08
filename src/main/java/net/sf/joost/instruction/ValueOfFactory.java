@@ -24,11 +24,6 @@
 
 package net.sf.joost.instruction;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.stx.Context;
-import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.Value;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -36,105 +31,115 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.grammar.Tree;
+import net.sf.joost.stx.Context;
+import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Value;
 
 /**
- * Factory for <code>value-of</code> elements, which are represented by
- * the inner Instance class.
+ * Factory for <code>value-of</code> elements, which are represented by the
+ * inner Instance class.
+ * 
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
 final public class ValueOfFactory extends FactoryBase
 {
-   /** allowed attributes for this element */
-   private HashSet attrNames;
+  /** allowed attributes for this element */
+  private final HashSet attrNames;
 
-   // Constructor
-   public ValueOfFactory()
-   {
-      attrNames = new HashSet();
-      attrNames.add("select");
-      attrNames.add("separator");
-   }
+  // Constructor
+  public ValueOfFactory ()
+  {
+    attrNames = new HashSet ();
+    attrNames.add ("select");
+    attrNames.add ("separator");
+  }
 
-   /** @return <code>"value-of"</code> */
-   public String getName()
-   {
-      return "value-of";
-   }
+  /** @return <code>"value-of"</code> */
+  @Override
+  public String getName ()
+  {
+    return "value-of";
+  }
 
-   public NodeBase createNode(NodeBase parent, String qName,
-                              Attributes attrs, ParseContext context)
-      throws SAXParseException
-   {
-      Tree selectExpr = parseRequiredExpr(qName, attrs, "select", context);
+  @Override
+  public NodeBase createNode (final NodeBase parent,
+                              final String qName,
+                              final Attributes attrs,
+                              final ParseContext context) throws SAXParseException
+  {
+    final Tree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
 
-      Tree separatorAVT = parseAVT(attrs.getValue("separator"), context);
+    final Tree separatorAVT = parseAVT (attrs.getValue ("separator"), context);
 
-      checkAttributes(qName, attrs, attrNames, context);
-      return new Instance(qName, parent, context, selectExpr, separatorAVT);
-   }
+    checkAttributes (qName, attrs, attrNames, context);
+    return new Instance (qName, parent, context, selectExpr, separatorAVT);
+  }
 
+  /** Represents an instance of the <code>value-of</code> element. */
+  final public class Instance extends NodeBase
+  {
+    private Tree select, separator;
 
-   /** Represents an instance of the <code>value-of</code> element. */
-   final public class Instance extends NodeBase
-   {
-      private Tree select, separator;
+    protected Instance (final String qName,
+                        final NodeBase parent,
+                        final ParseContext context,
+                        final Tree select,
+                        final Tree separator)
+    {
+      super (qName, parent, context, false);
+      this.select = select;
+      this.separator = separator;
+    }
 
-      protected Instance(String qName, NodeBase parent, ParseContext context,
-                         Tree select, Tree separator)
+    /**
+     * Evaluates the expression given in the select attribute and outputs its
+     * value to emitter.
+     */
+    @Override
+    public short process (final Context context) throws SAXException
+    {
+      Value v = select.evaluate (context, this);
+      String s;
+      if (v.next == null)
+        s = v.getStringValue ();
+      else
       {
-         super(qName, parent, context, false);
-         this.select = select;
-         this.separator = separator;
+        // create a string from a sequence
+        // evaluate separator
+        final String sep = (separator != null) ? separator.evaluate (context, this).getString () : " "; // default
+                                                                                                        // value
+        // use a string buffer for creating the result
+        final StringBuffer sb = new StringBuffer ();
+        Value nextVal = v.next;
+        v.next = null;
+        sb.append (v.getStringValue ());
+        while (nextVal != null)
+        {
+          sb.append (sep);
+          v = nextVal;
+          nextVal = v.next;
+          v.next = null;
+          sb.append (v.getStringValue ());
+        }
+        s = sb.toString ();
       }
+      context.emitter.characters (s.toCharArray (), 0, s.length (), this);
+      return PR_CONTINUE;
+    }
 
+    @Override
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    {
+      super.onDeepCopy (copy, copies);
+      final Instance theCopy = (Instance) copy;
+      if (select != null)
+        theCopy.select = select.deepCopy (copies);
+      if (separator != null)
+        theCopy.separator = separator.deepCopy (copies);
+    }
 
-      /**
-       * Evaluates the expression given in the select attribute and
-       * outputs its value to emitter.
-       */
-      public short process(Context context)
-         throws SAXException
-      {
-         Value v = select.evaluate(context, this);
-         String s;
-         if (v.next == null)
-            s = v.getStringValue();
-         else {
-            // create a string from a sequence
-            // evaluate separator
-            String sep = (separator != null)
-               ? separator.evaluate(context, this).getString()
-               : " "; // default value
-            // use a string buffer for creating the result
-            StringBuffer sb = new StringBuffer();
-            Value nextVal = v.next;
-            v.next = null;
-            sb.append(v.getStringValue());
-            while (nextVal != null) {
-               sb.append(sep);
-               v = nextVal;
-               nextVal = v.next;
-               v.next = null;
-               sb.append(v.getStringValue());
-            }
-            s = sb.toString();
-         }
-         context.emitter.characters(s.toCharArray(), 0, s.length(), this);
-         return PR_CONTINUE;
-      }
-
-
-      protected void onDeepCopy(AbstractInstruction copy, HashMap copies)
-      {
-         super.onDeepCopy(copy, copies);
-         Instance theCopy = (Instance) copy;
-         if (select != null)
-            theCopy.select = select.deepCopy(copies);
-         if (separator != null)
-            theCopy.separator = separator.deepCopy(copies);
-      }
-
-   }
+  }
 }
