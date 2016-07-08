@@ -88,9 +88,9 @@
       <version>2.4.0</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
+      <groupId>fop</groupId>
       <artifactId>fop</artifactId>
-      <version>2.1</version>
+      <version>0.20.5</version>
     </dependency>
     <dependency>
       <groupId>commons-discovery</groupId>
