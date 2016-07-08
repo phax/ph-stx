@@ -3,6 +3,7 @@ package java_cup;
 
 import java.util.Enumeration; 
 import java.io.*;
+import java_cup.runtime.*;
 
 /** This class serves as the main driver for the JavaCup system.
  *  It accepts user options and coordinates overall control flow.
@@ -53,6 +54,8 @@ import java.io.*;
  *   <dd> turn on debugging messages within JavaCup 
  *   <dt> -nopositions
  *   <dd> don't generate the positions code
+ *   <dt> -locations
+ *   <dd> generate handles xleft/xright for symbol positions in actions
  *   <dt> -noscanner
  *   <dd> don't refer to java_cup.runtime.Scanner in the parser
  *        (for compatibility with old runtimes)
@@ -77,7 +80,7 @@ public class Main {
   /* Options set by the user */
   /*-------------------------*/
   /** User option -- do we print progress messages. */
-  protected static boolean print_progress   = true;
+  protected static boolean print_progress   = false;
   /** User option -- do we produce a dump of the state machine */
   protected static boolean opt_dump_states  = false;
   /** User option -- do we produce a dump of the parse tables */
@@ -88,6 +91,8 @@ public class Main {
   protected static boolean opt_show_timing  = false;
   /** User option -- do we run produce extra debugging messages */
   protected static boolean opt_do_debug     = false;
+  /** User option -- do eclipse debug symbols */
+  protected static boolean opt_do_debugsymbols = false; 
   /** User option -- do we compact tables by making most common reduce the 
       default action */
   protected static boolean opt_compact_red  = false;
@@ -102,7 +107,10 @@ public class Main {
   /* frankf added this 6/18/96 */
   /** User option -- should generator generate code for left/right values? */
   protected static boolean lr_values = true;
-
+  protected static boolean locations = false;
+  protected static boolean xmlactions = false;
+  protected static boolean genericlabels = false;
+  
   /** User option -- should symbols be put in a class or an interface? [CSA]*/
   protected static boolean sym_interface = false;
 
@@ -155,6 +163,16 @@ public class Main {
       boolean did_output = false;
 
       start_time = System.currentTimeMillis();
+      
+      /** clean all static members, that contain remaining stuff from earlier calls */
+      terminal.clear();
+      production.clear();
+      action_production.clear();
+      emit.clear();
+      non_terminal.clear();
+      parse_reduce_row.clear();
+      parse_action_row.clear();
+      lalr_state.clear();
 
       /* process user options and arguments */
       parse_args(argv);
@@ -162,7 +180,10 @@ public class Main {
       /* frankf 6/18/96
 	 hackish, yes, but works */
       emit.set_lr_values(lr_values);
-      /* open output files */
+      emit.set_locations(locations);
+      emit.set_xmlactions(xmlactions);
+      emit.set_genericlabels(genericlabels);
+      /* open output set_xmlactionsfiles */
       if (print_progress) System.err.println("Opening files...");
       /* use a buffered version of standard input */
       input_file = new BufferedInputStream(System.in);
@@ -177,7 +198,7 @@ public class Main {
       parse_end = System.currentTimeMillis();
 
       /* don't proceed unless we are error free */
-      if (lexer.error_count == 0)
+      if (ErrorManager.getManager().getErrorCount() == 0)
 	{
 	  /* check for unused bits */
           if (print_progress) System.err.println("Checking specification...");
@@ -192,7 +213,7 @@ public class Main {
           build_end = System.currentTimeMillis();
 
 	  /* output the generated code, if # of conflicts permits */
-	  if (lexer.error_count != 0) {
+	  if (ErrorManager.getManager().getErrorCount() != 0) {
 	      // conflicts! don't emit code, don't dump tables.
 	      opt_dump_tables = false;
 	  } else { // everything's okay, emit parser.
@@ -221,7 +242,7 @@ public class Main {
 
       /* If there were errors during the run,
        * exit with non-zero status (makefile-friendliness). --CSA */
-      if (lexer.error_count != 0)
+      if (ErrorManager.getManager().getErrorCount() != 0)
 	  System.exit(100);
     }
 
@@ -237,11 +258,14 @@ public class Main {
       System.err.println(message);
       System.err.println();
       System.err.println(
+version.title_str + "\n" +
 "Usage: " + version.program_name + " [options] [filename]\n" +
 "  and expects a specification file on standard input if no filename is given.\n" +
 "  Legal options include:\n" +
 "    -package name  specify package generated classes go in [default none]\n" +
+"    -destdir name  specify the destination directory, to store the generated files in\n" +
 "    -parser name   specify parser class name [default \"parser\"]\n" +
+"    -typearg args  specify type arguments for parser class\n" + 
 "    -symbols name  specify name for symbol constant class [default \"sym\"]\n"+
 "    -interface     put symbols in an interface, rather than a class\n" +
 "    -nonterms      put non terminals in symbol constant class\n" + 
@@ -250,6 +274,9 @@ public class Main {
 "    -nowarn        don't warn about useless productions, etc.\n" +
 "    -nosummary     don't print the usual summary of parse states, etc.\n" +
 "    -nopositions   don't propagate the left and right token position values\n" +
+"    -locations     generate handles xleft/xright for symbol positions in actions\n" +
+"    -xmlactions    make the generated parser yield its parse tree as XML\n" +
+"    -genericlabels automatically generate labels to all symbols in XML mode\n" +
 "    -noscanner     don't refer to java_cup.runtime.Scanner\n" +
 "    -progress      print messages to indicate progress of the system\n" +
 "    -time          print time usage summary\n" +
@@ -286,6 +313,15 @@ public class Main {
 
 	      /* record the name */
 	      emit.package_name = argv[i];
+	    }
+	  else if (argv[i].equals("-destdir"))
+	    {
+	      /* must have an arg */
+	      if (++i >= len || argv[i].startsWith("-") || 
+				argv[i].endsWith(".cup")) 
+		usage("-destdir must have a name argument");
+	      /* record the name */
+	      Main.dest_dir = new java.io.File(argv[i]);
 	    }
 	  else if (argv[i].equals("-parser"))
 	    {
@@ -336,8 +372,12 @@ public class Main {
 	        opt_dump_states = opt_dump_tables = opt_dump_grammar = true; 
 	  else if (argv[i].equals("-time"))         opt_show_timing = true; 
 	  else if (argv[i].equals("-debug"))        opt_do_debug = true;
+	  else if (argv[i].equals("-debugsymbols"))        opt_do_debugsymbols = true;
 	  /* frankf 6/18/96 */
 	  else if (argv[i].equals("-nopositions"))  lr_values = false;
+	  else if (argv[i].equals("-locations"))    locations = true;
+	  else if (argv[i].equals("-xmlactions"))   xmlactions = true;
+	  else if (argv[i].equals("-genericlabels"))   genericlabels = true;
 	  /* CSA 12/21/97 */
 	  else if (argv[i].equals("-interface"))    sym_interface = true;
 	  /* CSA 23-Jul-1999 */
@@ -347,6 +387,16 @@ public class Main {
 	      System.out.println(version.title_str);
 	      System.exit(1);
 	  }
+      /* TUM changes; suggested by Henning Niss 20050628*/
+ 	  else if (argv[i].equals("-typearg")){
+ 	      if (++i >= len || argv[i].startsWith("-") || 
+              argv[i].endsWith(".cup")) 
+              usage("-symbols must have a name argument");
+          
+ 	      /* record the typearg */
+ 	      emit.class_type_argument = argv[i];
+      }
+
 	  /* CSA 24-Jul-1999; suggestion by Jean Vaucher */
 	  else if (!argv[i].startsWith("-") && i==len-1) {
 	      /* use input from file. */
@@ -378,6 +428,8 @@ public class Main {
   /** Output file for the symbol constant class. */
   protected static PrintWriter symbol_class_file;
 
+  /** Output directory. */
+  protected static File dest_dir = null;
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Open various files used by the system. */
@@ -390,7 +442,7 @@ public class Main {
 
       /* parser class */
       out_name = emit.parser_class_name + ".java";
-      fil = new File(out_name);
+      fil = new File(dest_dir,out_name);
       try {
         parser_class_file = new PrintWriter(
 		 new BufferedOutputStream(new FileOutputStream(fil), 4096));
@@ -401,7 +453,7 @@ public class Main {
 
       /* symbol constants class */
       out_name = emit.symbol_const_class_name + ".java";
-      fil = new File(out_name);
+      fil = new File(dest_dir,out_name);
       try {
         symbol_class_file = new PrintWriter(
 		 new BufferedOutputStream(new FileOutputStream(fil), 4096));
@@ -434,7 +486,9 @@ public class Main {
       parser parser_obj;
 
       /* create a parser and parse with it */
-      parser_obj = new parser();
+      ComplexSymbolFactory csf = new ComplexSymbolFactory();
+      parser_obj = new parser(new Lexer(csf),csf);
+      parser_obj.setDebugSymbols(opt_do_debugsymbols);
       try {
 	if (opt_do_debug)
           parser_obj.debug_parse();
@@ -444,7 +498,7 @@ public class Main {
       {
 	/* something threw an exception.  catch it and emit a message so we 
 	   have a line number to work with, then re-throw it */
-	lexer.emit_error("Internal error: Unexpected exception");
+	ErrorManager.getManager().emit_error("Internal error: Unexpected exception");
 	throw e;
       }
     }
@@ -477,9 +531,7 @@ public class Main {
 	      emit.unused_term++;
 	      if (!emit.nowarn) 
 		{
-		  System.err.println("Warning: Terminal \"" + term.name() + 
-				     "\" was declared but never used");
-		  lexer.warning_count++;
+		    ErrorManager.getManager().emit_warning("Terminal \"" + term.name() +  "\" was declared but never used");
 		}
 	    }
 	}
@@ -496,9 +548,7 @@ public class Main {
 	      emit.unused_term++;
 	      if (!emit.nowarn) 
 		{
-		  System.err.println("Warning: Non terminal \"" + nt.name() + 
-				     "\" was declared but never used");
-		  lexer.warning_count++;
+		    ErrorManager.getManager().emit_warning("Non terminal \"" + nt.name() +  "\" was declared but never used");
 		}
 	    }
 	}
@@ -576,9 +626,9 @@ public class Main {
       /* if we have more conflicts than we expected issue a message and die */
       if (emit.num_conflicts > expect_conflicts)
 	{
-	  System.err.println("*** More conflicts encountered than expected " +
+	    ErrorManager.getManager().emit_error("*** More conflicts encountered than expected " +
 			     "-- parser generation aborted");
-	  lexer.error_count++; // indicate the problem.
+	  // indicate the problem.
 	  // we'll die on return, after clean up.
 	}
     }
@@ -625,9 +675,9 @@ public class Main {
 			 " Parser Generation Summary -------");
 
       /* error and warning count */
-      System.err.println("  " + lexer.error_count + " error" + 
-	 plural(lexer.error_count) + " and " + lexer.warning_count + 
-	 " warning" + plural(lexer.warning_count));
+      System.err.println("  " + ErrorManager.getManager().getErrorCount() + " error" + 
+	 plural(ErrorManager.getManager().getErrorCount()) + " and " + ErrorManager.getManager().getWarningCount() + 
+	 " warning" + plural(ErrorManager.getManager().getWarningCount()));
 
       /* basic stats */
       System.err.print("  " + terminal.number() + " terminal" + 
@@ -665,7 +715,7 @@ public class Main {
 
       System.err.println(
 	"---------------------------------------------------- (" + 
-	 version.version_str + ")");
+	 version.title_str + ")");
     }
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

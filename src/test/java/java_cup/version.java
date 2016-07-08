@@ -25,12 +25,12 @@ public class version {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** The minor version number. */
-  public static final int minor = 10;
+  public static final int minor = 11;
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** The update letter. */
-  public static final char update = 'k';
+  public static final String update = "b beta 20140226";
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -40,13 +40,13 @@ public class version {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Full title of the system */
-  public static final String title_str = "CUP " + version_str;
+  public static final String title_str = "CUP " + "v0.11b 0.11.ph (SVN rev 70)";
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Name of the author */
   public static final String author_str =
-      "Scott E. Hudson, Frank Flannery, and C. Scott Ananian";
+      "Scott E. Hudson, Frank Flannery, Michael Petter and C. Scott Ananian";
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 

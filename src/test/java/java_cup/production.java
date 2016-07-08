@@ -230,6 +230,12 @@ public class production {
     return (production) _all.get(new Integer(indx));
   }
 
+  //Hm Added clear  to clear all static fields
+  public static void clear() {
+      _all.clear();
+      next_index=0;
+  }
+  
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
  
   /** Total number of productions. */
@@ -389,19 +395,37 @@ public class production {
       String ret;
 
       /* Put in the left/right value labels */
-      if (emit.lr_values())
+      if (emit.lr_values()){
+	if (!emit.locations())
         ret = "\t\tint " + labelname + "left = ((java_cup.runtime.Symbol)" + 
-	  emit.pre("stack") + ".elementAt(" + emit.pre("top") + 
-	  "-" + offset + ")).left;\n" +
+	  emit.pre("stack") + 
+ 	    // TUM 20050917
+	    ((offset==0)?".peek()":(".elementAt(" + emit.pre("top") + "-" + offset + ")"))+
+	    ").left;\n" +
 	  "\t\tint " + labelname + "right = ((java_cup.runtime.Symbol)" + 
-	  emit.pre("stack") + ".elementAt(" + emit.pre("top") +
-	  "-" + offset + ")).right;\n";
+	  emit.pre("stack") +
+ 	    // TUM 20050917
+	    ((offset==0)?".peek()":(".elementAt(" + emit.pre("top") + "-" + offset + ")"))+
+	    ").right;\n";
+	else
+        ret = "\t\tLocation " + labelname + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)" + 
+	  emit.pre("stack") + 
+ 	    // TUM 20050917
+	    ((offset==0)?".peek()":(".elementAt(" + emit.pre("top") + "-" + offset + ")"))+
+	    ").xleft;\n" +
+	  "\t\tLocation " + labelname + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)" + 
+	  emit.pre("stack") +
+ 	    // TUM 20050917
+	    ((offset==0)?".peek()":(".elementAt(" + emit.pre("top") + "-" + offset + ")"))+
+	    ").xright;\n";}
       else ret = "";
 
       /* otherwise, just declare label. */
 	return ret + "\t\t" + stack_type + " " + labelname + " = (" + stack_type + 
-	  ")((" + "java_cup.runtime.Symbol) " + emit.pre("stack") + ".elementAt(" + emit.pre("top") 
-	  + "-" + offset + ")).value;\n";
+	  ")((" + "java_cup.runtime.Symbol) " + emit.pre("stack") + 
+	    // TUM 20050917
+	    ((offset==0)?".peek()":(".elementAt(" + emit.pre("top") + "-" + offset + ")"))+
+	    ").value;\n";
 
     }
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -429,12 +453,13 @@ public class production {
 	  if (!rhs[pos].is_action())
 	    {
 	      part = (symbol_part)rhs[pos];
-
+	      String label;
 	      /* if it has a label, make declaration! */
-	      if (part.label() != null)
+	      if ((label=part.label()) != null || emit._xmlactions)
 		{
+	    	  if (label==null) label=part.the_symbol().name()+pos;
 		  declaration = declaration + 
-		    make_declaration(part.label(), part.the_symbol().stack_type(), 
+		    make_declaration(label, part.the_symbol().stack_type(), 
 				     rhs_len-pos-1);
 		}
 	    }
@@ -552,7 +577,7 @@ public class production {
       non_terminal new_nt;
       production   new_prod;
       String declare_str;
-      
+      int lastLocation = -1;
       /* walk over the production and process each action */
       for (int act_loc = 0; act_loc < rhs_length(); act_loc++)
 	if (rhs(act_loc).is_action())
@@ -562,15 +587,16 @@ public class production {
 	    declare_str = declare_labels(
 		      _rhs, act_loc, "");
 	    /* create a new non terminal for the action production */
-	    new_nt = non_terminal.create_new();
+	    new_nt = non_terminal.create_new(null, lhs().the_symbol().stack_type()); // TUM 20060608 embedded actions patch
 	    new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
 	    /* create a new production with just the action */
 	    new_prod = new action_production(this, new_nt, null, 0, 
-		declare_str + ((action_part)rhs(act_loc)).code_string());
+		declare_str + ((action_part)rhs(act_loc)).code_string(), (lastLocation==-1)?-1:(act_loc-lastLocation));
 
 	    /* replace the action with the generated non terminal */
 	    _rhs[act_loc] = new symbol_part(new_nt);
+            lastLocation = act_loc;
 	  }
     }
 

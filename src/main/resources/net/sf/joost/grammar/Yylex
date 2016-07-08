@@ -34,12 +34,11 @@ name = [a-zA-Z_][a-zA-Z_.0-9-]*
 <CMT>.            { }
 <YYINITIAL>":)"   { last = new Symbol(error,yychar,yychar+1,yytext()); 
                     return last; }
-
 <YYINITIAL>\|     { last = new Symbol(BAR,yychar,yychar+1,yytext()); 
                     return last; }
-<YYINITIAL>/      { last = new Symbol(SLASH,yychar,yychar+1,yytext()); 
+<YYINITIAL>"/"      { last = new Symbol(SLASH,yychar,yychar+1,yytext()); 
                     return last; }
-<YYINITIAL>//     { last = new
+<YYINITIAL>"//"     { last = new
                     Symbol(DSLASH,yychar,yychar+2,yytext()); 
                     return last; }
 <YYINITIAL>\[     { last = new

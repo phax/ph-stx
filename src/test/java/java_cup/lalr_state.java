@@ -88,6 +88,13 @@ public class lalr_state {
   /** Collection of all states. */
   public static Enumeration all() {return _all.elements();}
 
+  //Hm Added clear  to clear all static fields
+  public static void clear() {
+      _all.clear();
+      _all_kernels.clear();
+      next_index=0;
+  }
+  
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Indicate total number of states there are. */
@@ -740,9 +747,10 @@ public class lalr_state {
 		    }
 		}
 	      /* report S/R conflicts under all the symbols we conflict under */
+	      terminal_set lookahead = itm.lookahead(); 
 	      for (int t = 0; t < terminal.number(); t++)
-		if (conflict_set.contains(t))
-		  report_shift_reduce(itm,t);
+	    	  if (conflict_set.contains(t) && lookahead.contains(t))
+	    		  report_shift_reduce(itm,t);
 	    }
 	}
     }
@@ -758,31 +766,28 @@ public class lalr_state {
     throws internal_error
     {
       boolean comma_flag = false;
-
-      System.err.println("*** Reduce/Reduce conflict found in state #"+index());
-      System.err.print  ("  between ");
-      System.err.println(itm1.to_simple_string());
-      System.err.print  ("  and     ");
-      System.err.println(itm2.to_simple_string());
-      System.err.print("  under symbols: {" );
+      
+      String message = "*** Reduce/Reduce conflict found in state #"+index()+"\n" +
+      "  between " + itm1.to_simple_string() + "\n" +
+      "  and     " + itm2.to_simple_string() + "\n" +
+	  "  under symbols: {";
       for (int t = 0; t < terminal.number(); t++)
 	{
 	  if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t))
 	    {
-	      if (comma_flag) System.err.print(", "); else comma_flag = true;
-	      System.err.print(terminal.find(t).name());
+	      if (comma_flag) message+=(", "); else comma_flag = true;
+	      message += (terminal.find(t).name());
 	    }
 	}
-      System.err.println("}");
-      System.err.print("  Resolved in favor of ");
+      message += "}\n  Resolved in favor of ";
       if (itm1.the_production().index() < itm2.the_production().index())
-	System.err.println("the first production.\n");
+	message+="the first production.\n";
       else
-	System.err.println("the second production.\n");
+	message+="the second production.\n";
 
       /* count the conflict */
       emit.num_conflicts++;
-      lexer.warning_count++;
+      ErrorManager.getManager().emit_warning(message);
     }
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -801,10 +806,10 @@ public class lalr_state {
       symbol       shift_sym;
 
       /* emit top part of message including the reduce item */
-      System.err.println("*** Shift/Reduce conflict found in state #"+index());
-      System.err.print  ("  between ");
-      System.err.println(red_itm.to_simple_string());
+      String message = "*** Shift/Reduce conflict found in state #"+index()+"\n" +
+      "  between " + red_itm.to_simple_string()+"\n";
 
+      int relevancecounter = 0;
       /* find and report on all items that shift under our conflict symbol */
       for (Enumeration itms = items().all(); itms.hasMoreElements(); )
 	{
@@ -813,21 +818,23 @@ public class lalr_state {
 	  /* only look if its not the same item and not a reduce */
 	  if (itm != red_itm && !itm.dot_at_end())
 	    {
+
 	      /* is it a shift on our conflicting terminal */
 	      shift_sym = itm.symbol_after_dot();
 	      if (!shift_sym.is_non_term() && shift_sym.index() == conflict_sym)
 	        {
+			  relevancecounter++;
 		  /* yes, report on it */
-                  System.err.println("  and     " + itm.to_simple_string());
+                  message += "  and     " + itm.to_simple_string()+"\n";
 		}
 	    }
 	}
-      System.err.println("  under symbol "+ terminal.find(conflict_sym).name());
-      System.err.println("  Resolved in favor of shifting.\n");
-
+      message += "  under symbol "+ terminal.find(conflict_sym).name() + "\n"+
+      "  Resolved in favor of shifting.\n";
+      if (relevancecounter==0) return;
       /* count the conflict */
       emit.num_conflicts++;
-      lexer.warning_count++;
+      ErrorManager.getManager().emit_warning(message);
     }
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
