@@ -27,7 +27,7 @@ package net.sf.joost.trax;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 import net.sf.joost.OptionalLog;
 
@@ -40,7 +40,7 @@ public class TransformationErrListener implements ErrorListener
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformationErrListener".
-  private static Log log = OptionalLog.getLog (TransformationErrListener.class);
+  private static Logger log = OptionalLog.getLog (TransformationErrListener.class);
 
   private ErrorListener userErrorListener;
 
@@ -73,19 +73,13 @@ public class TransformationErrListener implements ErrorListener
       }
       catch (final TransformerException e2)
       {
-        if (log != null)
-          log.warn (e2);
-        else
-          System.err.println ("Warning - " + e2);
+        log.warn ("Exception", e2);
         throw e2;
       }
     }
     else
     {
-      if (log != null)
-        log.warn (tE);
-      else
-        System.err.println ("Warning - " + tE);
+      log.warn ("Exception", tE);
     }
   }
 
@@ -103,19 +97,13 @@ public class TransformationErrListener implements ErrorListener
       }
       catch (final TransformerException e2)
       {
-        if (log != null)
-          log.error (e2);
-        else
-          System.err.println ("Error - " + e2);
+        log.error ("Exception", e2);
         throw e2;
       }
     }
     else
     {
-      if (log != null)
-        log.error (tE);
-      else
-        System.err.println ("Error - " + tE);
+      log.error ("Exception", tE);
       // no user defined errorlistener, so throw this exception
       throw tE;
     }
@@ -135,19 +123,13 @@ public class TransformationErrListener implements ErrorListener
       }
       catch (final TransformerException e2)
       {
-        if (log != null)
-          log.fatal (e2);
-        else
-          System.err.println ("Fatal error - " + e2);
+        log.error ("Exception", e2);
         throw e2;
       }
     }
     else
     {
-      if (log != null)
-        log.fatal (tE);
-      else
-        System.err.print ("Fatal error - " + tE);
+      log.error ("Exception", tE);
       // no user defined errorlistener, so throw this exception
       throw tE;
     }

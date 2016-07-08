@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMResult;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,7 +53,7 @@ public class DOMEmitter extends StxEmitterBase
 
   // Define a static logger variable so that it references the
   // Logger instance named "DOMEmitter".
-  private static Log log = OptionalLog.getLog (DOMEmitter.class);
+  private static Logger log = OptionalLog.getLog (DOMEmitter.class);
 
   private Document document = null;
   private Node nextSiblingOfRootNodes = null;

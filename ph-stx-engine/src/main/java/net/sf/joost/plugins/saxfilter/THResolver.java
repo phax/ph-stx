@@ -30,7 +30,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -53,7 +53,7 @@ public final class THResolver implements TransformerHandlerResolver
   public static final String SAX_METHOD = "http://xml.org/sax";
 
   /** logging object */
-  private static Log log = OptionalLog.getLog (THResolver.class);
+  private static Logger log = OptionalLog.getLog (THResolver.class);
 
   /**
    * It return supported URIs, in this case @SAX_METHOD

@@ -28,8 +28,8 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.TemplatesHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
@@ -49,11 +49,11 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
 
   // Define a static logger variable so that it references the
   // Logger instance named "TemplatesHandlerImpl".
-  private static Log log;
+  private static Logger log;
   static
   {
     if (DEBUG)
-      log = LogFactory.getLog (TemplatesHandlerImpl.class);
+      log = LoggerFactory.getLogger (TemplatesHandlerImpl.class);
   }
 
   // member fields
@@ -63,7 +63,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
 
   /**
    * Constructor
-   * 
+   *
    * @param tfactory
    *        A Reference to <code>TransformerFactoryImpl</code>
    */
@@ -86,7 +86,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
   /**
    * Get the base ID (URI or system ID) from where relative URLs will be
    * resolved
-   * 
+   *
    * @return The systemID that was set with {link setSystemId(String)}
    */
   public String getSystemId ()
@@ -98,7 +98,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
    * When a TemplatesHandler object is used as a ContentHandler for the parsing
    * of transformation instructions, it creates a Templates object, which the
    * caller can get once the SAX events have been completed.
-   * 
+   *
    * @return {@link Templates} The Templates object that was created during the
    *         SAX event process, or <code>null</code> if no Templates object has
    *         been created.
@@ -132,7 +132,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
    * Set the base ID (URI or system ID) from the Templates object created by
    * this builder. This must be set in order to resolve relative URIs in the
    * stylesheet. This must be called before the startDocument event.
-   * 
+   *
    * @param systemId
    *        Necessary for document root.
    */

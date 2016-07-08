@@ -24,8 +24,8 @@
 
 package net.sf.joost.emitter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -37,7 +37,7 @@ import org.xml.sax.ext.LexicalHandler;
  * designed for using <code>SAXResult</code>. So this class outputs a
  * SAX2-event-stream to the output target - {@link #saxContentHandler} (e.g. the
  * registered ContentHandler).
- * 
+ *
  * @author Zubow
  */
 public class SAXEmitter extends StxEmitterBase
@@ -45,11 +45,11 @@ public class SAXEmitter extends StxEmitterBase
 
   // Define a static logger variable so that it references the
   // Logger instance named "SAXEmitter".
-  private static Log log;
+  private static Logger log;
   static
   {
     if (DEBUG)
-      log = LogFactory.getLog (SAXEmitter.class);
+      log = LoggerFactory.getLogger (SAXEmitter.class);
   }
 
   /**
@@ -66,7 +66,7 @@ public class SAXEmitter extends StxEmitterBase
 
   /**
    * Constructor
-   * 
+   *
    * @param saxSourceHandler
    *        A ContentHandler for the SAXResult
    */

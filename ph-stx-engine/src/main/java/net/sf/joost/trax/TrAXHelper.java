@@ -48,7 +48,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
@@ -63,7 +63,7 @@ import net.sf.joost.stx.Processor;
 
 /**
  * This class provides TrAX helper functions
- * 
+ *
  * @author Anatolij Zubow, Oliver Becker
  */
 public class TrAXHelper implements TrAXConstants
@@ -71,7 +71,7 @@ public class TrAXHelper implements TrAXConstants
 
   // Define a static logger variable so that it references the
   // Logger instance named "TrAXHelper".
-  private static Log log = OptionalLog.getLog (TrAXHelper.class);
+  private static Logger log = OptionalLog.getLog (TrAXHelper.class);
 
   /**
    * Defaultconstructor
@@ -81,7 +81,7 @@ public class TrAXHelper implements TrAXConstants
 
   /**
    * Helpermethod for getting an InputSource from a StreamSource.
-   * 
+   *
    * @param source
    *        <code>Source</code>
    * @return An <code>InputSource</code> object or null
@@ -177,12 +177,12 @@ public class TrAXHelper implements TrAXConstants
         catch (final TransformerException e2)
         {
           if (DEBUG)
-            log.debug (sE);
+            log.debug ("Exception", sE);
           throw new TransformerConfigurationException (sE.getMessage ());
         }
       }
       if (DEBUG)
-        log.debug (sE);
+        log.debug ("Exception", sE);
       throw new TransformerConfigurationException (sE.getMessage ());
     }
     return (input);
@@ -190,7 +190,7 @@ public class TrAXHelper implements TrAXConstants
 
   /**
    * HelperMethod for initiating StxEmitter.
-   * 
+   *
    * @param result
    *        A <code>Result</code> object.
    * @return An <code>StxEmitter</code>.
@@ -299,13 +299,13 @@ public class TrAXHelper implements TrAXConstants
     catch (final IOException iE)
     {
       if (DEBUG)
-        log.debug (iE);
+        log.debug ("Exception", iE);
       throw new TransformerException (iE);
     }
     catch (final ParserConfigurationException pE)
     {
       if (DEBUG)
-        log.debug (pE);
+        log.debug ("Exception", pE);
       throw new TransformerException (pE);
     }
     return null;
@@ -313,7 +313,7 @@ public class TrAXHelper implements TrAXConstants
 
   /**
    * Converts a supplied <code>Source</code> to a <code>SAXSource</code>.
-   * 
+   *
    * @param source
    *        The supplied input source
    * @param errorListener
@@ -365,18 +365,15 @@ public class TrAXHelper implements TrAXConstants
       final InputSource isource = getInputSourceForStreamSources (source, errorListener);
       return new SAXSource (isource);
     }
+
+    final String errMsg = "Unknown type of source";
+    log.error (errMsg);
+    final IllegalArgumentException iE = new IllegalArgumentException (errMsg);
+    final TransformerConfigurationException tE = new TransformerConfigurationException (iE.getMessage (), iE);
+    if (errorListener != null)
+      errorListener.error (tE);
     else
-    {
-      final String errMsg = "Unknown type of source";
-      if (log != null)
-        log.error (errMsg);
-      final IllegalArgumentException iE = new IllegalArgumentException (errMsg);
-      final TransformerConfigurationException tE = new TransformerConfigurationException (iE.getMessage (), iE);
-      if (errorListener != null)
-        errorListener.error (tE);
-      else
-        throw tE;
-      return null;
-    }
+      throw tE;
+    return null;
   }
 }

@@ -25,7 +25,7 @@
 package net.sf.joost.instruction;
 
 import java.io.StringReader;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -45,7 +45,7 @@ import net.sf.joost.stx.ParseContext;
  * Abstract base class for all factory classes which produce nodes
  * ({@link NodeBase}) for the tree representation of an STX transformation
  * sheet.
- * 
+ *
  * @version $Revision: 2.11 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
@@ -57,7 +57,7 @@ public abstract class FactoryBase implements Constants
 
   /**
    * The factory method.
-   * 
+   *
    * @param parent
    *        the parent Node
    * @param qName
@@ -77,7 +77,7 @@ public abstract class FactoryBase implements Constants
 
   /**
    * Looks for the required attribute <code>name</code> in <code>attrs</code>.
-   * 
+   *
    * @param elementName
    *        the name of the parent element
    * @param attrs
@@ -115,7 +115,7 @@ public abstract class FactoryBase implements Constants
   /**
    * Looks for the attribute <code>name</code> in <code>attrs</code> and checks
    * if the value is among the values of <code>enumValues</code>.
-   * 
+   *
    * @param name
    *        the name of the attribute to look for
    * @param attrs
@@ -167,7 +167,7 @@ public abstract class FactoryBase implements Constants
 
   /**
    * Looks for extra attributes and throws an exception if present
-   * 
+   *
    * @param elementName
    *        the name of the parent element
    * @param attrs
@@ -181,7 +181,7 @@ public abstract class FactoryBase implements Constants
    */
   protected static void checkAttributes (final String elementName,
                                          final Attributes attrs,
-                                         final HashSet attNames,
+                                         final Set <String> attNames,
                                          final ParseContext context) throws SAXParseException
   {
     final int len = attrs.getLength ();
@@ -198,7 +198,7 @@ public abstract class FactoryBase implements Constants
   /**
    * Parses a qualified name by extracting local name and namespace URI. The
    * result string has the form "{namespace-uri}local-name".
-   * 
+   *
    * @param qName
    *        string representing the qualified name
    * @param context
@@ -227,7 +227,7 @@ public abstract class FactoryBase implements Constants
 
   /**
    * Parses the string given in <code>string</code> as a pattern.
-   * 
+   *
    * @param string
    *        the string to be parsed
    * @param context
@@ -294,7 +294,7 @@ public abstract class FactoryBase implements Constants
 
   /**
    * Parses the string given in <code>string</code> as an expression
-   * 
+   *
    * @param string
    *        the string to be parsed
    * @param context
@@ -370,7 +370,7 @@ public abstract class FactoryBase implements Constants
   /**
    * Parses an attribute value template (AVT) and creates a Tree (of AVT nodes)
    * which works similar to the concat function.
-   * 
+   *
    * @param string
    *        the string to be parsed
    * @param context

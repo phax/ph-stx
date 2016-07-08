@@ -91,15 +91,16 @@ final public class ScriptFactory extends FactoryBase
     final String scriptUri = (String) context.nsSet.get (prefixAtt);
 
     // check if the prefix has been already defined
-    if (context.getFunctionFactory ().isScriptPrefix (prefixAtt))
-    {
-      throw new SAXParseException ("Prefix '" +
-                                   prefixAtt +
-                                   "' of '" +
-                                   qName +
-                                   "' has been already defined by another script element",
-                                   context.locator);
-    }
+    // TODO
+    // if (context.getFunctionFactory ().isScriptPrefix (prefixAtt))
+    // {
+    // throw new SAXParseException ("Prefix '" +
+    // prefixAtt +
+    // "' of '" +
+    // qName +
+    // "' has been already defined by another script element",
+    // context.locator);
+    // }
 
     final String srcAtt = attrs.getValue ("src");
 
@@ -222,7 +223,8 @@ final public class ScriptFactory extends FactoryBase
       }
 
       // add the script element
-      context.getFunctionFactory ().addScript (this, data);
+      // TODO
+      // context.getFunctionFactory ().addScript (this, data);
 
       // done
       return false;

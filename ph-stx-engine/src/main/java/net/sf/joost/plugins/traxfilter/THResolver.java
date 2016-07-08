@@ -41,7 +41,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -175,7 +175,7 @@ public class THResolver implements TransformerHandlerResolver, Constants
   private static Object SYNCHRONIZE_GUARD = new Object ();
 
   /** logging object */
-  private static Log log = OptionalLog.getLog (THResolver.class);
+  private static Logger log = OptionalLog.getLog (THResolver.class);
 
   /*
    * (non-Javadoc)

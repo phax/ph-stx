@@ -27,7 +27,7 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -42,7 +42,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Factory for <code>copy</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.13 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -55,8 +55,8 @@ final public class CopyFactory extends FactoryBase
   /** empty attribute list (needed as parameter for startElement) */
   private static Attributes emptyAttList = new AttributesImpl ();
 
-  // Log initialization
-  private static Log log = OptionalLog.getLog (CopyFactory.class);
+  // Logger initialization
+  private static Logger log = OptionalLog.getLog (CopyFactory.class);
 
   // Constructor
   public CopyFactory ()
@@ -186,8 +186,7 @@ final public class CopyFactory extends FactoryBase
           next = successor;
           break;
         default:
-          if (log != null)
-            log.error ("Unknown SAXEvent type " + event.type);
+          log.error ("Unknown SAXEvent type " + event.type);
           throw new SAXParseException ("Unknown SAXEvent type", publicId, systemId, lineNo, colNo);
       }
       return PR_CONTINUE;

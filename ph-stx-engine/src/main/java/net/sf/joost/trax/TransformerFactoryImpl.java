@@ -45,7 +45,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
@@ -63,7 +63,7 @@ import net.sf.joost.trace.ParserListenerMgr;
  * help of this factory you can get a templates-object or directly a
  * transformer-object for the transformation process. If you use a SAXResult you
  * can simply downcast to SAXTransformerFactory and use it like a Sax-Parser.
- * 
+ *
  * @author Zubow
  */
 public class TransformerFactoryImpl extends SAXTransformerFactory implements TrAXConstants
@@ -71,7 +71,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerFactoryImpl".
-  private static Log log = OptionalLog.getLog (TransformerFactoryImpl.class);
+  private static Logger log = OptionalLog.getLog (TransformerFactoryImpl.class);
 
   // Member
   private URIResolver uriResolver = null;
@@ -124,7 +124,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   /**
    * Returns the <code>Source</code> of the stylesheet associated with the
    * xml-document. Feature is not supported.
-   * 
+   *
    * @param source
    *        The <code>Source</code> of the xml-document.
    * @param media
@@ -152,7 +152,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   /**
    * Allows the user to retrieve specific attributes of the underlying
    * implementation.
-   * 
+   *
    * @param name
    *        The attribute name.
    * @return An object according to the attribute-name
@@ -194,8 +194,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
               }
               else
               {
-                if (log != null)
-                  log.warn ("Feature not supported: " + name);
+                log.warn ("Feature not supported: " + name);
                 throw new IllegalArgumentException ("Feature not supported: " + name);
               }
   }
@@ -204,7 +203,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * Allows the user to set specific attributes on the underlying
    * implementation. An attribute in this context is defined to be an option
    * that the implementation provides.
-   * 
+   *
    * @param name
    *        Name of the attribute (key)
    * @param value
@@ -236,8 +235,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
             }
             catch (final TransformerConfigurationException e)
             {
-              if (log != null)
-                log.fatal (e.getMessage (), e);
+              log.error (e.getMessage (), e);
               throw new IllegalArgumentException (e.getMessage ());
             }
           }
@@ -269,15 +267,14 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
               }
               else
               {
-                if (log != null)
-                  log.warn ("Feature not supported: " + name);
+                log.warn ("Feature not supported: " + name);
                 throw new IllegalArgumentException ("Feature not supported: " + name);
               }
   }
 
   /**
    * Getter for {@link #errorListener}
-   * 
+   *
    * @return The registered <code>ErrorListener</code>
    */
   @Override
@@ -288,7 +285,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Setter for {@link #errorListener}
-   * 
+   *
    * @param errorListener
    *        The <code>ErrorListener</code> object.
    * @throws IllegalArgumentException
@@ -312,7 +309,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Getter for {@link #uriResolver}
-   * 
+   *
    * @return The registered <code>URIResolver</code>
    */
   @Override
@@ -323,7 +320,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Setter for {@link #uriResolver}
-   * 
+   *
    * @param resolver
    *        The <code>URIResolver</code> object.
    */
@@ -350,7 +347,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Supplied features.
-   * 
+   *
    * @param name
    *        Name of the feature.
    * @return true if feature is supported.
@@ -408,7 +405,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Creates a new Templates for Transformations.
-   * 
+   *
    * @param source
    *        The <code>Source</code> of the stylesheet.
    * @return A <code>Templates</code> object or <code>null</code> when an error
@@ -443,7 +440,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   /**
    * Creates a new Transformer object that performs a copy of the source to the
    * result.
-   * 
+   *
    * @return A <code>Transformer</code> object for an identical transformation.
    * @throws TransformerConfigurationException
    */
@@ -460,7 +457,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Gets a new Transformer object for transformation.
-   * 
+   *
    * @param source
    *        The <code>Source</code> of the stylesheet.
    * @return A <code>Transformer</code> object according to the
@@ -489,7 +486,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * Gets a <code>TemplatesHandler</code> object that can process SAX
    * ContentHandler events into a <code>Templates</code> object. Implementation
    * of the {@link SAXTransformerFactory}
-   * 
+   *
    * @see SAXTransformerFactory
    * @return {@link TemplatesHandler} ready to parse a stylesheet.
    * @throws TransformerConfigurationException
@@ -513,7 +510,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * identity (or copy) transformation, for example to copy a series of SAX
    * parse events into a DOM tree. Implementation of the
    * {@link SAXTransformerFactory}
-   * 
+   *
    * @return {@link TransformerHandler} ready to transform SAX events.
    * @throws TransformerConfigurationException
    */
@@ -535,7 +532,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * ContentHandler events into a Result, based on the transformation
    * instructions specified by the argument. Implementation of the
    * {@link SAXTransformerFactory}
-   * 
+   *
    * @param src
    *        The Source of the transformation instructions
    * @return {@link TransformerHandler} ready to transform SAX events.
@@ -559,7 +556,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * Gets a <code>TransformerHandler</code> object that can process SAX
    * ContentHandler events into a Result, based on the Templates argument.
    * Implementation of the {@link SAXTransformerFactory}
-   * 
+   *
    * @param templates
    *        - The compiled transformation instructions.
    * @return {@link TransformerHandler} ready to transform SAX events.
@@ -583,7 +580,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * Creates an <code>XMLFilter</code> that uses the given <code>Source</code>
    * as the transformation instructions. Implementation of the
    * {@link SAXTransformerFactory}
-   * 
+   *
    * @param src
    *        - The Source of the transformation instructions.
    * @return An {@link XMLFilter} object, or <code>null</code> if this feature
@@ -618,7 +615,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   /**
    * Creates an XMLFilter, based on the Templates argument. Implementation of
    * the {@link SAXTransformerFactory}
-   * 
+   *
    * @param templates
    *        - The compiled transformation instructions.
    * @return An {@link XMLFilter} object, or null if this feature is not
@@ -649,7 +646,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
   /**
    * Method creates a new Emitter for stx:message output
-   * 
+   *
    * @param emitterClass
    *        the name of the emitter class
    * @return a <code>StxEmitter</code>

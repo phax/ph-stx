@@ -31,7 +31,7 @@ import java.util.Properties;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -40,14 +40,14 @@ import net.sf.joost.OptionalLog;
 /**
  * This class implements an emitter that uses the <code>xml</code> output method
  * for byte or character streams.
- * 
+ *
  * @version $Revision: 1.9 $ $Date: 2008/10/06 13:31:41 $
  * @author Oliver Becker, Anatolij Zubow
  */
 public class XmlEmitter extends StreamEmitter
 {
-  // Log initialization
-  private static Log log = OptionalLog.getLog (XmlEmitter.class);
+  // Logger initialization
+  private static final Logger log = OptionalLog.getLog (XmlEmitter.class);
 
   /** output property: omit-xml-declaration */
   private boolean propOmitXmlDeclaration = false;
@@ -103,7 +103,7 @@ public class XmlEmitter extends StreamEmitter
   /**
    * Defines whether the XML declaration should be omitted, default is
    * <code>false</code>.
-   * 
+   *
    * @param flag
    *        <code>true</code>: the XML declaration will be omitted;
    *        <code>false</code>: the XML declaration will be output
@@ -120,7 +120,7 @@ public class XmlEmitter extends StreamEmitter
    * {@link Result#PI_DISABLE_OUTPUT_ESCAPING} and
    * {@link Result#PI_ENABLE_OUTPUT_ESCAPING} will be interpreted). The default
    * is <code>false</code>
-   * 
+   *
    * @param flag
    *        <code>true</code> the PIs will be interpreted; <code>false</code>
    *        the PIs will be written literally
@@ -133,7 +133,7 @@ public class XmlEmitter extends StreamEmitter
 
   /**
    * Outputs a start or empty element tag if there is one stored.
-   * 
+   *
    * @param end
    *        true if this method was called due to an endElement event, i.e. an
    *        empty element tag has to be output.
@@ -195,12 +195,11 @@ public class XmlEmitter extends StreamEmitter
         // stream string to writer
         writer.write (out.toString ());
         if (DEBUG)
-          log.debug (out);
+          log.debug (out.toString ());
       }
       catch (final IOException ex)
       {
-        if (log != null)
-          log.error (ex);
+        log.error ("Exception", ex);
         throw new SAXException (ex);
       }
 
@@ -230,8 +229,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -250,8 +248,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -286,8 +283,7 @@ public class XmlEmitter extends StreamEmitter
       }
       catch (final IOException ex)
       {
-        if (log != null)
-          log.error (ex);
+        log.error ("Exception", ex);
         throw new SAXException (ex);
       }
     }
@@ -341,8 +337,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -400,8 +395,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -420,8 +414,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
 
@@ -441,8 +434,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -463,8 +455,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -502,8 +493,7 @@ public class XmlEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }

@@ -30,7 +30,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -46,7 +46,7 @@ import net.sf.joost.stx.Processor;
 
 /**
  * TrAXFilter
- * 
+ *
  * @author Zubow
  * @version 1.0
  */
@@ -55,7 +55,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerImpl".
-  private static Log log = OptionalLog.getLog (TrAXFilter.class);
+  private static Logger log = OptionalLog.getLog (TrAXFilter.class);
 
   private Templates templates = null;
   private Processor processor = null;
@@ -65,7 +65,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
 
   /**
    * Constructor
-   * 
+   *
    * @param templates
    *        A <code>Templates</code>
    */
@@ -83,7 +83,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
 
   /**
    * Parses the <code>InputSource</code>
-   * 
+   *
    * @param input
    *        A <code>InputSource</code> object.
    * @throws SAXException
@@ -112,10 +112,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
       {
         final String msg = "An error is occured, because the given transformer is " +
                            "not an instance of TransformerImpl";
-        if (log != null)
-          log.fatal (msg);
-        else
-          System.err.println ("Fatal error - " + msg);
+        log.error (msg);
 
       }
       XMLReader parent = this.getParent ();

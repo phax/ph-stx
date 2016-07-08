@@ -31,7 +31,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -50,7 +50,7 @@ import net.sf.joost.stx.Processor;
  * getTransformerHandler() and process the transformation with a Sax-Parser.
  * TransformerHandler acts as a proxy an propagates the Sax-Events to the
  * underlying joost-stx-engine the Processor-class
- * 
+ *
  * @author Zubow
  */
 public class TransformerHandlerImpl implements TransformerHandler, Constants
@@ -58,7 +58,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerHandlerImpl".
-  private static Log log = OptionalLog.getLog (TransformerHandlerImpl.class);
+  private static Logger log = OptionalLog.getLog (TransformerHandlerImpl.class);
 
   /**
    * Processor is the joost-stx-engine
@@ -82,7 +82,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
 
   /**
    * Constructor.
-   * 
+   *
    * @param transformer
    */
   protected TransformerHandlerImpl (final Transformer transformer)
@@ -100,7 +100,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
 
   /**
    * Getter for {@link #systemId}
-   * 
+   *
    * @return <code>String</code>
    */
   public String getSystemId ()
@@ -110,7 +110,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
 
   /**
    * Gets a <code>Transformer</code> object.
-   * 
+   *
    * @return <code>String</code>
    */
   public Transformer getTransformer ()
@@ -120,7 +120,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
 
   /**
    * Setter for {@link #result}
-   * 
+   *
    * @param result
    *        A <code>Result</code>
    * @throws IllegalArgumentException
@@ -153,8 +153,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
       }
       else
       {
-        if (log != null)
-          log.fatal (e);
+        log.error ("Exception", e);
         throw new IllegalArgumentException ("result is invalid.");
       }
     }
@@ -162,7 +161,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
 
   /**
    * Setter for {@link #systemId}
-   * 
+   *
    * @param systemId
    *        the system identifier to set
    */

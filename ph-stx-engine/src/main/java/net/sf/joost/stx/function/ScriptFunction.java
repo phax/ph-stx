@@ -27,8 +27,6 @@ package net.sf.joost.stx.function;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.apache.bsf.BSFEngine;
-import org.apache.bsf.BSFException;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
@@ -48,7 +46,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
 final public class ScriptFunction implements Instance
 {
   /** BSF script engine instance */
-  BSFEngine engine;
+  // BSFEngine engine;
 
   /** the local function name without prefix for this script function */
   String funcName;
@@ -58,16 +56,17 @@ final public class ScriptFunction implements Instance
    */
   String qName;
 
-  public ScriptFunction (final BSFEngine engine, final String funcName, final String qName)
-  {
-    this.engine = engine;
-    this.funcName = funcName;
-    this.qName = qName;
-  }
+  // public ScriptFunction (final BSFEngine engine, final String funcName, final
+  // String qName)
+  // {
+  // this.engine = engine;
+  // this.funcName = funcName;
+  // this.qName = qName;
+  // }
 
   /**
    * convert Joost-STXPath arguments Value-tree into an array of simple Objects
-   * 
+   *
    * @param top
    * @param args
    * @return Object[]
@@ -116,16 +115,16 @@ final public class ScriptFunction implements Instance
     // convert input params
     final Object [] scrArgs = convertInputArgs (context, top, args);
 
-    Object ret = null;
+    final Object ret = null;
     // execute the script function
-    try
-    {
-      ret = engine.call (null, funcName, scrArgs);
-    }
-    catch (final BSFException e)
-    {
-      throw new EvalException ("Exception while executing " + qName, e);
-    }
+    // try
+    // {
+    // ret = engine.call (null, funcName, scrArgs);
+    // }
+    // catch (final BSFException e)
+    // {
+    // throw new EvalException ("Exception while executing " + qName, e);
+    // }
 
     // wrap the result
     return new Value (ret);

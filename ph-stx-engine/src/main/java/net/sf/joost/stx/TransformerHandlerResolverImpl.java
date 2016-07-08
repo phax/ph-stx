@@ -31,10 +31,11 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.apache.commons.discovery.tools.Service;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
+import com.helger.commons.lang.ServiceLoaderHelper;
 
 import net.sf.joost.Constants;
 import net.sf.joost.OptionalLog;
@@ -58,7 +59,7 @@ import net.sf.joost.TransformerHandlerResolver;
 public final class TransformerHandlerResolverImpl implements TransformerHandlerResolver, Constants
 {
   /** logging object */
-  private static Log log = OptionalLog.getLog (TransformerHandlerResolverImpl.class);
+  private static Logger log = OptionalLog.getLog (TransformerHandlerResolverImpl.class);
 
   /** hashtable with available methods and their plugin implementations */
   private static Hashtable plugins = new Hashtable ();
@@ -94,7 +95,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
    * of all implemented filter-methods and their factories. In case of
    * duplicated method implementations its behaviour is defined by
    * {link @flgName} system property.
-   * 
+   *
    * @throws SAXException
    *         when duplicated method implementation is found and has been asked
    *         to raise an exception
@@ -117,23 +118,26 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
     int flg;
     // fail with exception if duplicate is found
     if ("fail".equalsIgnoreCase (prop))
+    {
+      // ignore duplicate and print info message
       flg = FLAG_FAIL;
-    // ignore duplicate and print info message
+    }
     else
       if ("ignore".equalsIgnoreCase (prop))
+      {
+        // accept duplicate and print warning message
         flg = FLAG_IGNORE;
-      // accept duplicate and print warning message
+      }
       else
-                                            // just a warning and replace
-                                            flg = FLAG_REPLACE;
+      {
+        // just a warning and replace
+        flg = FLAG_REPLACE;
+      }
 
     // plugin classes
-    final Enumeration clss = Service.providers (TransformerHandlerResolver.class);
-
     // loop over founded classes
-    while (clss.hasMoreElements ())
+    for (final TransformerHandlerResolver plg : ServiceLoaderHelper.getAllSPIImplementations (TransformerHandlerResolver.class))
     {
-      final TransformerHandlerResolver plg = (TransformerHandlerResolver) clss.nextElement ();
       if (DEBUG)
         log.debug ("scanning implemented stx-filter-methods of class" + plg.getClass ());
 
@@ -166,13 +170,11 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
           else
             if (flg == FLAG_IGNORE)
             {
-              if (log != null)
-                log.warn (msg + "\nImplementation ignored, " + "using first plugin!");
+              log.warn (msg + "\nImplementation ignored, " + "using first plugin!");
             }
             else
             { // replace + warning
-              if (log != null)
-                log.warn (msg + "\nUsing new implementation, " + "previous plugin ignored!");
+              log.warn (msg + "\nUsing new implementation, " + "previous plugin ignored!");
               plugins.put (mt, plg);
             }
         }
@@ -211,7 +213,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
   /**
    * Resolve given method via searching for a plugin providing implementation
    * for it.
-   * 
+   *
    * @return TransformerHandler for that method or throws exception.
    */
   public TransformerHandler resolve (final String method,
@@ -289,8 +291,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
       }
       catch (final SAXException e)
       {
-        if (log != null)
-          log.error ("Error while initializing the plugins", e);
+        log.error ("Error while initializing the plugins", e);
       }
     }
 
@@ -300,7 +301,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
   /**
    * Return all supported filter-method URIs Each one must return true when
    * checked against {@link #available(String)}.
-   * 
+   *
    * @return array of supported URIs
    */
   public String [] resolves ()
@@ -313,8 +314,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
       }
       catch (final SAXException e)
       {
-        if (log != null)
-          log.error ("Error while initializing the plugins", e);
+        log.error ("Error while initializing the plugins", e);
       }
     }
 

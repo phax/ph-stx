@@ -27,10 +27,11 @@ package net.sf.joost.instruction;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -46,7 +47,7 @@ import net.sf.joost.trax.SourceLocatorImpl;
 /**
  * Factory for <code>message</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.11 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
@@ -54,7 +55,7 @@ import net.sf.joost.trax.SourceLocatorImpl;
 final public class MessageFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   /** enumerated values for the level attribute */
   private static final String [] LEVEL_VALUES = { "trace", "debug", "info", "warn", "error", "fatal" };
@@ -65,7 +66,7 @@ final public class MessageFactory extends FactoryBase
 
   public MessageFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("select");
     attrNames.add ("terminate");
     attrNames.add ("level");
@@ -105,7 +106,7 @@ final public class MessageFactory extends FactoryBase
   final public class Instance extends NodeBase
   {
     private Tree select, terminate;
-    private Log log;
+    private Logger log;
     private final int level;
 
     private StringBuffer buffer; // used only when log != null
@@ -153,11 +154,8 @@ final public class MessageFactory extends FactoryBase
             // Create emitter with a StringWriter
             final StringWriter writer = new StringWriter ();
             buffer = writer.getBuffer ();
+            // Note: encoding parameter is irrelevant here
             final StreamEmitter se = StreamEmitter.newEmitter (writer,
-                                                               // Note: encoding
-                                                               // parameter is
-                                                               // irrelevant
-                                                               // here
                                                                DEFAULT_ENCODING,
                                                                context.currentProcessor.outputProperties);
             se.setOmitXmlDeclaration (true);
@@ -215,7 +213,7 @@ final public class MessageFactory extends FactoryBase
     /**
      * Process the message: use the logger if it is available and evaluate the
      * optional 'terminate' attribute
-     * 
+     *
      * @throws SAXException
      *         when the transformation shall terminate
      */
@@ -248,7 +246,7 @@ final public class MessageFactory extends FactoryBase
             log.error (sb.toString ());
             break;
           case FATAL_LEVEL:
-            log.fatal (sb.toString ());
+            log.error (sb.toString ());
             break;
         }
         buffer.setLength (0);

@@ -28,7 +28,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Hashtable;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -44,7 +44,7 @@ import net.sf.joost.stx.SAXEvent;
 
 /**
  * Extends the {@link net.sf.joost.stx.Emitter} with debug features.
- * 
+ *
  * @version $Revision: 1.12 $ $Date: 2006/02/03 19:04:46 $
  * @author Zubow
  */
@@ -52,7 +52,7 @@ public class DebugEmitter extends Emitter
 {
 
   /** logger */
-  private static Log log = OptionalLog.getLog (DebugEmitter.class);
+  private static Logger log = OptionalLog.getLog (DebugEmitter.class);
 
   /** for dynamic tracing */
   private TraceManager tmgr;
@@ -72,7 +72,7 @@ public class DebugEmitter extends Emitter
 
   /**
    * Called from {@link #pushEmitter(StxEmitter)}
-   * 
+   *
    * @param prev
    *        the previous emitter
    * @param handler
@@ -128,7 +128,7 @@ public class DebugEmitter extends Emitter
                                  final int colNo,
                                  final boolean append) throws java.io.IOException, SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("requesting writer for " + href);
     return writer = new DebugWriter (href);
   }
@@ -143,7 +143,7 @@ public class DebugEmitter extends Emitter
   @Override
   public void startDocument () throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("start resultdocument");
     // update locator
     updateLocator (null, null, -1, -1);
@@ -156,7 +156,7 @@ public class DebugEmitter extends Emitter
   @Override
   public void endDocument (final AbstractInstruction instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("end resultdocument");
     super.endDocument (instruction);
     // update locator
@@ -178,7 +178,7 @@ public class DebugEmitter extends Emitter
                             final Hashtable namespaces,
                             final NodeBase instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("start element in resultdoc");
     SAXEvent saxevent;
     saxevent = SAXEvent.newElement (uri, lName, qName, attrs, true, namespaces);
@@ -198,7 +198,7 @@ public class DebugEmitter extends Emitter
                           final String qName,
                           final AbstractInstruction instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("end element in resultdoc");
     SAXEvent saxevent;
     // todo - namespace support - remove null value
@@ -221,7 +221,7 @@ public class DebugEmitter extends Emitter
                           final int length,
                           final NodeBase instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("characters in resultdoc");
     SAXEvent saxevent;
     saxevent = SAXEvent.newText (new String (ch, start, length));
@@ -239,7 +239,7 @@ public class DebugEmitter extends Emitter
                                      final String data,
                                      final NodeBase instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("processingInstruction in resultdoc");
     SAXEvent saxevent;
     saxevent = SAXEvent.newPI (target, data);
@@ -258,7 +258,7 @@ public class DebugEmitter extends Emitter
                        final int length,
                        final NodeBase instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("comment in resultdoc");
     SAXEvent saxevent;
     saxevent = SAXEvent.newComment (new String (ch, start, length));
@@ -274,7 +274,7 @@ public class DebugEmitter extends Emitter
   @Override
   public void startCDATA (final NodeBase instruction) throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("start CDATA in resultdoc");
     super.startCDATA (instruction);
     // update locator
@@ -288,7 +288,7 @@ public class DebugEmitter extends Emitter
   @Override
   public void endCDATA () throws SAXException
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("end CDATA in resultdoc");
     super.endCDATA ();
     // update locator
@@ -301,7 +301,7 @@ public class DebugEmitter extends Emitter
   // ------------------------------------------------------------------------
   private void updateLocator (final String publicId, final String systemId, final int lineNo, final int colNo)
   {
-    if (log != null)
+    if (log.isDebugEnabled ())
       log.debug ("update emitterlocator " + publicId + " " + systemId + " " + lineNo + "," + colNo);
     locator.setPublicId (publicId);
     locator.setSystemId (systemId);

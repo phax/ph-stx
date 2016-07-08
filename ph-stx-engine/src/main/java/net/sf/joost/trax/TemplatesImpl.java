@@ -30,7 +30,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -45,7 +45,7 @@ import net.sf.joost.trace.DebugProcessor;
  * This class implements the Templates-Interface for TraX. Templates are
  * thread-safe, so create one templates and call newTransformer() to get a new
  * Transformer-Object.
- * 
+ *
  * @author Zubow
  */
 public class TemplatesImpl implements Templates, TrAXConstants
@@ -53,7 +53,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
 
   // Define a static logger variable so that it references the
   // Logger instance named "TemplatesImpl".
-  private static Log log = OptionalLog.getLog (TemplatesImpl.class);
+  private static final Logger log = OptionalLog.getLog (TemplatesImpl.class);
 
   /**
    * Holding a reference on a <code>TransformerFactoryImpl</code> should be
@@ -92,15 +92,14 @@ public class TemplatesImpl implements Templates, TrAXConstants
     }
     catch (final TransformerConfigurationException tE)
     {
-      if (log != null)
-        log.fatal (tE);
+      log.error ("Exception", tE);
       throw tE;
     }
   }
 
   /**
    * Constructor.
-   * 
+   *
    * @param reader
    *        The <code>XMLReader</code> for parsing the stylesheet
    * @param isource
@@ -132,7 +131,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
   /**
    * Configures the <code>Templates</code> - initializing with a completed
    * <code>Parser</code> object.
-   * 
+   *
    * @param stxParser
    *        A <code>Parser</code>
    * @throws TransformerConfigurationException
@@ -150,8 +149,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
 
       if (debugmode)
       {
-        if (log != null)
-          log.info ("init transformer in debug mode");
+        log.info ("init transformer in debug mode");
         processor = new DebugProcessor (stxParser);
       }
       else
@@ -163,14 +161,12 @@ public class TemplatesImpl implements Templates, TrAXConstants
     }
     catch (final org.xml.sax.SAXException sE)
     {
-      if (log != null)
-        log.fatal (sE);
+      log.error ("Exception", sE);
       throw new TransformerConfigurationException (sE.getMessage ());
     }
     catch (final java.lang.NullPointerException nE)
     {
-      if (log != null)
-        log.fatal (nE);
+      log.error ("Exception", nE);
       throw new TransformerConfigurationException ("Could not found value for property javax.xml.parsers.SAXParser " +
                                                    nE.getMessage ());
     }
@@ -179,7 +175,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
   /**
    * Configures the <code>Templates</code> - initializing by parsing the
    * stylesheet.
-   * 
+   *
    * @param reader
    *        The <code>XMLReader</code> for parsing the stylesheet
    * @param isource
@@ -222,7 +218,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
     catch (final java.io.IOException iE)
     {
       if (DEBUG)
-        log.debug (iE);
+        log.debug ("Exception", iE);
       throw new TransformerConfigurationException (iE.getMessage (), iE);
     }
     catch (final org.xml.sax.SAXException sE)
@@ -231,13 +227,13 @@ public class TemplatesImpl implements Templates, TrAXConstants
       if (emb instanceof TransformerConfigurationException)
         throw (TransformerConfigurationException) emb;
       if (DEBUG)
-        log.debug (sE);
+        log.debug ("Exception", sE);
       throw new TransformerConfigurationException (sE.getMessage (), sE);
     }
     catch (final java.lang.NullPointerException nE)
     {
       if (DEBUG)
-        log.debug (nE);
+        log.debug ("Exception", nE);
       nE.printStackTrace (System.err);
       throw new TransformerConfigurationException ("could not found value for property javax.xml.parsers.SAXParser ",
                                                    nE);
@@ -246,7 +242,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
 
   /**
    * Method returns a Transformer-instance for transformation-process
-   * 
+   *
    * @return A <code>Transformer</code> object.
    * @throws TransformerConfigurationException
    */
@@ -267,8 +263,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
       }
       catch (final SAXException e)
       {
-        if (log != null)
-          log.fatal (e);
+        log.error ("Exception", e);
         throw new TransformerConfigurationException (e.getMessage ());
       }
     }
@@ -276,7 +271,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
 
   /**
    * Gets the static properties for stx:output.
-   * 
+   *
    * @return Properties according to JAXP-Spec or null if an error is occured.
    */
   public Properties getOutputProperties ()

@@ -37,7 +37,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.URIResolver;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -69,7 +69,7 @@ import net.sf.joost.instruction.TransformFactory;
 /**
  * Processes an XML document as SAX XMLFilter. Actions are contained within an
  * array of templates, received from a transform node.
- * 
+ *
  * @version $Revision: 2.61 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
@@ -237,7 +237,7 @@ public class Processor extends XMLFilterImpl
 
     /**
      * Initial constructor for the first element of the data stack.
-     * 
+     *
      * @param c
      *        the initial context
      */
@@ -249,7 +249,7 @@ public class Processor extends XMLFilterImpl
 
     /**
      * Constructor used when processing a built-in template.
-     * 
+     *
      * @param data
      *        a {@link Processor.Data} element that will be copied partially
      */
@@ -366,7 +366,7 @@ public class Processor extends XMLFilterImpl
 
   // **********************************************************************
 
-  private static Log log = OptionalLog.getLog (Processor.class);
+  private static Logger log = OptionalLog.getLog (Processor.class);
 
   //
   // Constructors
@@ -376,7 +376,7 @@ public class Processor extends XMLFilterImpl
    * Constructs a new <code>Processor</code> instance by parsing an STX
    * transformation sheet. This constructor attempts to create its own
    * {@link XMLReader} object.
-   * 
+   *
    * @param src
    *        the source for the STX transformation sheet
    * @param pContext
@@ -394,7 +394,7 @@ public class Processor extends XMLFilterImpl
   /**
    * Constructs a new <code>Processor</code> instance by parsing an STX
    * transformation sheet.
-   * 
+   *
    * @param reader
    *        the parser that is used for reading the transformation sheet
    * @param src
@@ -429,7 +429,7 @@ public class Processor extends XMLFilterImpl
   /**
    * Constructs a new Processor instance from an existing Parser (Joost
    * representation of an STX transformation sheet)
-   * 
+   *
    * @param stxParser
    *        the Joost representation of a transformation sheet
    * @throws SAXException
@@ -443,7 +443,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Constructs a copy of the given Processor.
-   * 
+   *
    * @param proc
    *        the original Processor object
    * @throws SAXException
@@ -462,7 +462,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Constructs a copy of this Processor.
-   * 
+   *
    * @throws SAXException
    *         if the construction of a new XML parser fails
    */
@@ -477,7 +477,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Create an <code>XMLReader</code> object (a SAX Parser)
-   * 
+   *
    * @throws SAXException
    *         if a SAX Parser couldn't be created
    */
@@ -573,7 +573,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * The initialization of the emitter could be overriden for debug purpose.
-   * 
+   *
    * @param ctx
    *        The current context
    * @return an emitter-instance
@@ -614,10 +614,7 @@ public class Processor extends XMLFilterImpl
     }
     catch (final SAXException ex)
     {
-      if (log != null)
-        log.warn ("Accessing " + parent + ": " + ex);
-      else
-        System.err.println ("Warning - Accessing " + parent + ": " + ex);
+      log.warn ("Accessing " + parent + ": " + ex);
     }
   }
 
@@ -682,7 +679,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Sets a global parameter of the STX transformation sheet
-   * 
+   *
    * @param name
    *        the (expanded) parameter name
    * @param value
@@ -697,7 +694,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Returns a global parameter of the STX transformation sheet
-   * 
+   *
    * @param name
    *        the (expanded) parameter name
    * @return the parameter value or <code>null</code> if this parameter isn't
@@ -714,11 +711,9 @@ public class Processor extends XMLFilterImpl
         return param.toJavaObject (Object.class);
     }
     catch (final EvalException ex)
-    { // shouldn't happen here
-      if (log != null)
-        log.fatal (ex);
-      else
-        System.err.println ("Fatal error - " + ex);
+    {
+      // shouldn't happen here
+      log.error ("Internal error", ex);
     }
     return null;
   }
@@ -733,7 +728,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Registers a custom {@link TransformerHandlerResolver} object.
-   * 
+   *
    * @param resolver
    *        the resolver to be registered
    */
@@ -744,7 +739,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Registers a URIResolver for <code>stx:process-document</code>
-   * 
+   *
    * @param resolver
    *        the resolver to be registered
    */
@@ -755,7 +750,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Registers an {@link OutputURIResolver} for <code>stx:result-document</code>
-   * 
+   *
    * @param resolver
    *        the resolver to be registered
    */
@@ -766,7 +761,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Registers a message emitter for <code>stx:message</code>
-   * 
+   *
    * @param emitter
    *        the emitter object to be registered
    */
@@ -815,7 +810,7 @@ public class Processor extends XMLFilterImpl
   /**
    * Check for the next best matching template after
    * <code>stx:process-self</code>
-   * 
+   *
    * @param temp
    *        a template matching the current node
    * @return <code>true</code> if this template hasn't been processed before
@@ -901,7 +896,7 @@ public class Processor extends XMLFilterImpl
    * Performs the processing of the linked instruction chain until an end
    * condition was met. This method stores the last return value in the class
    * member variable {@link #processStatus}.
-   * 
+   *
    * @param inst
    *        the first instruction in the chain
    * @param event
@@ -960,7 +955,7 @@ public class Processor extends XMLFilterImpl
   /**
    * Process an instruction. This method should be overridden for debug
    * purposes.
-   * 
+   *
    * @param inst
    *        The instruction which should be processed
    * @param event
@@ -984,8 +979,8 @@ public class Processor extends XMLFilterImpl
     if (DEBUG)
       if (log.isDebugEnabled ())
       {
-        log.debug (event);
-        log.debug (context.localVars);
+        log.debug (event.toString ());
+        log.debug (context.localVars.toString ());
       }
 
     if (dataStack.peek ().lastProcStatus == PR_SIBLINGS)
@@ -1004,7 +999,7 @@ public class Processor extends XMLFilterImpl
         if (log.isDebugEnabled ())
         {
           log.debug ("stop " + processStatus);
-          log.debug (context.localVars);
+          log.debug (context.localVars.toString ());
         }
 
       switch (processStatus)
@@ -1085,10 +1080,7 @@ public class Processor extends XMLFilterImpl
                 break;
 
               default:
-                if (log != null)
-                  log.error ("Unexpected event: " + event);
-                else
-                  System.err.println ("Error - Unexpected event: " + event);
+                log.error ("Unexpected event: " + event);
             }
           }
           else
@@ -1152,8 +1144,7 @@ public class Processor extends XMLFilterImpl
         default:
           // Mustn't happen
           final String msg = "Unexpected return value from process() " + processStatus;
-          if (log != null)
-            log.error (msg);
+          log.error (msg);
           throw new SAXException (msg);
       }
     }
@@ -1206,10 +1197,7 @@ public class Processor extends XMLFilterImpl
           break;
 
         default:
-          if (log != null)
-            log.error ("no default action for " + event);
-          else
-            System.err.println ("Error - no default action for " + event);
+          log.error ("no default action for " + event);
       }
     }
   }
@@ -1222,7 +1210,7 @@ public class Processor extends XMLFilterImpl
   {
     if (DEBUG)
       if (log.isDebugEnabled ())
-        log.debug (lastElement);
+        log.debug (lastElement.toString ());
 
     // determine if the look-ahead is a text node
     final String s = collectedCharacters.toString ();
@@ -1301,7 +1289,7 @@ public class Processor extends XMLFilterImpl
    * Simulate events for each of the attributes of the current element. This
    * method will be called due to an <code>stx:process-attributes</code>
    * instruction.
-   * 
+   *
    * @param attrs
    *        the attributes to be processed
    */
@@ -1385,7 +1373,7 @@ public class Processor extends XMLFilterImpl
   /**
    * Clear consecutive pending <code>stx:process-siblings</code> instructions on
    * the top of {@link #dataStack} until the passed object is encountered.
-   * 
+   *
    * @param stopData
    *        data for the last <code>stx:process-siblings</code> instruction
    * @param clearLast
@@ -1421,7 +1409,7 @@ public class Processor extends XMLFilterImpl
           if (log.isDebugEnabled ())
           {
             log.debug ("stop " + processStatus);
-            log.debug (context.localVars);
+            log.debug (String.valueOf (context.localVars));
           }
 
         switch (processStatus)
@@ -1666,10 +1654,7 @@ public class Processor extends XMLFilterImpl
         }
         else
         {
-          if (log != null)
-            log.error ("encountered 'else' " + prStatus);
-          else
-            System.err.println ("Error - encountered 'else' " + prStatus);
+          log.error ("encountered 'else' " + prStatus);
         }
     }
     else
@@ -1699,10 +1684,7 @@ public class Processor extends XMLFilterImpl
       }
     }
     else
-      if (log != null)
-        log.error ("skipDepth at document end: " + skipDepth);
-      else
-        System.err.println ("Error - skipDepth at document end: " + skipDepth);
+      log.error ("skipDepth at document end: " + skipDepth);
   }
 
   @Override
@@ -1833,10 +1815,7 @@ public class Processor extends XMLFilterImpl
         }
         else
         {
-          if (log != null)
-            log.error ("encountered 'else' " + prStatus);
-          else
-            System.err.println ("Error - encountered 'else' " + prStatus);
+          log.error ("encountered 'else' " + prStatus);
         }
     }
     else
@@ -2066,7 +2045,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Returns a reference to the event stack.
-   * 
+   *
    * @return the event stack
    */
   public Stack getEventStack ()
@@ -2076,7 +2055,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Returns a reference to the data stack.
-   * 
+   *
    * @return the data stack
    */
   protected DataStack getDataStack ()
@@ -2086,7 +2065,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Returns a ref to the current context of the processing.
-   * 
+   *
    * @return the current context
    */
   public Context getContext ()
@@ -2096,7 +2075,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Returns a ref to the registered emitter
-   * 
+   *
    * @return the emitter
    */
   public Emitter getEmitter ()
@@ -2106,7 +2085,7 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Returns a ref to the last element (look ahead)
-   * 
+   *
    * @return the last element
    */
   protected SAXEvent getLastElement ()

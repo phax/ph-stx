@@ -30,7 +30,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -55,7 +55,7 @@ public final class THResolver implements TransformerHandlerResolver
   public static final String HTTP_POST_METHOD = "http://www.ietf.org/rfc/rfc2616.txt#POST";
 
   /** logging object */
-  private static Log log = OptionalLog.getLog (THResolver.class);
+  private static Logger log = OptionalLog.getLog (THResolver.class);
 
   /**
    * It return supported URIs, in this case @HTTP_POST_METHOD

@@ -33,7 +33,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -54,7 +54,7 @@ import net.sf.joost.trax.TrAXHelper;
 /**
  * Factory for <code>process-document</code> elements, which are represented by
  * the inner Instance class.
- * 
+ *
  * @version $Revision: 2.20 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
@@ -64,8 +64,8 @@ public class PDocumentFactory extends FactoryBase
   /** allowed attributes for this element */
   private final HashSet attrNames;
 
-  // Log initialization
-  private static Log log = OptionalLog.getLog (PDocumentFactory.class);
+  // Logger initialization
+  private static Logger log = OptionalLog.getLog (PDocumentFactory.class);
 
   //
   // Constructor
@@ -215,8 +215,7 @@ public class PDocumentFactory extends FactoryBase
               }
               catch (final SAXException ex)
               {
-                if (log != null)
-                  log.warn ("Accessing " + reader + ": " + ex);
+                log.warn ("Accessing " + reader + ": " + ex);
                 context.errorHandler.warning ("Accessing " + reader + ": " + ex, publicId, systemId, lineNo, colNo, ex);
               }
             }
@@ -245,8 +244,7 @@ public class PDocumentFactory extends FactoryBase
             }
             catch (final SAXException ex)
             {
-              if (log != null)
-                log.warn ("Accessing " + reader + ": " + ex);
+              log.warn ("Accessing " + reader + ": " + ex);
               context.errorHandler.warning ("Accessing " + reader + ": " + ex, publicId, systemId, lineNo, colNo, ex);
             }
           }

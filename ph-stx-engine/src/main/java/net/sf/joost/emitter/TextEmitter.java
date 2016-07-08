@@ -27,7 +27,7 @@ package net.sf.joost.emitter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -36,14 +36,14 @@ import net.sf.joost.OptionalLog;
 /**
  * This class implements an emitter that uses the <code>text</code> output
  * method for byte or character streams.
- * 
+ *
  * @version $Revision: 1.4 $ $Date: 2007/11/25 14:18:02 $
  * @author Oliver Becker, Anatolij Zubow
  */
 public class TextEmitter extends StreamEmitter
 {
-  // Log initialization
-  private static Log log = OptionalLog.getLog (TextEmitter.class);
+  // Logger initialization
+  private static Logger log = OptionalLog.getLog (TextEmitter.class);
 
   /** Constructor */
   public TextEmitter (final Writer writer, final String encoding)
@@ -68,8 +68,7 @@ public class TextEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }
@@ -108,8 +107,7 @@ public class TextEmitter extends StreamEmitter
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
+      log.error ("Exception", ex);
       throw new SAXException (ex);
     }
   }

@@ -33,10 +33,7 @@ import java.io.InputStreamReader;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.logging.Log;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -55,7 +52,7 @@ import net.sf.joost.stx.Processor;
 public class Main implements Constants
 {
   // the logger object if available
-  private static Log log = OptionalLog.getLog (Main.class);
+  private static Logger log = OptionalLog.getLog (Main.class);
 
   /**
    * Entry point
@@ -77,12 +74,6 @@ public class Main implements Constants
 
     // custom message emitter class name (optional)
     String meClassname = null;
-
-    // log4j properties filename (optional)
-    String log4jProperties = null;
-
-    // log4j message level (this is an object of the class Level)
-    Level log4jLevel = null;
 
     // set to true if a command line parameter was wrong
     boolean wrongParameter = false;
@@ -224,79 +215,10 @@ public class Main implements Constants
                                 wrongParameter = true;
                               }
                               else
-                                if (DEBUG && "-log-properties".equals (args[i]))
-                                {
-                                  // this option needs a parameter
-                                  if (++i < args.length && args[i].charAt (0) != '-')
-                                  {
-                                    log4jProperties = args[i];
-                                    continue;
-                                  }
-                                  System.err.println ("Option -log-properties requires " + "a filename");
-                                  wrongParameter = true;
-                                }
-                                else
-                                  if (DEBUG && "-log-level".equals (args[i]))
-                                  {
-                                    // this option needs a parameter
-                                    if (++i < args.length && args[i].charAt (0) != '-')
-                                    {
-                                      if ("off".equals (args[i]))
-                                      {
-                                        log4jLevel = Level.OFF;
-                                        continue;
-                                      }
-                                      else
-                                        if ("debug".equals (args[i]))
-                                        {
-                                          log4jLevel = Level.DEBUG;
-                                          continue;
-                                        }
-                                        else
-                                          if ("info".equals (args[i]))
-                                          {
-                                            log4jLevel = Level.INFO;
-                                            continue;
-                                          }
-                                          else
-                                            if ("warn".equals (args[i]))
-                                            {
-                                              log4jLevel = Level.WARN;
-                                              continue;
-                                            }
-                                            else
-                                              if ("error".equals (args[i]))
-                                              {
-                                                log4jLevel = Level.ERROR;
-                                                continue;
-                                              }
-                                              else
-                                                if ("fatal".equals (args[i]))
-                                                {
-                                                  log4jLevel = Level.FATAL;
-                                                  continue;
-                                                }
-                                                else
-                                                  if ("all".equals (args[i]))
-                                                  {
-                                                    log4jLevel = Level.ALL;
-                                                    continue;
-                                                  }
-                                                  else
-                                                  {
-                                                    System.err.println ("Unknown parameter for -log-level: " + args[i]);
-                                                    wrongParameter = true;
-                                                    continue;
-                                                  }
-                                    }
-                                    System.err.println ("Option -log-level requires a " + "parameter");
-                                    wrongParameter = true;
-                                  }
-                                  else
-                                  {
-                                    System.err.println ("Unknown option " + args[i]);
-                                    wrongParameter = true;
-                                  }
+                              {
+                                System.err.println ("Unknown option " + args[i]);
+                                wrongParameter = true;
+                              }
           }
           // command line argument is not an option with a leading '-'
           else
@@ -410,17 +332,6 @@ public class Main implements Constants
       {
         System.err.println ("Specify -help to get a detailed help message");
         System.exit (1);
-      }
-
-      if (DEBUG)
-      {
-        // use specified log4j properties file
-        if (log4jProperties != null)
-          PropertyConfigurator.configure (log4jProperties);
-
-        // set log level specified on the the command line
-        if (log4jLevel != null)
-          Logger.getRootLogger ().setLevel (log4jLevel);
       }
 
       // The first processor re-uses its XMLReader for parsing the input
@@ -600,10 +511,7 @@ public class Main implements Constants
     }
     catch (final IOException ex)
     {
-      if (log != null)
-        log.error (ex);
-      else
-        System.err.println (ex);
+      log.error ("Exception", ex);
     }
   }
 
@@ -612,7 +520,7 @@ public class Main implements Constants
    */
   private static void logInfoAndExit ()
   {
-    System.err.println ("Logging is " + ((log != null) ? "enabled using " + log.getClass ().getName () : "disabled"));
+    System.err.println ("Logging is enabled using " + log.getClass ().getName ());
     System.exit (0);
   }
 }

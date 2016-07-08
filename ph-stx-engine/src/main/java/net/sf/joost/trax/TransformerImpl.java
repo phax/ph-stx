@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
@@ -41,7 +42,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -68,9 +69,9 @@ public class TransformerImpl extends Transformer implements TrAXConstants
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerImpl".
-  private static Log log = OptionalLog.getLog (TransformerImpl.class);
+  private static Logger log = OptionalLog.getLog (TransformerImpl.class);
 
-  private Processor processor = null; // Bugfix
+  private Processor m_aProcessor = null; // Bugfix
 
   private URIResolver uriRes = null;
 
@@ -78,14 +79,14 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   private ErrorListener errorListener = new TransformationErrListener ();
 
   // output properties
-  private final HashSet supportedProperties = new HashSet ();
-  private final HashSet ignoredProperties = new HashSet ();
+  private final Set <String> supportedProperties = new HashSet<> ();
+  private final Set <String> ignoredProperties = new HashSet<> ();
 
   /**
    * Synch object to gaurd against setting values from the TrAX interface or
    * reentry while the transform is going on.
    */
-  private final Boolean reentryGuard = new Boolean (true);
+  private final Boolean reentryGuard = Boolean.TRUE;
 
   /**
    * This is a compile-time flag to enable or disable calling of trace
@@ -113,7 +114,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
    */
   protected TransformerImpl (final Processor processor)
   {
-    this.processor = processor;
+    this.m_aProcessor = processor;
 
     // set tracing manager on processor object
     if (processor instanceof DebugProcessor)
@@ -182,16 +183,16 @@ public class TransformerImpl extends Transformer implements TrAXConstants
       {
 
         // init StxEmitter
-        out = TrAXHelper.initStxEmitter (result, processor, null);
+        out = TrAXHelper.initStxEmitter (result, m_aProcessor, null);
         out.setSystemId (result.getSystemId ());
 
-        this.processor.setContentHandler (out);
-        this.processor.setLexicalHandler (out);
+        this.m_aProcessor.setContentHandler (out);
+        this.m_aProcessor.setLexicalHandler (out);
 
         // register ErrorListener
         if (this.errorListener != null)
         {
-          this.processor.setErrorListener (errorListener);
+          this.m_aProcessor.setErrorListener (errorListener);
         }
 
         // construct from source a SAXSource
@@ -251,11 +252,11 @@ public class TransformerImpl extends Transformer implements TrAXConstants
               }
             }
             // set the the SAXSource as the parent of the STX-Processor
-            this.processor.setParent (saxSource.getXMLReader ());
+            this.m_aProcessor.setParent (saxSource.getXMLReader ());
           }
 
           // perform transformation
-          this.processor.parse (isource);
+          this.m_aProcessor.parse (isource);
         }
         else
         {
@@ -339,12 +340,11 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   {
 
     if (supportedProperties.contains (name))
-      return processor.outputProperties.getProperty (name);
+      return m_aProcessor.outputProperties.getProperty (name);
     if (ignoredProperties.contains (name))
       return null;
     final IllegalArgumentException iE = new IllegalArgumentException ("Unsupported property " + name);
-    if (log != null)
-      log.error (iE.getMessage (), iE);
+    log.error (iE.getMessage (), iE);
     throw iE;
   }
 
@@ -367,23 +367,20 @@ public class TransformerImpl extends Transformer implements TrAXConstants
       if (OutputKeys.METHOD.equals (name) && !isValidOutputMethod (value))
       {
         iE = new IllegalArgumentException ("Unsupported output method " + value);
-        if (log != null)
-          log.error (iE.getMessage (), iE);
+        log.error (iE.getMessage (), iE);
         throw iE;
       }
-      processor.outputProperties.setProperty (name, value);
+      m_aProcessor.outputProperties.setProperty (name, value);
     }
     else
       if (ignoredProperties.contains (name))
       {
-        if (log != null)
-          log.warn ("Output property '" + name + "' is not supported and will be ignored");
+        log.warn ("Output property '" + name + "' is not supported and will be ignored");
       }
       else
       {
         iE = new IllegalArgumentException ("Invalid output property '" + name + "'");
-        if (log != null)
-          log.error (iE.getMessage (), iE);
+        log.error (iE.getMessage (), iE);
         throw iE;
       }
   }
@@ -396,7 +393,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   @Override
   public Properties getOutputProperties ()
   {
-    return (Properties) processor.outputProperties.clone ();
+    return (Properties) m_aProcessor.outputProperties.clone ();
   }
 
   /**
@@ -412,7 +409,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   {
     if (oformat == null)
     {
-      processor.initOutputProperties (); // re-initialize
+      m_aProcessor.initOutputProperties (); // re-initialize
     }
     else
     {
@@ -423,27 +420,24 @@ public class TransformerImpl extends Transformer implements TrAXConstants
         final Object propKey = e.nextElement ();
         if (ignoredProperties.contains (propKey))
         {
-          if (log != null)
-            log.warn ("Output property '" + propKey + "' is not supported and will be ignored");
+          log.warn ("Output property '" + propKey + "' is not supported and will be ignored");
           continue;
         }
         if (!supportedProperties.contains (propKey))
         {
           iE = new IllegalArgumentException ("Invalid output property '" + propKey + "'");
-          if (log != null)
-            log.error (iE);
+          log.error ("Exception", iE);
           throw iE;
         }
         final String propVal = oformat.getProperty ((String) propKey);
         if (OutputKeys.METHOD.equals (propKey) && !isValidOutputMethod (propVal))
         {
           iE = new IllegalArgumentException ("Unsupported output method " + oformat.getProperty ((String) propKey));
-          if (log != null)
-            log.error (iE);
+          log.error ("Exception", iE);
           throw iE;
         }
       }
-      processor.outputProperties = (Properties) oformat.clone ();
+      m_aProcessor.outputProperties = (Properties) oformat.clone ();
     }
   }
 
@@ -479,7 +473,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
     synchronized (reentryGuard)
     {
       uriRes = resolver;
-      processor.setURIResolver (resolver);
+      m_aProcessor.setURIResolver (resolver);
     }
   }
 
@@ -489,7 +483,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   @Override
   public void clearParameters ()
   {
-    processor.clearParameters ();
+    m_aProcessor.clearParameters ();
   }
 
   /**
@@ -503,7 +497,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   @Override
   public void setParameter (final String name, final Object value)
   {
-    processor.setParameter (name, value);
+    m_aProcessor.setParameter (name, value);
   }
 
   /**
@@ -516,7 +510,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   @Override
   public Object getParameter (final String name)
   {
-    return processor.getParameter (name);
+    return m_aProcessor.getParameter (name);
   }
 
   /**
@@ -545,13 +539,13 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   }
 
   /**
-   * Getter for {@link #processor}
+   * Getter for {@link #m_aProcessor}
    *
    * @return A <code>Processor</code> object.
    */
   public Processor getStxProcessor ()
   {
     // Processor tempProcessor = new Processor(processor);
-    return processor;
+    return m_aProcessor;
   }
 }

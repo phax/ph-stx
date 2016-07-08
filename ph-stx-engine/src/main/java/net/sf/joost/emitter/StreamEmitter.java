@@ -38,7 +38,7 @@ import java.util.Properties;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
@@ -48,14 +48,14 @@ import net.sf.joost.trax.TrAXConstants;
 
 /**
  * Base class for emitter classes that produce a character stream.
- * 
+ *
  * @version $Revision: 1.32 $ $Date: 2008/10/06 13:31:41 $
  * @author Oliver Becker
  */
 public abstract class StreamEmitter extends StxEmitterBase implements Constants
 {
-  // Log initialization
-  private static Log log = OptionalLog.getLog (StreamEmitter.class);
+  // Logger initialization
+  private static Logger log = OptionalLog.getLog (StreamEmitter.class);
 
   /** Joost's HTML extension output method */
   private static String HTML_METHOD = "{" + JOOST_EXT_NS + "}html";
@@ -89,7 +89,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
    * and a set of output properties. The value of the
    * <code>OutputKeys.METHOD</code> property determines the returned emitter
    * object.
-   * 
+   *
    * @param writer
    *        A <code>Writer</code> for receiving the output.
    * @param encoding
@@ -116,10 +116,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
           else
           {
             final String msg = "Unsupported output method '" + outputMethod + "', use default 'xml' method instead";
-            if (log != null)
-              log.warn (msg);
-            else
-              System.err.println ("Warning: " + msg);
+            log.warn (msg);
           }
       if (emitter != null)
       {
@@ -142,7 +139,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
    * property defines the encoding for to used. The value of the
    * <code>OutputKeys.METHOD</code> property determines the returned emitter
    * object.
-   * 
+   *
    * @param out
    *        An <code>OutputStream</code> for receiving the output.
    * @param outputProperties
@@ -171,10 +168,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
     catch (final java.io.UnsupportedEncodingException e)
     {
       final String msg = "Unsupported encoding " + encoding + ", using " + DEFAULT_ENCODING;
-      if (log != null)
-        log.warn (msg);
-      else
-        System.err.println ("Warning: " + msg);
+      log.warn (msg);
       writer = new OutputStreamWriter (out, DEFAULT_ENCODING);
     }
 
@@ -184,7 +178,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
   /**
    * Creates an XML emitter using a given <code>Writer</code> and the default
    * output encoding ({@link #DEFAULT_ENCODING}).
-   * 
+   *
    * @param writer
    *        A <code>Writer</code> for receiving the output.
    * @return a proper XML emitter object
@@ -200,7 +194,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
    * defines the encoding for to used. The value of the
    * <code>OutputKeys.METHOD</code> property determines the returned emitter
    * object.
-   * 
+   *
    * @param filename
    *        The name of the output file.
    * @param outputProperties
@@ -221,7 +215,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
   /**
    * Defines whether the XML declaration should be omitted, default is
    * <code>false</code>.
-   * 
+   *
    * @param flag
    *        <code>true</code>: the XML declaration will be omitted;
    *        <code>false</code>: the XML declaration will be output
@@ -235,7 +229,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
    * {@link Result#PI_DISABLE_OUTPUT_ESCAPING} and
    * {@link Result#PI_ENABLE_OUTPUT_ESCAPING} will be interpreted). The default
    * is <code>false</code>
-   * 
+   *
    * @param flag
    *        <code>true</code> the PIs will be interpreted; <code>false</code>
    *        the PIs will be written literally
@@ -245,7 +239,7 @@ public abstract class StreamEmitter extends StxEmitterBase implements Constants
 
   /**
    * Encode a character from a character array, respect surrogate pairs
-   * 
+   *
    * @param chars
    *        the character array
    * @param index

@@ -23,14 +23,13 @@
  */
 package net.sf.joost;
 
-import java.lang.reflect.Method;
-
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a helper class that optionally initializes the Commons Logging
  * facility. If <code>org.apache.commons.logging.LogFactory</code> is present
- * the {@link #getLog(Class)} method returns a normal <code>Log</code> object
+ * the {@link #getLog(Class)} method returns a normal <code>Logger</code> object
  * that must be converted (via a type cast) before using it. Otherwise the
  * method returns <code>null</code>. This approach prevents a
  * <code>NoClassDefFoundError</code> in case logging is not available.
@@ -40,89 +39,21 @@ import org.apache.commons.logging.Log;
  */
 public final class OptionalLog
 {
-  private static Method getLogMethodClass;
-  private static Method getLogMethodString;
-  static
+  /**
+   * Returns a <code>org.slf4j.Logger</log> object if this
+   * class is available, otherwise <code>null</code>
+   */
+  public static Logger getLog (final Class <?> _class)
   {
-    try
-    {
-      final Class c = Class.forName ("org.apache.commons.logging.LogFactory");
-      try
-      {
-        // look for getLog(Class _class)
-        final Class [] declaredParams = { Class.class };
-        getLogMethodClass = c.getDeclaredMethod ("getLog", declaredParams);
-        // one trial invocation
-        final Object [] actualParams = { OptionalLog.class };
-        getLogMethodClass.invoke (null, actualParams);
-      }
-      catch (final Throwable t)
-      {
-        // Something went wrong, logging is not available
-        getLogMethodClass = null;
-      }
-      try
-      {
-        // look for getLog(String name)
-        final Class [] declaredParams = { String.class };
-        getLogMethodString = c.getDeclaredMethod ("getLog", declaredParams);
-        // one trial invocation
-        final Object [] actualParamsString = { OptionalLog.class.getName () };
-        getLogMethodString.invoke (null, actualParamsString);
-      }
-      catch (final Throwable t)
-      {
-        // Something went wrong, logging is not available
-        getLogMethodString = null;
-      }
-    }
-    catch (final Throwable t)
-    {
-      // Class not found, logging is not available
-      getLogMethodClass = null;
-      getLogMethodString = null;
-    }
+    return LoggerFactory.getLogger (_class);
   }
 
   /**
-   * Returns a <code>org.apache.commons.logging.Log</log> object if this
+   * Returns a <code>org.slf4j.Logger</log> object if this
    * class is available, otherwise <code>null</code>
    */
-  public static Log getLog (final Class _class)
+  public static Logger getLog (final String name)
   {
-    if (getLogMethodClass != null)
-    {
-      final Object [] params = { _class };
-      try
-      {
-        return (Log) getLogMethodClass.invoke (null, params);
-      }
-      catch (final Throwable t)
-      {
-        // Shouldn't happen ...
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Returns a <code>org.apache.commons.logging.Log</log> object if this
-   * class is available, otherwise <code>null</code>
-   */
-  public static Log getLog (final String name)
-  {
-    if (getLogMethodString != null)
-    {
-      final Object [] params = { name };
-      try
-      {
-        return (Log) getLogMethodString.invoke (null, params);
-      }
-      catch (final Throwable t)
-      {
-        // Shouldn't happen ...
-      }
-    }
-    return null;
+    return LoggerFactory.getLogger (name);
   }
 }

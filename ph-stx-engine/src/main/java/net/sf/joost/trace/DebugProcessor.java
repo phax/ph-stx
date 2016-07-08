@@ -26,7 +26,7 @@ package net.sf.joost.trace;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -49,7 +49,7 @@ import net.sf.joost.trax.TransformerImpl;
 
 /**
  * Extends the {@link net.sf.joost.stx.Processor} with debug features.
- * 
+ *
  * @version $Revision: 1.22 $ $Date: 2008/10/04 17:13:14 $
  * @author Zubow
  */
@@ -66,12 +66,12 @@ public class DebugProcessor extends Processor
   private Locator locator;
 
   /** logger */
-  private static Log log = OptionalLog.getLog (DebugProcessor.class);
+  private static Logger log = OptionalLog.getLog (DebugProcessor.class);
 
   /**
    * See
    * {@link net.sf.joost.stx.Processor#Processor(net.sf.joost.stx.Processor)}
-   * 
+   *
    * @throws SAXException
    */
   public DebugProcessor (final Processor proc) throws SAXException
@@ -121,7 +121,7 @@ public class DebugProcessor extends Processor
 
   /**
    * See {@link net.sf.joost.stx.Processor#copy()}
-   * 
+   *
    * @throws SAXException
    */
   @Override
@@ -152,14 +152,13 @@ public class DebugProcessor extends Processor
   @Override
   protected Emitter initializeEmitter (final Context ctx)
   {
-    if (log != null)
-      log.info ("initialize DebugProcessor ...");
+    log.info ("initialize DebugProcessor ...");
     return new DebugEmitter (ctx.errorHandler);
   }
 
   /**
    * Overriden method for the execution of a given instruction.
-   * 
+   *
    * @param inst
    *        the instruction to be executed
    * @param event
