@@ -24,12 +24,12 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.io.stream.StreamHelper;
-import com.helger.commons.string.StringHelper;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * This class is only used internally as the source for the generated parsers.<br>
+ * This class is only used internally as the source for the generated
+ * parsers.<br>
  * An implementation of interface {@link CharStream}, where the stream is
  * assumed to contain only ASCII characters (with java-like unicode escape
  * processing).
@@ -278,19 +278,6 @@ public final class STXCharStream implements CharStream
     m_aBufColumn[m_nBufpos] = m_nColumn;
   }
 
-  private static boolean _isHexChar (final char c)
-  {
-    return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
-  }
-
-  private static int _hexval (final char c) throws IOException
-  {
-    final int ret = StringHelper.getHexValue (c);
-    if (ret < 0)
-      throw new IOException ("Illegal hex char '" + c + "'");
-    return ret;
-  }
-
   /**
    * Read a character.
    *
@@ -402,14 +389,15 @@ public final class STXCharStream implements CharStream
   /**
    * Method to adjust line and column numbers for the start of a token.
    *
-   * @param newLine
+   * @param nNewLine
    *        line index
    * @param newCol
    *        column index
    */
-  public void adjustBeginLineColumn (int newLine, final int newCol)
+  public void adjustBeginLineColumn (final int nNewLine, final int newCol)
   {
     int start = m_nTokenBegin;
+    int newLine = nNewLine;
     int len;
 
     if (m_nBufpos >= m_nTokenBegin)
