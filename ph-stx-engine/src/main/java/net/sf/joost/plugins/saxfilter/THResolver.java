@@ -31,11 +31,11 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.ITransformerHandlerResolver;
 
 /**
@@ -53,7 +53,7 @@ public final class THResolver implements ITransformerHandlerResolver
   public static final String SAX_METHOD = "http://xml.org/sax";
 
   /** logging object */
-  private static Logger log = OptionalLog.getLog (THResolver.class);
+  private static final Logger log = LoggerFactory.getLogger (THResolver.class);
 
   /**
    * It return supported URIs, in this case @SAX_METHOD

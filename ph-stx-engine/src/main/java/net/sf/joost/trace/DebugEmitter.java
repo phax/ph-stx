@@ -29,12 +29,12 @@ import java.io.Writer;
 import java.util.Map;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.LocatorImpl;
 
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.AbstractNodeBase;
@@ -52,7 +52,7 @@ public class DebugEmitter extends Emitter
 {
 
   /** logger */
-  private static Logger log = OptionalLog.getLog (DebugEmitter.class);
+  private static Logger log = LoggerFactory.getLogger (DebugEmitter.class);
 
   /** for dynamic tracing */
   private TraceManager tmgr;

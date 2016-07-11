@@ -39,6 +39,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.URIResolver;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -54,16 +55,15 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.IOutputURIResolver;
 import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.AbstractGroupBase;
+import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.AbstractNodeBase;
-import net.sf.joost.instruction.PSiblingsFactory;
 import net.sf.joost.instruction.AbstractProcessBase;
+import net.sf.joost.instruction.PSiblingsFactory;
 import net.sf.joost.instruction.TemplateFactory;
 import net.sf.joost.instruction.TransformFactory;
 
@@ -367,7 +367,7 @@ public class Processor extends XMLFilterImpl
 
   // **********************************************************************
 
-  private static Logger log = OptionalLog.getLog (Processor.class);
+  private static Logger log = LoggerFactory.getLogger (Processor.class);
 
   //
   // Constructors
@@ -750,7 +750,8 @@ public class Processor extends XMLFilterImpl
   }
 
   /**
-   * Registers an {@link IOutputURIResolver} for <code>stx:result-document</code>
+   * Registers an {@link IOutputURIResolver} for
+   * <code>stx:result-document</code>
    *
    * @param resolver
    *        the resolver to be registered
@@ -1688,7 +1689,7 @@ public class Processor extends XMLFilterImpl
           context.emitter.endDocument (transformNode);
         }
         else
-          eventStack = context.ancestorStack = (Stack <Object>) innerProcStack.pop ();
+          eventStack = context.ancestorStack = (Stack <SAXEvent>) innerProcStack.pop ();
       }
     }
     else

@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -35,8 +36,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.util.regex.JRegularExpression;
@@ -52,14 +53,11 @@ import net.sf.joost.util.regex.JRegularExpression;
 public final class AnalyzeTextFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames;
 
-  //
-  // Constructor
-  //
   public AnalyzeTextFactory ()
   {
-    attrNames = new HashSet <String> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("select");
   }
 
@@ -72,9 +70,9 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
 
@@ -95,7 +93,10 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
     private AbstractNodeBase noMatchChild;
 
     // Constructor
-    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree select)
+    protected Instance (final String qName,
+                        final AbstractNodeBase parent,
+                        final ParseContext context,
+                        final AbstractTree select)
     {
       super (qName, parent, context, true);
       this.select = select;

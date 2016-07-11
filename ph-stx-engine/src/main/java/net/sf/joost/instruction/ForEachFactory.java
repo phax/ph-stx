@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -50,12 +51,12 @@ import net.sf.joost.stx.Value;
 public final class ForEachFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public ForEachFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }
@@ -69,9 +70,9 @@ public final class ForEachFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     final String expName = getExpandedName (nameAtt, context);
@@ -119,7 +120,7 @@ public final class ForEachFactory extends AbstractFactoryBase
       this.select = select;
 
       // this instruction declares a local variable
-      scopedVariables = new Vector ();
+      scopedVariables = new Vector<> ();
     }
 
     /**
@@ -209,8 +210,7 @@ public final class ForEachFactory extends AbstractFactoryBase
       if (select != null)
         theCopy.select = select.deepCopy (copies);
       theCopy.continued = false;
-      theCopy.resultStack = new Stack ();
+      theCopy.resultStack = new Stack<> ();
     }
-
   }
 }

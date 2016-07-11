@@ -49,13 +49,13 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.DOMEmitter;
 import net.sf.joost.emitter.IStxEmitter;
@@ -72,7 +72,7 @@ public class TrAXHelper
 
   // Define a static logger variable so that it references the
   // Logger instance named "TrAXHelper".
-  private static final Logger log = OptionalLog.getLog (TrAXHelper.class);
+  private static final Logger log = LoggerFactory.getLogger (TrAXHelper.class);
 
   /**
    * Defaultconstructor

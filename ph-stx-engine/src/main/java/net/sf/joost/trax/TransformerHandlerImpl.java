@@ -32,13 +32,13 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.DOMEmitter;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.Processor;
@@ -58,7 +58,7 @@ public class TransformerHandlerImpl implements TransformerHandler
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerHandlerImpl".
-  private static Logger log = OptionalLog.getLog (TransformerHandlerImpl.class);
+  private static Logger log = LoggerFactory.getLogger (TransformerHandlerImpl.class);
 
   /**
    * Processor is the joost-stx-engine

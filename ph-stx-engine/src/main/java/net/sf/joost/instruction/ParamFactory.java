@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -50,12 +51,12 @@ import net.sf.joost.stx.Value;
 public final class ParamFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public ParamFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("required");
     attrNames.add ("select");
@@ -70,13 +71,14 @@ public final class ParamFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
-    if (parent == null || !(parent instanceof AbstractGroupBase || // transform, group
+    if (parent == null || !(parent instanceof AbstractGroupBase || // transform,
+                                                                   // group
                             parent instanceof AbstractTemplateBase)) // template,
-                                                             // procedure
+      // procedure
       throw new SAXParseException ("'" +
                                    qName +
                                    "' must be a top level element " +

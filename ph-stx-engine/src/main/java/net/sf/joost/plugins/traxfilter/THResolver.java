@@ -42,12 +42,12 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.plugins.attributes.AbstractAttribute;
 import net.sf.joost.plugins.attributes.BooleanAttribute;
@@ -176,7 +176,7 @@ public class THResolver implements ITransformerHandlerResolver
   private static Object SYNCHRONIZE_GUARD = new Object ();
 
   /** logging object */
-  private static Logger log = OptionalLog.getLog (THResolver.class);
+  private static Logger log = LoggerFactory.getLogger (THResolver.class);
 
   /*
    * (non-Javadoc)

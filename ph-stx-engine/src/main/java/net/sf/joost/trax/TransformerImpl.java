@@ -43,13 +43,13 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.DOMEmitter;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.Emitter;
@@ -70,7 +70,7 @@ public class TransformerImpl extends Transformer
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerImpl".
-  private static Logger log = OptionalLog.getLog (TransformerImpl.class);
+  private static Logger log = LoggerFactory.getLogger (TransformerImpl.class);
 
   private Processor m_aProcessor = null; // Bugfix
 

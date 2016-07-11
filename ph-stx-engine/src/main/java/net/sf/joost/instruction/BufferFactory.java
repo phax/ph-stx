@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,12 +48,12 @@ import net.sf.joost.stx.ParseContext;
 public final class BufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public BufferFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
   }
 
@@ -64,9 +65,9 @@ public final class BufferFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
 

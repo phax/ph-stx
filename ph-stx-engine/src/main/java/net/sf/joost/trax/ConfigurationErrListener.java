@@ -29,8 +29,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
-
-import net.sf.joost.OptionalLog;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class acts as a default ErrorListener for the
@@ -41,7 +40,7 @@ public class ConfigurationErrListener implements ErrorListener
 
   // Define a static logger variable so that it references the
   // Logger instance named "ConfigurationErrListener".
-  private static Logger log = OptionalLog.getLog (ConfigurationErrListener.class);
+  private static Logger log = LoggerFactory.getLogger (ConfigurationErrListener.class);
 
   private ErrorListener userErrorListener;
 

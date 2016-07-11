@@ -12,7 +12,6 @@ package net.sf.joost.util.om;
  */
 public class Whitespace
 {
-
   private Whitespace ()
   {}
 
@@ -62,7 +61,7 @@ public class Whitespace
 
   /**
    * Apply schema-defined whitespace normalization to a string
-   * 
+   *
    * @param action
    *        the action to be applied: one of PRESERVE, REPLACE, or COLLAPSE
    * @param value
@@ -77,7 +76,7 @@ public class Whitespace
       case PRESERVE:
         return value;
       case REPLACE:
-        final StringBuffer sb = new StringBuffer (value.length ());
+        final StringBuilder sb = new StringBuilder (value.length ());
         for (int i = 0; i < value.length (); i++)
         {
           final char c = value.charAt (i);
@@ -176,7 +175,7 @@ public class Whitespace
 
   /**
    * Determine if a string is all-whitespace
-   * 
+   *
    * @param content
    *        the string to be tested
    * @return true if the supplied string contains no non-whitespace characters
@@ -313,7 +312,7 @@ public class Whitespace
    * Remove leading and trailing whitespace. This has the same effect as
    * collapseWhitespace, but is cheaper, for use by data types that do not allow
    * internal whitespace.
-   * 
+   *
    * @param in
    *        the input string whose whitespace is to be removed
    * @return the result of removing excess whitespace

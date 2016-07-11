@@ -34,6 +34,7 @@ import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -52,7 +53,7 @@ import net.sf.joost.stx.Processor;
 public class Main
 {
   // the logger object if available
-  private static Logger log = OptionalLog.getLog (Main.class);
+  private static final Logger log = LoggerFactory.getLogger (Main.class);
 
   /**
    * Entry point
@@ -107,7 +108,8 @@ public class Main
     AbstractStreamEmitter emitter = null;
 
     // filenames for the usage and version info
-    final String USAGE = "usage.txt", VERSION = "version.txt";
+    final String USAGE = "usage.txt";
+    final String VERSION = "version.txt";
 
     try
     {
@@ -128,97 +130,90 @@ public class Main
               printHelp = true;
               continue;
             }
-            else
-              if ("-version".equals (args[i]))
+            if ("-version".equals (args[i]))
+            {
+              _printResource (VERSION);
+              _logInfo ();
+              return;
+            }
+            if ("-pdf".equals (args[i]))
+            {
+              doFOP = true;
+              continue;
+            }
+            if ("-nodecl".equals (args[i]))
+            {
+              nodecl = true;
+              continue;
+            }
+            if ("-noext".equals (args[i]))
+            {
+              noext = true;
+              continue;
+            }
+            if ("-doe".equals (args[i]))
+            {
+              doe = true;
+              continue;
+            }
+            if ("-wait".equals (args[i]))
+            {
+              dontexit = true; // undocumented
+              continue;
+            }
+            if ("-time".equals (args[i]))
+            {
+              measureTime = true;
+              continue;
+            }
+            if ("-o".equals (args[i]))
+            {
+              // this option needs a parameter
+              if (++i < args.length && args[i].charAt (0) != '-')
               {
-                printResource (VERSION);
-                logInfoAndExit ();
-              }
-              else
-                if ("-pdf".equals (args[i]))
+                if (outFile != null)
                 {
-                  doFOP = true;
-                  continue;
+                  System.err.println ("Option -o already specified with " + outFile);
+                  wrongParameter = true;
                 }
                 else
-                  if ("-nodecl".equals (args[i]))
+                  outFile = args[i];
+                continue;
+              }
+              if (outFile != null)
+                System.err.println ("Option -o already specified with " + outFile);
+              else
+                System.err.println ("Option -o requires a filename");
+              i--;
+              wrongParameter = true;
+            }
+            else
+              if ("-m".equals (args[i]))
+              {
+                // this option needs a parameter
+                if (++i < args.length && args[i].charAt (0) != '-')
+                {
+                  if (meClassname != null)
                   {
-                    nodecl = true;
-                    continue;
+                    System.err.println ("Option -m already specified with " + meClassname);
+                    wrongParameter = true;
                   }
                   else
-                    if ("-noext".equals (args[i]))
-                    {
-                      noext = true;
-                      continue;
-                    }
-                    else
-                      if ("-doe".equals (args[i]))
-                      {
-                        doe = true;
-                        continue;
-                      }
-                      else
-                        if ("-wait".equals (args[i]))
-                        {
-                          dontexit = true; // undocumented
-                          continue;
-                        }
-                        else
-                          if ("-time".equals (args[i]))
-                          {
-                            measureTime = true;
-                            continue;
-                          }
-                          else
-                            if ("-o".equals (args[i]))
-                            {
-                              // this option needs a parameter
-                              if (++i < args.length && args[i].charAt (0) != '-')
-                              {
-                                if (outFile != null)
-                                {
-                                  System.err.println ("Option -o already specified with " + outFile);
-                                  wrongParameter = true;
-                                }
-                                else
-                                  outFile = args[i];
-                                continue;
-                              }
-                              if (outFile != null)
-                                System.err.println ("Option -o already specified with " + outFile);
-                              else
-                                System.err.println ("Option -o requires a filename");
-                              i--;
-                              wrongParameter = true;
-                            }
-                            else
-                              if ("-m".equals (args[i]))
-                              {
-                                // this option needs a parameter
-                                if (++i < args.length && args[i].charAt (0) != '-')
-                                {
-                                  if (meClassname != null)
-                                  {
-                                    System.err.println ("Option -m already specified with " + meClassname);
-                                    wrongParameter = true;
-                                  }
-                                  else
-                                    meClassname = args[i];
-                                  continue;
-                                }
-                                if (meClassname != null)
-                                  System.err.println ("Option -m already specified with " + meClassname);
-                                else
-                                  System.err.println ("Option -m requires a classname");
-                                i--;
-                                wrongParameter = true;
-                              }
-                              else
-                              {
-                                System.err.println ("Unknown option " + args[i]);
-                                wrongParameter = true;
-                              }
+                    meClassname = args[i];
+                  continue;
+                }
+                if (meClassname != null)
+                  System.err.println ("Option -m already specified with " + meClassname);
+                else
+                  System.err.println ("Option -m requires a classname");
+                i--;
+                wrongParameter = true;
+              }
+              else
+              {
+                System.err.println ("Unknown option " + args[i]);
+                wrongParameter = true;
+              }
           }
           // command line argument is not an option with a leading '-'
           else
@@ -323,9 +318,10 @@ public class Main
 
       if (printHelp)
       {
-        printResource (VERSION);
-        printResource (USAGE);
-        logInfoAndExit ();
+        _printResource (VERSION);
+        _printResource (USAGE);
+        _logInfo ();
+        return;
       }
 
       if (wrongParameter)
@@ -411,9 +407,8 @@ public class Main
         System.err.println ("Press Enter to exit");
         System.in.read ();
       }
-
     }
-    catch (final java.io.IOException ex)
+    catch (final IOException ex)
     {
       System.err.println (ex.toString ());
       System.exit (1);
@@ -481,7 +476,7 @@ public class Main
    * @param filename
    *        the name of the file containing the info to output
    */
-  private static void printResource (final String filename)
+  private static void _printResource (final String filename)
   {
     try
     {
@@ -495,7 +490,8 @@ public class Main
       while ((line = br.readLine ()) != null)
       {
         if (line.startsWith ("@@@ "))
-        { // special control line
+        {
+          // special control line
           if (line.equals ("@@@ START DEBUG ONLY"))
             doOutput = CSTX.DEBUG;
           else
@@ -518,9 +514,8 @@ public class Main
   /**
    * Output logging availability info and exit Joost
    */
-  private static void logInfoAndExit ()
+  private static void _logInfo ()
   {
     System.err.println ("Logging is enabled using " + log.getClass ().getName ());
-    System.exit (0);
   }
 }

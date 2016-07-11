@@ -46,12 +46,12 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.IOutputURIResolver;
 import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.emitter.AbstractStreamEmitter;
@@ -72,7 +72,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerFactoryImpl".
-  private static Logger log = OptionalLog.getLog (TransformerFactoryImpl.class);
+  private static Logger log = LoggerFactory.getLogger (TransformerFactoryImpl.class);
 
   // Member
   private URIResolver uriResolver = null;

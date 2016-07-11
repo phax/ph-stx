@@ -32,21 +32,21 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import com.helger.commons.lang.ServiceLoaderHelper;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.ITransformerHandlerResolver;
 
 /**
  * The default implementation of an {@link ITransformerHandlerResolver}. It
- * supports pluggable {@link ITransformerHandlerResolver} implementations. Plugin
- * mechanism is based on Jakarta's Discovery library. During instantiation it
- * will scan for available handlers and cache them if this was behavior was
- * configured. Upon calling
+ * supports pluggable {@link ITransformerHandlerResolver} implementations.
+ * Plugin mechanism is based on Jakarta's Discovery library. During
+ * instantiation it will scan for available handlers and cache them if this was
+ * behavior was configured. Upon calling
  * {@link #resolve(String, String, String, URIResolver, ErrorListener, Hashtable)}
  * or {@link #resolve(String, XMLReader, URIResolver, ErrorListener, Hashtable)}
  * it will look for a handler supporting the given method URI and will delegate
@@ -59,10 +59,10 @@ import net.sf.joost.ITransformerHandlerResolver;
 public final class TransformerHandlerResolverImpl implements ITransformerHandlerResolver
 {
   /** logging object */
-  private static Logger log = OptionalLog.getLog (TransformerHandlerResolverImpl.class);
+  private static final Logger log = LoggerFactory.getLogger (TransformerHandlerResolverImpl.class);
 
   /** hashtable with available methods and their plugin implementations */
-  private static Hashtable plugins = new Hashtable ();
+  private static Hashtable <String, ITransformerHandlerResolver> plugins = new Hashtable<> ();
 
   /**
    * Defines plugin factory behaviour when duplicated method implementations are
@@ -102,7 +102,6 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
    */
   private static synchronized void init () throws SAXException
   {
-
     // check again, in case this method has been called twice
     if (!notInitializedYet)
       return;
@@ -150,7 +149,7 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
           log.debug ("stx-filter-method found : " + mt);
 
         // see if method is already defined by some other plugin ?
-        final ITransformerHandlerResolver firstPlg = (ITransformerHandlerResolver) plugins.get (mt);
+        final ITransformerHandlerResolver firstPlg = plugins.get (mt);
 
         if (null != firstPlg)
         {
@@ -195,16 +194,16 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
   }
 
   /** Creates a new Hashtable with String resp. Object values */
-  private Hashtable createExternalParameters (final Hashtable params)
+  private Hashtable <String, Object> createExternalParameters (final Hashtable <String, Value> params)
   {
     // create new Hashtable with String values only
-    final Hashtable result = new Hashtable ();
-    for (final Enumeration e = params.keys (); e.hasMoreElements ();)
+    final Hashtable <String, Object> result = new Hashtable<> ();
+    for (final Enumeration <String> e = params.keys (); e.hasMoreElements ();)
     {
-      final String key = (String) e.nextElement ();
+      final String key = e.nextElement ();
       // remove preceding "{}" if present
       final String name = key.startsWith ("{}") ? key.substring (2) : key;
-      final Value val = ((Value) (params.get (key)));
+      final Value val = params.get (key);
       result.put (name, val.type == Value.OBJECT ? val.getObject () : val.getStringValue ());
     }
     return result;
@@ -239,7 +238,7 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
     if (notInitializedYet)
       init ();
 
-    final ITransformerHandlerResolver impl = (ITransformerHandlerResolver) plugins.get (method);
+    final ITransformerHandlerResolver impl = plugins.get (method);
     if (impl == null)
       throw new SAXException ("Undefined filter implementation for method '" + method + "'");
     return impl.resolve (method, href, base, uriResolver, errorListener, externalParams);
@@ -271,7 +270,7 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
     if (notInitializedYet)
       init ();
 
-    final ITransformerHandlerResolver impl = (ITransformerHandlerResolver) plugins.get (method);
+    final ITransformerHandlerResolver impl = plugins.get (method);
     if (impl == null)
       throw new SAXException ("Undefined filter implementation for method '" + method + "'");
     return impl.resolve (method, reader, uriResolver, errorListener, externalParams);
@@ -319,6 +318,6 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
     }
 
     final String [] uris = new String [plugins.size ()];
-    return (String []) plugins.keySet ().toArray (uris);
+    return plugins.keySet ().toArray (uris);
   }
 }

@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -51,18 +51,18 @@ import net.sf.joost.stx.SAXEvent;
 public final class CopyFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   /** empty attribute list (needed as parameter for startElement) */
   private static Attributes emptyAttList = new AttributesImpl ();
 
   // Logger initialization
-  private static Logger log = OptionalLog.getLog (CopyFactory.class);
+  private static Logger log = LoggerFactory.getLogger (CopyFactory.class);
 
   // Constructor
   public CopyFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("attributes");
   }
 
@@ -75,9 +75,9 @@ public final class CopyFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree attributesPattern = parsePattern (attrs.getValue ("attributes"), context);
 
@@ -106,7 +106,10 @@ public final class CopyFactory extends AbstractFactoryBase
     // Constructor
     //
 
-    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree attPattern)
+    public Instance (final String qName,
+                     final AbstractNodeBase parent,
+                     final ParseContext context,
+                     final AbstractTree attPattern)
     {
       super (qName, parent, context, true);
       this.attPattern = attPattern;
@@ -132,7 +135,7 @@ public final class CopyFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      final SAXEvent event = (SAXEvent) context.ancestorStack.peek ();
+      final SAXEvent event = context.ancestorStack.peek ();
       switch (event.type)
       {
         case SAXEvent.ROOT:
@@ -154,7 +157,7 @@ public final class CopyFactory extends AbstractFactoryBase
               context.ancestorStack.push (SAXEvent.newAttribute (event.attrs, i));
               if (attPattern.matches (context, context.ancestorStack.size (), false))
               {
-                final SAXEvent attrEvent = (SAXEvent) context.ancestorStack.peek ();
+                final SAXEvent attrEvent = context.ancestorStack.peek ();
                 context.emitter.addAttribute (attrEvent.uri, attrEvent.qName, attrEvent.lName, attrEvent.value, this);
               }
               // remove attribute
@@ -199,7 +202,7 @@ public final class CopyFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      final SAXEvent event = (SAXEvent) context.ancestorStack.peek ();
+      final SAXEvent event = context.ancestorStack.peek ();
       if (event.type == SAXEvent.ELEMENT)
         context.emitter.endElement (event.uri, event.lName, event.qName, this);
       return super.processEnd (context);

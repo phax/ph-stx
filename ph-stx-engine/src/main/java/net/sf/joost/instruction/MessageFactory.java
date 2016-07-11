@@ -32,12 +32,12 @@ import java.util.Set;
 import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.grammar.AbstractTree;
@@ -132,7 +132,7 @@ public final class MessageFactory extends AbstractFactoryBase
       this.terminate = terminate;
       this.level = level;
       if (logger != null)
-        log = OptionalLog.getLog (logger);
+        log = LoggerFactory.getLogger (logger);
     }
 
     /**

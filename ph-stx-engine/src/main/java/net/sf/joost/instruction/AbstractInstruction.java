@@ -74,9 +74,9 @@ public abstract class AbstractInstruction implements Cloneable
    *
    * @param context
    *        the current context
-   * @return {@link net.sf.joost.CSTX#PR_CONTINUE}, when the processing
-   *         should continue with the next node; otherwise when the processing
-   *         should be suspended due to an <code>stx:process-<em>xxx</em></code>
+   * @return {@link net.sf.joost.CSTX#PR_CONTINUE}, when the processing should
+   *         continue with the next node; otherwise when the processing should
+   *         be suspended due to an <code>stx:process-<em>xxx</em></code>
    *         instruction. This in turn means that only the implementations for
    *         these <code>stx:process-<em>xxx</em></code> instructions must
    *         return a value other than <code>PR_CONTINUE</code>. (Exception from
@@ -85,15 +85,31 @@ public abstract class AbstractInstruction implements Cloneable
   public abstract short process (Context context) throws SAXException;
 
   /**
+   * Callback that will be called when a clone of this instance has been
+   * created. To be overridden in subclasses.
+   *
+   * @param copy
+   *        the created clones
+   * @param aCopies
+   *        the map of already copied objects
+   */
+  protected void onDeepCopy (final AbstractInstruction copy,
+                             final HashMap <AbstractInstruction, AbstractInstruction> aCopies)
+  {
+    if (next != null)
+      copy.next = next.deepCopy (aCopies);
+  }
+
+  /**
    * Creates a deep copy of this instruction
    *
-   * @param copies
+   * @param aCopies
    *        the map of already copied objects
    * @return the copy of this instruction
    */
-  public final AbstractInstruction deepCopy (final HashMap <AbstractInstruction, AbstractInstruction> copies)
+  public final AbstractInstruction deepCopy (final HashMap <AbstractInstruction, AbstractInstruction> aCopies)
   {
-    AbstractInstruction copy = copies.get (this);
+    AbstractInstruction copy = aCopies.get (this);
     if (copy == null)
     {
       try
@@ -105,26 +121,10 @@ public abstract class AbstractInstruction implements Cloneable
         // mustn't happen since this class implements Cloneable
         throw new RuntimeException (e);
       }
-      copies.put (this, copy);
-      onDeepCopy (copy, copies);
+      aCopies.put (this, copy);
+      onDeepCopy (copy, aCopies);
     }
     return copy;
-  }
-
-  /**
-   * Callback that will be called when a clone of this instance has been
-   * created. To be overridden in subclasses.
-   *
-   * @param copy
-   *        the created clones
-   * @param copies
-   *        the map of already copied objects
-   */
-  protected void onDeepCopy (final AbstractInstruction copy,
-                             final HashMap <AbstractInstruction, AbstractInstruction> copies)
-  {
-    if (next != null)
-      copy.next = next.deepCopy (copies);
   }
 
   /**

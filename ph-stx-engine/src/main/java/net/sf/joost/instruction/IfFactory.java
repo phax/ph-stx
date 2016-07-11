@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,12 +48,12 @@ import net.sf.joost.stx.ParseContext;
 public final class IfFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public IfFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("test");
   }
 
@@ -65,9 +66,9 @@ public final class IfFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree testExpr = parseRequiredExpr (qName, attrs, "test", context);
 
@@ -87,7 +88,10 @@ public final class IfFactory extends AbstractFactoryBase
     /** next instruction if the test evaluates to false */
     private AbstractInstruction falseNext;
 
-    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree test)
+    protected Instance (final String qName,
+                        final AbstractNodeBase parent,
+                        final ParseContext context,
+                        final AbstractTree test)
     {
       super (qName, parent, context, true);
       this.test = test;

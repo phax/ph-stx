@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ import net.sf.joost.stx.ParseContext;
 public final class ElementEndFactory extends AbstractFactoryBase
 {
   /** Allowed attributes for this element. */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public ElementEndFactory ()

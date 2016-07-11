@@ -54,7 +54,7 @@ public final class Context implements Cloneable
   public Emitter emitter;
 
   /** The current ancestor stack */
-  public Stack ancestorStack = new Stack ();
+  public Stack <SAXEvent> ancestorStack = new Stack<> ();
 
   /** The position of the current node. */
   public long position;

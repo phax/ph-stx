@@ -27,6 +27,7 @@ package net.sf.joost.trace;
 import java.io.IOException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -34,15 +35,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Emitter;
+import net.sf.joost.stx.IParserListener;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Parser;
-import net.sf.joost.stx.IParserListener;
 import net.sf.joost.stx.Processor;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.trax.TransformerImpl;
@@ -66,7 +66,7 @@ public class DebugProcessor extends Processor
   private Locator locator;
 
   /** logger */
-  private static Logger log = OptionalLog.getLog (DebugProcessor.class);
+  private static Logger log = LoggerFactory.getLogger (DebugProcessor.class);
 
   /**
    * See

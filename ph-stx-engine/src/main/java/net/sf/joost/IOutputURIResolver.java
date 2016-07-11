@@ -39,10 +39,9 @@ import javax.xml.transform.TransformerException;
 
 public interface IOutputURIResolver
 {
-
   /**
    * Resolve an output URI.
-   * 
+   *
    * @param href
    *        The relative URI of the output document. This corresponds to the
    *        <code>href</code> attribute of the <code>stx:result-document</code>
@@ -64,10 +63,7 @@ public interface IOutputURIResolver
    *         URI resolver will be used to create a Result object.
    */
 
-  public Result resolve (String href,
-                         String base,
-                         Properties outputProperties,
-                         boolean append) throws TransformerException;
+  Result resolve (String href, String base, Properties outputProperties, boolean append) throws TransformerException;
 
   /**
    * Signal completion of the result document. This method is called by the
@@ -76,11 +72,9 @@ public interface IOutputURIResolver
    * firing off processes that take this result tree as input. Note that the
    * OutputURIResolver is stateless, so the the original Result object is
    * supplied to identify the document that has been completed.
-   * 
+   *
    * @param result
    *        The result object returned by the previous call of resolve()
    */
-
-  public void close (Result result) throws TransformerException;
-
+  void close (Result result) throws TransformerException;
 }

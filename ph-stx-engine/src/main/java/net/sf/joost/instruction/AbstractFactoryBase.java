@@ -31,10 +31,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.grammar.ExprParser;
 import net.sf.joost.grammar.PatternParser;
 import net.sf.joost.grammar.Sym;
-import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.grammar.Yylex;
 import net.sf.joost.grammar.tree.AvtTree;
 import net.sf.joost.grammar.tree.StringTree;

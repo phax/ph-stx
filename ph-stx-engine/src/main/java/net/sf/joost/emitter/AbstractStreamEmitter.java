@@ -39,11 +39,11 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.trax.CTrAX;
 
 /**
@@ -55,7 +55,7 @@ import net.sf.joost.trax.CTrAX;
 public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
 {
   // Logger initialization
-  private static Logger log = OptionalLog.getLog (AbstractStreamEmitter.class);
+  private static Logger log = LoggerFactory.getLogger (AbstractStreamEmitter.class);
 
   /** Joost's HTML extension output method */
   private static String HTML_METHOD = "{" + CSTX.JOOST_EXT_NS + "}html";

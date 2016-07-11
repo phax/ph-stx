@@ -32,11 +32,11 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 
 /**
  * This class implements an emitter that uses the <code>xml</code> output method
@@ -48,7 +48,7 @@ import net.sf.joost.OptionalLog;
 public class XmlEmitter extends AbstractStreamEmitter
 {
   // Logger initialization
-  private static final Logger log = OptionalLog.getLog (XmlEmitter.class);
+  private static final Logger log = LoggerFactory.getLogger (XmlEmitter.class);
 
   /** output property: omit-xml-declaration */
   private boolean propOmitXmlDeclaration = false;

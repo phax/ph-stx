@@ -31,6 +31,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,7 +40,6 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.emitter.SAXEmitter;
 import net.sf.joost.stx.Processor;
@@ -55,7 +55,7 @@ public class TrAXFilter extends XMLFilterImpl
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerImpl".
-  private static Logger log = OptionalLog.getLog (TrAXFilter.class);
+  private static Logger log = LoggerFactory.getLogger (TrAXFilter.class);
 
   private Templates templates = null;
   private Processor processor = null;

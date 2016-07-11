@@ -50,15 +50,17 @@ import net.sf.joost.stx.ParseContext;
 public class TextFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   private static final String [] MARKUP_VALUES = { "error", "ignore", "serialize" };
 
-  private static final int NO_MARKUP = 0, IGNORE_MARKUP = 1, SERIALIZE_MARKUP = 2;
+  private static final int NO_MARKUP = 0;
+  private static final int IGNORE_MARKUP = 1;
+  private static final int SERIALIZE_MARKUP = 2;
 
   public TextFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("markup");
   }
 
@@ -71,9 +73,9 @@ public class TextFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     int markup = getEnumAttValue ("markup", attrs, MARKUP_VALUES, context);
     if (markup == -1)

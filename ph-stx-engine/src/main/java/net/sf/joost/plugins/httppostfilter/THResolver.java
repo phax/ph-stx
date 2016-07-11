@@ -31,11 +31,11 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.ITransformerHandlerResolver;
 
 /**
@@ -55,7 +55,7 @@ public final class THResolver implements ITransformerHandlerResolver
   public static final String HTTP_POST_METHOD = "http://www.ietf.org/rfc/rfc2616.txt#POST";
 
   /** logging object */
-  private static Logger log = OptionalLog.getLog (THResolver.class);
+  private static Logger log = LoggerFactory.getLogger (THResolver.class);
 
   /**
    * It return supported URIs, in this case @HTTP_POST_METHOD

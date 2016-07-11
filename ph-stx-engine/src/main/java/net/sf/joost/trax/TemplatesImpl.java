@@ -31,12 +31,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Parser;
 import net.sf.joost.stx.Processor;
@@ -54,7 +54,7 @@ public class TemplatesImpl implements Templates
 
   // Define a static logger variable so that it references the
   // Logger instance named "TemplatesImpl".
-  private static final Logger log = OptionalLog.getLog (TemplatesImpl.class);
+  private static final Logger log = LoggerFactory.getLogger (TemplatesImpl.class);
 
   /**
    * Holding a reference on a <code>TransformerFactoryImpl</code> should be

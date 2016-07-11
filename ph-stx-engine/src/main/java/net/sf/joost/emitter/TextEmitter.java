@@ -28,11 +28,11 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.OptionalLog;
 
 /**
  * This class implements an emitter that uses the <code>text</code> output
@@ -44,7 +44,7 @@ import net.sf.joost.OptionalLog;
 public class TextEmitter extends AbstractStreamEmitter
 {
   // Logger initialization
-  private static Logger log = OptionalLog.getLog (TextEmitter.class);
+  private static Logger log = LoggerFactory.getLogger (TextEmitter.class);
 
   /** Constructor */
   public TextEmitter (final Writer writer, final String encoding)
