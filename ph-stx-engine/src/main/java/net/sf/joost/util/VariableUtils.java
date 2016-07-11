@@ -32,11 +32,11 @@ import net.sf.joost.stx.Context;
 
 /**
  * Provides static methods for the handling of variables.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/11/16 17:40:19 $
  * @author Oliver Becker
  */
-public abstract class VariableUtils
+public final class VariableUtils
 {
 
   private VariableUtils ()

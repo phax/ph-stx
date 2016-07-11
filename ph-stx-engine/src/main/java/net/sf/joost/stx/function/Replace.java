@@ -32,7 +32,7 @@ import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
 import net.sf.joost.util.regex.JRegularExpression;
-import net.sf.joost.util.regex.RegularExpression;
+import net.sf.joost.util.regex.IRegularExpression;
 
 /**
  * The <code>replace</code> function.<br>
@@ -90,7 +90,7 @@ final public class Replace implements Instance
       replacement = args.right.evaluate (context, top).getStringValue ();
       flags = "";
     }
-    final RegularExpression re = new JRegularExpression (pattern, true, flags);
+    final IRegularExpression re = new JRegularExpression (pattern, true, flags);
     if (re.matches (""))
       throw new EvalException ("The regular expression in replace() must " +
                                "not be one that matches a zero-length string");

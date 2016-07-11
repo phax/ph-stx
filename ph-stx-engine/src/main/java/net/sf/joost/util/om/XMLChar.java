@@ -94,8 +94,7 @@ public class XMLChar
   public static final int MASK_NCNAME = 0x80;
 
   private XMLChar ()
-  { // MHK
-  } // MHK
+  {}
 
   //
   // Static initialization

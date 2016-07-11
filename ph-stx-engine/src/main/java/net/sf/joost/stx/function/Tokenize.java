@@ -34,7 +34,7 @@ import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
 import net.sf.joost.util.regex.JRegularExpression;
-import net.sf.joost.util.regex.RegularExpression;
+import net.sf.joost.util.regex.IRegularExpression;
 
 /**
  * The <code>tokenize</code> function.<br>
@@ -94,7 +94,7 @@ final public class Tokenize implements Instance
     if ("".equals (input))
       return Value.VAL_EMPTY;
 
-    final RegularExpression re = new JRegularExpression (pattern, true, flags);
+    final IRegularExpression re = new JRegularExpression (pattern, true, flags);
     if (re.matches (""))
       throw new EvalException ("The regular expression in tokenize() must " +
                                "not be one that matches a zero-length string");

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sf.joost.util.om.FastStringBuffer;
 import net.sf.joost.util.om.Whitespace;
+import net.sf.joost.util.om.XMLChar;
 
 /**
  * This class translates XML Schema regex syntax into JDK 1.5 regex syntax. This
@@ -24,12 +24,8 @@ import net.sf.joost.util.om.Whitespace;
  * regex syntax. This version also removes most of the complexities of handling
  * non-BMP characters, since JDK 1.5 handles these natively.
  */
-public class JDK15RegexTranslator extends RegexTranslator
+public class JDK15RegexTranslator extends AbstractRegexTranslator
 {
-
-  // TODO: retrofit the changes for handling caseBlind comparison to the JDK 1.4
-  // translator
-
   /**
    * Translates XML Schema and XPath regexes into <code>java.util.regex</code>
    * regexes.
@@ -38,14 +34,13 @@ public class JDK15RegexTranslator extends RegexTranslator
    * @see <a href="http://www.w3.org/TR/xmlschema-2/#regexs">XML Schema Part
    *      2</a>
    */
-
-  public static final CharClass [] categoryCharClasses = new CharClass [RegexData.categories.length ()];
-  public static final CharClass [] subCategoryCharClasses = new CharClass [RegexData.subCategories.length () / 2];
+  public static final AbstractCharClass [] categoryCharClasses = new AbstractCharClass [RegexData.categories.length ()];
+  public static final AbstractCharClass [] subCategoryCharClasses = new AbstractCharClass [RegexData.subCategories.length () / 2];
 
   /**
    * CharClass for each block name in specialBlockNames.
    */
-  public static final CharClass [] specialBlockCharClasses = { new CharRange (0x10300, 0x1032F),
+  public static final AbstractCharClass [] specialBlockCharClasses = { new CharRange (0x10300, 0x1032F),
                                                                new CharRange (0x10330, 0x1034F),
                                                                new CharRange (0x10400, 0x1044F),
                                                                new CharRange (0x1D000, 0x1D0FF),
@@ -54,7 +49,7 @@ public class JDK15RegexTranslator extends RegexTranslator
                                                                new CharRange (0x20000, 0x2A6D6),
                                                                new CharRange (0x2F800, 0x2FA1F),
                                                                new CharRange (0xE0000, 0xE007F),
-                                                               new Union (new CharClass [] { new CharRange (0xE000,
+                                                               new Union (new AbstractCharClass [] { new CharRange (0xE000,
                                                                                                             0xF8FF),
                                                                                              new CharRange (0xF0000,
                                                                                                             0xFFFFD),
@@ -64,43 +59,43 @@ public class JDK15RegexTranslator extends RegexTranslator
                                                                Empty.getInstance (),
                                                                Empty.getInstance () };
 
-  private static final CharClass DOT_SCHEMA = new Complement (new Union (new CharClass [] { new SingleChar ('\n'),
+  private static final AbstractCharClass DOT_SCHEMA = new Complement (new Union (new AbstractCharClass [] { new SingleChar ('\n'),
                                                                                             new SingleChar ('\r') }));
 
-  private static final CharClass ESC_d = new Property ("Nd");
+  private static final AbstractCharClass ESC_d = new Property ("Nd");
 
-  private static final CharClass ESC_D = new Complement (ESC_d);
+  private static final AbstractCharClass ESC_D = new Complement (ESC_d);
 
-  private static final CharClass ESC_W = new Union (new CharClass [] { computeCategoryCharClass ('P'),
+  private static final AbstractCharClass ESC_W = new Union (new AbstractCharClass [] { computeCategoryCharClass ('P'),
                                                                        computeCategoryCharClass ('Z'),
                                                                        computeCategoryCharClass ('C') });
   // was: new Property("P"), new Property("Z"), new Property("C") }
 
-  private static final CharClass ESC_w = new Complement (ESC_W);
+  private static final AbstractCharClass ESC_w = new Complement (ESC_W);
 
-  private static final CharClass ESC_s = new Union (new CharClass [] { new SingleChar (' '),
+  private static final AbstractCharClass ESC_s = new Union (new AbstractCharClass [] { new SingleChar (' '),
                                                                        new SingleChar ('\n'),
                                                                        new SingleChar ('\r'),
                                                                        new SingleChar ('\t') });
 
-  private static final CharClass ESC_S = new Complement (ESC_s);
+  private static final AbstractCharClass ESC_S = new Complement (ESC_s);
 
-  private static final CharClass ESC_i = makeCharClass (RegexData.NMSTRT_CATEGORIES,
+  private static final AbstractCharClass ESC_i = makeCharClass (RegexData.NMSTRT_CATEGORIES,
                                                         RegexData.NMSTRT_INCLUDES,
                                                         RegexData.NMSTRT_EXCLUDE_RANGES);
 
-  private static final CharClass ESC_I = new Complement (ESC_i);
+  private static final AbstractCharClass ESC_I = new Complement (ESC_i);
 
-  private static final CharClass ESC_c = makeCharClass (RegexData.NMCHAR_CATEGORIES,
+  private static final AbstractCharClass ESC_c = makeCharClass (RegexData.NMCHAR_CATEGORIES,
                                                         RegexData.NMCHAR_INCLUDES,
                                                         RegexData.NMCHAR_EXCLUDE_RANGES);
 
-  private static final CharClass ESC_C = new Complement (ESC_c);
+  private static final AbstractCharClass ESC_C = new Complement (ESC_c);
 
   private JDK15RegexTranslator (final CharSequence regExp)
   {
-    this.regExp = regExp;
-    this.length = regExp.length ();
+    this.m_aRegExp = regExp;
+    this.m_nLength = regExp.length ();
   }
 
   /**
@@ -142,32 +137,41 @@ public class JDK15RegexTranslator extends RegexTranslator
     return tr.result.toString ();
   }
 
-  static abstract class CharClass
+  private static void appendWideChar (final StringBuilder buf, final int ch)
   {
+    if (ch > 0xffff)
+    {
+      buf.append (XMLChar.highSurrogate (ch));
+      buf.append (XMLChar.lowSurrogate (ch));
+    }
+    else
+    {
+      buf.append ((char) ch);
+    }
+  }
 
-    protected CharClass ()
+  static abstract class AbstractCharClass
+  {
+    protected AbstractCharClass ()
     {}
 
-    abstract void output (FastStringBuffer buf);
+    abstract void output (StringBuilder buf);
 
-    abstract void outputComplement (FastStringBuffer buf);
+    abstract void outputComplement (StringBuilder buf);
 
     int getSingleChar ()
     {
       return -1;
     }
-
   }
 
-  static abstract class SimpleCharClass extends CharClass
+  static abstract class AbstractSimpleCharClass extends AbstractCharClass
   {
-    SimpleCharClass ()
-    {
-
-    }
+    AbstractSimpleCharClass ()
+    {}
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       buf.append ('[');
       inClassOutput (buf);
@@ -175,48 +179,48 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       buf.append ("[^");
       inClassOutput (buf);
       buf.append (']');
     }
 
-    abstract void inClassOutput (FastStringBuffer buf);
+    abstract void inClassOutput (StringBuilder buf);
   }
 
-  static class SingleChar extends SimpleCharClass
+  static class SingleChar extends AbstractSimpleCharClass
   {
-    private final int c;
+    private final int m_c;
 
     SingleChar (final int c)
     {
-      this.c = c;
+      m_c = c;
     }
 
     @Override
     int getSingleChar ()
     {
-      return c;
+      return m_c;
     }
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       inClassOutput (buf);
     }
 
     @Override
-    void inClassOutput (final FastStringBuffer buf)
+    void inClassOutput (final StringBuilder buf)
     {
-      if (isJavaMetaChar (c))
+      if (isJavaMetaChar (m_c))
       {
         buf.append ('\\');
-        buf.append ((char) c);
+        buf.append ((char) m_c);
       }
       else
       {
-        switch (c)
+        switch (m_c)
         {
           case '\r':
             buf.append ("\\r");
@@ -231,7 +235,7 @@ public class JDK15RegexTranslator extends RegexTranslator
             buf.append ("\\x20");
             break;
           default:
-            buf.appendWideChar (c);
+            appendWideChar (buf, m_c);
         }
       }
       return;
@@ -239,7 +243,7 @@ public class JDK15RegexTranslator extends RegexTranslator
 
   }
 
-  static class Empty extends SimpleCharClass
+  static class Empty extends AbstractSimpleCharClass
   {
     private static final Empty instance = new Empty ();
 
@@ -254,26 +258,26 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       buf.append ("\\x00"); // no character matches
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       buf.append ("[^\\x00]"); // every character matches
     }
 
     @Override
-    void inClassOutput (final FastStringBuffer buf)
+    void inClassOutput (final StringBuilder buf)
     {
       throw new RuntimeException ("BMP output botch");
     }
 
   }
 
-  static class CharRange extends SimpleCharClass
+  static class CharRange extends AbstractSimpleCharClass
   {
     private final int lower;
     private final int upper;
@@ -285,24 +289,24 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void inClassOutput (final FastStringBuffer buf)
+    void inClassOutput (final StringBuilder buf)
     {
       if (isJavaMetaChar (lower))
       {
         buf.append ('\\');
       }
-      buf.appendWideChar (lower);
+      appendWideChar (buf, lower);
       buf.append ('-');
       if (isJavaMetaChar (upper))
       {
         buf.append ('\\');
       }
-      buf.appendWideChar (upper);
+      appendWideChar (buf, upper);
     }
 
   }
 
-  static class Property extends SimpleCharClass
+  static class Property extends AbstractSimpleCharClass
   {
     private final String name;
 
@@ -312,7 +316,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void inClassOutput (final FastStringBuffer buf)
+    void inClassOutput (final StringBuilder buf)
     {
       buf.append ("\\p{");
       buf.append (name);
@@ -320,7 +324,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       buf.append ("\\P{");
       buf.append (name);
@@ -328,12 +332,12 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
   }
 
-  static class Subtraction extends CharClass
+  static class Subtraction extends AbstractCharClass
   {
-    private final CharClass cc1;
-    private final CharClass cc2;
+    private final AbstractCharClass cc1;
+    private final AbstractCharClass cc2;
 
-    Subtraction (final CharClass cc1, final CharClass cc2)
+    Subtraction (final AbstractCharClass cc1, final AbstractCharClass cc2)
     {
       // min corresponds to intersection
       // complement corresponds to negation
@@ -342,7 +346,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       buf.append ('[');
       cc1.output (buf);
@@ -352,7 +356,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       buf.append ('[');
       cc1.outputComplement (buf);
@@ -361,62 +365,62 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
   }
 
-  static class Union extends CharClass
+  static class Union extends AbstractCharClass
   {
-    private final List <CharClass> members;
+    private final List <AbstractCharClass> members;
 
-    Union (final CharClass [] v)
+    Union (final AbstractCharClass [] v)
     {
       this (toList (v));
     }
 
-    private static List <CharClass> toList (final CharClass [] v)
+    private static List <AbstractCharClass> toList (final AbstractCharClass [] v)
     {
-      final List <CharClass> members = new ArrayList <> (5);
-      for (final CharClass element : v)
+      final List <AbstractCharClass> members = new ArrayList<> (5);
+      for (final AbstractCharClass element : v)
         members.add (element);
       return members;
     }
 
-    Union (final List <CharClass> members)
+    Union (final List <AbstractCharClass> members)
     {
       this.members = members;
     }
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       buf.append ('[');
       for (int i = 0, len = members.size (); i < len; i++)
       {
-        final CharClass cc = members.get (i);
+        final AbstractCharClass cc = members.get (i);
         cc.output (buf);
       }
       buf.append (']');
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       boolean first = true;
       final int len = members.size ();
       for (int i = 0; i < len; i++)
       {
-        final CharClass cc = members.get (i);
-        if (cc instanceof SimpleCharClass)
+        final AbstractCharClass cc = members.get (i);
+        if (cc instanceof AbstractSimpleCharClass)
         {
           if (first)
           {
             buf.append ("[^");
             first = false;
           }
-          ((SimpleCharClass) cc).inClassOutput (buf);
+          ((AbstractSimpleCharClass) cc).inClassOutput (buf);
         }
       }
       for (int i = 0; i < len; i++)
       {
-        final CharClass cc = members.get (i);
-        if (!(cc instanceof SimpleCharClass))
+        final AbstractCharClass cc = members.get (i);
+        if (!(cc instanceof AbstractSimpleCharClass))
         {
           if (first)
           {
@@ -434,7 +438,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       {
         // empty union, so the complement is everything
         buf.append ("[\u0001-");
-        buf.appendWideChar (RegexData.NONBMP_MAX);
+        appendWideChar (buf, RegexData.NONBMP_MAX);
         buf.append ("]");
       }
       else
@@ -444,7 +448,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
   }
 
-  static class BackReference extends CharClass
+  static class BackReference extends AbstractCharClass
   {
     private final int i;
 
@@ -454,49 +458,51 @@ public class JDK15RegexTranslator extends RegexTranslator
     }
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       inClassOutput (buf);
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       inClassOutput (buf);
     }
 
-    void inClassOutput (final FastStringBuffer buf)
+    void inClassOutput (final StringBuilder buf)
     {
       if (i != -1)
       {
-        buf.append ("(?:\\" + i + ")"); // terminate the back-reference with a
-                                        // syntactic separator
+        // terminate the back-reference with a
+        // syntactic separator
+        buf.append ("(?:\\" + i + ")");
       }
       else
       {
-        buf.append ("(?:)"); // matches a zero-length string, while allowing a
-                             // quantifier
+        // matches a zero-length string, while allowing a
+        // quantifier
+        buf.append ("(?:)");
       }
     }
   }
 
-  static class Complement extends CharClass
+  static class Complement extends AbstractCharClass
   {
-    private final CharClass cc;
+    private final AbstractCharClass cc;
 
-    Complement (final CharClass cc)
+    Complement (final AbstractCharClass cc)
     {
       this.cc = cc;
     }
 
     @Override
-    void output (final FastStringBuffer buf)
+    void output (final StringBuilder buf)
     {
       cc.outputComplement (buf);
     }
 
     @Override
-    void outputComplement (final FastStringBuffer buf)
+    void outputComplement (final StringBuilder buf)
     {
       cc.output (buf);
     }
@@ -543,14 +549,11 @@ public class JDK15RegexTranslator extends RegexTranslator
           // under XPath, "." has the same meaning as in JDK 1.5
           break;
         }
-        else
-        {
-          // under XMLSchema, "." means anything except \n or \r, which is
-          // different from the XPath/JDK rule
-          DOT_SCHEMA.output (result);
-          advance ();
-          return true;
-        }
+        // under XMLSchema, "." means anything except \n or \r, which is
+        // different from the XPath/JDK rule
+        DOT_SCHEMA.output (result);
+        advance ();
+        return true;
       case '$':
       case '^':
         if (isXPath)
@@ -567,7 +570,7 @@ public class JDK15RegexTranslator extends RegexTranslator
           final int [] variants = CaseVariants.getCaseVariants (thisChar);
           if (variants.length > 0)
           {
-            final CharClass [] chars = new CharClass [variants.length + 1];
+            final AbstractCharClass [] chars = new AbstractCharClass [variants.length + 1];
             chars[0] = new SingleChar (thisChar);
             for (int i = 0; i < variants.length; i++)
             {
@@ -578,17 +581,16 @@ public class JDK15RegexTranslator extends RegexTranslator
             advance ();
             return true;
           }
-          // else fall through
         }
-        // else fall through
+        break;
     }
     copyCurChar ();
     return true;
   }
 
-  private static CharClass makeCharClass (final String categories, final String includes, final String excludeRanges)
+  private static AbstractCharClass makeCharClass (final String categories, final String includes, final String excludeRanges)
   {
-    final List <CharClass> includeList = new ArrayList <> (5);
+    final List <AbstractCharClass> includeList = new ArrayList<> (5);
     for (int i = 0, len = categories.length (); i < len; i += 2)
       includeList.add (new Property (categories.substring (i, i + 2)));
     for (int i = 0, len = includes.length (); i < len; i++)
@@ -605,7 +607,7 @@ public class JDK15RegexTranslator extends RegexTranslator
         includeList.add (new CharRange (includes.charAt (i), includes.charAt (j)));
       i = j;
     }
-    final List <CharClass> excludeList = new ArrayList <> (5);
+    final List <AbstractCharClass> excludeList = new ArrayList<> (5);
     for (int i = 0, len = excludeRanges.length (); i < len; i += 2)
     {
       final char min = excludeRanges.charAt (i);
@@ -624,7 +626,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     return new Subtraction (new Union (includeList), new Union (excludeList));
   }
 
-  private CharClass parseEsc () throws RegexSyntaxException
+  private AbstractCharClass parseEsc () throws RegexSyntaxException
   {
     switch (curChar)
     {
@@ -745,12 +747,12 @@ public class JDK15RegexTranslator extends RegexTranslator
       default:
         throw makeException ("invalid escape sequence");
     }
-    final CharClass tem = new SingleChar (curChar);
+    final AbstractCharClass tem = new SingleChar (curChar);
     advance ();
     return tem;
   }
 
-  private CharClass parseProp () throws RegexSyntaxException
+  private AbstractCharClass parseProp () throws RegexSyntaxException
   {
     expect ('{');
     final int start = pos;
@@ -762,7 +764,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       if (!isAsciiAlnum (curChar) && curChar != '-')
         expect ('}');
     }
-    CharSequence propertyNameCS = regExp.subSequence (start, pos - 1);
+    CharSequence propertyNameCS = m_aRegExp.subSequence (start, pos - 1);
     if (ignoreWhitespace && !inCharClassExpr)
     {
       propertyNameCS = Whitespace.removeAllWhitespace (propertyNameCS);
@@ -797,7 +799,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     throw makeException ("invalid property name", propertyName);
   }
 
-  private CharClass parseCharClassExpr () throws RegexSyntaxException
+  private AbstractCharClass parseCharClassExpr () throws RegexSyntaxException
   {
     boolean compl;
     if (curChar == '^')
@@ -809,11 +811,11 @@ public class JDK15RegexTranslator extends RegexTranslator
     {
       compl = false;
     }
-    final List <CharClass> members = new ArrayList <> (10);
+    final List <AbstractCharClass> members = new ArrayList<> (10);
     // boolean firstOrLast = true;
     do
     {
-      final CharClass lower = parseCharClassEscOrXmlChar (true);
+      final AbstractCharClass lower = parseCharClassEscOrXmlChar (true);
       members.add (lower);
       if (curChar == ']' || eos)
       {
@@ -823,7 +825,7 @@ public class JDK15RegexTranslator extends RegexTranslator
       // firstOrLast = isLastInGroup();
       if (curChar == '-')
       {
-        final char next = regExp.charAt (pos);
+        final char next = m_aRegExp.charAt (pos);
         if (next == '[')
         {
           // hyphen denotes subtraction
@@ -845,7 +847,7 @@ public class JDK15RegexTranslator extends RegexTranslator
           {
             // hyphen denotes a character range
             advance ();
-            final CharClass upper = parseCharClassEscOrXmlChar (true);
+            final AbstractCharClass upper = parseCharClassEscOrXmlChar (true);
             if (lower.getSingleChar () < 0 || upper.getSingleChar () < 0)
               throw makeException ("multi_range");
             if (lower.getSingleChar () > upper.getSingleChar ())
@@ -884,7 +886,7 @@ public class JDK15RegexTranslator extends RegexTranslator
                 }
             }
             // look for a subtraction
-            if (curChar == '-' && regExp.charAt (pos) == '[')
+            if (curChar == '-' && m_aRegExp.charAt (pos) == '[')
             {
               advance ();
               // expect('[');
@@ -901,7 +903,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     {
       expect (']');
     }
-    CharClass result;
+    AbstractCharClass result;
     if (members.size () == 1)
       result = members.get (0);
     else
@@ -919,7 +921,7 @@ public class JDK15RegexTranslator extends RegexTranslator
     return result;
   }
 
-  private void addCaseVariant (final CharClass lower, final List <CharClass> members)
+  private void addCaseVariant (final AbstractCharClass lower, final List <AbstractCharClass> members)
   {
     if (caseBlind)
     {
@@ -934,11 +936,11 @@ public class JDK15RegexTranslator extends RegexTranslator
   private boolean isLastInGroup ()
   {
     // look ahead at the next character
-    final char c = regExp.charAt (pos);
+    final char c = m_aRegExp.charAt (pos);
     return (c == ']' || c == '[');
   }
 
-  private CharClass parseCharClassEscOrXmlChar (final boolean firstOrLast) throws RegexSyntaxException
+  private AbstractCharClass parseCharClassEscOrXmlChar (final boolean firstOrLast) throws RegexSyntaxException
   {
     switch (curChar)
     {
@@ -959,19 +961,19 @@ public class JDK15RegexTranslator extends RegexTranslator
         // }
         break;
     }
-    final CharClass tem = new SingleChar (absorbSurrogatePair ());
+    final AbstractCharClass tem = new SingleChar (absorbSurrogatePair ());
     advance ();
     return tem;
   }
 
-  private static synchronized CharClass getCategoryCharClass (final int ci)
+  private static synchronized AbstractCharClass getCategoryCharClass (final int ci)
   {
     if (categoryCharClasses[ci] == null)
       categoryCharClasses[ci] = computeCategoryCharClass (RegexData.categories.charAt (ci));
     return categoryCharClasses[ci];
   }
 
-  private static synchronized CharClass getSubCategoryCharClass (final int sci)
+  private static synchronized AbstractCharClass getSubCategoryCharClass (final int sci)
   {
     if (subCategoryCharClasses[sci] == null)
       subCategoryCharClasses[sci] = computeSubCategoryCharClass (RegexData.subCategories.substring (sci *
@@ -980,9 +982,9 @@ public class JDK15RegexTranslator extends RegexTranslator
     return subCategoryCharClasses[sci];
   }
 
-  private static CharClass computeCategoryCharClass (final char code)
+  private static AbstractCharClass computeCategoryCharClass (final char code)
   {
-    final List <CharClass> classes = new ArrayList <> (5);
+    final List <AbstractCharClass> classes = new ArrayList<> (5);
     classes.add (new Property (new String (new char [] { code })));
     for (int ci = RegexData.CATEGORY_NAMES.indexOf (code); ci >= 0; ci = RegexData.CATEGORY_NAMES.indexOf (code,
                                                                                                            ci + 1))
@@ -1002,9 +1004,9 @@ public class JDK15RegexTranslator extends RegexTranslator
     {
       // JDK 1.4 leaves Cn out of C?
       classes.add (new Subtraction (new Property ("Cn"),
-                                    new Union (new CharClass [] { new SingleChar (RegexData.UNICODE_3_1_ADD_Lu),
+                                    new Union (new AbstractCharClass [] { new SingleChar (RegexData.UNICODE_3_1_ADD_Lu),
                                                                   new SingleChar (RegexData.UNICODE_3_1_ADD_Ll) })));
-      final List <CharClass> assignedRanges = new ArrayList <> (5);
+      final List <AbstractCharClass> assignedRanges = new ArrayList<> (5);
       for (final int [] element : RegexData.CATEGORY_RANGES)
         for (int j = 0; j < element.length; j += 2)
           assignedRanges.add (new CharRange (element[j], element[j + 1]));
@@ -1016,22 +1018,22 @@ public class JDK15RegexTranslator extends RegexTranslator
     return new Union (classes);
   }
 
-  private static CharClass computeSubCategoryCharClass (final String name)
+  private static AbstractCharClass computeSubCategoryCharClass (final String name)
   {
-    final CharClass base = new Property (name);
+    final AbstractCharClass base = new Property (name);
     final int sci = RegexData.CATEGORY_NAMES.indexOf (name);
     if (sci < 0)
     {
       if (name.equals ("Cn"))
       {
         // Unassigned
-        final List <CharClass> assignedRanges = new ArrayList <> (5);
+        final List <AbstractCharClass> assignedRanges = new ArrayList<> (5);
         assignedRanges.add (new SingleChar (RegexData.UNICODE_3_1_ADD_Lu));
         assignedRanges.add (new SingleChar (RegexData.UNICODE_3_1_ADD_Ll));
         for (final int [] element : RegexData.CATEGORY_RANGES)
           for (int j = 0; j < element.length; j += 2)
             assignedRanges.add (new CharRange (element[j], element[j + 1]));
-        return new Subtraction (new Union (new CharClass [] { base,
+        return new Subtraction (new Union (new AbstractCharClass [] { base,
                                                               new CharRange (RegexData.NONBMP_MIN,
                                                                              RegexData.NONBMP_MAX) }),
                                 new Union (assignedRanges));
@@ -1042,7 +1044,7 @@ public class JDK15RegexTranslator extends RegexTranslator
         return makeCharClass (RegexData.CATEGORY_Pf);
       return base;
     }
-    final List <CharClass> classes = new ArrayList <> (5);
+    final List <AbstractCharClass> classes = new ArrayList<> (5);
     classes.add (base);
     final int [] addRanges = RegexData.CATEGORY_RANGES[sci / 2];
     for (int i = 0; i < addRanges.length; i += 2)
@@ -1064,9 +1066,9 @@ public class JDK15RegexTranslator extends RegexTranslator
     return new Union (classes);
   }
 
-  private static CharClass makeCharClass (final String members)
+  private static AbstractCharClass makeCharClass (final String members)
   {
-    final List <CharClass> list = new ArrayList <> (5);
+    final List <AbstractCharClass> list = new ArrayList<> (5);
     for (int i = 0, len = members.length (); i < len; i++)
       list.add (new SingleChar (members.charAt (i)));
     return new Union (list);

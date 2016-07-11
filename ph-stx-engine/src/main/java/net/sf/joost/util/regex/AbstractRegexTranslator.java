@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.joost.util.om.FastStringBuffer;
 import net.sf.joost.util.om.IntHashSet;
 import net.sf.joost.util.om.Whitespace;
 import net.sf.joost.util.om.XMLChar;
@@ -20,21 +19,21 @@ import net.sf.joost.util.om.XMLChar;
  * Abstract superclass for the various regex translators, which differ according
  * to the target platform.
  */
-public abstract class RegexTranslator
+public abstract class AbstractRegexTranslator
 {
 
-  protected CharSequence regExp;
+  protected CharSequence m_aRegExp;
   protected boolean isXPath;
   protected boolean ignoreWhitespace;
   protected boolean inCharClassExpr;
   protected boolean caseBlind;
   protected int pos = 0;
-  protected int length;
+  protected int m_nLength;
   protected char curChar;
   protected boolean eos = false;
   protected int currentCapture = 0;
   protected IntHashSet captures = new IntHashSet ();
-  protected final FastStringBuffer result = new FastStringBuffer (32);
+  protected final StringBuilder result = new StringBuilder (32);
 
   protected void translateTop () throws RegexSyntaxException
   {
@@ -126,7 +125,7 @@ public abstract class RegexTranslator
 
   protected CharSequence parseQuantExact () throws RegexSyntaxException
   {
-    final FastStringBuffer buf = new FastStringBuffer (10);
+    final StringBuilder buf = new StringBuilder (10);
     do
     {
       if ("0123456789".indexOf (curChar) < 0)
@@ -189,9 +188,9 @@ public abstract class RegexTranslator
 
   protected void advance ()
   {
-    if (pos < length)
+    if (pos < m_nLength)
     {
-      curChar = regExp.charAt (pos++);
+      curChar = m_aRegExp.charAt (pos++);
       if (ignoreWhitespace && !inCharClassExpr)
       {
         while (Whitespace.isWhitespace (curChar))
@@ -231,13 +230,13 @@ public abstract class RegexTranslator
     // The caller must ensure we don't fall off the start of the expression
     if (eos)
     {
-      curChar = regExp.charAt (length - 1);
-      pos = length;
+      curChar = m_aRegExp.charAt (m_nLength - 1);
+      pos = m_nLength;
       eos = false;
     }
     else
     {
-      curChar = regExp.charAt ((--pos) - 1);
+      curChar = m_aRegExp.charAt ((--pos) - 1);
     }
     if (ignoreWhitespace && !inCharClassExpr)
     {
@@ -264,7 +263,7 @@ public abstract class RegexTranslator
     return new RegexSyntaxException ("Error at character " +
                                      (pos - 1) +
                                      " in regular expression '" +
-                                     regExp +
+                                     m_aRegExp +
                                      "' : " +
                                      key);
   }
@@ -278,7 +277,7 @@ public abstract class RegexTranslator
     return new RegexSyntaxException ("Error at character " +
                                      (pos - 1) +
                                      " in regular expression '" +
-                                     regExp +
+                                     m_aRegExp +
                                      "': " +
                                      key +
                                      " (" +
@@ -313,7 +312,7 @@ public abstract class RegexTranslator
 
   protected static String highSurrogateRanges (final List ranges)
   {
-    final FastStringBuffer highRanges = new FastStringBuffer (ranges.size () * 2);
+    final StringBuilder highRanges = new StringBuilder (ranges.size () * 2);
     for (int i = 0, len = ranges.size (); i < len; i++)
     {
       final Range r = (Range) ranges.get (i);
@@ -340,7 +339,7 @@ public abstract class RegexTranslator
 
   protected static String lowSurrogateRanges (final List ranges)
   {
-    final FastStringBuffer lowRanges = new FastStringBuffer (ranges.size () * 2);
+    final StringBuilder lowRanges = new StringBuilder (ranges.size () * 2);
     for (int i = 0, len = ranges.size (); i < len; i++)
     {
       final Range r = (Range) ranges.get (i);

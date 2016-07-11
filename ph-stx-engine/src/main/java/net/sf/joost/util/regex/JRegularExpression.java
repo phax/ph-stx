@@ -15,7 +15,7 @@ import net.sf.joost.grammar.EvalException;
 /**
  * A compiled regular expression implemented using the Java JDK regex package
  */
-public class JRegularExpression implements RegularExpression
+public class JRegularExpression implements IRegularExpression
 {
   private Pattern pattern;
   private String javaRegex;
@@ -103,7 +103,7 @@ public class JRegularExpression implements RegularExpression
 
   // OB: added matcher()
   /**
-   * @see net.sf.joost.util.regex.RegularExpression#matcher(java.lang.CharSequence)
+   * @see net.sf.joost.util.regex.IRegularExpression#matcher(java.lang.CharSequence)
    */
   public Matcher matcher (final CharSequence input)
   {

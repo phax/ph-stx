@@ -15,7 +15,7 @@ import net.sf.joost.grammar.EvalException;
 /**
  * This interface represents a compiled regular expression
  */
-public interface RegularExpression extends Serializable
+public interface IRegularExpression extends Serializable
 {
 
   // OB: added matcher()
@@ -85,9 +85,7 @@ public interface RegularExpression extends Serializable
   // OB: changed thrown exception
   // public CharSequence replace(CharSequence input, CharSequence replacement)
   // throws XPathException;
-  public CharSequence replace (CharSequence input, CharSequence replacement) throws EvalException; // XPathException;
-                                                                                                   // //
-                                                                                                   // OB
+  public CharSequence replace (CharSequence input, CharSequence replacement) throws EvalException; 
 
 }
 
