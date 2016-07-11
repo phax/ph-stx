@@ -43,7 +43,6 @@ import net.sf.joost.stx.SAXEvent;
 
 public class BufferEmitter extends AbstractStxEmitterBase
 {
-
   /** the event buffer */
   private final List <SAXEvent> buffer = new Vector<> ();
 

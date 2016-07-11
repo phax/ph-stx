@@ -55,18 +55,17 @@ import net.sf.joost.trax.TransformerImpl;
  */
 public class DebugProcessor extends Processor
 {
+  /** logger */
+  private static final Logger log = LoggerFactory.getLogger (DebugProcessor.class);
 
   /** the TraceManager for dynamic tracing */
   private TraceManager m_aTraceMgr;
   /** the TrAX-Transformer */
   private TransformerImpl m_aTransformer;
   /** the ParserListener for static tracing */
-  private IParserListener parserListener;
+  private IParserListener m_aParserListener;
 
   private Locator m_aLocator;
-
-  /** logger */
-  private static Logger log = LoggerFactory.getLogger (DebugProcessor.class);
 
   /**
    * See
@@ -211,11 +210,11 @@ public class DebugProcessor extends Processor
   }
 
   /**
-   * getter for property {@link #parserListener}
+   * getter for property {@link #m_aParserListener}
    */
   public IParserListener getParserListener ()
   {
-    return parserListener;
+    return m_aParserListener;
   }
 
   /**

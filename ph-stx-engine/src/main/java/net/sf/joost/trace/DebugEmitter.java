@@ -80,8 +80,8 @@ public class DebugEmitter extends Emitter
   private DebugEmitter (final DebugEmitter prev, final IStxEmitter handler)
   {
     super (prev, handler);
-    this.m_aTraceMgr = prev.m_aTraceMgr;
-    this.m_aWriter = prev.m_aWriter;
+    m_aTraceMgr = prev.m_aTraceMgr;
+    m_aWriter = prev.m_aWriter;
   }
 
   /*
@@ -99,7 +99,7 @@ public class DebugEmitter extends Emitter
    */
   public void setTraceManager (final TraceManager tmgr)
   {
-    this.m_aTraceMgr = tmgr;
+    m_aTraceMgr = tmgr;
   }
 
   /**
@@ -107,7 +107,7 @@ public class DebugEmitter extends Emitter
    */
   public TraceManager getTraceManager ()
   {
-    return this.m_aTraceMgr;
+    return m_aTraceMgr;
   }
 
   public Locator getEmitterLocator ()
@@ -146,7 +146,7 @@ public class DebugEmitter extends Emitter
       log.debug ("start resultdocument");
     // update locator
     updateLocator (null, null, -1, -1);
-    this.m_aTraceMgr.fireStartResultDocument ();
+    m_aTraceMgr.fireStartResultDocument ();
   }
 
   /**
@@ -163,7 +163,7 @@ public class DebugEmitter extends Emitter
                    instruction.getNode ().m_sSystemID,
                    instruction.lineNo,
                    instruction.colNo);
-    this.m_aTraceMgr.fireEndResultDocument ();
+    m_aTraceMgr.fireEndResultDocument ();
   }
 
   /**
@@ -185,7 +185,7 @@ public class DebugEmitter extends Emitter
     super.startElement (uri, lName, qName, attrs, namespaces, instruction);
     // update locator
     updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
-    this.m_aTraceMgr.fireStartResultElement (saxevent);
+    m_aTraceMgr.fireStartResultElement (saxevent);
   }
 
   /**
@@ -208,7 +208,7 @@ public class DebugEmitter extends Emitter
                    instruction.lineNo,
                    instruction.colNo);
     super.endElement (uri, lName, qName, instruction);
-    this.m_aTraceMgr.fireEndResultElement (saxevent);
+    m_aTraceMgr.fireEndResultElement (saxevent);
   }
 
   /**
@@ -227,7 +227,7 @@ public class DebugEmitter extends Emitter
     super.characters (ch, start, length, instruction);
     // update locator
     updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
-    this.m_aTraceMgr.fireResultText (saxevent);
+    m_aTraceMgr.fireResultText (saxevent);
   }
 
   /**
@@ -245,7 +245,7 @@ public class DebugEmitter extends Emitter
     super.processingInstruction (target, data, instruction);
     // update locator
     updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
-    this.m_aTraceMgr.fireResultPI (saxevent);
+    m_aTraceMgr.fireResultPI (saxevent);
   }
 
   /**
@@ -264,7 +264,7 @@ public class DebugEmitter extends Emitter
     super.comment (ch, start, length, instruction);
     // update locator
     updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
-    this.m_aTraceMgr.fireResultComment (saxevent);
+    m_aTraceMgr.fireResultComment (saxevent);
   }
 
   /**
@@ -278,7 +278,7 @@ public class DebugEmitter extends Emitter
     super.startCDATA (instruction);
     // update locator
     updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
-    this.m_aTraceMgr.fireStartResultCDATA ();
+    m_aTraceMgr.fireStartResultCDATA ();
   }
 
   /**
@@ -292,7 +292,7 @@ public class DebugEmitter extends Emitter
     super.endCDATA ();
     // update locator
     updateLocator (null, null, -1, -1);
-    this.m_aTraceMgr.fireEndResultCDATA ();
+    m_aTraceMgr.fireEndResultCDATA ();
   }
 
   // ------------------------------------------------------------------------
@@ -312,13 +312,13 @@ public class DebugEmitter extends Emitter
   // Inner classes
   // ------------------------------------------------------------------------
 
-  public static class DebugWriter extends StringWriter
+  public static final class DebugWriter extends StringWriter
   {
     private final String m_sHref;
 
     public DebugWriter (final String href)
     {
-      this.m_sHref = href;
+      m_sHref = href;
     }
 
     public String getHref ()

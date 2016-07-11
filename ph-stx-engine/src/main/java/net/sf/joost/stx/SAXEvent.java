@@ -27,6 +27,9 @@ package net.sf.joost.stx;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xml.sax.Attributes;
 
 import net.sf.joost.stx.helpers.IMutableAttributes;
@@ -74,11 +77,22 @@ public final class SAXEvent
   // Factory methods
   //
 
-  /** Create a new element node */
+  /**
+   * Create a new element node
+   *
+   * @param uri
+   * @param lName
+   * @param qName
+   * @param attrs
+   * @param mutable
+   * @param inScopeNamespaces
+   * @return new {@link SAXEvent}
+   */
+  @Nonnull
   public static SAXEvent newElement (final String uri,
                                      final String lName,
                                      final String qName,
-                                     final Attributes attrs,
+                                     @Nullable final Attributes attrs,
                                      final boolean mutable,
                                      final Map <String, String> inScopeNamespaces)
   {

@@ -23,6 +23,11 @@
  */
 package net.sf.joost.stx.helpers;
 
+import javax.annotation.CheckForSigned;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xml.sax.Attributes;
 
 /**
@@ -30,124 +35,127 @@ import org.xml.sax.Attributes;
  */
 public final class MutableAttributesImpl implements IMutableAttributes
 {
-  private int _length;
-  private int _max;
-  private String [] _uris;
-  private String [] _lNames;
-  private String [] _qNames;
-  private String [] _values;
-  private String [] _types;
+  private int m_nLength;
+  private int m_nMax;
+  private String [] m_aUris;
+  private String [] m_aLocalNames;
+  private String [] m_aQNames;
+  private String [] m_aValues;
+  private String [] m_aTypes;
 
-  public MutableAttributesImpl (final Attributes attributes)
+  public MutableAttributesImpl (@Nonnull final Attributes attributes)
   {
     this (attributes, attributes.getLength ());
   }
 
-  public MutableAttributesImpl (final Attributes attributes, final int length)
+  public MutableAttributesImpl (@Nonnull final Attributes attributes, @Nonnegative final int length)
   {
-    _length = length;
-    _max = _length + 2; // _max is initially at least 2
-    _uris = new String [_max];
-    _lNames = new String [_max];
-    _qNames = new String [_max];
-    _values = new String [_max];
-    _types = new String [_max];
+    m_nLength = length;
+    m_nMax = m_nLength + 2; // _max is initially at least 2
+    m_aUris = new String [m_nMax];
+    m_aLocalNames = new String [m_nMax];
+    m_aQNames = new String [m_nMax];
+    m_aValues = new String [m_nMax];
+    m_aTypes = new String [m_nMax];
 
-    for (int n = _length; n-- > 0;)
+    for (int n = m_nLength; n-- > 0;)
     {
-      _uris[n] = attributes.getURI (n);
-      _lNames[n] = attributes.getLocalName (n);
-      _qNames[n] = attributes.getQName (n);
-      _values[n] = attributes.getValue (n);
-      _types[n] = attributes.getType (n);
+      m_aUris[n] = attributes.getURI (n);
+      m_aLocalNames[n] = attributes.getLocalName (n);
+      m_aQNames[n] = attributes.getQName (n);
+      m_aValues[n] = attributes.getValue (n);
+      m_aTypes[n] = attributes.getType (n);
     }
   }
 
+  @CheckForSigned
   public int getIndex (final String uri, final String localName)
   {
-    for (int n = _length; n-- > 0;)
-    {
-      if (localName.equals (_lNames[n]) && uri.equals (_uris[n]))
+    for (int n = m_nLength; n-- > 0;)
+      if (localName.equals (m_aLocalNames[n]) && uri.equals (m_aUris[n]))
         return n;
-    }
     return -1;
   }
 
+  @Nonnegative
   public int getLength ()
   {
-    return _length;
+    return m_nLength;
   }
 
   public String getLocalName (final int index)
   {
-    return _lNames[index];
+    return m_aLocalNames[index];
   }
 
   public String getQName (final int index)
   {
-    return _qNames[index];
+    return m_aQNames[index];
   }
 
   public String getType (final int index)
   {
-    return _types[index];
+    return m_aTypes[index];
   }
 
+  @Nullable
   public String getType (final String qName)
   {
-    for (int n = _length; n-- > 0;)
-    {
-      if (qName.equals (_qNames[n]))
-        return _types[n];
-    }
+    for (int n = m_nLength; n-- > 0;)
+      if (qName.equals (m_aQNames[n]))
+        return m_aTypes[n];
     return null;
   }
 
+  @Nullable
   public String getType (final String uri, final String localName)
   {
-    for (int n = _length; n-- > 0;)
+    for (int n = m_nLength; n-- > 0;)
     {
-      if (localName.equals (_lNames[n]) && _uris[n].equals (uri))
-        return _types[n];
+      if (localName.equals (m_aLocalNames[n]) && m_aUris[n].equals (uri))
+        return m_aTypes[n];
     }
     return null;
   }
 
   public String getURI (final int index)
   {
-    return _uris[index];
+    return m_aUris[index];
   }
 
   public String getValue (final int index)
   {
-    return _values[index];
+    return m_aValues[index];
   }
 
+  @Nullable
   public String getValue (final String qName)
   {
-    for (int n = _length; n-- > 0;)
+    for (int n = m_nLength; n-- > 0;)
     {
-      if (qName.equals (_qNames[n]))
-        return _values[n];
+      if (qName.equals (m_aQNames[n]))
+        return m_aValues[n];
     }
     return null;
   }
 
+  @Nullable
   public String getValue (final String uri, final String localName)
   {
-    for (int n = _length; n-- > 0;)
+    for (int n = m_nLength; n-- > 0;)
     {
-      if (_lNames[n].equals (localName) && _uris[n].equals (uri))
-        return _values[n];
+      if (m_aLocalNames[n].equals (localName) && m_aUris[n].equals (uri))
+        return m_aValues[n];
     }
     return null;
   }
 
+  @CheckForSigned
   public int getIndex (final String qName)
   {
-    for (int n = _length; n-- > 0;)
+    for (int n = m_nLength; n-- > 0;)
     {
-      if (qName.equals (_qNames[n]))
+      if (qName.equals (m_aQNames[n]))
         return n;
     }
     return -1;
@@ -155,7 +163,7 @@ public final class MutableAttributesImpl implements IMutableAttributes
 
   public void setValue (final int index, final String value)
   {
-    _values[index] = value;
+    m_aValues[index] = value;
   }
 
   public void addAttribute (final String uri,
@@ -164,35 +172,35 @@ public final class MutableAttributesImpl implements IMutableAttributes
                             final String type,
                             final String value)
   {
-    if (_length == _max)
+    if (m_nLength == m_nMax)
     {
-      _max <<= 1; // * 2
+      m_nMax *= 2;
 
-      final String [] uris = new String [_max + 1];
-      final String [] lNames = new String [_max + 1];
-      final String [] qNames = new String [_max + 1];
-      final String [] values = new String [_max + 1];
-      final String [] types = new String [_max + 1];
+      final String [] uris = new String [m_nMax + 1];
+      final String [] lNames = new String [m_nMax + 1];
+      final String [] qNames = new String [m_nMax + 1];
+      final String [] values = new String [m_nMax + 1];
+      final String [] types = new String [m_nMax + 1];
 
-      System.arraycopy (_uris, 0, uris, 0, _length);
-      System.arraycopy (_lNames, 0, lNames, 0, _length);
-      System.arraycopy (_qNames, 0, qNames, 0, _length);
-      System.arraycopy (_values, 0, values, 0, _length);
-      System.arraycopy (_types, 0, types, 0, _length);
+      System.arraycopy (m_aUris, 0, uris, 0, m_nLength);
+      System.arraycopy (m_aLocalNames, 0, lNames, 0, m_nLength);
+      System.arraycopy (m_aQNames, 0, qNames, 0, m_nLength);
+      System.arraycopy (m_aValues, 0, values, 0, m_nLength);
+      System.arraycopy (m_aTypes, 0, types, 0, m_nLength);
 
-      _uris = uris;
-      _lNames = lNames;
-      _qNames = qNames;
-      _values = values;
-      _types = types;
+      m_aUris = uris;
+      m_aLocalNames = lNames;
+      m_aQNames = qNames;
+      m_aValues = values;
+      m_aTypes = types;
     }
 
-    _uris[_length] = uri;
-    _lNames[_length] = lName;
-    _qNames[_length] = qName;
-    _values[_length] = value;
-    _types[_length] = type;
+    m_aUris[m_nLength] = uri;
+    m_aLocalNames[m_nLength] = lName;
+    m_aQNames[m_nLength] = qName;
+    m_aValues[m_nLength] = value;
+    m_aTypes[m_nLength] = type;
 
-    _length++;
+    m_nLength++;
   }
 }
