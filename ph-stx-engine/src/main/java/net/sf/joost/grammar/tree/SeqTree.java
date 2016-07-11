@@ -53,12 +53,12 @@ public final class SeqTree extends AbstractTree
   public Value evaluate (final Context context, final int top) throws SAXException
   {
     Value v1, v2;
-    if (left != null)
-      v1 = left.evaluate (context, top);
+    if (m_aLeft != null)
+      v1 = m_aLeft.evaluate (context, top);
     else
       v1 = Value.VAL_EMPTY;
-    if (right != null)
-      v2 = right.evaluate (context, top);
+    if (m_aRight != null)
+      v2 = m_aRight.evaluate (context, top);
     else
       v2 = Value.VAL_EMPTY;
 

@@ -46,18 +46,19 @@ public final class DescTree extends AbstractReversableTree
   }
 
   @Override
-  public boolean matches (final Context context, int top, final boolean setPosition) throws SAXException
+  public boolean matches (final Context context, final int nTop, final boolean setPosition) throws SAXException
   {
     // need at least 3 nodes (document, node1, node2), because
     // DESC may appear only between two nodes but not at the root
+    int top = nTop;
     if (top < 3)
       return false;
-    if (right.matches (context, top, setPosition))
+    if (m_aRight.matches (context, top, setPosition))
     {
       // look for a matching sub path on the left
       while (top > 1)
       {
-        if (left.matches (context, top - 1, false))
+        if (m_aLeft.matches (context, top - 1, false))
           return true;
         top--;
       }
@@ -66,12 +67,13 @@ public final class DescTree extends AbstractReversableTree
   }
 
   @Override
-  public Value evaluate (final Context context, int top) throws SAXException
+  public Value evaluate (final Context context, final int nTop) throws SAXException
   {
+    int top = nTop;
     Value ret = null, last = null; // for constructing the result seq
     while (top < context.ancestorStack.size ())
     {
-      final Value v1 = right.evaluate (context, top++);
+      final Value v1 = m_aRight.evaluate (context, top++);
       if (v1.type == Value.NODE)
       {
         if (ret != null)

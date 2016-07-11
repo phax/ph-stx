@@ -74,9 +74,9 @@ public final class EscapeUri implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    final Value v = args.left.evaluate (context, top);
+    final Value v = args.m_aLeft.evaluate (context, top);
     final String uri = v.getStringValue ();
-    final boolean eReserved = args.right.evaluate (context, top).getBooleanValue ();
+    final boolean eReserved = args.m_aRight.evaluate (context, top).getBooleanValue ();
 
     try
     {

@@ -56,7 +56,7 @@ import net.sf.joost.ITransformerHandlerResolver;
  * @author fikin
  */
 
-public final class TransformerHandlerResolverImpl implements ITransformerHandlerResolver
+public final class TransformerHandlerResolverImpl
 {
   /** logging object */
   private static final Logger log = LoggerFactory.getLogger (TransformerHandlerResolverImpl.class);
@@ -220,9 +220,9 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
                                      final String base,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable params) throws SAXException
+                                     final Hashtable <String, Value> params) throws SAXException
   {
-    final Hashtable externalParams = createExternalParameters (params);
+    final Hashtable <String, Object> externalParams = createExternalParameters (params);
     if (customResolver != null)
     {
       final TransformerHandler handler = customResolver.resolve (method,
@@ -255,7 +255,7 @@ public final class TransformerHandlerResolverImpl implements ITransformerHandler
                                      final ErrorListener errorListener,
                                      final Hashtable <String, Value> params) throws SAXException
   {
-    final Hashtable externalParams = createExternalParameters (params);
+    final Hashtable <String, Object> externalParams = createExternalParameters (params);
     if (customResolver != null)
     {
       final TransformerHandler handler = customResolver.resolve (method,

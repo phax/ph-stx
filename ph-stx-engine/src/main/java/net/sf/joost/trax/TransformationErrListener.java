@@ -41,7 +41,7 @@ public class TransformationErrListener implements ErrorListener
   // Logger instance named "TransformationErrListener".
   private static Logger log = LoggerFactory.getLogger (TransformationErrListener.class);
 
-  private ErrorListener userErrorListener;
+  private ErrorListener m_aUserErrorListener;
 
   /**
    * Default constructor.
@@ -51,12 +51,12 @@ public class TransformationErrListener implements ErrorListener
 
   public ErrorListener getUserErrorListener ()
   {
-    return userErrorListener;
+    return m_aUserErrorListener;
   }
 
   public void setUserErrorListener (final ErrorListener userErrorListener)
   {
-    this.userErrorListener = userErrorListener;
+    this.m_aUserErrorListener = userErrorListener;
   }
 
   /**
@@ -64,11 +64,11 @@ public class TransformationErrListener implements ErrorListener
    */
   public void warning (final TransformerException tE) throws TransformerException
   {
-    if (userErrorListener != null)
+    if (m_aUserErrorListener != null)
     {
       try
       {
-        userErrorListener.warning (tE);
+        m_aUserErrorListener.warning (tE);
       }
       catch (final TransformerException e2)
       {
@@ -88,11 +88,11 @@ public class TransformationErrListener implements ErrorListener
    */
   public void error (final TransformerException tE) throws TransformerException
   {
-    if (userErrorListener != null)
+    if (m_aUserErrorListener != null)
     {
       try
       {
-        userErrorListener.error (tE);
+        m_aUserErrorListener.error (tE);
       }
       catch (final TransformerException e2)
       {
@@ -114,11 +114,11 @@ public class TransformationErrListener implements ErrorListener
    */
   public void fatalError (final TransformerException tE) throws TransformerException
   {
-    if (userErrorListener != null)
+    if (m_aUserErrorListener != null)
     {
       try
       {
-        userErrorListener.fatalError (tE);
+        m_aUserErrorListener.fatalError (tE);
       }
       catch (final TransformerException e2)
       {

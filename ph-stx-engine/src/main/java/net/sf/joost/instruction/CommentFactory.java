@@ -48,11 +48,11 @@ import net.sf.joost.stx.ParseContext;
 public class CommentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   public CommentFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("select");
   }
 
@@ -65,9 +65,9 @@ public class CommentFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
@@ -78,25 +78,28 @@ public class CommentFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>comment</code> element. */
   public class Instance extends AbstractNodeBase
   {
-    private AbstractTree select;
-    private StringEmitter strEmitter;
-    private StringBuffer buffer;
+    private AbstractTree m_aSelect;
+    private StringEmitter m_aStrEmitter;
+    private StringBuffer m_aBuffer;
 
-    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree select)
+    public Instance (final String qName,
+                     final AbstractNodeBase parent,
+                     final ParseContext context,
+                     final AbstractTree select)
     {
       super (qName,
              parent,
              context,
              // this element must be empty if there is a select attribute
              select == null);
-      this.select = select;
+      this.m_aSelect = select;
       init ();
     }
 
     private void init ()
     {
-      buffer = new StringBuffer ();
-      strEmitter = new StringEmitter (buffer, "('" + qName + "' started in line " + lineNo + ")");
+      m_aBuffer = new StringBuffer ();
+      m_aStrEmitter = new StringEmitter (m_aBuffer, "('" + m_sQName + "' started in line " + lineNo + ")");
     }
 
     /**
@@ -105,22 +108,22 @@ public class CommentFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (select == null)
+      if (m_aSelect == null)
       {
         // we have contents to be processed
         super.process (context);
         // check for nesting of this stx:comment instructions
-        if (context.emitter.isEmitterActive (strEmitter))
+        if (context.emitter.isEmitterActive (m_aStrEmitter))
         {
-          context.errorHandler.error ("Can't create nested comment here", publicId, systemId, lineNo, colNo);
+          context.m_aErrorHandler.error ("Can't create nested comment here", m_sPublicID, m_sSystemID, lineNo, colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
-        buffer.setLength (0);
-        context.pushEmitter (strEmitter);
+        m_aBuffer.setLength (0);
+        context.pushEmitter (m_aStrEmitter);
       }
       else
       {
-        final String comment = select.evaluate (context, this).getStringValue ();
+        final String comment = m_aSelect.evaluate (context, this).getStringValue ();
         // Most comments won't have dashes inside, so it's reasonable
         // to skip the StringBuffer creation in these cases
         if (comment.indexOf ('-') != -1)
@@ -147,7 +150,7 @@ public class CommentFactory extends AbstractFactoryBase
     {
       context.popEmitter ();
 
-      emitComment (buffer, context);
+      emitComment (m_aBuffer, context);
 
       // It would be sensible to clear the buffer here,
       // but setLength(0) doesn't really free any memory ...
@@ -193,13 +196,13 @@ public class CommentFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
       theCopy.init ();
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
 
   }

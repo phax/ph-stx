@@ -29,8 +29,8 @@ import java.util.Vector;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -74,24 +74,24 @@ public final class ScriptFunction implements IInstance
   private Object [] convertInputArgs (final Context context, final int top, final AbstractTree args) throws SAXException
   {
     // evaluate current parameters
-    final Stack varr = new Stack ();
+    final Stack <Value> varr = new Stack<> ();
     if (args != null)
     {
       AbstractTree t = args;
       do
       {
-        if (t.right != null)
-          varr.push (t.right.evaluate (context, top));
-        if (t.left == null)
+        if (t.m_aRight != null)
+          varr.push (t.m_aRight.evaluate (context, top));
+        if (t.m_aLeft == null)
           varr.push (t.evaluate (context, top));
-      } while ((t = t.left) != null);
+      } while ((t = t.m_aLeft) != null);
     }
 
     // convert values to java objects
-    final Vector ret = new Vector ();
+    final Vector <Object> ret = new Vector <> ();
     while (!varr.isEmpty ())
     {
-      final Value v = (Value) varr.pop ();
+      final Value v = varr.pop ();
       try
       {
         ret.add (v.toJavaObject (Object.class));
@@ -110,7 +110,8 @@ public final class ScriptFunction implements IInstance
    * evaluate the script function with given input arguments and return the
    * result
    */
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     // convert input params
     final Object [] scrArgs = convertInputArgs (context, top, args);

@@ -52,9 +52,9 @@ public class NoMatchFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (!(parent instanceof AnalyzeTextFactory.Instance))
       throw new SAXParseException ("'" + qName + "' must be child of stx:analyze-text", context.locator);
@@ -84,8 +84,8 @@ public class NoMatchFactory extends AbstractFactoryBase
       // The next instruction has been set in stx:analyze-text, but
       // this stx:no-match may be interrupted by stx:process-xxx,
       // i.e. we need to store the info of a following stx:match here:
-      localFieldStack.push (nodeEnd.next);
-      localFieldStack.push (analyzeText.capSubstr);
+      m_aLocalFieldStack.push (m_aNodeEnd.next);
+      m_aLocalFieldStack.push (analyzeText.capSubstr);
       return CSTX.PR_CONTINUE;
     }
 
@@ -94,13 +94,13 @@ public class NoMatchFactory extends AbstractFactoryBase
     {
       context.localRegExGroup.pop ();
       // restore the values for the following stx:match
-      analyzeText.capSubstr = (String []) localFieldStack.pop ();
-      nodeEnd.next = (AbstractInstruction) localFieldStack.pop ();
+      analyzeText.capSubstr = (String []) m_aLocalFieldStack.pop ();
+      m_aNodeEnd.next = (AbstractInstruction) m_aLocalFieldStack.pop ();
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

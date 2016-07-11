@@ -47,8 +47,8 @@ public final class LeTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    final Value v1 = left.evaluate (context, top);
-    final Value v2 = right.evaluate (context, top);
+    final Value v1 = m_aLeft.evaluate (context, top);
+    final Value v2 = m_aRight.evaluate (context, top);
     if (v1.type == Value.EMPTY || v2.type == Value.EMPTY)
       return Value.VAL_FALSE;
 

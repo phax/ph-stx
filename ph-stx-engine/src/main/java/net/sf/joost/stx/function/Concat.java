@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -68,18 +68,16 @@ public final class Concat implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
-    if (args.type == AbstractTree.LIST)
+    if (args.m_nType == AbstractTree.LIST)
     {
-      final Value v1 = evaluate (context, top, args.left);
-      final Value v2 = args.right.evaluate (context, top);
+      final Value v1 = evaluate (context, top, args.m_aLeft);
+      final Value v2 = args.m_aRight.evaluate (context, top);
       return new Value (v1.getStringValue () + v2.getStringValue ());
     }
-    else
-    {
-      final Value v = args.evaluate (context, top);
-      return new Value (v.getStringValue ());
-    }
+    final Value v = args.evaluate (context, top);
+    return new Value (v.getStringValue ());
   }
 }

@@ -3658,7 +3658,7 @@ public final class LexScan implements sym, java_cup.runtime.Scanner
           actionText.setLength (0);
           yybegin (JAVA_CODE);
           final Symbol s = symbol_countUpdate (EOFRULE, null);
-          action_line = s.left + 1;
+          action_line = s.m_nLeft + 1;
           return s;
         }
         case 304:

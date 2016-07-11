@@ -35,7 +35,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 /**
  * Wrapper class which passes SAX events to
  * <a href="http://xml.apache.org/fop">FOP</a>
- * 
+ *
  * @version $Revision: 1.3 $ $Date: 2005/03/13 17:12:48 $, tested with FOP
  *          0.20.4
  * @author Oliver Becker
@@ -43,11 +43,11 @@ import org.xml.sax.helpers.XMLFilterImpl;
 public class FOPEmitter extends XMLFilterImpl implements IStxEmitter
 {
   /** The system identifier required by {@link IStxEmitter} */
-  private String systemId;
+  private String m_sSystemID;
 
   /**
    * Constructs a new FOPEmitter wrapper object.
-   * 
+   *
    * @param os
    *        the stream to which the PDF output will be written by FOP
    */
@@ -104,21 +104,13 @@ public class FOPEmitter extends XMLFilterImpl implements IStxEmitter
   public void comment (final char [] ch, final int start, final int length)
   {}
 
-  /*
-   * (non-Javadoc)
-   * @see net.sf.joost.emitter.StxEmitter#getSystemId()
-   */
   public String getSystemId ()
   {
-    return systemId;
+    return m_sSystemID;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.sf.joost.emitter.StxEmitter#setSystemId(java.lang.String)
-   */
   public void setSystemId (final String systemId)
   {
-    this.systemId = systemId;
+    this.m_sSystemID = systemId;
   }
 }

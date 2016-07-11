@@ -53,23 +53,19 @@ public final class SAXEvent
   public static final int MAPPING = 8;
   public static final int MAPPING_END = 9;
 
-  public int type;
-  public String uri;
-  public String lName;
-  public String qName; // PI->target, MAPPING->prefix
-  public IMutableAttributes attrs;
-  public Map <String, String> namespaces;
-  public String value = "";
+  public int m_nType;
+  public String m_sURI;
+  public String m_sLocalName;
+  public String m_sQName; // PI->target, MAPPING->prefix
+  public IMutableAttributes m_aAttrs;
+  public Map <String, String> m_aNamespaces;
+  public String m_sValue = "";
   // PI->data, MAPPING->uri, TEXT, ATTRIBUTES as usual
   // ELEMENT->text look-ahead
-  public boolean hasChildNodes = false;
+  public boolean m_bHasChildNodes = false;
 
   /** contains the position counters */
-  private Map <Object, Counter> posHash;
-
-  //
-  // private constructor
-  //
+  private Map <Object, Counter> m_aPosHash;
 
   private SAXEvent ()
   {}
@@ -87,17 +83,17 @@ public final class SAXEvent
                                      final Map <String, String> inScopeNamespaces)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = attrs != null ? ELEMENT : ELEMENT_END;
-    event.uri = uri;
-    event.lName = lName;
-    event.qName = qName;
+    event.m_nType = attrs != null ? ELEMENT : ELEMENT_END;
+    event.m_sURI = uri;
+    event.m_sLocalName = lName;
+    event.m_sQName = qName;
 
     if (attrs != null)
-      event.attrs = new MutableAttributesImpl (attrs);
+      event.m_aAttrs = new MutableAttributesImpl (attrs);
 
-    event.namespaces = inScopeNamespaces;
-    event.hasChildNodes = false;
-    event.value = "";
+    event.m_aNamespaces = inScopeNamespaces;
+    event.m_bHasChildNodes = false;
+    event.m_sValue = "";
     return event;
   }
 
@@ -105,8 +101,8 @@ public final class SAXEvent
   public static SAXEvent newText (final String value)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = TEXT;
-    event.value = value;
+    event.m_nType = TEXT;
+    event.m_sValue = value;
     return event;
   }
 
@@ -114,8 +110,8 @@ public final class SAXEvent
   public static SAXEvent newCDATA (final String value)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = CDATA;
-    event.value = value;
+    event.m_nType = CDATA;
+    event.m_sValue = value;
     return event;
   }
 
@@ -123,7 +119,7 @@ public final class SAXEvent
   public static SAXEvent newRoot ()
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = ROOT;
+    event.m_nType = ROOT;
     event.enableChildNodes (true);
     return event;
   }
@@ -132,8 +128,8 @@ public final class SAXEvent
   public static SAXEvent newComment (final String value)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = COMMENT;
-    event.value = value;
+    event.m_nType = COMMENT;
+    event.m_sValue = value;
     return event;
   }
 
@@ -141,9 +137,9 @@ public final class SAXEvent
   public static SAXEvent newPI (final String target, final String data)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = PI;
-    event.qName = target;
-    event.value = data;
+    event.m_nType = PI;
+    event.m_sQName = target;
+    event.m_sValue = data;
     return event;
   }
 
@@ -151,11 +147,11 @@ public final class SAXEvent
   public static SAXEvent newAttribute (final String uri, final String lname, final String qName, final String value)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = ATTRIBUTE;
-    event.uri = uri;
-    event.lName = lname;
-    event.qName = qName;
-    event.value = value;
+    event.m_nType = ATTRIBUTE;
+    event.m_sURI = uri;
+    event.m_sLocalName = lname;
+    event.m_sQName = qName;
+    event.m_sValue = value;
     return event;
   }
 
@@ -163,11 +159,11 @@ public final class SAXEvent
   public static SAXEvent newAttribute (final Attributes attrs, final int index)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = ATTRIBUTE;
-    event.uri = attrs.getURI (index);
-    event.lName = attrs.getLocalName (index);
-    event.qName = attrs.getQName (index);
-    event.value = attrs.getValue (index);
+    event.m_nType = ATTRIBUTE;
+    event.m_sURI = attrs.getURI (index);
+    event.m_sLocalName = attrs.getLocalName (index);
+    event.m_sQName = attrs.getQName (index);
+    event.m_sValue = attrs.getValue (index);
     return event;
   }
 
@@ -175,9 +171,9 @@ public final class SAXEvent
   public static SAXEvent newMapping (final String prefix, final String uri)
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = uri != null ? MAPPING : MAPPING_END;
-    event.qName = prefix;
-    event.value = uri;
+    event.m_nType = uri != null ? MAPPING : MAPPING_END;
+    event.m_sQName = prefix;
+    event.m_sValue = uri;
     return event;
   }
 
@@ -193,12 +189,12 @@ public final class SAXEvent
   {
     if (bHasChildNodes)
     {
-      posHash = new HashMap<> ();
-      this.hasChildNodes = true;
+      m_aPosHash = new HashMap<> ();
+      this.m_bHasChildNodes = true;
     }
     else
-      if (posHash == null)
-        posHash = new HashMap<> ();
+      if (m_aPosHash == null)
+        m_aPosHash = new HashMap<> ();
   }
 
   // *******************************************************************
@@ -226,20 +222,20 @@ public final class SAXEvent
    */
   private static final class DoubleString
   {
-    private final String s1, s2;
-    private final int hashValue;
+    private final String m_s1, m_s2;
+    private final int m_nHashValue;
 
     public DoubleString (final String s1, final String s2)
     {
-      this.s1 = s1;
-      this.s2 = s2;
-      hashValue = (s1.hashCode () << 1) ^ s2.hashCode ();
+      this.m_s1 = s1;
+      this.m_s2 = s2;
+      m_nHashValue = (s1.hashCode () << 1) ^ s2.hashCode ();
     }
 
     @Override
     public int hashCode ()
     {
-      return hashValue;
+      return m_nHashValue;
     }
 
     @Override
@@ -250,7 +246,7 @@ public final class SAXEvent
       if (o == null || !getClass ().equals (o.getClass ()))
         return false;
       final DoubleString ds = (DoubleString) o;
-      return s1.equals (ds.s1) && s2.equals (ds.s2);
+      return m_s1.equals (ds.m_s1) && m_s2.equals (ds.m_s2);
     }
   }
 
@@ -317,9 +313,9 @@ public final class SAXEvent
     Counter c;
     for (final Object key : keys)
     {
-      c = posHash.get (key);
+      c = m_aPosHash.get (key);
       if (c == null)
-        posHash.put (key, new Counter ());
+        m_aPosHash.put (key, new Counter ());
       else
         c.m_nValue++;
       // posHash.put(keys[i], new Long(l.longValue()+1));
@@ -328,7 +324,7 @@ public final class SAXEvent
 
   public long getPositionOf (final String uri, final String lName)
   {
-    final Counter c = posHash.get (new DoubleString (uri, lName));
+    final Counter c = m_aPosHash.get (new DoubleString (uri, lName));
     if (c == null)
     {
       // Shouldn't happen
@@ -339,7 +335,7 @@ public final class SAXEvent
 
   public long getPositionOfNode ()
   {
-    final Counter c = posHash.get ("node()");
+    final Counter c = m_aPosHash.get ("node()");
     if (c == null)
     {
       // Shouldn't happen
@@ -350,7 +346,7 @@ public final class SAXEvent
 
   public long getPositionOfText ()
   {
-    final Counter c = posHash.get ("text()");
+    final Counter c = m_aPosHash.get ("text()");
     if (c == null)
     {
       // Shouldn't happen
@@ -361,7 +357,7 @@ public final class SAXEvent
 
   public long getPositionOfCDATA ()
   {
-    final Counter c = posHash.get ("cdata()");
+    final Counter c = m_aPosHash.get ("cdata()");
     if (c == null)
     {
       // Shouldn't happen
@@ -372,7 +368,7 @@ public final class SAXEvent
 
   public long getPositionOfComment ()
   {
-    final Counter c = posHash.get ("comment()");
+    final Counter c = m_aPosHash.get ("comment()");
     if (c == null)
     {
       // Shouldn't happen
@@ -383,7 +379,7 @@ public final class SAXEvent
 
   public long getPositionOfPI (final String target)
   {
-    final Counter c = posHash.get (new DoubleString ("pi()", target));
+    final Counter c = m_aPosHash.get (new DoubleString ("pi()", target));
     if (c == null)
     {
       // Shouldn't happen
@@ -396,8 +392,8 @@ public final class SAXEvent
   public Object clone ()
   {
     final SAXEvent event = new SAXEvent ();
-    event.type = type;
-    event.qName = qName;
+    event.m_nType = m_nType;
+    event.m_sQName = m_sQName;
     return event;
   }
 
@@ -408,26 +404,26 @@ public final class SAXEvent
   public String toString ()
   {
     final String ret = "SAXEvent ";
-    switch (type)
+    switch (m_nType)
     {
       case ROOT:
         return ret + "/";
       case ELEMENT:
-        return ret + "<" + qName + ">";
+        return ret + "<" + m_sQName + ">";
       case ELEMENT_END:
-        return ret + "</" + qName + ">";
+        return ret + "</" + m_sQName + ">";
       case TEXT:
-        return ret + "'" + value + "'";
+        return ret + "'" + m_sValue + "'";
       case CDATA:
-        return ret + "<![CDATA[" + value + "]]>";
+        return ret + "<![CDATA[" + m_sValue + "]]>";
       case COMMENT:
-        return ret + "<!--" + value + "-->";
+        return ret + "<!--" + m_sValue + "-->";
       case PI:
-        return ret + "<?" + qName + " " + value + "?>";
+        return ret + "<?" + m_sQName + " " + m_sValue + "?>";
       case ATTRIBUTE:
-        return ret + qName + "='" + value + "'";
+        return ret + m_sQName + "='" + m_sValue + "'";
       case MAPPING:
-        return "xmlns:" + qName + "=" + value;
+        return "xmlns:" + m_sQName + "=" + m_sValue;
       default:
         return "SAXEvent ???";
     }

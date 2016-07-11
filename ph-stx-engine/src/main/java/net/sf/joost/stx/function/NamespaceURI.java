@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
@@ -70,7 +70,8 @@ public final class NamespaceURI implements IInstance
     return false;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     final Value v = FunctionFactory.getOptionalValue (context, top, args);
     if (v.type == Value.EMPTY)
@@ -84,9 +85,8 @@ public final class NamespaceURI implements IInstance
                                v +
                                ")");
 
-    if (event.type == SAXEvent.ELEMENT || event.type == SAXEvent.ATTRIBUTE)
-      return new Value (event.uri);
-    else
-      return Value.VAL_EMPTY_STRING;
+    if (event.m_nType == SAXEvent.ELEMENT || event.m_nType == SAXEvent.ATTRIBUTE)
+      return new Value (event.m_sURI);
+    return Value.VAL_EMPTY_STRING;
   }
 }

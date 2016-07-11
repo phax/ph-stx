@@ -42,8 +42,8 @@ import net.sf.joost.stx.ParseContext;
 
 /**
  * Abstract base class for all factory classes which produce nodes
- * ({@link AbstractNodeBase}) for the tree representation of an STX transformation
- * sheet.
+ * ({@link AbstractNodeBase}) for the tree representation of an STX
+ * transformation sheet.
  *
  * @version $Revision: 2.11 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
@@ -70,9 +70,9 @@ public abstract class AbstractFactoryBase
    *            for missing or wrong attributes, etc.
    */
   public abstract AbstractNodeBase createNode (AbstractNodeBase parent,
-                                       String qName,
-                                       Attributes attrs,
-                                       ParseContext context) throws SAXException;
+                                               String qName,
+                                               Attributes attrs,
+                                               ParseContext context) throws SAXException;
 
   /**
    * Looks for the required attribute <code>name</code> in <code>attrs</code>.
@@ -197,16 +197,16 @@ public abstract class AbstractFactoryBase
    * Parses a qualified name by extracting local name and namespace URI. The
    * result string has the form "{namespace-uri}local-name".
    *
-   * @param qName
+   * @param sQName
    *        string representing the qualified name
    * @param context
    *        the parse context
    */
-  protected static String getExpandedName (String qName, final ParseContext context) throws SAXParseException
+  protected static String getExpandedName (final String sQName, final ParseContext context) throws SAXParseException
   {
-    final StringBuffer result = new StringBuffer ("{");
+    final StringBuilder result = new StringBuilder ("{");
 
-    qName = qName.trim ();
+    String qName = sQName.trim ();
     final int colon = qName.indexOf (':');
     if (colon != -1)
     { // prefixed name
@@ -282,9 +282,9 @@ public abstract class AbstractFactoryBase
    * @see #parsePattern(String, ParseContext)
    */
   protected static AbstractTree parseRequiredPattern (final String elName,
-                                              final Attributes attrs,
-                                              final String attName,
-                                              final ParseContext context) throws SAXParseException
+                                                      final Attributes attrs,
+                                                      final String attName,
+                                                      final ParseContext context) throws SAXParseException
   {
     return parsePattern (getRequiredAttribute (elName, attrs, attName, context), context);
   }
@@ -350,9 +350,9 @@ public abstract class AbstractFactoryBase
    * @see #parseExpr(String, ParseContext)
    */
   protected static AbstractTree parseRequiredExpr (final String elName,
-                                           final Attributes attrs,
-                                           final String attName,
-                                           final ParseContext context) throws SAXParseException
+                                                   final Attributes attrs,
+                                                   final String attName,
+                                                   final ParseContext context) throws SAXParseException
   {
     return parseExpr (getRequiredAttribute (elName, attrs, attName, context), context);
   }
@@ -371,8 +371,8 @@ public abstract class AbstractFactoryBase
    *        the string to be parsed
    * @param context
    *        the parse context
-   * @return a {@link AbstractTree} representation of the AVT or <code>null</code> if
-   *         <code>string</code> was <code>null</code>
+   * @return a {@link AbstractTree} representation of the AVT or
+   *         <code>null</code> if <code>string</code> was <code>null</code>
    * @exception SAXParseException
    *            if a parse error occured
    */
@@ -483,9 +483,9 @@ public abstract class AbstractFactoryBase
    * @see #parseAVT(String, ParseContext)
    */
   protected static AbstractTree parseRequiredAVT (final String elName,
-                                          final Attributes attrs,
-                                          final String attName,
-                                          final ParseContext context) throws SAXParseException
+                                                  final Attributes attrs,
+                                                  final String attName,
+                                                  final ParseContext context) throws SAXParseException
   {
     return parseAVT (getRequiredAttribute (elName, attrs, attName, context), context);
   }

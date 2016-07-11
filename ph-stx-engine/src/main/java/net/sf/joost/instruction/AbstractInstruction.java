@@ -93,8 +93,7 @@ public abstract class AbstractInstruction implements Cloneable
    * @param aCopies
    *        the map of already copied objects
    */
-  protected void onDeepCopy (final AbstractInstruction copy,
-                             final HashMap <AbstractInstruction, AbstractInstruction> aCopies)
+  protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> aCopies)
   {
     if (next != null)
       copy.next = next.deepCopy (aCopies);
@@ -107,9 +106,9 @@ public abstract class AbstractInstruction implements Cloneable
    *        the map of already copied objects
    * @return the copy of this instruction
    */
-  public final AbstractInstruction deepCopy (final HashMap <AbstractInstruction, AbstractInstruction> aCopies)
+  public final AbstractInstruction deepCopy (final HashMap <Object, Object> aCopies)
   {
-    AbstractInstruction copy = aCopies.get (this);
+    AbstractInstruction copy = (AbstractInstruction) aCopies.get (this);
     if (copy == null)
     {
       try
@@ -137,15 +136,16 @@ public abstract class AbstractInstruction implements Cloneable
    *        the map of already copied objects
    * @return the copy
    */
-  public static final Hashtable deepHashtableCopy (final Hashtable hashtable, final HashMap copies)
+  protected static final Hashtable deepHashtableCopy (final Hashtable <String, ?> hashtable,
+                                                      final HashMap <Object, Object> copies)
   {
-    Hashtable copy = (Hashtable) copies.get (hashtable);
+    Hashtable <String, AbstractInstruction> copy = (Hashtable <String, AbstractInstruction>) copies.get (hashtable);
     if (copy == null)
     {
-      copy = new Hashtable (hashtable.size ());
-      for (final Enumeration e = hashtable.keys (); e.hasMoreElements ();)
+      copy = new Hashtable<> (hashtable.size ());
+      for (final Enumeration <String> e = hashtable.keys (); e.hasMoreElements ();)
       {
-        final Object key = e.nextElement ();
+        final String key = e.nextElement ();
         copy.put (key, ((AbstractInstruction) hashtable.get (key)).deepCopy (copies));
       }
       copies.put (hashtable, copy);
@@ -163,7 +163,7 @@ public abstract class AbstractInstruction implements Cloneable
    * @return the copy
    */
   public static final TemplateFactory.Instance [] deepTemplateArrayCopy (final TemplateFactory.Instance [] templates,
-                                                                         final HashMap copies)
+                                                                         final HashMap <Object, Object> copies)
   {
     TemplateFactory.Instance [] copy = (TemplateFactory.Instance []) copies.get (templates);
     if (copy == null)

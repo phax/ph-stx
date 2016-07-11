@@ -29,13 +29,12 @@ import org.xml.sax.SAXException;
 import net.sf.joost.grammar.AbstractReversableTree;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
-import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
 
 /**
  * Objects of ChildTree represent a child step on the ancestor stack in the
  * syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
@@ -51,23 +50,24 @@ public final class ChildTree extends AbstractReversableTree
   {
     if (top < 2)
       return false;
-    return left.matches (context, top - 1, false) && right.matches (context, top, setPosition);
+    return m_aLeft.matches (context, top - 1, false) && m_aRight.matches (context, top, setPosition);
   }
 
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    if (top < context.ancestorStack.size () && left.matches (context, top + 1, false))
+    if (top < context.ancestorStack.size () && m_aLeft.matches (context, top + 1, false))
     {
-      if (right != null)
-                        // path continues, evaluate recursively with top+1
-                        return right.evaluate (context, top + 1);
-      else
-                        // last step, return node at position top+1
-                        return new Value ((SAXEvent) context.ancestorStack.elementAt (top));
+      if (m_aRight != null)
+      {
+        // path continues, evaluate recursively with top+1
+        return m_aRight.evaluate (context, top + 1);
+      }
+      // last step, return node at position top+1
+      return new Value (context.ancestorStack.elementAt (top));
     }
-    else // path selects nothing
-      return Value.VAL_EMPTY;
+    // path selects nothing
+    return Value.VAL_EMPTY;
   }
 
   @Override

@@ -70,9 +70,9 @@ public final class VariableFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     final String varName = getExpandedName (nameAtt, context);
@@ -115,7 +115,6 @@ public final class VariableFactory extends AbstractFactoryBase
              select == null);
       this.varName = varName;
       this.select = select;
-      this.keepValue = keepValue;
       this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
       this.isGroupVar = parent instanceof AbstractGroupBase;
     }
@@ -157,23 +156,29 @@ public final class VariableFactory extends AbstractFactoryBase
       // determine scope
       Hashtable <String, Value> varTable;
       if (isGroupVar)
-        varTable = context.groupVars.get (parent).peek ();
+        varTable = context.groupVars.get (m_aParent).peek ();
       else
       {
         varTable = context.localVars;
-        parent.declareVariable (expName);
+        m_aParent.declareVariable (m_sExpName);
       }
 
-      if (varTable.get (expName) != null)
+      if (varTable.get (m_sExpName) != null)
       {
-        context.errorHandler.error ("Variable '" + varName + "' already declared", publicId, systemId, lineNo, colNo);
+        context.m_aErrorHandler.error ("Variable '" +
+                                    varName +
+                                    "' already declared",
+                                    m_sPublicID,
+                                    m_sSystemID,
+                                    lineNo,
+                                    colNo);
         return; // if the errorHandler returns
       }
-      varTable.put (expName, v);
+      varTable.put (m_sExpName, v);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

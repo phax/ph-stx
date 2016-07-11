@@ -34,7 +34,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Objects of UriWildcardTree represent element name test "*:lname" nodes in the
  * syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:43 $
  * @author Oliver Becker
  */
@@ -42,7 +42,7 @@ public final class UriWildcardTree extends AbstractTree
 {
   /**
    * Constructs a UriWildcardTree object with a given local name.
-   * 
+   *
    * @param lName
    *        the local name in the name test
    * @param context
@@ -51,7 +51,7 @@ public final class UriWildcardTree extends AbstractTree
   public UriWildcardTree (final String lName, final ParseContext context)
   {
     super (URI_WILDCARD);
-    this.lName = lName;
+    this.m_sLocalName = lName;
   }
 
   @Override
@@ -60,12 +60,12 @@ public final class UriWildcardTree extends AbstractTree
     if (top < 2)
       return false;
 
-    final SAXEvent e = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-    if (e.type != SAXEvent.ELEMENT || !lName.equals (e.lName))
+    final SAXEvent e = context.ancestorStack.elementAt (top - 1);
+    if (e.m_nType != SAXEvent.ELEMENT || !m_sLocalName.equals (e.m_sLocalName))
       return false;
 
     if (setPosition)
-      context.position = ((SAXEvent) context.ancestorStack.elementAt (top - 2)).getPositionOf ("*", lName);
+      context.position = context.ancestorStack.elementAt (top - 2).getPositionOf ("*", m_sLocalName);
 
     return true;
   }

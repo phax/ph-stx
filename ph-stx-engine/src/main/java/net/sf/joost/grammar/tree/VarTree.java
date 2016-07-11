@@ -25,7 +25,7 @@
 package net.sf.joost.grammar.tree;
 
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.Map;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -66,19 +66,19 @@ public final class VarTree extends AbstractTree
     final int colon = value.indexOf (":");
     if (colon != -1)
     {
-      uri = context.nsSet.get (value.substring (0, colon));
-      if (uri == null)
+      m_sURI = context.nsSet.get (value.substring (0, colon));
+      if (m_sURI == null)
       {
         throw new SAXParseException ("Undeclared prefix '" + value.substring (0, colon) + "'", context.locator);
       }
-      lName = value.substring (colon + 1);
+      m_sLocalName = value.substring (colon + 1);
     }
     else
     {
-      uri = "";
-      lName = value;
+      m_sURI = "";
+      m_sLocalName = value;
     }
-    expName = "{" + uri + "}" + lName;
+    expName = "{" + m_sURI + "}" + m_sLocalName;
   }
 
   @Override
@@ -92,11 +92,11 @@ public final class VarTree extends AbstractTree
       }
       catch (final VariableNotFoundException e)
       {
-        context.errorHandler.error ("Undeclared variable '" +
-                                    value +
+        context.m_aErrorHandler.error ("Undeclared variable '" +
+                                    m_aValue +
                                     "'",
-                                    context.currentInstruction.publicId,
-                                    context.currentInstruction.systemId,
+                                    context.currentInstruction.m_sPublicID,
+                                    context.currentInstruction.m_sSystemID,
                                     context.currentInstruction.lineNo,
                                     context.currentInstruction.colNo);
         // if the errorHandler decides to continue ...
@@ -105,9 +105,10 @@ public final class VarTree extends AbstractTree
       scopeDetermined = true;
     }
 
-    final Hashtable vars = (groupScope == null) ? context.localVars : context.groupVars.get (groupScope).peek ();
+    final Map <String, Value> vars = (groupScope == null) ? context.localVars
+                                                          : context.groupVars.get (groupScope).peek ();
 
-    final Value v1 = (Value) vars.get (expName);
+    final Value v1 = vars.get (expName);
     // create a copy if the result is a sequence
     return v1.next == null ? v1 : v1.copy ();
   }
@@ -119,7 +120,7 @@ public final class VarTree extends AbstractTree
   }
 
   @Override
-  public AbstractTree deepCopy (final HashMap copies)
+  public AbstractTree deepCopy (final HashMap <Object, Object> copies)
   {
     final VarTree copy = (VarTree) super.deepCopy (copies);
     if (scopeDetermined && groupScope != null)

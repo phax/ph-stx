@@ -17,9 +17,9 @@ import net.sf.joost.grammar.EvalException;
  */
 public class JRegularExpression implements IRegularExpression
 {
-  private Pattern pattern;
-  private String javaRegex;
-  private final int flagBits;
+  private Pattern m_aPattern;
+  private String m_sJavaRegex;
+  private final int m_nFlagBits;
 
   /**
    * Create a regular expression, starting with an already-translated Java regex
@@ -27,9 +27,9 @@ public class JRegularExpression implements IRegularExpression
 
   public JRegularExpression (final String javaRegex, final int flagBits)
   {
-    this.flagBits = flagBits;
-    this.javaRegex = javaRegex;
-    pattern = Pattern.compile (javaRegex, flagBits & (~(Pattern.COMMENTS | Pattern.CASE_INSENSITIVE)));
+    this.m_nFlagBits = flagBits;
+    this.m_sJavaRegex = javaRegex;
+    m_aPattern = Pattern.compile (javaRegex, flagBits & (~(Pattern.COMMENTS | Pattern.CASE_INSENSITIVE)));
   }
 
   /**
@@ -49,13 +49,13 @@ public class JRegularExpression implements IRegularExpression
    */
   public JRegularExpression (final CharSequence regex, final boolean isXPath, final int flagBits) throws EvalException
   {
-    this.flagBits = flagBits;
+    this.m_nFlagBits = flagBits;
     try
     {
       final boolean ignoreWhitespace = ((flagBits & Pattern.COMMENTS) != 0);
       final boolean caseBlind = ((flagBits & Pattern.CASE_INSENSITIVE) != 0);
-      javaRegex = JDK15RegexTranslator.translate (regex, isXPath, ignoreWhitespace, caseBlind);
-      pattern = Pattern.compile (javaRegex, flagBits & (~(Pattern.COMMENTS | Pattern.CASE_INSENSITIVE)));
+      m_sJavaRegex = JDK15RegexTranslator.translate (regex, isXPath, ignoreWhitespace, caseBlind);
+      m_aPattern = Pattern.compile (m_sJavaRegex, flagBits & (~(Pattern.COMMENTS | Pattern.CASE_INSENSITIVE)));
     }
     catch (final RegexSyntaxException e)
     {
@@ -75,7 +75,7 @@ public class JRegularExpression implements IRegularExpression
    */
   public String getJavaRegularExpression ()
   {
-    return javaRegex;
+    return m_sJavaRegex;
   }
 
   /**
@@ -83,7 +83,7 @@ public class JRegularExpression implements IRegularExpression
    */
   public int getFlagBits ()
   {
-    return flagBits;
+    return m_nFlagBits;
   }
 
   // OB: commented out analyze()
@@ -107,7 +107,7 @@ public class JRegularExpression implements IRegularExpression
    */
   public Matcher matcher (final CharSequence input)
   {
-    return pattern.matcher (input);
+    return m_aPattern.matcher (input);
   }
 
   /**
@@ -121,7 +121,7 @@ public class JRegularExpression implements IRegularExpression
 
   public boolean containsMatch (final CharSequence input)
   {
-    return pattern.matcher (input).find ();
+    return m_aPattern.matcher (input).find ();
   }
 
   /**
@@ -135,7 +135,7 @@ public class JRegularExpression implements IRegularExpression
 
   public boolean matches (final CharSequence input)
   {
-    return pattern.matcher (input).matches ();
+    return m_aPattern.matcher (input).matches ();
   }
 
   /**
@@ -156,7 +156,7 @@ public class JRegularExpression implements IRegularExpression
   // throws XPathException {
   public CharSequence replace (final CharSequence input, final CharSequence replacement) throws EvalException
   {
-    final Matcher matcher = pattern.matcher (input);
+    final Matcher matcher = m_aPattern.matcher (input);
     try
     {
       final String res = matcher.replaceAll (replacement.toString ());

@@ -86,15 +86,15 @@ public final class ForEachFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>for-each-item</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private final String varName, expName;
-    private AbstractTree select;
+    private final String m_sVarName, m_sExpName;
+    private AbstractTree m_aSelect;
 
     /**
      * Stack that stores the remaining sequence of the select attribute in case
      * this for-each-item was interrupted via
      * <code>stx:process-<em>xxx</em></code>
      */
-    private Stack <Value> resultStack = new Stack<> ();
+    private Stack <Value> m_aResultStack = new Stack<> ();
 
     private AbstractInstruction contents, successor;
 
@@ -115,12 +115,12 @@ public final class ForEachFactory extends AbstractFactoryBase
                         final AbstractTree select)
     {
       super (qName, parent, context, true);
-      this.varName = varName;
-      this.expName = expName;
-      this.select = select;
+      this.m_sVarName = varName;
+      this.m_sExpName = expName;
+      this.m_aSelect = select;
 
       // this instruction declares a local variable
-      scopedVariables = new Vector<> ();
+      m_aScopedVariables = new Vector<> ();
     }
 
     /**
@@ -133,8 +133,8 @@ public final class ForEachFactory extends AbstractFactoryBase
         return true;
 
       contents = next;
-      successor = nodeEnd.next;
-      nodeEnd.next = this; // loop
+      successor = m_aNodeEnd.next;
+      m_aNodeEnd.next = this; // loop
       return false;
     }
 
@@ -149,25 +149,25 @@ public final class ForEachFactory extends AbstractFactoryBase
       Value selectResult;
       if (continued)
       {
-        selectResult = resultStack.pop ();
+        selectResult = m_aResultStack.pop ();
         continued = false;
       }
       else
       {
         // perform this check only once per for-each-item
-        if (context.localVars.get (expName) != null)
+        if (context.localVars.get (m_sExpName) != null)
         {
-          context.errorHandler.fatalError ("Variable '" +
-                                           varName +
+          context.m_aErrorHandler.fatalError ("Variable '" +
+                                           m_sVarName +
                                            "' already declared",
-                                           publicId,
-                                           systemId,
+                                           m_sPublicID,
+                                           m_sSystemID,
                                            lineNo,
                                            colNo);
           return CSTX.PR_ERROR;// if the errorHandler returns
         }
 
-        selectResult = select.evaluate (context, this);
+        selectResult = m_aSelect.evaluate (context, this);
       }
 
       if (selectResult == null || selectResult.type == Value.EMPTY)
@@ -178,11 +178,11 @@ public final class ForEachFactory extends AbstractFactoryBase
       }
 
       super.process (context); // enter new scope for local variables
-      resultStack.push (selectResult.next);
+      m_aResultStack.push (selectResult.next);
       selectResult.next = null;
 
-      context.localVars.put (expName, selectResult);
-      declareVariable (expName);
+      context.localVars.put (m_sExpName, selectResult);
+      declareVariable (m_sExpName);
 
       next = contents;
       return CSTX.PR_CONTINUE;
@@ -199,7 +199,7 @@ public final class ForEachFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
@@ -207,10 +207,10 @@ public final class ForEachFactory extends AbstractFactoryBase
         theCopy.contents = contents.deepCopy (copies);
       if (successor != null)
         theCopy.successor = successor.deepCopy (copies);
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
       theCopy.continued = false;
-      theCopy.resultStack = new Stack<> ();
+      theCopy.m_aResultStack = new Stack<> ();
     }
   }
 }

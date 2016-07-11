@@ -52,16 +52,13 @@ import net.sf.joost.stx.Processor;
  */
 public class TrAXFilter extends XMLFilterImpl
 {
+  private static final Logger log = LoggerFactory.getLogger (TrAXFilter.class);
 
-  // Define a static logger variable so that it references the
-  // Logger instance named "TransformerImpl".
-  private static Logger log = LoggerFactory.getLogger (TrAXFilter.class);
-
-  private Templates templates = null;
-  private Processor processor = null;
+  private final Templates m_aTemplates;
+  private Processor m_aProcessor;
 
   // default ErrorListener
-  private ConfigurationErrListener configErrListener;
+  private ConfigurationErrListener m_aConfigErrListener;
 
   /**
    * Constructor
@@ -74,10 +71,10 @@ public class TrAXFilter extends XMLFilterImpl
 
     if (CSTX.DEBUG)
       log.debug ("calling constructor");
-    this.templates = templates;
+    this.m_aTemplates = templates;
     if (templates instanceof TemplatesImpl)
     {
-      configErrListener = ((TemplatesImpl) templates).factory.defaultErrorListener;
+      m_aConfigErrListener = ((TemplatesImpl) templates).m_aFactory.m_aDefaultErrorListener;
     }
   }
 
@@ -103,10 +100,10 @@ public class TrAXFilter extends XMLFilterImpl
     try
     {
       // get a new Transformer
-      transformer = this.templates.newTransformer ();
+      transformer = this.m_aTemplates.newTransformer ();
       if (transformer instanceof TransformerImpl)
       {
-        this.processor = ((TransformerImpl) transformer).getStxProcessor ();
+        this.m_aProcessor = ((TransformerImpl) transformer).getStxProcessor ();
       }
       else
       {
@@ -116,54 +113,47 @@ public class TrAXFilter extends XMLFilterImpl
 
       }
       XMLReader parent = this.getParent ();
-
       if (parent == null)
       {
         parent = XMLReaderFactory.createXMLReader ();
         setParent (parent);
       }
-      ContentHandler handler = this.getContentHandler ();
 
+      ContentHandler handler = this.getContentHandler ();
       if (handler == null)
       {
         handler = parent.getContentHandler ();
       }
       if (handler == null)
-      {
         throw new SAXException ("no ContentHandler registered");
-      }
-      // init StxEmitter
-      IStxEmitter out = null;
 
       // SAX specific Implementation
-      out = new SAXEmitter (handler);
+      final IStxEmitter out = new SAXEmitter (handler);
 
-      if (this.processor != null)
+      if (m_aProcessor != null)
       {
-        this.processor.setContentHandler (out);
-        this.processor.setLexicalHandler (out);
+        m_aProcessor.setContentHandler (out);
+        m_aProcessor.setLexicalHandler (out);
       }
       else
       {
         throw new SAXException ("Joost-Processor is not correct configured.");
       }
+
       if (parent == null)
-      {
         throw new SAXException ("No parent for filter");
-      }
-      parent.setContentHandler (this.processor);
-      parent.setProperty ("http://xml.org/sax/properties/lexical-handler", this.processor);
+      parent.setContentHandler (this.m_aProcessor);
+      parent.setProperty ("http://xml.org/sax/properties/lexical-handler", this.m_aProcessor);
       parent.setEntityResolver (this);
       parent.setDTDHandler (this);
       parent.setErrorHandler (this);
       parent.parse (input);
-
     }
     catch (final TransformerConfigurationException tE)
     {
       try
       {
-        configErrListener.fatalError (tE);
+        m_aConfigErrListener.fatalError (tE);
       }
       catch (final TransformerConfigurationException innerE)
       {
@@ -174,7 +164,7 @@ public class TrAXFilter extends XMLFilterImpl
     {
       try
       {
-        configErrListener.fatalError (new TransformerConfigurationException (sE.getMessage (), sE));
+        m_aConfigErrListener.fatalError (new TransformerConfigurationException (sE.getMessage (), sE));
       }
       catch (final TransformerConfigurationException innerE)
       {
@@ -185,7 +175,7 @@ public class TrAXFilter extends XMLFilterImpl
     {
       try
       {
-        configErrListener.fatalError (new TransformerConfigurationException (iE.getMessage (), iE));
+        m_aConfigErrListener.fatalError (new TransformerConfigurationException (iE.getMessage (), iE));
       }
       catch (final TransformerConfigurationException innerE)
       {

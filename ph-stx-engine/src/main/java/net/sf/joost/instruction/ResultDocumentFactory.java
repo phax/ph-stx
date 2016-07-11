@@ -62,7 +62,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
   // Constructor
   public ResultDocumentFactory ()
   {
-    attrNames = new HashSet <String> ();
+    attrNames = new HashSet <> ();
     attrNames.add ("href");
     attrNames.add ("output-encoding");
     attrNames.add ("output-method");
@@ -78,9 +78,9 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree href = parseRequiredAVT (qName, attrs, "href", context);
 
@@ -143,7 +143,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
 
       final String filename = href.evaluate (context, this).getString ();
 
-      final Properties props = (Properties) context.currentProcessor.outputProperties.clone ();
+      final Properties props = (Properties) context.currentProcessor.m_aOutputProperties.clone ();
       props.setProperty (OutputKeys.ENCODING, encoding);
       if (method != null)
         props.setProperty (OutputKeys.METHOD, method);
@@ -153,7 +153,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
       {
         if (context.outputUriResolver != null)
         {
-          final Result result = context.outputUriResolver.resolve (filename, systemId, props, append);
+          final Result result = context.outputUriResolver.resolve (filename, m_sSystemID, props, append);
           if (result != null)
           {
             emitter = TrAXHelper.initStxEmitter (result, context.currentProcessor, props);
@@ -161,8 +161,8 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
             {
               throw new SAXParseException ("Unsupported Result type " +
                                            result.getClass ().getName (),
-                                           publicId,
-                                           systemId,
+                                           m_sPublicID,
+                                           m_sSystemID,
                                            lineNo,
                                            colNo);
             }
@@ -170,7 +170,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
             {
               ((AbstractStreamEmitter) emitter).setOmitXmlDeclaration (true);
             }
-            localFieldStack.push (result);
+            m_aLocalFieldStack.push (result);
           }
         }
 
@@ -179,8 +179,8 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
           // either there's no outputUriResolver or it returned null
           final Writer osw = context.emitter.getResultWriter (filename,
                                                               encoding,
-                                                              publicId,
-                                                              systemId,
+                                                              m_sPublicID,
+                                                              m_sSystemID,
                                                               lineNo,
                                                               colNo,
                                                               append);
@@ -188,25 +188,25 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
           final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (osw, encoding, props);
           if (append)
             se.setOmitXmlDeclaration (true);
-          localFieldStack.push (osw);
+          m_aLocalFieldStack.push (osw);
           emitter = se;
         }
       }
       catch (final java.io.IOException ex)
       {
-        context.errorHandler.error (ex.toString (), publicId, systemId, lineNo, colNo, ex);
+        context.m_aErrorHandler.error (ex.toString (), m_sPublicID, m_sSystemID, lineNo, colNo, ex);
         // if the errorHandler returns
         return CSTX.PR_CONTINUE;
       }
       catch (final URISyntaxException ex)
       {
-        context.errorHandler.error (ex.toString (), publicId, systemId, lineNo, colNo, ex);
+        context.m_aErrorHandler.error (ex.toString (), m_sPublicID, m_sSystemID, lineNo, colNo, ex);
         // if the errorHandler returns
         return CSTX.PR_CONTINUE;
       }
       catch (final TransformerException ex)
       {
-        context.errorHandler.error (ex);
+        context.m_aErrorHandler.error (ex);
       }
 
       context.pushEmitter (emitter);
@@ -218,9 +218,9 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      context.emitter.endDocument (nodeEnd);
+      context.emitter.endDocument (m_aNodeEnd);
       context.popEmitter ();
-      final Object object = localFieldStack.pop ();
+      final Object object = m_aLocalFieldStack.pop ();
       try
       {
         if (object instanceof Writer)
@@ -235,18 +235,18 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
       }
       catch (final java.io.IOException ex)
       {
-        context.errorHandler.error (ex.toString (), publicId, systemId, nodeEnd.lineNo, nodeEnd.colNo, ex);
+        context.m_aErrorHandler.error (ex.toString (), m_sPublicID, m_sSystemID, m_aNodeEnd.lineNo, m_aNodeEnd.colNo, ex);
       }
       catch (final TransformerException ex)
       {
-        context.errorHandler.error (ex);
+        context.m_aErrorHandler.error (ex);
       }
 
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

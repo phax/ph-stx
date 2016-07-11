@@ -449,8 +449,8 @@ public abstract class lr_parser
     System.err.print (message);
     System.err.flush ();
     if (info instanceof Symbol)
-      if (((Symbol) info).left != -1)
-        System.err.println (" at character " + ((Symbol) info).left + " of input");
+      if (((Symbol) info).m_nLeft != -1)
+        System.err.println (" at character " + ((Symbol) info).m_nLeft + " of input");
       else
         System.err.println ("");
   }

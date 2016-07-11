@@ -71,9 +71,9 @@ public final class InsertBefore implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    Value target = args.left.left.evaluate (context, top);
-    final Value arg2 = args.left.right.evaluate (context, top);
-    Value inserts = args.right.evaluate (context, top);
+    Value target = args.m_aLeft.m_aLeft.evaluate (context, top);
+    final Value arg2 = args.m_aLeft.m_aRight.evaluate (context, top);
+    Value inserts = args.m_aRight.evaluate (context, top);
 
     // make sure that the second parameter is a valid number
     final double dPos = arg2.getNumberValue ();

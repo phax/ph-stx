@@ -47,6 +47,6 @@ public final class ValueTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    return (Value) value;
+    return (Value) m_aValue;
   }
 }

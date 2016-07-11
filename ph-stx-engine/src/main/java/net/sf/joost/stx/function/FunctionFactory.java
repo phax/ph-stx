@@ -30,11 +30,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
-import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
 
 /**
@@ -95,53 +94,53 @@ public final class FunctionFactory
   static
   {
     final IInstance [] functions = { new StringConv (),
-                                    new NumberConv (),
-                                    new BooleanConv (),
-                                    new Position (),
-                                    new HasChildNodes (),
-                                    new NodeKind (),
-                                    new Name (),
-                                    new LocalName (),
-                                    new NamespaceURI (),
-                                    new GetNamespaceUriForPrefix (),
-                                    new GetInScopePrefixes (),
-                                    new Not (),
-                                    new True (),
-                                    new False (),
-                                    new Floor (),
-                                    new Ceiling (),
-                                    new Round (),
-                                    new Concat (),
-                                    new StringJoin (),
-                                    new StringLength (),
-                                    new NormalizeSpace (),
-                                    new Contains (),
-                                    new StartsWith (),
-                                    new EndsWith (),
-                                    new Substring (),
-                                    new SubstringBefore (),
-                                    new SubstringAfter (),
-                                    new Translate (),
-                                    new StringPad (),
-                                    new Matches (),
-                                    new Replace (),
-                                    new Tokenize (),
-                                    new EscapeUri (),
-                                    new Empty (),
-                                    new Exists (),
-                                    new ItemAt (),
-                                    new IndexOf (),
-                                    new Subsequence (),
-                                    new InsertBefore (),
-                                    new Remove (),
-                                    new Count (),
-                                    new Sum (),
-                                    new Min (),
-                                    new Max (),
-                                    new Avg (),
-                                    new RegexGroup (),
-                                    new FilterAvailable (),
-                                    new ExtSequence () };
+                                     new NumberConv (),
+                                     new BooleanConv (),
+                                     new Position (),
+                                     new HasChildNodes (),
+                                     new NodeKind (),
+                                     new Name (),
+                                     new LocalName (),
+                                     new NamespaceURI (),
+                                     new GetNamespaceUriForPrefix (),
+                                     new GetInScopePrefixes (),
+                                     new Not (),
+                                     new True (),
+                                     new False (),
+                                     new Floor (),
+                                     new Ceiling (),
+                                     new Round (),
+                                     new Concat (),
+                                     new StringJoin (),
+                                     new StringLength (),
+                                     new NormalizeSpace (),
+                                     new Contains (),
+                                     new StartsWith (),
+                                     new EndsWith (),
+                                     new Substring (),
+                                     new SubstringBefore (),
+                                     new SubstringAfter (),
+                                     new Translate (),
+                                     new StringPad (),
+                                     new Matches (),
+                                     new Replace (),
+                                     new Tokenize (),
+                                     new EscapeUri (),
+                                     new Empty (),
+                                     new Exists (),
+                                     new ItemAt (),
+                                     new IndexOf (),
+                                     new Subsequence (),
+                                     new InsertBefore (),
+                                     new Remove (),
+                                     new Count (),
+                                     new Sum (),
+                                     new Min (),
+                                     new Max (),
+                                     new Avg (),
+                                     new RegexGroup (),
+                                     new FilterAvailable (),
+                                     new ExtSequence () };
     functionHash = new Hashtable<> (functions.length);
     for (final IInstance function : functions)
       functionHash.put (function.getName (), function);
@@ -182,9 +181,9 @@ public final class FunctionFactory
    *            wrong
    */
   public IInstance getFunction (final String uri,
-                               final String lName,
-                               final String qName,
-                               final AbstractTree args) throws SAXParseException
+                                final String lName,
+                                final String qName,
+                                final AbstractTree args) throws SAXParseException
   {
     // execute java methods
     if (uri.startsWith ("java:"))
@@ -215,9 +214,9 @@ public final class FunctionFactory
     if (aArgs != null)
     {
       argc = 1;
-      while (aArgs.type == AbstractTree.LIST)
+      while (aArgs.m_nType == AbstractTree.LIST)
       {
-        aArgs = aArgs.left;
+        aArgs = aArgs.m_aLeft;
         argc++;
       }
     }
@@ -253,7 +252,7 @@ public final class FunctionFactory
       return args.evaluate (context, top);
     // use current node
     if (top > 0)
-      return new Value ((SAXEvent) context.ancestorStack.elementAt (top - 1));
+      return new Value (context.ancestorStack.elementAt (top - 1));
 
     // no event available (e.g. init of global variables)
     return Value.VAL_EMPTY;

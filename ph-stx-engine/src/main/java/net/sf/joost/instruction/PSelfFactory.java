@@ -25,6 +25,7 @@
 package net.sf.joost.instruction;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -45,12 +46,12 @@ import net.sf.joost.stx.ParseContext;
 public class PSelfFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public PSelfFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <> ();
     attrNames.add ("group");
     attrNames.add ("filter-method");
     attrNames.add ("filter-src");
@@ -65,9 +66,9 @@ public class PSelfFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String groupAtt = attrs.getValue ("group");
 
@@ -112,7 +113,7 @@ public class PSelfFactory extends AbstractFactoryBase
     {
       // no need to call super.processEnd(), there are no local
       // variable declarations
-      if (filter != null)
+      if (m_aFilter != null)
       {
         // use external SAX filter (TransformerHandler)
         context.targetHandler = getProcessHandler (context);

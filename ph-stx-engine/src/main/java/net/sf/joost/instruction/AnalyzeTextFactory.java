@@ -83,12 +83,12 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>analyze-text</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private AbstractTree select;
+    private AbstractTree m_aSelect;
 
     private AbstractInstruction successor;
 
     // this instruction manages its children itself
-    private Vector <AbstractNodeBase> mVector = new Vector <AbstractNodeBase> ();
+    private Vector <AbstractNodeBase> mVector = new Vector<> ();
     private MatchFactory.Instance [] matchChildren;
     private AbstractNodeBase noMatchChild;
 
@@ -99,7 +99,7 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
                         final AbstractTree select)
     {
       super (qName, parent, context, true);
-      this.select = select;
+      this.m_aSelect = select;
     }
 
     /**
@@ -116,10 +116,10 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
           // this test is not really necessary for the implementation,
           // however, it is required by the specification
           throw new SAXParseException ("'" +
-                                       qName +
+                                       m_sQName +
                                        "' must not have more children after stx:no-match",
-                                       node.publicId,
-                                       node.systemId,
+                                       node.m_sPublicID,
+                                       node.m_sSystemID,
                                        node.lineNo,
                                        node.colNo);
         }
@@ -130,12 +130,12 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
         {
           if (noMatchChild != null)
             throw new SAXParseException ("'" +
-                                         qName +
+                                         m_sQName +
                                          "' must have at most one '" +
-                                         node.qName +
+                                         node.m_sQName +
                                          "' child",
-                                         node.publicId,
-                                         node.systemId,
+                                         node.m_sPublicID,
+                                         node.m_sSystemID,
                                          node.lineNo,
                                          node.colNo);
           noMatchChild = node;
@@ -144,26 +144,28 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
           if (node instanceof TextNode)
           {
             if (((TextNode) node).isWhitespaceNode ())
-              return; // ignore white space nodes (from xml:space="preserve")
-            else
-              throw new SAXParseException ("'" +
-                                           qName +
-                                           "' may only contain stx:match and stx:no-match children " +
-                                           "(encountered text)",
-                                           node.publicId,
-                                           node.systemId,
-                                           node.lineNo,
-                                           node.colNo);
+            {
+              // ignore white space nodes (from xml:space="preserve")
+              return;
+            }
+            throw new SAXParseException ("'" +
+                                         m_sQName +
+                                         "' may only contain stx:match and stx:no-match children " +
+                                         "(encountered text)",
+                                         node.m_sPublicID,
+                                         node.m_sSystemID,
+                                         node.lineNo,
+                                         node.colNo);
           }
           else
             throw new SAXParseException ("'" +
-                                         qName +
+                                         m_sQName +
                                          "' may only contain stx:match and stx:no-match children " +
                                          "(encountered '" +
-                                         node.qName +
+                                         node.m_sQName +
                                          "')",
-                                         node.publicId,
-                                         node.systemId,
+                                         node.m_sPublicID,
+                                         node.m_sSystemID,
                                          node.lineNo,
                                          node.colNo);
 
@@ -183,10 +185,10 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
 
       if (mVector.size () == 0)
         throw new SAXParseException ("'" +
-                                     qName +
+                                     m_sQName +
                                      "' must have at least one stx:match child",
-                                     publicId,
-                                     systemId,
+                                     m_sPublicID,
+                                     m_sSystemID,
                                      lineNo,
                                      colNo);
 
@@ -195,8 +197,8 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
       mVector.toArray (matchChildren);
       mVector = null; // for garbage collection
 
-      successor = nodeEnd.next;
-      nodeEnd.next = this; // loop
+      successor = m_aNodeEnd.next;
+      m_aNodeEnd.next = this; // loop
 
       return false;
     }
@@ -226,14 +228,14 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
       if (continued)
       {
         // restore previous values
-        text = (String) localFieldStack.pop ();
-        lastIndex = ((Integer) localFieldStack.pop ()).intValue ();
-        matchers = (Matcher []) localFieldStack.pop ();
+        text = (String) m_aLocalFieldStack.pop ();
+        lastIndex = ((Integer) m_aLocalFieldStack.pop ()).intValue ();
+        matchers = (Matcher []) m_aLocalFieldStack.pop ();
         continued = false; // in case there will be an stx:process-xxx
       }
       else
       { // this is a new invocation
-        text = select.evaluate (context, this).getStringValue ();
+        text = m_aSelect.evaluate (context, this).getStringValue ();
         lastIndex = 0;
         // create a pseudo variable for regex-group()
         if (context.localRegExGroup == null)
@@ -253,7 +255,7 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
           }
           catch (final EvalException e)
           {
-            context.errorHandler.fatalError (e.getMessage (), publicId, systemId, lineNo, colNo, e);
+            context.m_aErrorHandler.fatalError (e.getMessage (), m_sPublicID, m_sSystemID, lineNo, colNo, e);
             return CSTX.PR_ERROR;
           }
         }
@@ -303,14 +305,14 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
           for (int i = 0; i < capSubstr.length; i++)
             capSubstr[i] = matchers[matchIndex].group (i);
           noMatchStr[0] = text.substring (lastIndex, newIndex);
-          localFieldStack.push (matchers);
-          localFieldStack.push (new Integer (newIndex + maxSubstringLength));
-          localFieldStack.push (text);
+          m_aLocalFieldStack.push (matchers);
+          m_aLocalFieldStack.push (new Integer (newIndex + maxSubstringLength));
+          m_aLocalFieldStack.push (text);
           if (noMatchChild != null && newIndex != lastIndex)
           {
             // invoke stx:no-match before stx:match
             next = noMatchChild;
-            noMatchChild.nodeEnd.next = matchChildren[matchIndex];
+            noMatchChild.m_aNodeEnd.next = matchChildren[matchIndex];
           }
           else
             next = matchChildren[matchIndex];
@@ -322,7 +324,7 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
             noMatchStr[0] = text.substring (lastIndex);
             next = noMatchChild;
             // leave stx:analyze-text after stx:no-match
-            noMatchChild.nodeEnd.next = successor;
+            noMatchChild.m_aNodeEnd.next = successor;
           }
           else
             next = successor; // leave stx:analyze-text instantly
@@ -342,7 +344,7 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
@@ -360,8 +362,8 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
         theCopy.noMatchChild = (AbstractNodeBase) noMatchChild.deepCopy (copies);
       if (successor != null)
         theCopy.successor = successor.deepCopy (copies);
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
 
   }

@@ -28,17 +28,17 @@ public class Symbol
    *******************************/
   public Symbol (final int id, final Symbol left, final Symbol right, final Object o)
   {
-    this (id, left.left, right.right, o);
+    this (id, left.m_nLeft, right.m_nRight, o);
   }
 
   public Symbol (final int id, final Symbol left, final Symbol right)
   {
-    this (id, left.left, right.right);
+    this (id, left.m_nLeft, right.m_nRight);
   }
 
   public Symbol (final int id, final Symbol left, final Object o)
   {
-    this (id, left.right, left.right, o);
+    this (id, left.m_nRight, left.m_nRight, o);
   }
 
   /*******************************
@@ -48,9 +48,9 @@ public class Symbol
   public Symbol (final int id, final int l, final int r, final Object o)
   {
     this (id);
-    left = l;
-    right = r;
-    value = o;
+    m_nLeft = l;
+    m_nRight = r;
+    m_aValue = o;
   }
 
   /*******************************
@@ -78,8 +78,8 @@ public class Symbol
   public Symbol (final int sym_num)
   {
     this (sym_num, -1);
-    left = -1;
-    right = -1;
+    m_nLeft = -1;
+    m_nRight = -1;
   }
 
   /***********************************
@@ -114,8 +114,8 @@ public class Symbol
    * The data passed to parser
    *******************************/
 
-  public int left, right;
-  public Object value;
+  public int m_nLeft, m_nRight;
+  public Object m_aValue;
 
   /*****************************
    * Printing this token out. (Override for pretty-print).

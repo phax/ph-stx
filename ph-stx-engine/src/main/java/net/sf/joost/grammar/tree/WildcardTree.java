@@ -33,7 +33,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Objects of WildcardTree represent element test nodes ("*") in the syntax tree
  * of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
@@ -50,12 +50,12 @@ public final class WildcardTree extends AbstractTree
     if (top < 2)
       return false;
 
-    final SAXEvent e = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-    if (e.type != SAXEvent.ELEMENT)
+    final SAXEvent e = context.ancestorStack.elementAt (top - 1);
+    if (e.m_nType != SAXEvent.ELEMENT)
       return false;
 
     if (setPosition)
-      context.position = ((SAXEvent) context.ancestorStack.elementAt (top - 2)).getPositionOf ("*", "*");
+      context.position = context.ancestorStack.elementAt (top - 2).getPositionOf ("*", "*");
 
     return true;
   }

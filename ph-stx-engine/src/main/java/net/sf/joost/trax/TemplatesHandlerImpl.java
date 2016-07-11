@@ -46,20 +46,12 @@ import net.sf.joost.stx.Parser;
  */
 public class TemplatesHandlerImpl implements TemplatesHandler
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "TemplatesHandlerImpl".
-  private static Logger log;
-  static
-  {
-    if (CSTX.DEBUG)
-      log = LoggerFactory.getLogger (TemplatesHandlerImpl.class);
-  }
+  private static final Logger log = LoggerFactory.getLogger (TemplatesHandlerImpl.class);
 
   // member fields
-  private Parser stxparser = null;
-  private String systemId = null;
-  private TransformerFactoryImpl tfactory = null;
+  private Parser m_aSTXParser = null;
+  private String m_sSystemID = null;
+  private TransformerFactoryImpl m_aTransformerFactory = null;
 
   /**
    * Constructor
@@ -72,11 +64,11 @@ public class TemplatesHandlerImpl implements TemplatesHandler
 
     if (CSTX.DEBUG)
       log.debug ("calling constructor");
-    this.tfactory = tfactory;
+    this.m_aTransformerFactory = tfactory;
     // construct a tree representation of an STX stylesheet
     final ParseContext pContext = new ParseContext ();
-    pContext.allowExternalFunctions = tfactory.allowExternalFunctions;
-    stxparser = new Parser (pContext);
+    pContext.allowExternalFunctions = tfactory.m_bAllowExternalFunctions;
+    m_aSTXParser = new Parser (pContext);
   }
 
   // *************************************************************************
@@ -91,7 +83,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler
    */
   public String getSystemId ()
   {
-    return this.systemId;
+    return this.m_sSystemID;
   }
 
   /**
@@ -112,13 +104,13 @@ public class TemplatesHandlerImpl implements TemplatesHandler
     try
     {
       // construct TrAX-representation of an compiled STX stylesheet
-      templates = new TemplatesImpl (stxparser, tfactory);
+      templates = new TemplatesImpl (m_aSTXParser, m_aTransformerFactory);
     }
     catch (final TransformerConfigurationException tE)
     {
       try
       {
-        tfactory.defaultErrorListener.fatalError (tE);
+        m_aTransformerFactory.m_aDefaultErrorListener.fatalError (tE);
       }
       catch (final TransformerConfigurationException e)
       {
@@ -138,7 +130,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler
    */
   public void setSystemId (final String systemId)
   {
-    this.systemId = systemId;
+    this.m_sSystemID = systemId;
   }
 
   // *************************************************************************
@@ -147,105 +139,105 @@ public class TemplatesHandlerImpl implements TemplatesHandler
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void setDocumentLocator (final Locator locator)
   {
-    stxparser.setDocumentLocator (locator);
+    m_aSTXParser.setDocumentLocator (locator);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void startDocument () throws org.xml.sax.SAXException
   {
-    stxparser.startDocument ();
+    m_aSTXParser.startDocument ();
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void endDocument () throws org.xml.sax.SAXException
   {
-    stxparser.endDocument ();
+    m_aSTXParser.endDocument ();
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void startPrefixMapping (final String parm1, final String parm2) throws org.xml.sax.SAXException
   {
-    stxparser.startPrefixMapping (parm1, parm2);
+    m_aSTXParser.startPrefixMapping (parm1, parm2);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void endPrefixMapping (final String parm) throws org.xml.sax.SAXException
   {
-    stxparser.endPrefixMapping (parm);
+    m_aSTXParser.endPrefixMapping (parm);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void startElement (final String parm1,
                             final String parm2,
                             final String parm3,
                             final Attributes parm4) throws org.xml.sax.SAXException
   {
-    stxparser.startElement (parm1, parm2, parm3, parm4);
+    m_aSTXParser.startElement (parm1, parm2, parm3, parm4);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void endElement (final String parm1, final String parm2, final String parm3) throws org.xml.sax.SAXException
   {
-    stxparser.endElement (parm1, parm2, parm3);
+    m_aSTXParser.endElement (parm1, parm2, parm3);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void characters (final char [] parm1, final int parm2, final int parm3) throws org.xml.sax.SAXException
   {
-    stxparser.characters (parm1, parm2, parm3);
+    m_aSTXParser.characters (parm1, parm2, parm3);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void ignorableWhitespace (final char [] parm1,
                                    final int parm2,
                                    final int parm3) throws org.xml.sax.SAXException
   {
-    stxparser.ignorableWhitespace (parm1, parm2, parm3);
+    m_aSTXParser.ignorableWhitespace (parm1, parm2, parm3);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void processingInstruction (final String parm1, final String parm2) throws org.xml.sax.SAXException
   {
-    stxparser.processingInstruction (parm1, parm2);
+    m_aSTXParser.processingInstruction (parm1, parm2);
   }
 
   /**
    * SAX2-Callback - Simply propagates the Call to the registered
-   * {@link net.sf.joost.stx.Parser} - here the {@link #stxparser}
+   * {@link net.sf.joost.stx.Parser} - here the {@link #m_aSTXParser}
    */
   public void skippedEntity (final String parm1) throws org.xml.sax.SAXException
   {
-    stxparser.skippedEntity (parm1);
+    m_aSTXParser.skippedEntity (parm1);
   }
 }

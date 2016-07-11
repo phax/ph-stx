@@ -33,23 +33,15 @@ package net.sf.joost.emitter;
 public abstract class AbstractStxEmitterBase implements IStxEmitter
 {
   /** The system identifier of this STX emitter (optional) */
-  private String systemId;
+  private String m_sSystemID;
 
-  /*
-   * (non-Javadoc)
-   * @see net.sf.joost.emitter.StxEmitter#setSystemId(java.lang.String)
-   */
   public void setSystemId (final String systemId)
   {
-    this.systemId = systemId;
+    m_sSystemID = systemId;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.sf.joost.emitter.StxEmitter#getSystemId()
-   */
   public String getSystemId ()
   {
-    return systemId;
+    return m_sSystemID;
   }
 }

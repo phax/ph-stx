@@ -1,5 +1,5 @@
 /*
- * $Id: THResolver.java,v 1.5 2009/09/22 21:13:43 obecker Exp $
+ * $Id: THResolver.java,v 1.4 2009/09/22 21:13:44 obecker Exp $
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -22,7 +22,7 @@
  * Contributor(s): ______________________________________.
  */
 
-package net.sf.joost.plugins.httppostfilter;
+package net.sf.joost.plugins.saxfilter;
 
 import java.util.Hashtable;
 
@@ -39,35 +39,33 @@ import net.sf.joost.CSTX;
 import net.sf.joost.ITransformerHandlerResolver;
 
 /**
- * Implementation of HTTP-Post filter. Filter URI:
- * http://www.ietf.org/rfc/rfc2616.txt#POST Example: ...
- * <stx:process-self filter-method="http://www.ietf.org/rfc/rfc2616.txt#POST" >
- * <stx:with-param name="target" select="http://myWebServerIP" />
- * </stx:process-self> ...
+ * Implementation of SAX as Trax filter. Filter URI: http://xml.org/sax Example:
+ * ... <stx:process-self filter-method="http://xml.org/sax" filter-src=
+ * "url('your-file.stx')" /> ...
  *
- * @version $Revision: 1.5 $ $Date: 2009/09/22 21:13:43 $
- * @author Oliver Becker
+ * @version $Revision: 1.4 $ $Date: 2009/09/22 21:13:44 $
+ * @author Oliver Becker, Nikolay Fiykov
  */
 
-public final class THResolver implements ITransformerHandlerResolver
+public final class THSAXResolver implements ITransformerHandlerResolver
 {
   /** The URI identifying an STX transformation */
-  public static final String HTTP_POST_METHOD = "http://www.ietf.org/rfc/rfc2616.txt#POST";
+  public static final String SAX_METHOD = "http://xml.org/sax";
 
   /** logging object */
-  private static Logger log = LoggerFactory.getLogger (THResolver.class);
+  private static final Logger log = LoggerFactory.getLogger (THSAXResolver.class);
 
   /**
-   * It return supported URIs, in this case @HTTP_POST_METHOD
+   * It return supported URIs, in this case @SAX_METHOD
    */
   public String [] resolves ()
   {
-    final String [] uris = { HTTP_POST_METHOD };
+    final String [] uris = { SAX_METHOD };
     return uris;
   }
 
   /**
-   * If given method is {@link #HTTP_POST_METHOD} return cached (or new) Trax
+   * If given method is {@link #SAX_METHOD} return cached (or new) Trax
    * compatible instance. otherwise return <code>null</code>.
    */
   public TransformerHandler resolve (final String method,
@@ -75,35 +73,34 @@ public final class THResolver implements ITransformerHandlerResolver
                                      final String base,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable params) throws SAXException
+                                     final Hashtable <String, Object> params) throws SAXException
   {
-    return resolve (method, href, base, null, params);
+    return _resolve (method, href, null);
   }
 
   /**
-   * If given method is {@link #HTTP_POST_METHOD} return cached (or new) Trax
+   * If given method is {@link #SAX_METHOD} return cached (or new) Trax
    * compatible instance. otherwise return <code>null</code>.
    */
   public TransformerHandler resolve (final String method,
                                      final XMLReader reader,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable params) throws SAXException
+                                     final Hashtable <String, Object> params) throws SAXException
   {
-    return resolve (method, null, null, reader, params);
+    return _resolve (method, null, reader);
   }
 
   /**
-   * actual business logic related to POST. Used by both resolve methods.
+   * If given method is @SAX_METHOD return cached (or new) Trax compatible
+   * instance. otherwise return null.
    */
-  private TransformerHandler resolve (final String method,
-                                      final String href,
-                                      final String base,
-                                      final XMLReader reader,
-                                      final Hashtable params) throws SAXException
+  private TransformerHandler _resolve (final String method,
+                                       final String href,
+                                       final XMLReader reader) throws SAXException
   {
     if (CSTX.DEBUG)
-      log.debug ("hppt-post-filter : resolve '" + method + "'");
+      log.debug ("sax-filter : resolve '" + method + "'");
 
     if (!available (method))
       throw new SAXException ("Not supported filter-method!");
@@ -111,18 +108,14 @@ public final class THResolver implements ITransformerHandlerResolver
     if ((reader != null) || (href != null))
       throw new SAXException ("Attribute 'filter-src' not allowed for method '" + method + "'");
 
-    final String v = String.valueOf (params.get ("target"));
-    if (v == null)
-      throw new SAXException ("Missing parameter 'target' for filter " + "method '" + method + "'");
-
-    return new HttpPostHandler (v);
+    return new SAXWrapperHandler ();
   }
 
   /**
-   * Return true if given method is equal to @HTTP_POST_METHOD, otherwise false
+   * Return true if given method is equal to @SAX_METHOD, otherwise false
    */
   public boolean available (final String method)
   {
-    return HTTP_POST_METHOD.equals (method);
+    return SAX_METHOD.equals (method);
   }
 }

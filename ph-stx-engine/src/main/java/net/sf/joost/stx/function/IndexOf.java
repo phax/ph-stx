@@ -74,8 +74,8 @@ public final class IndexOf implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    Value seq = args.left.evaluate (context, top);
-    final Value item = args.right.evaluate (context, top);
+    Value seq = args.m_aLeft.evaluate (context, top);
+    final Value item = args.m_aRight.evaluate (context, top);
 
     if (seq.type == Value.EMPTY)
       return seq;
@@ -100,7 +100,7 @@ public final class IndexOf implements IInstance
         else
           last = last.next = new Value (index);
       }
-      tSeq.value = seq = next;
+      tSeq.m_aValue = seq = next;
       index++;
     }
 

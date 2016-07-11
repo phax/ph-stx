@@ -161,9 +161,7 @@ public class IntHashMap implements Serializable
   public void put (final int key, final Object value)
   {
     if (value == null)
-    {
       throw new NullPointerException ("IntHashMap does not allow null values");
-    }
     final int i = indexOf (key);
     // if (_filled[i]) {
     if (_value[i] != null)
@@ -232,17 +230,16 @@ public class IntHashMap implements Serializable
     }
   }
 
-  private void setCapacity (int capacity)
+  private void setCapacity (final int nCapacity)
   {
+    int capacity = nCapacity;
     if (capacity < _n)
-    {
       capacity = _n;
-    }
     final double factor = (_factor < 0.01) ? 0.01 : (_factor > 0.99) ? 0.99 : _factor;
     int nbit, nmax;
     for (nbit = 1, nmax = 2; nmax * factor < capacity && nmax < NMAX; ++nbit, nmax *= 2)
     {
-      ;
+      // empty
     }
     final int nold = _nmax;
     if (nmax == nold)
@@ -288,7 +285,7 @@ public class IntHashMap implements Serializable
    * Get an iterator over the values
    */
 
-  public Iterator valueIterator ()
+  public Iterator <Object> valueIterator ()
   {
     return new IntHashMapValueIterator ();
   }
@@ -329,7 +326,6 @@ public class IntHashMap implements Serializable
    */
   private class IntHashMapKeyIterator implements IIntIterator, Serializable
   {
-
     private int i = 0;
 
     public IntHashMapKeyIterator ()
@@ -342,13 +338,8 @@ public class IntHashMap implements Serializable
       while (i < _key.length)
       {
         if (_value[i] != null)
-        {
           return true;
-        }
-        else
-        {
-          i++;
-        }
+        i++;
       }
       return false;
     }
@@ -362,7 +353,7 @@ public class IntHashMap implements Serializable
   /**
    * Iterator over keys
    */
-  private class IntHashMapValueIterator implements Iterator, Serializable
+  private class IntHashMapValueIterator implements Iterator <Object>, Serializable
   {
 
     private int i = 0;
@@ -377,13 +368,8 @@ public class IntHashMap implements Serializable
       while (i < _key.length)
       {
         if (_value[i] != null)
-        {
           return true;
-        }
-        else
-        {
-          i++;
-        }
+        i++;
       }
       return false;
     }
@@ -396,7 +382,7 @@ public class IntHashMap implements Serializable
     /**
      * Removes from the underlying collection the last element returned by the
      * iterator (optional operation).
-     * 
+     *
      * @throws UnsupportedOperationException
      *         if the <tt>remove</tt> operation is not supported by this
      *         Iterator.
@@ -404,35 +390,6 @@ public class IntHashMap implements Serializable
     public void remove ()
     {
       throw new UnsupportedOperationException ("remove");
-    }
-  }
-
-  /**
-   * Iterator over values
-   */
-  private class IntHashMapValueIteratorOLD implements Iterator, Serializable
-  {
-
-    private final IntHashMapKeyIterator k;
-
-    public IntHashMapValueIteratorOLD ()
-    {
-      k = new IntHashMapKeyIterator ();
-    }
-
-    public boolean hasNext ()
-    {
-      return k.hasNext ();
-    }
-
-    public Object next ()
-    {
-      return get (k.next ());
-    }
-
-    public void remove ()
-    {
-      throw new UnsupportedOperationException ("remove() is not supported on IntHashMapValueIterator");
     }
   }
 }

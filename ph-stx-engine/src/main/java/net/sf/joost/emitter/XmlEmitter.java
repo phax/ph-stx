@@ -194,7 +194,7 @@ public class XmlEmitter extends AbstractStreamEmitter
       try
       {
         // stream string to writer
-        writer.write (out.toString ());
+        m_aWriter.write (out.toString ());
         if (CSTX.DEBUG)
           log.debug (out.toString ());
       }
@@ -220,13 +220,13 @@ public class XmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write ("<?xml version=\"");
-      writer.write (propVersion);
-      writer.write ("\" encoding=\"");
-      writer.write (encoding);
+      m_aWriter.write ("<?xml version=\"");
+      m_aWriter.write (propVersion);
+      m_aWriter.write ("\" encoding=\"");
+      m_aWriter.write (m_sEncoding);
       if (propStandalone)
-        writer.write ("\" standalone=\"yes");
-      writer.write ("\"?>\n");
+        m_aWriter.write ("\" standalone=\"yes");
+      m_aWriter.write ("\"?>\n");
     }
     catch (final IOException ex)
     {
@@ -244,8 +244,8 @@ public class XmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write ("\n");
-      writer.flush ();
+      m_aWriter.write ("\n");
+      m_aWriter.flush ();
     }
     catch (final IOException ex)
     {
@@ -278,9 +278,9 @@ public class XmlEmitter extends AbstractStreamEmitter
     {
       try
       {
-        writer.write ("</");
-        writer.write (qName);
-        writer.write (">");
+        m_aWriter.write ("</");
+        m_aWriter.write (qName);
+        m_aWriter.write (">");
       }
       catch (final IOException ex)
       {
@@ -304,13 +304,13 @@ public class XmlEmitter extends AbstractStreamEmitter
         // check that the characters can be represented in the current
         // encoding (escaping not possible within CDATA)
         for (int i = 0; i < length; i++)
-          if (!charsetEncoder.canEncode (ch[start + i]))
+          if (!m_aCharsetEncoder.canEncode (ch[start + i]))
             throw new SAXException ("Cannot output character with code " +
                                     (int) ch[start + i] +
                                     " in the encoding '" +
-                                    encoding +
+                                    m_sEncoding +
                                     "' within a CDATA section");
-        writer.write (ch, start, length);
+        m_aWriter.write (ch, start, length);
       }
       else
       {
@@ -331,7 +331,7 @@ public class XmlEmitter extends AbstractStreamEmitter
             default:
               i = encodeCharacters (ch, start + i, out) - start;
           }
-        writer.write (out.toString ());
+        m_aWriter.write (out.toString ());
       }
       if (CSTX.DEBUG)
         log.debug ("'" + new String (ch, start, length) + "'");
@@ -383,16 +383,16 @@ public class XmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write ("<?");
-      writer.write (target);
+      m_aWriter.write ("<?");
+      m_aWriter.write (target);
 
       if (!data.equals (""))
       {
-        writer.write (" ");
-        writer.write (data);
+        m_aWriter.write (" ");
+        m_aWriter.write (data);
       }
 
-      writer.write ("?>");
+      m_aWriter.write ("?>");
     }
     catch (final IOException ex)
     {
@@ -411,7 +411,7 @@ public class XmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write ("<![CDATA[");
+      m_aWriter.write ("<![CDATA[");
     }
     catch (final IOException ex)
     {
@@ -431,7 +431,7 @@ public class XmlEmitter extends AbstractStreamEmitter
     insideCDATA = false;
     try
     {
-      writer.write ("]]>");
+      m_aWriter.write ("]]>");
     }
     catch (final IOException ex)
     {
@@ -450,9 +450,9 @@ public class XmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write ("<!--");
-      writer.write (ch, start, length);
-      writer.write ("-->");
+      m_aWriter.write ("<!--");
+      m_aWriter.write (ch, start, length);
+      m_aWriter.write ("-->");
     }
     catch (final IOException ex)
     {
@@ -469,28 +469,28 @@ public class XmlEmitter extends AbstractStreamEmitter
   {
     try
     {
-      writer.write ("<!DOCTYPE ");
-      writer.write (name);
+      m_aWriter.write ("<!DOCTYPE ");
+      m_aWriter.write (name);
       if (publicId != null)
       {
-        writer.write (" PUBLIC \"");
-        writer.write (publicId);
-        writer.write ("\" \"");
+        m_aWriter.write (" PUBLIC \"");
+        m_aWriter.write (publicId);
+        m_aWriter.write ("\" \"");
         if (systemId != null)
         {
-          writer.write (systemId);
+          m_aWriter.write (systemId);
         }
-        writer.write ("\"");
+        m_aWriter.write ("\"");
       }
       else
         if (systemId != null)
         {
-          writer.write (" SYSTEM \"");
-          writer.write (systemId);
-          writer.write ("\"");
+          m_aWriter.write (" SYSTEM \"");
+          m_aWriter.write (systemId);
+          m_aWriter.write ("\"");
         }
       // internal subset not supported yet
-      writer.write (">\n");
+      m_aWriter.write (">\n");
     }
     catch (final IOException ex)
     {

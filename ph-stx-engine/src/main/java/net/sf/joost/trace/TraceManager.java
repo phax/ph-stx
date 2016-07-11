@@ -33,17 +33,16 @@ import net.sf.joost.trax.TransformerImpl;
 /**
  * This class manages a collection of {@link ITraceListener}, and acts as an
  * interface for the tracing functionality in Joost.
- * 
+ *
  * @version $Revision: 1.8 $ $Date: 2004/11/07 13:47:05 $
  * @author Zubow
  */
 public class TraceManager
 {
-
   /**
    * Collection of registered listeners (must be synchronized).
    */
-  private Vector traceListeners = null;
+  private Vector <ITraceListener> traceListeners = null;
 
   /**
    * Default constructor for the tracemanager.
@@ -63,7 +62,7 @@ public class TraceManager
 
   /**
    * Add a tracelistener (debugging and profiling).
-   * 
+   *
    * @param newTraceListener
    *        A tracelistener to be added.
    */
@@ -73,7 +72,7 @@ public class TraceManager
     TransformerImpl.DEBUG_MODE = true;
     if (traceListeners == null)
     {
-      traceListeners = new Vector ();
+      traceListeners = new Vector <> ();
     }
     // add new tracelistener
     traceListeners.addElement (newTraceListener);
@@ -81,7 +80,7 @@ public class TraceManager
 
   /**
    * Remove a tracelistener.
-   * 
+   *
    * @param oldTraceListener
    *        A tracelistener to be removed.
    */
@@ -113,7 +112,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.startSourceDocument ();
       }
@@ -131,7 +130,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.endSourceDocument ();
       }
@@ -149,7 +148,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.startSourceElement (saxevent);
       }
@@ -167,7 +166,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.endSourceElement (saxevent);
       }
@@ -185,7 +184,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.sourceText (saxevent);
       }
@@ -203,7 +202,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.sourcePI (saxevent);
       }
@@ -221,7 +220,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.sourceMapping (saxevent);
       }
@@ -239,7 +238,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.sourceComment (saxevent);
       }
@@ -261,7 +260,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.enterInstructionNode (inst, event);
       }
@@ -279,7 +278,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.leaveInstructionNode (inst, event);
       }
@@ -301,7 +300,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.startResultDocument ();
       }
@@ -319,7 +318,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.endResultDocument ();
       }
@@ -337,7 +336,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.startResultElement (saxevent);
       }
@@ -355,7 +354,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.endResultElement (saxevent);
       }
@@ -373,7 +372,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.resultText (saxevent);
       }
@@ -391,7 +390,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.resultPI (saxevent);
       }
@@ -409,7 +408,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.resultComment (saxevent);
       }
@@ -427,7 +426,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.startResultCDATA ();
       }
@@ -445,7 +444,7 @@ public class TraceManager
       final int countListener = traceListeners.size ();
       for (int i = 0; i < countListener; i++)
       {
-        final ITraceListener currentListener = (ITraceListener) traceListeners.elementAt (i);
+        final ITraceListener currentListener = traceListeners.elementAt (i);
         // call the according method on tracelistener
         currentListener.endResultCDATA ();
       }

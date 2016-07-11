@@ -37,7 +37,7 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of AttrTree represent attribute nodes in the syntax tree of a pattern
  * or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.3 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
@@ -45,7 +45,7 @@ public final class AttrTree extends AbstractTree
 {
   /**
    * Constructs an AttrTree object.
-   * 
+   *
    * @param value
    *        the qualified attribute name
    * @param context
@@ -59,17 +59,17 @@ public final class AttrTree extends AbstractTree
     final int colon = value.indexOf (":");
     if (colon != -1)
     {
-      uri = (String) context.nsSet.get (value.substring (0, colon));
-      lName = value.substring (colon + 1);
-      if (uri == null)
+      m_sURI = context.nsSet.get (value.substring (0, colon));
+      m_sLocalName = value.substring (colon + 1);
+      if (m_sURI == null)
       {
         throw new SAXParseException ("Undeclared prefix '" + value.substring (0, colon) + "'", context.locator);
       }
     }
     else
     {
-      uri = "";
-      lName = value;
+      m_sURI = "";
+      m_sLocalName = value;
     }
   }
 
@@ -79,13 +79,13 @@ public final class AttrTree extends AbstractTree
     // an attribute requires at least two ancestors
     if (top < 3)
       return false;
-    final SAXEvent e = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-    if (e.type != SAXEvent.ATTRIBUTE)
+    final SAXEvent e = context.ancestorStack.elementAt (top - 1);
+    if (e.m_nType != SAXEvent.ATTRIBUTE)
       return false;
     if (setPosition)
       context.position = 1; // position for attributes is undefined
 
-    if (uri.equals (e.uri) && lName.equals (e.lName))
+    if (m_sURI.equals (e.m_sURI) && m_sLocalName.equals (e.m_sLocalName))
       return true;
 
     return false;
@@ -94,9 +94,9 @@ public final class AttrTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    if (left != null)
+    if (m_aLeft != null)
     { // preceding path
-      Value v1 = left.evaluate (context, top);
+      Value v1 = m_aLeft.evaluate (context, top);
       if (v1.type == Value.EMPTY)
         return Value.VAL_EMPTY;
 
@@ -106,24 +106,27 @@ public final class AttrTree extends AbstractTree
       {
         if (v1.type != Value.NODE)
         {
-          context.errorHandler.error ("Current item for evaluating '@" +
-                                      value +
+          context.m_aErrorHandler.error ("Current item for evaluating '@" +
+                                      m_aValue +
                                       "' is not a node (got " +
                                       v1 +
                                       ")",
-                                      context.currentInstruction.publicId,
-                                      context.currentInstruction.systemId,
+                                      context.currentInstruction.m_sPublicID,
+                                      context.currentInstruction.m_sSystemID,
                                       context.currentInstruction.lineNo,
                                       context.currentInstruction.colNo);
           // if the errorHandler decides to continue ...
           return Value.VAL_EMPTY;
         }
 
-        final Attributes a = v1.getNode ().attrs;
+        final Attributes a = v1.getNode ().m_aAttrs;
         int index;
-        if (a != null && (index = a.getIndex (uri, lName)) != -1)
+        if (a != null && (index = a.getIndex (m_sURI, m_sLocalName)) != -1)
         {
-          final Value v2 = new Value (SAXEvent.newAttribute (uri, lName, a.getQName (index), a.getValue (index)));
+          final Value v2 = new Value (SAXEvent.newAttribute (m_sURI,
+                                                             m_sLocalName,
+                                                             a.getQName (index),
+                                                             a.getValue (index)));
           if (last != null)
             last.next = v2;
           else
@@ -140,12 +143,12 @@ public final class AttrTree extends AbstractTree
     else
       if (top > 0)
       { // use current node
-        final SAXEvent saxEvent = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-        final Attributes a = saxEvent.attrs;
-        final int index = a.getIndex (uri, lName);
+        final SAXEvent saxEvent = context.ancestorStack.elementAt (top - 1);
+        final Attributes a = saxEvent.m_aAttrs;
+        final int index = a.getIndex (m_sURI, m_sLocalName);
         if (index == -1)
           return Value.VAL_EMPTY;
-        return new Value (SAXEvent.newAttribute (uri, lName, a.getQName (index), a.getValue (index)));
+        return new Value (SAXEvent.newAttribute (m_sURI, m_sLocalName, a.getQName (index), a.getValue (index)));
       }
       else
         return Value.VAL_EMPTY;

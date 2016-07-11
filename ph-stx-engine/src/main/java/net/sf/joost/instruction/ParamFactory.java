@@ -140,7 +140,7 @@ public final class ParamFactory extends AbstractFactoryBase
         return true; // nodeEnd not available yet
 
       contents = next;
-      successor = nodeEnd != null ? nodeEnd.next : next;
+      successor = m_aNodeEnd != null ? m_aNodeEnd.next : next;
       return false;
     }
 
@@ -148,26 +148,26 @@ public final class ParamFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       Value v;
-      if (parent instanceof AbstractGroupBase)
+      if (m_aParent instanceof AbstractGroupBase)
       {
         // passed value from the outside
-        v = context.globalParameters.get (expName);
+        v = context.globalParameters.get (m_sExpName);
       }
       else
       {
         // passed value from another template via stx:with-param
-        v = context.passedParameters.get (expName);
+        v = context.m_aPassedParameters.get (m_sExpName);
       }
       if (v == null)
       {
         // no parameter passed
         if (required)
         {
-          context.errorHandler.error ("Missing value for required parameter '" +
+          context.m_aErrorHandler.error ("Missing value for required parameter '" +
                                       varName +
                                       "'",
-                                      publicId,
-                                      systemId,
+                                      m_sPublicID,
+                                      m_sSystemID,
                                       lineNo,
                                       colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
@@ -183,12 +183,12 @@ public final class ParamFactory extends AbstractFactoryBase
           next = contents;
           super.process (context);
           context.pushEmitter (new StringEmitter (new StringBuffer (),
-                                                  "('" + qName + "' started in line " + lineNo + ")"));
+                                                  "('" + m_sQName + "' started in line " + lineNo + ")"));
           return CSTX.PR_CONTINUE;
         }
       }
       processParam (v, context);
-      if (nodeEnd != null)
+      if (m_aNodeEnd != null)
       {
         // skip contents, the parameter value is already available
         next = successor;
@@ -208,25 +208,25 @@ public final class ParamFactory extends AbstractFactoryBase
     {
       // determine scope
       Hashtable <String, Value> varTable;
-      if (parent instanceof AbstractGroupBase) // global parameter
-        varTable = context.groupVars.get (parent).peek ();
+      if (m_aParent instanceof AbstractGroupBase) // global parameter
+        varTable = context.groupVars.get (m_aParent).peek ();
       else
         varTable = context.localVars;
 
-      if (varTable.get (expName) != null)
+      if (varTable.get (m_sExpName) != null)
       {
-        context.errorHandler.error ("Param '" + varName + "' already declared", publicId, systemId, lineNo, colNo);
+        context.m_aErrorHandler.error ("Param '" + varName + "' already declared", m_sPublicID, m_sSystemID, lineNo, colNo);
         return; // if the errorHandler returns
       }
 
-      varTable.put (expName, v);
+      varTable.put (m_sExpName, v);
 
       if (varTable == context.localVars)
-        parent.declareVariable (expName);
+        m_aParent.declareVariable (m_sExpName);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

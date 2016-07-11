@@ -32,7 +32,7 @@ import net.sf.joost.stx.Value;
 
 /**
  * Objects of AvtTree represent attribute value trees.
- * 
+ *
  * @version $Revision: 1.1 $ $Date: 2004/09/29 05:59:51 $
  * @author Oliver Becker
  */
@@ -46,13 +46,12 @@ public final class AvtTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    final Value v1 = right.evaluate (context, top);
-    if (left != null)
+    final Value v1 = m_aRight.evaluate (context, top);
+    if (m_aLeft != null)
     {
-      final Value v2 = left.evaluate (context, top);
+      final Value v2 = m_aLeft.evaluate (context, top);
       return new Value (v2.getStringValue () + v1.getStringValue ());
     }
-    else
-      return new Value (v1.getStringValue ());
+    return new Value (v1.getStringValue ());
   }
 }

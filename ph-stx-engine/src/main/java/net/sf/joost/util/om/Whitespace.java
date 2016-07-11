@@ -117,10 +117,7 @@ public class Whitespace
       }
       return sb;
     }
-    else
-    {
-      return value;
-    }
+    return value;
   }
 
   /**
@@ -350,10 +347,7 @@ public class Whitespace
     {
       return in;
     }
-    else
-    {
-      return in.subSequence (first, last + 1);
-    }
+    return in.subSequence (first, last + 1);
   }
 }
 //

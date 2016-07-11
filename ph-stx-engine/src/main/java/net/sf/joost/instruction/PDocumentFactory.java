@@ -154,7 +154,7 @@ public class PDocumentFactory extends AbstractFactoryBase
       final Processor proc = context.currentProcessor;
       ContentHandler contH = proc;
       LexicalHandler lexH = proc;
-      if (filter != null)
+      if (m_aFilter != null)
       {
         // use external SAX filter (TransformerHandler)
         final TransformerHandler handler = getProcessHandler (context);
@@ -173,7 +173,7 @@ public class PDocumentFactory extends AbstractFactoryBase
         // node in v comes from a different document
         // (for example, it was stored in a variable)
         else // use #sheet
-          base = systemId;
+          base = m_sSystemID;
       }
       else
       { // use specified base URI
@@ -182,7 +182,7 @@ public class PDocumentFactory extends AbstractFactoryBase
           base = context.locator.getSystemId ();
         else
           if ("#sheet".equals (base))
-            base = systemId;
+            base = m_sSystemID;
       }
 
       final Locator prevLoc = context.locator;
@@ -202,13 +202,13 @@ public class PDocumentFactory extends AbstractFactoryBase
           v.next = null;
           final String hrefURI = v.getStringValue ();
           // ask URI resolver if present
-          if (context.uriResolver != null && (source = context.uriResolver.resolve (hrefURI, base)) != null)
+          if (context.m_aURIResolver != null && (source = context.m_aURIResolver.resolve (hrefURI, base)) != null)
           {
             final SAXSource saxSource = TrAXHelper.getSAXSource (source, null);
             reader = saxSource.getXMLReader ();
             if (reader != null)
             {
-              reader.setErrorHandler (context.errorHandler);
+              reader.setErrorHandler (context.m_aErrorHandler);
               reader.setContentHandler (contH);
               try
               {
@@ -217,7 +217,7 @@ public class PDocumentFactory extends AbstractFactoryBase
               catch (final SAXException ex)
               {
                 log.warn ("Accessing " + reader + ": " + ex);
-                context.errorHandler.warning ("Accessing " + reader + ": " + ex, publicId, systemId, lineNo, colNo, ex);
+                context.m_aErrorHandler.warning ("Accessing " + reader + ": " + ex, m_sPublicID, m_sSystemID, lineNo, colNo, ex);
               }
             }
             else
@@ -237,7 +237,7 @@ public class PDocumentFactory extends AbstractFactoryBase
             // construct a default XML reader,
             // happens at most once per process-document invocation
             reader = defaultReader = Processor.createXMLReader ();
-            reader.setErrorHandler (context.errorHandler);
+            reader.setErrorHandler (context.m_aErrorHandler);
             reader.setContentHandler (contH);
             try
             {
@@ -246,7 +246,7 @@ public class PDocumentFactory extends AbstractFactoryBase
             catch (final SAXException ex)
             {
               log.warn ("Accessing " + reader + ": " + ex);
-              context.errorHandler.warning ("Accessing " + reader + ": " + ex, publicId, systemId, lineNo, colNo, ex);
+              context.m_aErrorHandler.warning ("Accessing " + reader + ": " + ex, m_sPublicID, m_sSystemID, lineNo, colNo, ex);
             }
           }
 
@@ -257,11 +257,11 @@ public class PDocumentFactory extends AbstractFactoryBase
       catch (final java.io.IOException ex)
       {
         // TODO: better error handling
-        context.errorHandler.error (new SAXParseException (ex.toString (), publicId, systemId, lineNo, colNo));
+        context.m_aErrorHandler.error (new SAXParseException (ex.toString (), m_sPublicID, m_sSystemID, lineNo, colNo));
       }
       catch (final TransformerException te)
       {
-        context.errorHandler.error (te);
+        context.m_aErrorHandler.error (te);
       }
       proc.endInnerProcessing ();
       context.locator = prevLoc;
@@ -269,7 +269,7 @@ public class PDocumentFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

@@ -51,14 +51,11 @@ import net.sf.joost.CSTX;
  */
 public class DOMEmitter extends AbstractStxEmitterBase
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "DOMEmitter".
-  private static Logger log = LoggerFactory.getLogger (DOMEmitter.class);
+  private static final Logger log = LoggerFactory.getLogger (DOMEmitter.class);
 
   private Document document = null;
   private Node nextSiblingOfRootNodes = null;
-  private final Stack <Node> stack = new Stack <Node> ();
+  private final Stack <Node> stack = new Stack <> ();
   private boolean insideCDATA = false;
 
   /**

@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -69,10 +69,11 @@ public final class Remove implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
-    Value seq = args.left.evaluate (context, top);
-    final Value arg2 = args.right.evaluate (context, top);
+    Value seq = args.m_aLeft.evaluate (context, top);
+    final Value arg2 = args.m_aRight.evaluate (context, top);
 
     // make sure that the second parameter is a valid number
     final double dPos = arg2.getNumberValue ();
@@ -99,11 +100,11 @@ public final class Remove implements IInstance
       return result;
 
     if (last == null)
-    { // remove the first item
+    {
+      // remove the first item
       if (result.next == null) // the one and only item
         return Value.VAL_EMPTY;
-      else
-        return result.next;
+      return result.next;
     }
 
     last.next = seq.next;

@@ -34,7 +34,6 @@ import java.util.Vector;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.instruction.TemplateFactory.Instance;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
@@ -58,88 +57,88 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
    * The rule how to process unmatched events (from
    * <code>stx:options' pass-through</code>)
    */
-  public byte passThrough = Processor.PASS_THROUGH_NONE;
+  public byte m_nPassThrough = Processor.PASS_THROUGH_NONE;
 
   /**
    * Should white-space only text nodes be stripped (from
    * <code>stx:options' strip-space</code>)?
    */
-  public boolean stripSpace = false;
+  public boolean m_bStripSpace = false;
 
   /**
    * Should CDATA section be recognized (from
    * <code>stx:options' recognize-cdata</code>)?
    */
-  public boolean recognizeCdata = true;
+  public boolean m_bRecognizeCdata = true;
 
   /**
    * Vector of all contained public templates in this group. Used only
    * temporarily during compiling the transformation sheet.
    */
-  private final Vector <Instance> containedPublicTemplates;
+  private final Vector <TemplateFactory.Instance> m_aContainedPublicTemplates;
 
   /**
    * Vector of all contained group templates in this group. Used only
    * temporarily during compiling the transformation sheet.
    */
-  private Vector <Instance> containedGroupTemplates;
+  private Vector <TemplateFactory.Instance> m_aContainedGroupTemplates;
 
   /**
    * Vector of all contained global templates in this group Used only
    * temporarily during compiling the transformation sheet.
    */
-  private Vector <Instance> containedGlobalTemplates;
+  private Vector <TemplateFactory.Instance> m_aContainedGlobalTemplates;
 
   /**
    * Visible templates: templates from this group and public templates from
    * subgroups
    */
-  public TemplateFactory.Instance [] visibleTemplates;
+  public TemplateFactory.Instance [] m_aVisibleTemplates;
 
-  /** The templates from {@link #containedGroupTemplates} as array */
-  public TemplateFactory.Instance [] groupTemplates;
+  /** The templates from {@link #m_aContainedGroupTemplates} as array */
+  public TemplateFactory.Instance [] m_aGroupTemplates;
 
   /**
    * Table of all contained public and global procedures in this group Used only
    * temporarily during compiling the transformation sheet.
    */
-  private final Hashtable <String, ProcedureFactory.Instance> containedPublicProcedures;
+  private final Hashtable <String, ProcedureFactory.Instance> m_aContainedPublicProcedures;
 
   /** Table of the group procedures visible for this group */
-  Hashtable <String, ProcedureFactory.Instance> groupProcedures;
+  Hashtable <String, ProcedureFactory.Instance> m_aGroupProcedures;
 
   /**
    * Table of all global procedures in the transformation sheet, stems from the
    * parent group
    */
-  Hashtable <String, ProcedureFactory.Instance> globalProcedures;
+  Hashtable <String, ProcedureFactory.Instance> m_aGlobalProcedures;
 
   /**
    * Visible procedures: procedures from this group and public templates from
    * subgroups
    */
-  public Hashtable <String, ProcedureFactory.Instance> visibleProcedures;
+  public Hashtable <String, ProcedureFactory.Instance> m_aVisibleProcedures;
 
   /** Contained groups in this group */
-  protected AbstractGroupBase [] containedGroups;
+  protected AbstractGroupBase [] m_aContainedGroups;
 
   /**
    * Table of named groups: key = group name, value = group object. All groups
    * will have a reference to the same singleton Hashtable.
    */
-  public Hashtable <String, Object> namedGroups;
+  public Hashtable <String, Object> m_aNamedGroups;
 
   /** parent group */
-  public AbstractGroupBase parentGroup;
+  public AbstractGroupBase m_aParentGroup;
 
   /** Group variables */
-  private AbstractVariableBase [] groupVariables;
+  private AbstractVariableBase [] m_aGroupVariables;
 
   /** Expanded name of this group */
-  public String groupName;
+  public String m_sGroupName;
 
   /** Vector of the children */
-  protected Vector <AbstractNodeBase> children = new Vector<> ();
+  protected Vector <AbstractNodeBase> m_aChildren = new Vector<> ();
 
   // Constructor
   protected AbstractGroupBase (final String qName,
@@ -150,20 +149,20 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
                                final boolean recognizeCdata)
   {
     super (qName, parent, context, true);
-    this.parentGroup = (AbstractGroupBase) parent;
-    this.passThrough = passThrough;
-    this.stripSpace = stripSpace;
-    this.recognizeCdata = recognizeCdata;
-    containedPublicTemplates = new Vector<> ();
-    containedGroupTemplates = new Vector<> ();
-    containedGlobalTemplates = new Vector<> ();
-    visibleProcedures = new Hashtable<> ();
-    containedPublicProcedures = new Hashtable<> ();
-    groupProcedures = new Hashtable<> ();
-    if (parentGroup != null)
+    this.m_aParentGroup = (AbstractGroupBase) parent;
+    this.m_nPassThrough = passThrough;
+    this.m_bStripSpace = stripSpace;
+    this.m_bRecognizeCdata = recognizeCdata;
+    m_aContainedPublicTemplates = new Vector<> ();
+    m_aContainedGroupTemplates = new Vector<> ();
+    m_aContainedGlobalTemplates = new Vector<> ();
+    m_aVisibleProcedures = new Hashtable<> ();
+    m_aContainedPublicProcedures = new Hashtable<> ();
+    m_aGroupProcedures = new Hashtable<> ();
+    if (m_aParentGroup != null)
     {
-      namedGroups = parentGroup.namedGroups;
-      globalProcedures = parentGroup.globalProcedures;
+      m_aNamedGroups = m_aParentGroup.m_aNamedGroups;
+      m_aGlobalProcedures = m_aParentGroup.m_aGlobalProcedures;
     }
   }
 
@@ -171,7 +170,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
   public void insert (final AbstractNodeBase node) throws SAXParseException
   {
     // no call of super.insert(node)
-    children.addElement (node);
+    m_aChildren.addElement (node);
   }
 
   /**
@@ -187,19 +186,19 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     if (pass == 1)
     {
       // create the groupTemplates array
-      groupTemplates = new TemplateFactory.Instance [containedGroupTemplates.size ()];
-      containedGroupTemplates.toArray (groupTemplates);
-      Arrays.sort (groupTemplates);
-      containedGroupTemplates = null; // for garbage collection
+      m_aGroupTemplates = new TemplateFactory.Instance [m_aContainedGroupTemplates.size ()];
+      m_aContainedGroupTemplates.toArray (m_aGroupTemplates);
+      Arrays.sort (m_aGroupTemplates);
+      m_aContainedGroupTemplates = null; // for garbage collection
       return false; // done
     }
 
     // pass 0
 
-    final Object [] objs = children.toArray ();
-    final int length = children.size ();
+    final Object [] objs = m_aChildren.toArray ();
+    final int length = m_aChildren.size ();
     // template vector
-    final Vector <Instance> tvec = new Vector<> ();
+    final Vector <TemplateFactory.Instance> tvec = new Vector<> ();
     // group vector
     final Vector <AbstractGroupBase> gvec = new Vector<> ();
     // variable vector
@@ -213,17 +212,17 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
         do
         {
           tvec.addElement (t);
-          if (t.isPublic)
+          if (t.m_bIsPublic)
           {
-            containedPublicTemplates.addElement (t);
+            m_aContainedPublicTemplates.addElement (t);
           }
-          if (t.visibility == AbstractTemplateBase.GROUP_VISIBLE)
+          if (t.m_nVisibility == AbstractTemplateBase.GROUP_VISIBLE)
           {
-            containedGroupTemplates.addElement (t);
+            m_aContainedGroupTemplates.addElement (t);
           }
-          if (t.visibility == AbstractTemplateBase.GLOBAL_VISIBLE)
+          if (t.m_nVisibility == AbstractTemplateBase.GLOBAL_VISIBLE)
           {
-            containedGlobalTemplates.addElement (t);
+            m_aContainedGlobalTemplates.addElement (t);
           }
 
           // split templates with unions (|) in their match pattern
@@ -233,48 +232,48 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
         if (objs[i] instanceof ProcedureFactory.Instance)
         {
           final ProcedureFactory.Instance p = (ProcedureFactory.Instance) objs[i];
-          AbstractNodeBase node = visibleProcedures.get (p.expName);
+          AbstractNodeBase node = m_aVisibleProcedures.get (p.m_sExpName);
           if (node != null)
           {
             throw new SAXParseException ("Procedure '" +
-                                         p.procName +
+                                         p.m_sProcName +
                                          "' already defined in line " +
                                          node.lineNo +
-                                         (p.systemId.equals (node.systemId) ? (node.lineNo == p.lineNo ? " (possibly several times included)"
-                                                                                                       : "")
-                                                                            : (" of " + node.systemId)),
-                                         p.publicId,
-                                         p.systemId,
+                                         (p.m_sSystemID.equals (node.m_sSystemID) ? (node.lineNo == p.lineNo ? " (possibly several times included)"
+                                                                                                             : "")
+                                                                                  : (" of " + node.m_sSystemID)),
+                                         p.m_sPublicID,
+                                         p.m_sSystemID,
                                          p.lineNo,
                                          p.colNo);
           }
-          visibleProcedures.put (p.expName, p);
-          if (p.isPublic)
-            containedPublicProcedures.put (p.expName, p);
-          if (p.visibility == AbstractTemplateBase.GROUP_VISIBLE)
+          m_aVisibleProcedures.put (p.m_sExpName, p);
+          if (p.m_bIsPublic)
+            m_aContainedPublicProcedures.put (p.m_sExpName, p);
+          if (p.m_nVisibility == AbstractTemplateBase.GROUP_VISIBLE)
           {
-            groupProcedures.put (p.expName, p);
+            m_aGroupProcedures.put (p.m_sExpName, p);
           }
-          if (p.visibility == AbstractTemplateBase.GLOBAL_VISIBLE)
+          if (p.m_nVisibility == AbstractTemplateBase.GLOBAL_VISIBLE)
           {
-            node = globalProcedures.get (p.expName);
+            node = m_aGlobalProcedures.get (p.m_sExpName);
             if (node != null)
             {
               throw new SAXParseException ("Global procedure '" +
-                                           p.procName +
+                                           p.m_sProcName +
                                            "' already defined in line " +
                                            node.lineNo +
-                                           (p.systemId.equals (node.systemId) ? (node.lineNo == p.lineNo ? " (possibly several times included)"
-                                                                                                         : "")
-                                                                              : (" of " + node.systemId)),
-                                           p.publicId,
-                                           p.systemId,
+                                           (p.m_sSystemID.equals (node.m_sSystemID) ? (node.lineNo == p.lineNo ? " (possibly several times included)"
+                                                                                                               : "")
+                                                                                    : (" of " + node.m_sSystemID)),
+                                           p.m_sPublicID,
+                                           p.m_sSystemID,
                                            p.lineNo,
                                            p.colNo);
             }
-            globalProcedures.put (p.expName, p);
+            m_aGlobalProcedures.put (p.m_sExpName, p);
             // global means also group visible
-            groupProcedures.put (p.expName, p);
+            m_aGroupProcedures.put (p.m_sExpName, p);
           }
         }
         else
@@ -286,71 +285,71 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     }
 
     // create group array
-    containedGroups = new AbstractGroupBase [gvec.size ()];
-    gvec.toArray (containedGroups);
+    m_aContainedGroups = new AbstractGroupBase [gvec.size ()];
+    gvec.toArray (m_aContainedGroups);
 
     // visible templates/procedures: from this group
     // plus public templates/procedures from child groups
-    for (final AbstractGroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : m_aContainedGroups)
     {
-      tvec.addAll (containedGroup.containedPublicTemplates);
-      final Hashtable <String, net.sf.joost.instruction.ProcedureFactory.Instance> pubProc = containedGroup.containedPublicProcedures;
+      tvec.addAll (containedGroup.m_aContainedPublicTemplates);
+      final Hashtable <String, net.sf.joost.instruction.ProcedureFactory.Instance> pubProc = containedGroup.m_aContainedPublicProcedures;
       for (final Enumeration <String> e = pubProc.keys (); e.hasMoreElements ();)
       {
         Object o;
-        if (visibleProcedures.containsKey (o = e.nextElement ()))
+        if (m_aVisibleProcedures.containsKey (o = e.nextElement ()))
         {
           final ProcedureFactory.Instance p1 = pubProc.get (o);
-          final AbstractNodeBase p2 = visibleProcedures.get (o);
+          final AbstractNodeBase p2 = m_aVisibleProcedures.get (o);
           throw new SAXParseException ("Public procedure '" +
-                                       p1.procName +
+                                       p1.m_sProcName +
                                        "' conflicts with the procedure definition in line " +
                                        p2.lineNo +
-                                       (p1.systemId.equals (p2.systemId) ? (p1.lineNo == p2.lineNo ? " (possibly several times included)"
-                                                                                                   : "")
-                                                                         : (" of " + p2.systemId)),
-                                       p1.publicId,
-                                       p1.systemId,
+                                       (p1.m_sSystemID.equals (p2.m_sSystemID) ? (p1.lineNo == p2.lineNo ? " (possibly several times included)"
+                                                                                                         : "")
+                                                                               : (" of " + p2.m_sSystemID)),
+                                       p1.m_sPublicID,
+                                       p1.m_sSystemID,
                                        p1.lineNo,
                                        p1.colNo);
         }
       }
-      visibleProcedures.putAll (containedGroup.containedPublicProcedures);
+      m_aVisibleProcedures.putAll (containedGroup.m_aContainedPublicProcedures);
     }
 
     // create sorted array of visible templates
-    visibleTemplates = new TemplateFactory.Instance [tvec.size ()];
-    tvec.toArray (visibleTemplates);
-    Arrays.sort (visibleTemplates); // in descending priority order
+    m_aVisibleTemplates = new TemplateFactory.Instance [tvec.size ()];
+    tvec.toArray (m_aVisibleTemplates);
+    Arrays.sort (m_aVisibleTemplates); // in descending priority order
 
-    if (groupName != null)
+    if (m_sGroupName != null)
     {
       // register group
-      namedGroups.put (groupName, this);
+      m_aNamedGroups.put (m_sGroupName, this);
     }
 
     // add group and global templates/procedures to all sub-groups
     // (group scope)
-    for (final AbstractGroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : m_aContainedGroups)
     {
-      containedGroup.addGroupTemplates (containedGroupTemplates);
-      containedGroup.addGroupTemplates (containedGlobalTemplates);
-      containedGroup.addGroupProcedures (groupProcedures);
+      containedGroup.addGroupTemplates (m_aContainedGroupTemplates);
+      containedGroup.addGroupTemplates (m_aContainedGlobalTemplates);
+      containedGroup.addGroupProcedures (m_aGroupProcedures);
     }
     // remove the current group procedures in this group
     // (because they are also in visibleProcedures)
-    groupProcedures.clear ();
+    m_aGroupProcedures.clear ();
 
     // add global templates from all sub-groups (global scope)
     // (this removes the global templates in these groups)
-    for (final AbstractGroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : m_aContainedGroups)
     {
-      containedGlobalTemplates.addAll (containedGroup.getGlobalTemplates ());
+      m_aContainedGlobalTemplates.addAll (containedGroup.getGlobalTemplates ());
     }
 
     // create array of group variables
-    groupVariables = new AbstractVariableBase [vvec.size ()];
-    vvec.toArray (groupVariables);
+    m_aGroupVariables = new AbstractVariableBase [vvec.size ()];
+    vvec.toArray (m_aGroupVariables);
 
     return true; // need an additional pass for creating groupTemplates
   }
@@ -362,7 +361,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
   public void initGroupVariables (final Context context) throws SAXException
   {
     enterRecursionLevel (context);
-    for (final AbstractGroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : m_aContainedGroups)
       containedGroup.initGroupVariables (context);
   }
 
@@ -383,9 +382,9 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     context.groupVars.get (this).push (varTable);
 
     context.currentGroup = this;
-    for (final AbstractVariableBase groupVariable : groupVariables)
-      if (groupVariable.keepValue && shadowed != null)
-        varTable.put (groupVariable.expName, shadowed.get (groupVariable.expName));
+    for (final AbstractVariableBase groupVariable : m_aGroupVariables)
+      if (groupVariable.m_bKeepValue && shadowed != null)
+        varTable.put (groupVariable.m_sExpName, shadowed.get (groupVariable.m_sExpName));
       else
       {
         for (AbstractInstruction inst = groupVariable; inst != null; inst = inst.next)
@@ -408,10 +407,10 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
    * @param tVec
    *        a Vector containing the templates
    */
-  protected void addGroupTemplates (final Vector <Instance> tVec)
+  protected void addGroupTemplates (final Vector <TemplateFactory.Instance> tVec)
   {
-    containedGroupTemplates.addAll (tVec);
-    for (final AbstractGroupBase containedGroup : containedGroups)
+    m_aContainedGroupTemplates.addAll (tVec);
+    for (final AbstractGroupBase containedGroup : m_aContainedGroups)
       containedGroup.addGroupTemplates (tVec);
   }
 
@@ -430,25 +429,25 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     for (final Enumeration <String> e = pTable.keys (); e.hasMoreElements ();)
     {
       final Object key = e.nextElement ();
-      if (groupProcedures.containsKey (key))
+      if (m_aGroupProcedures.containsKey (key))
       {
         final ProcedureFactory.Instance p1 = pTable.get (key);
-        final AbstractNodeBase p2 = groupProcedures.get (key);
+        final AbstractNodeBase p2 = m_aGroupProcedures.get (key);
         throw new SAXParseException ("Group procedure '" +
-                                     p1.procName +
+                                     p1.m_sProcName +
                                      "' conflicts with the procedure definition in line " +
                                      p2.lineNo +
-                                     (p1.systemId.equals (p2.systemId) ? (p1.lineNo == p2.lineNo ? " (possibly several times included)"
-                                                                                                 : "")
-                                                                       : (" of " + p2.systemId)),
-                                     p1.publicId,
-                                     p1.systemId,
+                                     (p1.m_sSystemID.equals (p2.m_sSystemID) ? (p1.lineNo == p2.lineNo ? " (possibly several times included)"
+                                                                                                       : "")
+                                                                             : (" of " + p2.m_sSystemID)),
+                                     p1.m_sPublicID,
+                                     p1.m_sSystemID,
                                      p1.lineNo,
                                      p1.colNo);
       }
     }
-    groupProcedures.putAll (pTable);
-    for (final AbstractGroupBase containedGroup : containedGroups)
+    m_aGroupProcedures.putAll (pTable);
+    for (final AbstractGroupBase containedGroup : m_aContainedGroups)
       containedGroup.addGroupProcedures (pTable);
   }
 
@@ -456,13 +455,13 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
    * Returns the globally visible templates in this group (and all sub-groups).
    * This method is called from {@link #compile} in the parent group, which adds
    * in turn the returned vector to its vector of the global templates. The
-   * field {@link #containedGlobalTemplates} will be set to <code>null</code>
+   * field {@link #m_aContainedGlobalTemplates} will be set to <code>null</code>
    * afterwards to allow garbage collection.
    */
-  public Vector <Instance> getGlobalTemplates ()
+  public Vector <TemplateFactory.Instance> getGlobalTemplates ()
   {
-    final Vector <Instance> tmp = containedGlobalTemplates;
-    containedGlobalTemplates = null; // for memory reasons
+    final Vector <TemplateFactory.Instance> tmp = m_aContainedGlobalTemplates;
+    m_aContainedGlobalTemplates = null; // for memory reasons
     return tmp;
   }
 
@@ -476,71 +475,55 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
   @Override
   public short process (final Context c) throws SAXException
   {
-    throw new SAXParseException ("process called for " + qName, publicId, systemId, lineNo, colNo);
+    throw new SAXParseException ("process called for " + m_sQName, m_sPublicID, m_sSystemID, lineNo, colNo);
   }
 
-  /** returns the value of {@link #visibleTemplates} */
+  /** returns the value of {@link #m_aVisibleTemplates} */
   public TemplateFactory.Instance [] getVisibleTemplates ()
   {
-    return visibleTemplates;
+    return m_aVisibleTemplates;
   }
 
   @Override
-  protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+  protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
   {
     super.onDeepCopy (copy, copies);
     final AbstractGroupBase theCopy = (AbstractGroupBase) copy;
-    if (containedGroups != null)
+    if (m_aContainedGroups != null)
     {
-      theCopy.containedGroups = (AbstractGroupBase []) copies.get (containedGroups);
-      if (theCopy.containedGroups == null)
+      theCopy.m_aContainedGroups = (AbstractGroupBase []) copies.get (m_aContainedGroups);
+      if (theCopy.m_aContainedGroups == null)
       {
-        theCopy.containedGroups = new AbstractGroupBase [containedGroups.length];
-        for (int i = 0; i < containedGroups.length; i++)
+        theCopy.m_aContainedGroups = new AbstractGroupBase [m_aContainedGroups.length];
+        for (int i = 0; i < m_aContainedGroups.length; i++)
         {
-          theCopy.containedGroups[i] = (AbstractGroupBase) containedGroups[i].deepCopy (copies);
+          theCopy.m_aContainedGroups[i] = (AbstractGroupBase) m_aContainedGroups[i].deepCopy (copies);
         }
       }
     }
-    if (groupVariables != null)
+    if (m_aGroupVariables != null)
     {
-      theCopy.groupVariables = (AbstractVariableBase []) copies.get (groupVariables);
-      if (theCopy.groupVariables == null)
+      theCopy.m_aGroupVariables = (AbstractVariableBase []) copies.get (m_aGroupVariables);
+      if (theCopy.m_aGroupVariables == null)
       {
-        theCopy.groupVariables = new AbstractVariableBase [groupVariables.length];
-        for (int i = 0; i < groupVariables.length; i++)
-        {
-          theCopy.groupVariables[i] = (AbstractVariableBase) groupVariables[i].deepCopy (copies);
-        }
+        theCopy.m_aGroupVariables = new AbstractVariableBase [m_aGroupVariables.length];
+        for (int i = 0; i < m_aGroupVariables.length; i++)
+          theCopy.m_aGroupVariables[i] = (AbstractVariableBase) m_aGroupVariables[i].deepCopy (copies);
       }
     }
-    if (groupTemplates != null)
-    {
-      theCopy.groupTemplates = deepTemplateArrayCopy (groupTemplates, copies);
-    }
-    if (visibleTemplates != null)
-    {
-      theCopy.visibleTemplates = deepTemplateArrayCopy (visibleTemplates, copies);
-    }
-    if (parentGroup != null)
-    {
-      theCopy.parentGroup = (AbstractGroupBase) parentGroup.deepCopy (copies);
-    }
-    if (namedGroups != null)
-    {
-      theCopy.namedGroups = deepHashtableCopy (namedGroups, copies);
-    }
-    if (visibleProcedures != null)
-    {
-      theCopy.visibleProcedures = deepHashtableCopy (visibleProcedures, copies);
-    }
-    if (globalProcedures != null)
-    {
-      theCopy.globalProcedures = deepHashtableCopy (globalProcedures, copies);
-    }
-    if (groupProcedures != null)
-    {
-      theCopy.groupProcedures = deepHashtableCopy (groupProcedures, copies);
-    }
+    if (m_aGroupTemplates != null)
+      theCopy.m_aGroupTemplates = deepTemplateArrayCopy (m_aGroupTemplates, copies);
+    if (m_aVisibleTemplates != null)
+      theCopy.m_aVisibleTemplates = deepTemplateArrayCopy (m_aVisibleTemplates, copies);
+    if (m_aParentGroup != null)
+      theCopy.m_aParentGroup = (AbstractGroupBase) m_aParentGroup.deepCopy (copies);
+    if (m_aNamedGroups != null)
+      theCopy.m_aNamedGroups = deepHashtableCopy (m_aNamedGroups, copies);
+    if (m_aVisibleProcedures != null)
+      theCopy.m_aVisibleProcedures = deepHashtableCopy (m_aVisibleProcedures, copies);
+    if (m_aGlobalProcedures != null)
+      theCopy.m_aGlobalProcedures = deepHashtableCopy (m_aGlobalProcedures, copies);
+    if (m_aGroupProcedures != null)
+      theCopy.m_aGroupProcedures = deepHashtableCopy (m_aGroupProcedures, copies);
   }
 }

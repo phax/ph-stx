@@ -72,33 +72,33 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
 
   // Define a static logger variable so that it references the
   // Logger instance named "TransformerFactoryImpl".
-  private static Logger log = LoggerFactory.getLogger (TransformerFactoryImpl.class);
+  private static final Logger log = LoggerFactory.getLogger (TransformerFactoryImpl.class);
 
   // Member
-  private URIResolver uriResolver = null;
-  private ErrorListener errorListener = null;
-  protected ITransformerHandlerResolver thResolver = null;
-  protected IOutputURIResolver outputUriResolver = null;
-  protected boolean allowExternalFunctions = true;
+  private URIResolver m_aURIResolver;
+  private ErrorListener m_aErrorListener;
+  protected ITransformerHandlerResolver m_aTHResolver;
+  protected IOutputURIResolver m_aOutputUriResolver;
+  protected boolean m_bAllowExternalFunctions = true;
 
   // init default errorlistener
   // visible for TemplatesImpl
-  protected ConfigurationErrListener defaultErrorListener = new ConfigurationErrListener ();
+  protected ConfigurationErrListener m_aDefaultErrorListener = new ConfigurationErrListener ();
 
   // indicates if the transformer is working in debug mode
-  private boolean debugmode = false;
+  private boolean m_bDebugmode = false;
 
   // indicates which Emitter class for stx:message output should be used
-  private IStxEmitter msgEmitter;
+  private IStxEmitter m_aMsgEmitter;
 
   // Synch object to guard against setting values from the TrAX interface
   // or reentry while the transform is going on.
-  private final Boolean reentryGuard = new Boolean (true);
+  private final Boolean m_aReentryGuard = new Boolean (true);
 
   /**
    * The parserlistener manager for tracing purpose.
    */
-  private final ParserListenerMgr parserListenerMgr = new ParserListenerMgr ();
+  private final ParserListenerMgr m_aParserListenerMgr = new ParserListenerMgr ();
 
   /**
    * The default constructor.
@@ -108,8 +108,8 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
     try
     {
       // initialize default messageEmitter
-      msgEmitter = AbstractStreamEmitter.newEmitter (System.err, null);
-      ((AbstractStreamEmitter) msgEmitter).setOmitXmlDeclaration (true);
+      m_aMsgEmitter = AbstractStreamEmitter.newEmitter (System.err, null);
+      ((AbstractStreamEmitter) m_aMsgEmitter).setOmitXmlDeclaration (true);
     }
     catch (final UnsupportedEncodingException e)
     {
@@ -146,7 +146,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
 
     final TransformerConfigurationException tE = new TransformerConfigurationException ("Feature not supported");
 
-    defaultErrorListener.fatalError (tE);
+    m_aDefaultErrorListener.fatalError (tE);
     return null;
   }
 
@@ -165,17 +165,17 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   {
 
     if (CTrAX.KEY_TH_RESOLVER.equals (name))
-      return thResolver;
+      return m_aTHResolver;
     if (CTrAX.KEY_OUTPUT_URI_RESOLVER.equals (name))
-      return outputUriResolver;
+      return m_aOutputUriResolver;
     if (CTrAX.MESSAGE_EMITTER_CLASS.equals (name))
-      return msgEmitter;
+      return m_aMsgEmitter;
     if (CTrAX.KEY_XSLT_FACTORY.equals (name))
       return System.getProperty (CTrAX.KEY_XSLT_FACTORY);
     if (CTrAX.ALLOW_EXTERNAL_FUNCTIONS.equals (name))
-      return Boolean.valueOf (allowExternalFunctions);
+      return Boolean.valueOf (m_bAllowExternalFunctions);
     if (CTrAX.DEBUG_FEATURE.equals (name))
-      return Boolean.valueOf (debugmode);
+      return Boolean.valueOf (m_bDebugmode);
 
     log.warn ("Feature not supported: " + name);
     throw new IllegalArgumentException ("Feature not supported: " + name);
@@ -198,12 +198,12 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
 
     if (CTrAX.KEY_TH_RESOLVER.equals (name))
     {
-      thResolver = (ITransformerHandlerResolver) value;
+      m_aTHResolver = (ITransformerHandlerResolver) value;
     }
     else
       if (CTrAX.KEY_OUTPUT_URI_RESOLVER.equals (name))
       {
-        outputUriResolver = (IOutputURIResolver) value;
+        m_aOutputUriResolver = (IOutputURIResolver) value;
       }
       else
         if (CTrAX.MESSAGE_EMITTER_CLASS.equals (name))
@@ -213,7 +213,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
           {
             try
             {
-              msgEmitter = buildMessageEmitter ((String) value);
+              m_aMsgEmitter = buildMessageEmitter ((String) value);
             }
             catch (final TransformerConfigurationException e)
             {
@@ -224,7 +224,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
           else
             if (value instanceof IStxEmitter)
             { // already instantiated
-              msgEmitter = (IStxEmitter) value;
+              m_aMsgEmitter = (IStxEmitter) value;
             }
             else
             {
@@ -240,12 +240,12 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
           else
             if (CTrAX.ALLOW_EXTERNAL_FUNCTIONS.equals (name))
             {
-              this.allowExternalFunctions = ((Boolean) value).booleanValue ();
+              this.m_bAllowExternalFunctions = ((Boolean) value).booleanValue ();
             }
             else
               if (CTrAX.DEBUG_FEATURE.equals (name))
               {
-                this.debugmode = ((Boolean) value).booleanValue ();
+                this.m_bDebugmode = ((Boolean) value).booleanValue ();
               }
               else
               {
@@ -255,18 +255,18 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   }
 
   /**
-   * Getter for {@link #errorListener}
+   * Getter for {@link #m_aErrorListener}
    *
    * @return The registered <code>ErrorListener</code>
    */
   @Override
   public ErrorListener getErrorListener ()
   {
-    return errorListener;
+    return m_aErrorListener;
   }
 
   /**
-   * Setter for {@link #errorListener}
+   * Setter for {@link #m_aErrorListener}
    *
    * @param errorListener
    *        The <code>ErrorListener</code> object.
@@ -276,7 +276,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public void setErrorListener (final ErrorListener errorListener) throws IllegalArgumentException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
         log.debug ("setting ErrorListener");
@@ -284,24 +284,24 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
       {
         throw new IllegalArgumentException ("ErrorListener is null");
       }
-      this.errorListener = errorListener;
-      defaultErrorListener.setUserErrorListener (errorListener);
+      this.m_aErrorListener = errorListener;
+      m_aDefaultErrorListener.setUserErrorListener (errorListener);
     }
   }
 
   /**
-   * Getter for {@link #uriResolver}
+   * Getter for {@link #m_aURIResolver}
    *
    * @return The registered <code>URIResolver</code>
    */
   @Override
   public URIResolver getURIResolver ()
   {
-    return uriResolver;
+    return m_aURIResolver;
   }
 
   /**
-   * Setter for {@link #uriResolver}
+   * Setter for {@link #m_aURIResolver}
    *
    * @param resolver
    *        The <code>URIResolver</code> object.
@@ -310,9 +310,9 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public void setURIResolver (final URIResolver resolver)
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
-      this.uriResolver = resolver;
+      this.m_aURIResolver = resolver;
     }
   }
 
@@ -376,7 +376,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
 
     try
     {
-      defaultErrorListener.error (tE);
+      m_aDefaultErrorListener.error (tE);
       return false;
     }
     catch (final TransformerException e)
@@ -398,7 +398,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public Templates newTemplates (final Source source) throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
       {
@@ -407,13 +407,13 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
       }
       try
       {
-        final SAXSource saxSource = TrAXHelper.getSAXSource (source, errorListener);
+        final SAXSource saxSource = TrAXHelper.getSAXSource (source, m_aErrorListener);
         final Templates template = new TemplatesImpl (saxSource.getXMLReader (), saxSource.getInputSource (), this);
         return template;
       }
       catch (final TransformerException tE)
       {
-        defaultErrorListener.fatalError (tE);
+        m_aDefaultErrorListener.fatalError (tE);
         return null;
       }
     }
@@ -430,7 +430,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public Transformer newTransformer () throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       final StreamSource streamSrc = new StreamSource (new StringReader (CTrAX.IDENTITY_TRANSFORM));
       return newTransformer (streamSrc);
@@ -450,7 +450,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public Transformer newTransformer (final Source source) throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
         log.debug ("get a Transformer-instance");
@@ -477,7 +477,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public TemplatesHandler newTemplatesHandler () throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
         log.debug ("create a TemplatesHandler-instance");
@@ -500,7 +500,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public TransformerHandler newTransformerHandler () throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
         log.debug ("get a TransformerHandler " + "(identity transformation or copy)");
@@ -524,7 +524,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public TransformerHandler newTransformerHandler (final Source src) throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
         if (log.isDebugEnabled ())
@@ -548,7 +548,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   public TransformerHandler newTransformerHandler (final Templates templates) throws TransformerConfigurationException
   {
 
-    synchronized (reentryGuard)
+    synchronized (m_aReentryGuard)
     {
       if (CSTX.DEBUG)
         log.debug ("get a TransformerHandler-instance from Templates");
@@ -589,7 +589,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
     catch (final SAXException ex)
     {
       final TransformerConfigurationException tE = new TransformerConfigurationException (ex.getMessage (), ex);
-      defaultErrorListener.fatalError (tE);
+      m_aDefaultErrorListener.fatalError (tE);
       return null;
     }
   }
@@ -614,16 +614,16 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
     return new TrAXFilter (templates);
   }
 
-  /** returns the value of {@link #parserListenerMgr} */
+  /** returns the value of {@link #m_aParserListenerMgr} */
   public ParserListenerMgr getParserListenerMgr ()
   {
-    return parserListenerMgr;
+    return m_aParserListenerMgr;
   }
 
-  /** returns the value of {@link #msgEmitter} */
+  /** returns the value of {@link #m_aMsgEmitter} */
   public IStxEmitter getMessageEmitter ()
   {
-    return msgEmitter;
+    return m_aMsgEmitter;
   }
 
   /**

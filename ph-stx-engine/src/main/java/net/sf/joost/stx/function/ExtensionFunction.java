@@ -101,9 +101,9 @@ public final class ExtensionFunction implements IInstance
     if (aArgs != null)
     {
       paramCount = 1;
-      while (aArgs.type == AbstractTree.LIST)
+      while (aArgs.m_nType == AbstractTree.LIST)
       {
-        aArgs = aArgs.left;
+        aArgs = aArgs.m_aLeft;
         paramCount++;
       }
     }
@@ -218,8 +218,8 @@ public final class ExtensionFunction implements IInstance
 
       for (int i = paramCount - 1; i > 0; i--)
       {
-        values[i] = aArgs.right.evaluate (context, top);
-        aArgs = aArgs.left;
+        values[i] = aArgs.m_aRight.evaluate (context, top);
+        aArgs = aArgs.m_aLeft;
       }
       values[0] = aArgs.evaluate (context, top);
     }

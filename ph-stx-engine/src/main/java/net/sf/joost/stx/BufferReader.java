@@ -53,15 +53,15 @@ import net.sf.joost.instruction.AbstractGroupBase;
 public class BufferReader implements XMLReader
 {
   /** the lexical handler object */
-  private LexicalHandler lexH;
+  private LexicalHandler m_aLexH;
 
   /** the content handler object */
-  private ContentHandler contH;
+  private ContentHandler m_aContH;
 
   /** the array of events to be feed into the external SAX processor */
-  private final SAXEvent [] events;
+  private final SAXEvent [] m_aEvents;
 
-  private final String publicId, systemId;
+  private final String m_sPublicID, m_sSystemID;
 
   /**
    * Constructs a new <code>BufferReader</code> object.
@@ -90,9 +90,9 @@ public class BufferReader implements XMLReader
     // endDocument() doesn't add a event to the buffer.
     // However, it checks that the buffer contents is well-formed
     emitter.endDocument (context.currentInstruction);
-    this.events = ((BufferEmitter) emitter.contH).getEvents ();
-    this.publicId = publicId;
-    this.systemId = systemId;
+    this.m_aEvents = ((BufferEmitter) emitter.m_aContH).getEvents ();
+    this.m_sPublicID = publicId;
+    this.m_sSystemID = systemId;
   }
 
   public void setFeature (final String name, final boolean state) throws SAXNotRecognizedException,
@@ -135,7 +135,7 @@ public class BufferReader implements XMLReader
                                                                   SAXNotSupportedException
   {
     if (name.equals ("http://xml.org/sax/properties/lexical-handler"))
-      lexH = (LexicalHandler) value;
+      m_aLexH = (LexicalHandler) value;
     else
       throw new SAXNotRecognizedException (name);
   }
@@ -143,9 +143,8 @@ public class BufferReader implements XMLReader
   public Object getProperty (final String name) throws SAXNotRecognizedException
   {
     if (name.equals ("http://xml.org/sax/properties/lexical-handler"))
-      return lexH;
-    else
-      throw new SAXNotRecognizedException (name);
+      return m_aLexH;
+    throw new SAXNotRecognizedException (name);
   }
 
   /** does nothing */
@@ -170,12 +169,12 @@ public class BufferReader implements XMLReader
 
   public void setContentHandler (final ContentHandler handler)
   {
-    contH = handler;
+    m_aContH = handler;
   }
 
   public ContentHandler getContentHandler ()
   {
-    return contH;
+    return m_aContH;
   }
 
   /** does nothing */
@@ -189,24 +188,24 @@ public class BufferReader implements XMLReader
 
   public void parse (final InputSource dummy) throws SAXException
   {
-    if (contH == null)
+    if (m_aContH == null)
     { // shouldn't happen
       throw new SAXException ("Missing ContentHandler for buffer processing");
     }
-    if (lexH == null)
+    if (m_aLexH == null)
     {
-      if (contH instanceof LexicalHandler)
-        lexH = (LexicalHandler) contH;
+      if (m_aContH instanceof LexicalHandler)
+        m_aLexH = (LexicalHandler) m_aContH;
     }
     final LocatorImpl locator = new LocatorImpl ();
-    locator.setPublicId (publicId);
-    locator.setSystemId (systemId);
-    contH.setDocumentLocator (locator);
+    locator.setPublicId (m_sPublicID);
+    locator.setSystemId (m_sSystemID);
+    m_aContH.setDocumentLocator (locator);
     // Note: call startDocument() and endDocument() only for external
     // processing (when parse() is invoked by someone else)
-    contH.startDocument ();
-    parse (contH, lexH);
-    contH.endDocument ();
+    m_aContH.startDocument ();
+    parse (m_aContH, m_aLexH);
+    m_aContH.endDocument ();
   }
 
   public void parse (final String dummy) throws SAXException
@@ -221,41 +220,41 @@ public class BufferReader implements XMLReader
   public void parse (final ContentHandler contH, final LexicalHandler lexH) throws SAXException
   {
     // generate events
-    for (final SAXEvent ev : events)
+    for (final SAXEvent ev : m_aEvents)
     {
-      switch (ev.type)
+      switch (ev.m_nType)
       {
         case SAXEvent.ELEMENT:
-          contH.startElement (ev.uri, ev.lName, ev.qName, ev.attrs);
+          contH.startElement (ev.m_sURI, ev.m_sLocalName, ev.m_sQName, ev.m_aAttrs);
           break;
         case SAXEvent.ELEMENT_END:
-          contH.endElement (ev.uri, ev.lName, ev.qName);
+          contH.endElement (ev.m_sURI, ev.m_sLocalName, ev.m_sQName);
           break;
         case SAXEvent.TEXT:
-          contH.characters (ev.value.toCharArray (), 0, ev.value.length ());
+          contH.characters (ev.m_sValue.toCharArray (), 0, ev.m_sValue.length ());
           break;
         case SAXEvent.CDATA:
           if (lexH != null)
           {
             lexH.startCDATA ();
-            contH.characters (ev.value.toCharArray (), 0, ev.value.length ());
+            contH.characters (ev.m_sValue.toCharArray (), 0, ev.m_sValue.length ());
             lexH.endCDATA ();
           }
           else
-            contH.characters (ev.value.toCharArray (), 0, ev.value.length ());
+            contH.characters (ev.m_sValue.toCharArray (), 0, ev.m_sValue.length ());
           break;
         case SAXEvent.PI:
-          contH.processingInstruction (ev.qName, ev.value);
+          contH.processingInstruction (ev.m_sQName, ev.m_sValue);
           break;
         case SAXEvent.COMMENT:
           if (lexH != null)
-            lexH.comment (ev.value.toCharArray (), 0, ev.value.length ());
+            lexH.comment (ev.m_sValue.toCharArray (), 0, ev.m_sValue.length ());
           break;
         case SAXEvent.MAPPING:
-          contH.startPrefixMapping (ev.qName, ev.value);
+          contH.startPrefixMapping (ev.m_sQName, ev.m_sValue);
           break;
         case SAXEvent.MAPPING_END:
-          contH.endPrefixMapping (ev.qName);
+          contH.endPrefixMapping (ev.m_sQName);
           break;
       }
     }

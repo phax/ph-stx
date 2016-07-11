@@ -76,7 +76,7 @@ public class Main
 
     try
     {
-      NFA nfa = (NFA) parser.parse ().value;
+      NFA nfa = (NFA) parser.parse ().m_aValue;
 
       Out.checkErrors ();
 

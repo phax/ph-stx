@@ -60,9 +60,9 @@ public final class PredicateTree extends AbstractTree
     boolean retValue = false;
     if (top > 1 &&
         // allow set position for evaluating the predicate
-        left.matches (context, top, true))
+        m_aLeft.matches (context, top, true))
     {
-      final Value v = right.evaluate (context, top);
+      final Value v = m_aRight.evaluate (context, top);
       if (v.type == Value.NUMBER)
         retValue = (context.position == Math.round (v.getNumberValue ()));
       else

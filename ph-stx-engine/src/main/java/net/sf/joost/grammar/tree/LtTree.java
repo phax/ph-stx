@@ -33,7 +33,7 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of LtTree represent comparison nodes (less than, "&lt;") in the
  * syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.1 $ $Date: 2004/09/29 05:59:51 $
  * @author Oliver Becker
  */
@@ -47,8 +47,8 @@ public final class LtTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    final Value v1 = left.evaluate (context, top);
-    final Value v2 = right.evaluate (context, top);
+    final Value v1 = m_aLeft.evaluate (context, top);
+    final Value v2 = m_aRight.evaluate (context, top);
     if (v1.type == Value.EMPTY || v2.type == Value.EMPTY)
       return Value.VAL_FALSE;
 

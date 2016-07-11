@@ -1031,7 +1031,7 @@ public class LexParse extends java_cup.runtime.lr_parser
       if (s.sym == sym.EOF)
         Out.error (ErrorMessages.UNEXPECTED_EOF);
       else
-        Out.error (scanner.file, ErrorMessages.SYNTAX_ERROR, s.left, s.right);
+        Out.error (scanner.file, ErrorMessages.SYNTAX_ERROR, s.m_nLeft, s.m_nRight);
     }
     else
       Out.error (ErrorMessages.UNKNOWN_SYNTAX);
@@ -1565,9 +1565,9 @@ class CUP$LexParse$actions
       case 101: // classcontentelem ::= CHAR
       {
         Interval RESULT = null;
-        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Integer c = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Integer c = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = new Interval (c, c);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("classcontentelem",
                                                                     10,
@@ -1581,13 +1581,13 @@ class CUP$LexParse$actions
       case 100: // classcontentelem ::= CHAR DASH CHAR
       {
         Interval RESULT = null;
-        final int c1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int c1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
+        final int c1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int c1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
         final Integer c1 = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                              2)).value;
-        final int c2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int c2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Integer c2 = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                              2)).m_aValue;
+        final int c2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int c2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Integer c2 = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         if (c2 < c1)
         {
@@ -1608,9 +1608,9 @@ class CUP$LexParse$actions
       case 99: // classcontent ::= charclass
       {
         List <Interval> RESULT = null;
-        final int regexleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int regexright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp regex = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int regexleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int regexright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp regex = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final List <Interval> list = (List <Interval>) ((RegExp1) regex).content;
         if (null == list)
@@ -1645,13 +1645,13 @@ class CUP$LexParse$actions
       case 98: // classcontent ::= classcontent charclass
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int regexleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int regexright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp regex = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int regexleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int regexright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp regex = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final List <Interval> intervals = (List <Interval>) ((RegExp1) regex).content;
         if (null != intervals)
@@ -1684,9 +1684,9 @@ class CUP$LexParse$actions
       case 97: // classcontent ::= MACROUSE
       {
         final List <Interval> RESULT = null;
-        final int identleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int identright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String ident = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int identleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int identright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String ident = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         syntaxError (ErrorMessages.CHARCLASS_MACRO, identleft, identright);
 
@@ -1702,13 +1702,13 @@ class CUP$LexParse$actions
       case 96: // classcontent ::= classcontent MACROUSE
       {
         final List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int identleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int identright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String ident = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int identleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int identright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String ident = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         syntaxError (ErrorMessages.CHARCLASS_MACRO, identleft, identright);
 
@@ -1725,9 +1725,9 @@ class CUP$LexParse$actions
       case 95: // classcontent ::= STRING
       {
         List <Interval> RESULT = null;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String s = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String s = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         RESULT = new ArrayList<> ();
         for (int i = 0; i < s.length ();)
@@ -1749,13 +1749,13 @@ class CUP$LexParse$actions
       case 94: // classcontent ::= classcontent STRING
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String s = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String s = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         for (int i = 0; i < s.length ();)
         {
@@ -1778,9 +1778,9 @@ class CUP$LexParse$actions
       case 93: // classcontent ::= UNIPROPCCLASSNOT
       {
         List <Interval> RESULT = null;
-        final int notintcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int notintcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final IntCharSet notintcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int notintcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int notintcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final IntCharSet notintcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet absComp = new IntCharSet (new Interval (0,
                                                                  scanner.getUnicodeProperties ()
@@ -1800,13 +1800,13 @@ class CUP$LexParse$actions
       case 92: // classcontent ::= classcontent UNIPROPCCLASSNOT
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int notintcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int notintcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final IntCharSet notintcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int notintcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int notintcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final IntCharSet notintcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet absComp = new IntCharSet (new Interval (0,
                                                                  scanner.getUnicodeProperties ()
@@ -1828,9 +1828,9 @@ class CUP$LexParse$actions
       case 91: // classcontent ::= UNIPROPCCLASS
       {
         List <Interval> RESULT = null;
-        final int intcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int intcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final IntCharSet intcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int intcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int intcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final IntCharSet intcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = intcharset.copy ().getIntervals ();
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("classcontent",
                                                                     11,
@@ -1844,13 +1844,13 @@ class CUP$LexParse$actions
       case 90: // classcontent ::= classcontent UNIPROPCCLASS
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int intcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int intcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final IntCharSet intcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int intcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int intcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final IntCharSet intcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         // TODO: Is IntCharSet.copy() required here?
         list.addAll (intcharset.copy ().getIntervals ());
@@ -1869,9 +1869,9 @@ class CUP$LexParse$actions
       case 89: // classcontent ::= preclass
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = list;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("classcontent",
                                                                     11,
@@ -1885,13 +1885,13 @@ class CUP$LexParse$actions
       case 88: // classcontent ::= classcontent preclass
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int plistleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int plistright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final List <Interval> plist = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int plistleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int plistright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final List <Interval> plist = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list.addAll (plist);
         RESULT = list;
@@ -1909,9 +1909,9 @@ class CUP$LexParse$actions
       case 87: // classcontent ::= classcontentelem
       {
         List <Interval> RESULT = null;
-        final int elemleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int elemright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Interval elem = (Interval) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int elemleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int elemright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Interval elem = (Interval) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final List <Interval> list = new ArrayList<> ();
         list.add (elem);
@@ -1929,13 +1929,13 @@ class CUP$LexParse$actions
       case 86: // classcontent ::= classcontent classcontentelem
       {
         List <Interval> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int elemleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int elemright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Interval elem = (Interval) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int elemleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int elemright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Interval elem = (Interval) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list.add (elem);
         RESULT = list;
@@ -1954,17 +1954,17 @@ class CUP$LexParse$actions
                // SYMMETRICDIFFERENCE DASH classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -1992,17 +1992,17 @@ class CUP$LexParse$actions
                // DASH classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         list2.add (new Interval ('-', '-'));
@@ -2029,17 +2029,17 @@ class CUP$LexParse$actions
                // SYMMETRICDIFFERENCE classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2066,17 +2066,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         final IntCharSet intcharset2 = new IntCharSet (list2);
@@ -2102,17 +2102,17 @@ class CUP$LexParse$actions
                // DASH classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2140,17 +2140,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         list2.add (new Interval ('-', '-'));
@@ -2177,17 +2177,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2214,17 +2214,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         final IntCharSet intcharset2 = new IntCharSet (list2);
@@ -2250,17 +2250,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2288,17 +2288,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         list2.add (new Interval ('-', '-'));
@@ -2325,17 +2325,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2362,17 +2362,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         final IntCharSet intcharset2 = new IntCharSet (list2);
@@ -2398,17 +2398,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2436,17 +2436,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         list2.add (new Interval ('-', '-'));
@@ -2473,17 +2473,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2510,17 +2510,17 @@ class CUP$LexParse$actions
                // CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         final IntCharSet intcharset2 = new IntCharSet (list2);
@@ -2546,17 +2546,17 @@ class CUP$LexParse$actions
                // DASH classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2581,17 +2581,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         list2.add (new Interval ('-', '-'));
@@ -2615,17 +2615,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2649,17 +2649,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         final IntCharSet intcharset2 = new IntCharSet (list2);
@@ -2682,17 +2682,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2716,17 +2716,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 4)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 4)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         list2.add (new Interval ('-', '-'));
@@ -2749,17 +2749,17 @@ class CUP$LexParse$actions
                // classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         list1.add (new Interval ('-', '-'));
         final IntCharSet intcharset1 = new IntCharSet (list1);
@@ -2782,17 +2782,17 @@ class CUP$LexParse$actions
                // CLOSECLASS
       {
         RegExp RESULT = null;
-        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int list1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int list1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Interval> list1 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 3)).value;
-        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                 3)).m_aValue;
+        final int list2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int list2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list2 = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                 1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                 1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet intcharset1 = new IntCharSet (list1);
         final IntCharSet intcharset2 = new IntCharSet (list2);
@@ -2813,13 +2813,13 @@ class CUP$LexParse$actions
       case 61: // charclass ::= OPENCLASS HAT DASH classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -2845,13 +2845,13 @@ class CUP$LexParse$actions
       case 60: // charclass ::= OPENCLASS DASH classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -2877,13 +2877,13 @@ class CUP$LexParse$actions
       case 59: // charclass ::= OPENCLASS HAT classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -2908,9 +2908,9 @@ class CUP$LexParse$actions
       case 58: // charclass ::= OPENCLASS HAT CLOSECLASS
       {
         RegExp RESULT = null;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final List <Interval> list = new ArrayList<> ();
         list.add (new Interval (0, charClasses.getMaxCharCode ()));
@@ -2937,13 +2937,13 @@ class CUP$LexParse$actions
       case 57: // charclass ::= OPENCLASS classcontent CLOSECLASS
       {
         RegExp RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
-        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                                1)).m_aValue;
+        final int closeleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int closeright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object close = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -2984,9 +2984,9 @@ class CUP$LexParse$actions
       case 55: // regexp ::= CHAR
       {
         RegExp RESULT = null;
-        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Integer c = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Integer c = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -3063,9 +3063,9 @@ class CUP$LexParse$actions
       case 52: // regexp ::= STRING
       {
         RegExp RESULT = null;
-        final int strleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int strright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String str = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int strleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int strright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String str = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -3097,9 +3097,9 @@ class CUP$LexParse$actions
       case 51: // regexp ::= UNIPROPCCLASSNOT
       {
         RegExp RESULT = null;
-        final int notintcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int notintcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final IntCharSet notintcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int notintcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int notintcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final IntCharSet notintcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet set = scanner.caseless ? notintcharset.getCaseless (scanner.getUnicodeProperties ())
                                                 : notintcharset.copy ();
@@ -3125,9 +3125,9 @@ class CUP$LexParse$actions
       case 50: // regexp ::= UNIPROPCCLASS
       {
         RegExp RESULT = null;
-        final int intcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int intcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final IntCharSet intcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int intcharsetleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int intcharsetright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final IntCharSet intcharset = (IntCharSet) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final IntCharSet set = scanner.caseless ? intcharset.getCaseless (scanner.getUnicodeProperties ())
                                                 : intcharset.copy ();
@@ -3153,9 +3153,9 @@ class CUP$LexParse$actions
       case 49: // regexp ::= preclass
       {
         RegExp RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final List <Interval> list = (List <Interval>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         try
         {
@@ -3180,9 +3180,9 @@ class CUP$LexParse$actions
       case 48: // regexp ::= charclass
       {
         RegExp RESULT = null;
-        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp c = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp c = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = c;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3196,9 +3196,9 @@ class CUP$LexParse$actions
       case 47: // regexp ::= MACROUSE
       {
         RegExp RESULT = null;
-        final int identleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int identright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String ident = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int identleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int identright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String ident = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         if (!scanner.macroDefinition)
         {
@@ -3219,9 +3219,9 @@ class CUP$LexParse$actions
       case 46: // regexp ::= OPENBRACKET series CLOSEBRACKET
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
         RESULT = r;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3236,17 +3236,17 @@ class CUP$LexParse$actions
       case 45: // regexp ::= regexp REPEAT REPEAT RBRACE
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).value;
-        final int n1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int n1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_aValue;
+        final int n1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int n1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
         final Integer n1 = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                              2)).value;
-        final int n2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int n2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                              2)).m_aValue;
+        final int n2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int n2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final Integer n2 = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                              1)).value;
+                                                                                              1)).m_aValue;
         RESULT = makeRepeat (r, n1, n2, n1left, n2right);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3261,16 +3261,16 @@ class CUP$LexParse$actions
       case 44: // regexp ::= regexp REPEAT RBRACE
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).value;
-        final int nleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int nright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_aValue;
+        final int nleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int nright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final Integer n = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                             1)).value;
-        final int bleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int bright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object b = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                             1)).m_aValue;
+        final int bleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int bright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object b = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = makeRepeat (r, n, n, bleft, bright);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3285,9 +3285,9 @@ class CUP$LexParse$actions
       case 43: // regexp ::= regexp QUESTION
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
         RESULT = new RegExp1 (sym.QUESTION, r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3302,9 +3302,9 @@ class CUP$LexParse$actions
       case 42: // regexp ::= regexp PLUS
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
         RESULT = new RegExp1 (sym.PLUS, r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3319,9 +3319,9 @@ class CUP$LexParse$actions
       case 41: // regexp ::= regexp STAR
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
         RESULT = new RegExp1 (sym.STAR, r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("regexp",
                                                                     7,
@@ -3336,9 +3336,9 @@ class CUP$LexParse$actions
       case 40: // nregexp ::= TILDE nregexp
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = new RegExp1 (sym.TILDE, r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("nregexp",
                                                                     6,
@@ -3353,9 +3353,9 @@ class CUP$LexParse$actions
       case 39: // nregexp ::= BANG nregexp
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = new RegExp1 (sym.BANG, r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("nregexp",
                                                                     6,
@@ -3370,9 +3370,9 @@ class CUP$LexParse$actions
       case 38: // nregexp ::= regexp
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = r;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("nregexp",
                                                                     6,
@@ -3386,9 +3386,9 @@ class CUP$LexParse$actions
       case 37: // concs ::= nregexp
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = r;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("concs",
                                                                     5,
@@ -3402,13 +3402,13 @@ class CUP$LexParse$actions
       case 36: // concs ::= concs nregexp
       {
         RegExp RESULT = null;
-        final int r1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int r1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int r1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int r1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final RegExp r1 = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                            1)).value;
-        final int r2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int r2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r2 = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                            1)).m_aValue;
+        final int r2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int r2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r2 = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = new RegExp2 (sym.CONCAT, r1, r2);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("concs",
                                                                     5,
@@ -3423,9 +3423,9 @@ class CUP$LexParse$actions
       case 35: // series ::= BAR
       {
         final RegExp RESULT = null;
-        final int bleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int bright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object b = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int bleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int bright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object b = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         syntaxError (ErrorMessages.REGEXP_EXPECTED, bleft, bright);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("series",
                                                                     4,
@@ -3439,9 +3439,9 @@ class CUP$LexParse$actions
       case 34: // series ::= concs
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = r;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("series",
                                                                     4,
@@ -3455,13 +3455,13 @@ class CUP$LexParse$actions
       case 33: // series ::= series BAR concs
       {
         RegExp RESULT = null;
-        final int r1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int r1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
+        final int r1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int r1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
         final RegExp r1 = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                            2)).value;
-        final int r2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int r2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r2 = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                            2)).m_aValue;
+        final int r2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int r2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r2 = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         if (!Options.jlex && !Options.legacy_dot && isDotOrNewlinePattern (r1, r2))
         {
@@ -3512,9 +3512,9 @@ class CUP$LexParse$actions
       case 30: // states ::= IDENT COMMA
       {
         final List <Integer> RESULT = null;
-        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object c = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int cleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int cright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object c = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         syntaxError (ErrorMessages.REGEXP_EXPECTED, cleft, cright + 1);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("states",
                                                                     13,
@@ -3529,9 +3529,9 @@ class CUP$LexParse$actions
       case 29: // states ::= IDENT
       {
         List <Integer> RESULT = null;
-        final int idleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int idright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final String id = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int idleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int idright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final String id = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         final List <Integer> list = new ArrayList<> ();
         stateNumber = scanner.states.getNumber (id);
@@ -3555,13 +3555,13 @@ class CUP$LexParse$actions
       case 28: // states ::= IDENT COMMA states
       {
         List <Integer> RESULT = null;
-        final int idleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int idright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
+        final int idleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int idright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
         final String id = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                            2)).value;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final List <Integer> list = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                            2)).m_aValue;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final List <Integer> list = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
 
         stateNumber = scanner.states.getNumber (id);
         if (stateNumber != null)
@@ -3598,10 +3598,10 @@ class CUP$LexParse$actions
       case 26: // statesOPT ::= LESSTHAN states MORETHAN
       {
         List <Integer> RESULT = null;
-        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int listleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int listright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Integer> list = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                              1)).value;
+                                                                                                              1)).m_aValue;
         RESULT = list;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("statesOPT",
                                                                     14,
@@ -3629,9 +3629,9 @@ class CUP$LexParse$actions
       case 24: // actions ::= act
       {
         Action RESULT = null;
-        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = a;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("actions",
                                                                     18,
@@ -3645,9 +3645,9 @@ class CUP$LexParse$actions
       case 23: // act ::= REGEXPEND ACTION
       {
         Action RESULT = null;
-        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = a;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("act",
                                                                     17,
@@ -3662,9 +3662,9 @@ class CUP$LexParse$actions
       case 22: // lookahead ::= LOOKAHEAD series DOLLAR
       {
         RegExp RESULT = null;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp s = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp s = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
         RESULT = new RegExp2 (sym.CONCAT, s, makeNL ());
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("lookahead",
                                                                     9,
@@ -3679,9 +3679,9 @@ class CUP$LexParse$actions
       case 21: // lookahead ::= LOOKAHEAD series
       {
         RegExp RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = r;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("lookahead",
                                                                     9,
@@ -3722,13 +3722,13 @@ class CUP$LexParse$actions
       case 18: // rule ::= statesOPT EOFRULE ACTION
       {
         Integer RESULT = null;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
         final List <Integer> s = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                           2)).value;
-        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                           2)).m_aValue;
+        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = regExps.insert (s, a);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rule",
                                                                     2,
@@ -3743,23 +3743,23 @@ class CUP$LexParse$actions
       case 17: // rule ::= statesOPT hatOPT series lookahead NOACTION
       {
         final Integer RESULT = null;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Integer> s = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                           4)).value;
-        final int bolleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int bolright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+                                                                                                           4)).m_aValue;
+        final int bolleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int bolright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final Boolean bol = (Boolean) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                               3)).value;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).value;
-        final int lleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int lright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp l = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
-        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object a = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                               3)).m_aValue;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_aValue;
+        final int lleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int lright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp l = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
+        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object a = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         syntaxError (ErrorMessages.LOOKAHEAD_NEEDS_ACTION, aleft, aright + 1);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rule",
                                                                     2,
@@ -3774,23 +3774,23 @@ class CUP$LexParse$actions
       case 16: // rule ::= statesOPT hatOPT series lookahead act
       {
         Integer RESULT = null;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Integer> s = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                           4)).value;
-        final int bolleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int bolright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+                                                                                                           4)).m_aValue;
+        final int bolleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int bolright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final Boolean bol = (Boolean) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                               3)).value;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).value;
-        final int lleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int lright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp l = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
-        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                               3)).m_aValue;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_aValue;
+        final int lleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int lright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp l = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
+        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = regExps.insert (rleft, s, r, a, bol, l);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rule",
                                                                     2,
@@ -3805,20 +3805,20 @@ class CUP$LexParse$actions
       case 15: // rule ::= statesOPT hatOPT series actions
       {
         Integer RESULT = null;
-        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int sleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int sright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final List <Integer> s = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                           3)).value;
-        final int bolleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).left;
-        final int bolright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).right;
+                                                                                                           3)).m_aValue;
+        final int bolleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nLeft;
+        final int bolright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 2)).m_nRight;
         final Boolean bol = (Boolean) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                               2)).value;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
-        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).value;
-        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                               2)).m_aValue;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
+        final RegExp r = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_aValue;
+        final int aleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int aright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Action a = (Action) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = regExps.insert (rleft, s, r, a, bol, null);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rule",
                                                                     2,
@@ -3833,9 +3833,9 @@ class CUP$LexParse$actions
       case 14: // rules ::= rule
       {
         List <Integer> RESULT = null;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Integer r = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Integer r = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         RESULT = new ArrayList<> ();
         RESULT.add (r);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rules",
@@ -3850,14 +3850,14 @@ class CUP$LexParse$actions
       case 13: // rules ::= LESSTHAN states MORETHAN LBRACE rules RBRACE
       {
         List <Integer> RESULT = null;
-        final int statesleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int statesright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+        final int statesleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int statesright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Integer> states = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                4)).value;
-        final int rlistleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rlistright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                4)).m_aValue;
+        final int rlistleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rlistright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Integer> rlist = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                               1)).value;
+                                                                                                               1)).m_aValue;
 
         for (final Integer elem : rlist)
         {
@@ -3882,18 +3882,18 @@ class CUP$LexParse$actions
       case 12: // rules ::= rules LESSTHAN states MORETHAN LBRACE rules RBRACE
       {
         List <Integer> RESULT = null;
-        final int rlist1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 6)).left;
-        final int rlist1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 6)).right;
+        final int rlist1left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 6)).m_nLeft;
+        final int rlist1right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 6)).m_nRight;
         final List <Integer> rlist1 = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                6)).value;
-        final int statesleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).left;
-        final int statesright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).right;
+                                                                                                                6)).m_aValue;
+        final int statesleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nLeft;
+        final int statesright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 4)).m_nRight;
         final List <Integer> states = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                4)).value;
-        final int rlist2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rlist2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+                                                                                                                4)).m_aValue;
+        final int rlist2left = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rlist2right = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Integer> rlist2 = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                                1)).value;
+                                                                                                                1)).m_aValue;
 
         for (final Integer elem : rlist2)
         {
@@ -3919,13 +3919,13 @@ class CUP$LexParse$actions
       case 11: // rules ::= rules rule
       {
         List <Integer> RESULT = null;
-        final int rlistleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
-        final int rlistright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).right;
+        final int rlistleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
+        final int rlistright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nRight;
         final List <Integer> rlist = (List <Integer>) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                               1)).value;
-        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Integer r = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+                                                                                                               1)).m_aValue;
+        final int rleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int rright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Integer r = (Integer) ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         rlist.add (r);
         RESULT = rlist;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("rules",
@@ -3941,9 +3941,9 @@ class CUP$LexParse$actions
       case 10: // macro ::= IDENT EQUALS
       {
         final Object RESULT = null;
-        final int eleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).left;
-        final int eright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).right;
-        final Object e = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).value;
+        final int eleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nLeft;
+        final int eright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_nRight;
+        final Object e = ((java_cup.runtime.Symbol) CUP$LexParse$stack.peek ()).m_aValue;
         syntaxError (ErrorMessages.REGEXP_EXPECTED, eleft, eright);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("macro",
                                                                     1,
@@ -3958,15 +3958,15 @@ class CUP$LexParse$actions
       case 9: // macro ::= IDENT EQUALS series REGEXPEND
       {
         final Object RESULT = null;
-        final int nameleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).left;
-        final int nameright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).right;
+        final int nameleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nLeft;
+        final int nameright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 3)).m_nRight;
         final String name = (String) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                              3)).value;
-        final int definitionleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
+                                                                                              3)).m_aValue;
+        final int definitionleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
         final int definitionright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                             1)).right;
+                                                                                             1)).m_nRight;
         final RegExp definition = (RegExp) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                                    1)).value;
+                                                                                                    1)).m_aValue;
         macros.insert (name, definition);
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("macro",
                                                                     1,
@@ -4138,11 +4138,11 @@ class CUP$LexParse$actions
       case 0: // $START ::= specification EOF
       {
         Object RESULT = null;
-        final int start_valleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).left;
+        final int start_valleft = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top - 1)).m_nLeft;
         final int start_valright = ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                            1)).right;
+                                                                                            1)).m_nRight;
         final NFA start_val = (NFA) ((java_cup.runtime.Symbol) CUP$LexParse$stack.elementAt (CUP$LexParse$top -
-                                                                                             1)).value;
+                                                                                             1)).m_aValue;
         RESULT = start_val;
         CUP$LexParse$result = parser.getSymbolFactory ().newSymbol ("$START",
                                                                     0,

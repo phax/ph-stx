@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -46,12 +47,12 @@ import net.sf.joost.stx.ParseContext;
 public final class TemplateFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public TemplateFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("match");
     attrNames.add ("priority");
     attrNames.add ("visibility");
@@ -68,9 +69,9 @@ public final class TemplateFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (parent == null || !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" +
@@ -119,7 +120,14 @@ public final class TemplateFactory extends AbstractFactoryBase
 
     checkAttributes (qName, attrs, attrNames, context);
 
-    return new Instance (qName, parent, context, matchPattern, priority, visibility, isPublic, newScope);
+    return new Instance (qName,
+                         (AbstractGroupBase) parent,
+                         context,
+                         matchPattern,
+                         priority,
+                         visibility,
+                         isPublic,
+                         newScope);
   }
 
   // -----------------------------------------------------------------------
@@ -137,7 +145,7 @@ public final class TemplateFactory extends AbstractFactoryBase
     // Constructor
     //
     protected Instance (final String qName,
-                        final AbstractNodeBase parent,
+                        final AbstractGroupBase parent,
                         final ParseContext context,
                         final AbstractTree match,
                         final double priority,
@@ -165,7 +173,7 @@ public final class TemplateFactory extends AbstractFactoryBase
     public boolean matches (final Context context, final boolean setPosition) throws SAXException
     {
       context.currentInstruction = this;
-      context.currentGroup = parentGroup;
+      context.currentGroup = m_aParentGroup;
       return match.matches (context, context.ancestorStack.size (), setPosition);
     }
 
@@ -178,7 +186,7 @@ public final class TemplateFactory extends AbstractFactoryBase
      */
     public Instance split () throws SAXException
     {
-      if (match.type != AbstractTree.UNION)
+      if (match.m_nType != AbstractTree.UNION)
         return null;
 
       Instance copy = null;
@@ -190,10 +198,10 @@ public final class TemplateFactory extends AbstractFactoryBase
       {
         throw new SAXException ("Can't split " + this, e);
       }
-      copy.match = match.right; // non-union
+      copy.match = match.m_aRight; // non-union
       if (Double.isNaN (copy.priority)) // no priority specified
         copy.priority = copy.match.getPriority ();
-      match = match.left; // may contain another union
+      match = match.m_aLeft; // may contain another union
       if (Double.isNaN (priority)) // no priority specified
         priority = match.getPriority ();
       return copy;
@@ -226,7 +234,7 @@ public final class TemplateFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

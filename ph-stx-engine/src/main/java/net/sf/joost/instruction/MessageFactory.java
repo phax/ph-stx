@@ -83,9 +83,9 @@ public final class MessageFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
     final AbstractTree terminateAVT = parseAVT (attrs.getValue ("terminate"), context);
@@ -158,7 +158,7 @@ public final class MessageFactory extends AbstractFactoryBase
             // Note: encoding parameter is irrelevant here
             final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (writer,
                                                                                CSTX.DEFAULT_ENCODING,
-                                                                               context.currentProcessor.outputProperties);
+                                                                               context.currentProcessor.m_aOutputProperties);
             se.setOmitXmlDeclaration (true);
             emitter = se;
           }
@@ -167,17 +167,17 @@ public final class MessageFactory extends AbstractFactoryBase
             {
               // create global message emitter using stderr
               final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (System.err,
-                                                                                 context.currentProcessor.outputProperties);
+                                                                                 context.currentProcessor.m_aOutputProperties);
               se.setOmitXmlDeclaration (true);
               context.messageEmitter = emitter = se;
             }
             else
-              // use global message emitter
-              emitter = context.messageEmitter;
+                                                // use global message emitter
+                                                emitter = context.messageEmitter;
         }
         catch (final java.io.IOException ex)
         {
-          context.errorHandler.fatalError (ex.toString (), publicId, systemId, lineNo, colNo, ex);
+          context.m_aErrorHandler.fatalError (ex.toString (), m_sPublicID, m_sSystemID, lineNo, colNo, ex);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
       }
@@ -224,7 +224,7 @@ public final class MessageFactory extends AbstractFactoryBase
       if (log != null)
       {
         // include locator info for logging
-        final StringBuffer sb = new StringBuffer (systemId).append (':')
+        final StringBuffer sb = new StringBuffer (m_sSystemID).append (':')
                                                            .append (lineNo)
                                                            .append (':')
                                                            .append (colNo)
@@ -260,22 +260,22 @@ public final class MessageFactory extends AbstractFactoryBase
       final String terminateValue = terminate.evaluate (context, this).getString ();
       if (terminateValue.equals ("yes"))
         throw new SAXException (new TransformerException ("Transformation terminated",
-                                                          new SourceLocatorImpl (publicId, systemId, lineNo, colNo)));
+                                                          new SourceLocatorImpl (m_sPublicID, m_sSystemID, lineNo, colNo)));
 
       if (!terminateValue.equals ("no"))
-        context.errorHandler.fatalError ("Attribute 'terminate' of '" +
-                                         qName +
+        context.m_aErrorHandler.fatalError ("Attribute 'terminate' of '" +
+                                         m_sQName +
                                          "' must be 'yes' or 'no', found '" +
                                          terminateValue +
                                          "'",
-                                         publicId,
-                                         systemId,
+                                         m_sPublicID,
+                                         m_sSystemID,
                                          lineNo,
                                          colNo);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

@@ -71,9 +71,9 @@ public final class Translate implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    final String s1 = args.left.left.evaluate (context, top).getStringValue ();
-    final String s2 = args.left.right.evaluate (context, top).getStringValue ();
-    final String s3 = args.right.evaluate (context, top).getStringValue ();
+    final String s1 = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
+    final String s2 = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
+    final String s3 = args.m_aRight.evaluate (context, top).getStringValue ();
     final StringBuffer result = new StringBuffer ();
     final int s1len = s1.length ();
     final int s3len = s3.length ();

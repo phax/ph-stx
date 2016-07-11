@@ -82,12 +82,12 @@ public final class Name implements IInstance
                                v +
                                ")");
 
-    switch (event.type)
+    switch (event.m_nType)
     {
       case SAXEvent.ELEMENT:
       case SAXEvent.ATTRIBUTE:
       case SAXEvent.PI:
-        return new Value (event.qName);
+        return new Value (event.m_sQName);
       default:
         return Value.VAL_EMPTY_STRING;
     }

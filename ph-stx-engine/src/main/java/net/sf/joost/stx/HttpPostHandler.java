@@ -56,21 +56,21 @@ import net.sf.joost.emitter.XmlEmitter;
 public class HttpPostHandler extends XmlEmitter implements TransformerHandler
 {
   /** event sink for this transformer */
-  private SAXResult saxResult;
+  private SAXResult m_aSAXResult;
 
   /** the character buffer */
-  private final StringBuffer buffer;
+  private final StringBuffer m_aBuffer;
 
   /** the target URL for the POST request */
-  private final String targetURL;
+  private final String m_sTargetURL;
 
   // Constructor
   public HttpPostHandler (final String targetURL)
   {
     super (null, CSTX.DEFAULT_ENCODING, null); // postpone writer initialization
-    writer = new StringWriter (); // catch up here
-    buffer = ((StringWriter) writer).getBuffer ();
-    this.targetURL = targetURL;
+    m_aWriter = new StringWriter (); // catch up here
+    m_aBuffer = ((StringWriter) m_aWriter).getBuffer ();
+    this.m_sTargetURL = targetURL;
   }
 
   // ---------------------------------------------------------------------
@@ -107,14 +107,14 @@ public class HttpPostHandler extends XmlEmitter implements TransformerHandler
   {
     super.endDocument ();
 
-    if (saxResult == null) // Shouldn't happen
+    if (m_aSAXResult == null) // Shouldn't happen
       throw new SAXException ("No result set");
 
     HttpURLConnection conn = null;
     try
     {
       // create HTTP connection
-      final URL url = new URL (targetURL);
+      final URL url = new URL (m_sTargetURL);
       // HttpURLConnection
       conn = (HttpURLConnection) url.openConnection ();
       conn.setRequestMethod ("POST");
@@ -125,14 +125,14 @@ public class HttpPostHandler extends XmlEmitter implements TransformerHandler
 
       try (final PrintStream ps = new PrintStream (conn.getOutputStream (), false, "UTF-8"))
       {
-        ps.print (buffer.toString ());
+        ps.print (m_aBuffer.toString ());
       }
 
       final XMLReader parser = Processor.createXMLReader ();
-      parser.setContentHandler (saxResult.getHandler ());
+      parser.setContentHandler (m_aSAXResult.getHandler ());
       try
       {
-        parser.setProperty ("http://xml.org/sax/properties/lexical-handler", saxResult.getLexicalHandler ());
+        parser.setProperty ("http://xml.org/sax/properties/lexical-handler", m_aSAXResult.getLexicalHandler ());
       }
       catch (final SAXException ex)
       {}
@@ -181,7 +181,7 @@ public class HttpPostHandler extends XmlEmitter implements TransformerHandler
   public void setResult (final Result result)
   {
     if (result instanceof SAXResult)
-      saxResult = (SAXResult) result;
+      m_aSAXResult = (SAXResult) result;
     else
     {
       // this will not happen in Joost

@@ -65,9 +65,9 @@ public final class WhileFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree testExpr = parseRequiredExpr (qName, attrs, "test", context);
 
@@ -78,14 +78,17 @@ public final class WhileFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>while</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private AbstractTree test;
+    private AbstractTree m_aTest;
     private AbstractInstruction contents, successor;
 
     // Constructor
-    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree test)
+    protected Instance (final String qName,
+                        final AbstractNodeBase parent,
+                        final ParseContext context,
+                        final AbstractTree test)
     {
       super (qName, parent, context, true);
-      this.test = test;
+      this.m_aTest = test;
     }
 
     @Override
@@ -96,8 +99,8 @@ public final class WhileFactory extends AbstractFactoryBase
 
       mayDropEnd ();
       contents = next;
-      successor = nodeEnd.next;
-      nodeEnd.next = this; // loop
+      successor = m_aNodeEnd.next;
+      m_aNodeEnd.next = this; // loop
       return false; // done
     }
 
@@ -108,7 +111,7 @@ public final class WhileFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (test.evaluate (context, this).getBooleanValue ())
+      if (m_aTest.evaluate (context, this).getBooleanValue ())
       {
         super.process (context);
         next = contents;
@@ -119,7 +122,7 @@ public final class WhileFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
@@ -127,9 +130,8 @@ public final class WhileFactory extends AbstractFactoryBase
         theCopy.contents = contents.deepCopy (copies);
       if (successor != null)
         theCopy.successor = successor.deepCopy (copies);
-      if (test != null)
-        theCopy.test = test.deepCopy (copies);
+      if (m_aTest != null)
+        theCopy.m_aTest = m_aTest.deepCopy (copies);
     }
-
   }
 }

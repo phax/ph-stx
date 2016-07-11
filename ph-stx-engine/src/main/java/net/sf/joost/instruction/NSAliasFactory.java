@@ -36,7 +36,7 @@ import net.sf.joost.stx.ParseContext;
 
 /**
  * Factory for <code>namespace-alias</code> elements
- * 
+ *
  * @version $Revision: 2.6 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
@@ -44,12 +44,12 @@ import net.sf.joost.stx.ParseContext;
 public final class NSAliasFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public NSAliasFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("sheet-prefix");
     attrNames.add ("result-prefix");
   }
@@ -64,13 +64,13 @@ public final class NSAliasFactory extends AbstractFactoryBase
   /** Returns an instance of {@link Instance} */
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXException
   {
     // check parent
     if (parent != null && !(parent instanceof TransformFactory.Instance))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", context.locator);
+      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.m_sQName + "'", context.locator);
 
     String fromPrefix = getRequiredAttribute (qName, attrs, "sheet-prefix", context);
     // check value syntax
@@ -84,7 +84,7 @@ public final class NSAliasFactory extends AbstractFactoryBase
     if (fromPrefix.equals ("#default"))
       fromPrefix = "";
     // declared namespace?
-    Object fromURI = context.nsSet.get (fromPrefix);
+    String fromURI = context.nsSet.get (fromPrefix);
     if (fromURI == null)
     {
       if (fromPrefix != "")
@@ -106,7 +106,7 @@ public final class NSAliasFactory extends AbstractFactoryBase
                                    context.locator);
     if (toPrefix.equals ("#default"))
       toPrefix = "";
-    Object toURI = context.nsSet.get (toPrefix);
+    String toURI = context.nsSet.get (toPrefix);
     if (toURI == null)
     {
       if (toPrefix != "")
@@ -119,8 +119,8 @@ public final class NSAliasFactory extends AbstractFactoryBase
     }
 
     // alias already defined?
-    final Hashtable namespaceAliases = ((TransformFactory.Instance) parent).namespaceAliases;
-    final Object alias = namespaceAliases.get (fromURI);
+    final Hashtable <String, String> namespaceAliases = ((TransformFactory.Instance) parent).namespaceAliases;
+    final String alias = namespaceAliases.get (fromURI);
     if (alias != null && !alias.equals (toURI))
     {
       throw new SAXParseException ("Namespace alias for prefix '" +
@@ -161,7 +161,7 @@ public final class NSAliasFactory extends AbstractFactoryBase
     @Override
     public short process (final Context c) throws SAXException
     {
-      throw new SAXParseException ("process called for " + qName, publicId, systemId, lineNo, colNo);
+      throw new SAXParseException ("process called for " + m_sQName, m_sPublicID, m_sSystemID, lineNo, colNo);
     }
   }
 }

@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,14 +51,13 @@ import net.sf.joost.stx.SAXEvent;
 
 public final class CopyFactory extends AbstractFactoryBase
 {
-  /** allowed attributes for this element. */
-  private final HashSet <String> attrNames;
+  private static final Logger log = LoggerFactory.getLogger (CopyFactory.class);
 
   /** empty attribute list (needed as parameter for startElement) */
   private static Attributes emptyAttList = new AttributesImpl ();
 
-  // Logger initialization
-  private static Logger log = LoggerFactory.getLogger (CopyFactory.class);
+  /** allowed attributes for this element. */
+  private final Set <String> attrNames;
 
   // Constructor
   public CopyFactory ()
@@ -92,10 +92,10 @@ public final class CopyFactory extends AbstractFactoryBase
      * the pattern in the <code>attributes</code> attribute, <code>null</code>
      * if this attribute is missing
      */
-    private AbstractTree attPattern;
+    private AbstractTree m_aAttPattern;
 
     /**
-     * <code>true</code> if {@link #attPattern} is a wildcard (<code>@*</code>)
+     * <code>true</code> if {@link #m_aAttPattern} is a wildcard (<code>@*</code>)
      */
     private boolean attrWildcard = false;
 
@@ -112,8 +112,8 @@ public final class CopyFactory extends AbstractFactoryBase
                      final AbstractTree attPattern)
     {
       super (qName, parent, context, true);
-      this.attPattern = attPattern;
-      if (attPattern != null && attPattern.type == AbstractTree.ATTR_WILDCARD)
+      this.m_aAttPattern = attPattern;
+      if (attPattern != null && attPattern.m_nType == AbstractTree.ATTR_WILDCARD)
         attrWildcard = true;
     }
 
@@ -125,7 +125,7 @@ public final class CopyFactory extends AbstractFactoryBase
         return true; // successor not available yet
 
       contents = next;
-      successor = nodeEnd.next;
+      successor = m_aNodeEnd.next;
       return false;
     }
 
@@ -136,7 +136,7 @@ public final class CopyFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       final SAXEvent event = context.ancestorStack.peek ();
-      switch (event.type)
+      switch (event.m_nType)
       {
         case SAXEvent.ROOT:
           super.process (context);
@@ -145,20 +145,29 @@ public final class CopyFactory extends AbstractFactoryBase
         case SAXEvent.ELEMENT:
         {
           super.process (context);
-          final Attributes attList = attrWildcard ? event.attrs : emptyAttList;
-          context.emitter.startElement (event.uri, event.lName, event.qName, attList, event.namespaces, this);
-          if (attPattern != null && !attrWildcard)
+          final Attributes attList = attrWildcard ? event.m_aAttrs : emptyAttList;
+          context.emitter.startElement (event.m_sURI,
+                                        event.m_sLocalName,
+                                        event.m_sQName,
+                                        attList,
+                                        event.m_aNamespaces,
+                                        this);
+          if (m_aAttPattern != null && !attrWildcard)
           {
             // attribute pattern present, but no wildcard (@*)
-            final int attrNum = event.attrs.getLength ();
+            final int attrNum = event.m_aAttrs.getLength ();
             for (int i = 0; i < attrNum; i++)
             {
               // put attributes on the event stack for matching
-              context.ancestorStack.push (SAXEvent.newAttribute (event.attrs, i));
-              if (attPattern.matches (context, context.ancestorStack.size (), false))
+              context.ancestorStack.push (SAXEvent.newAttribute (event.m_aAttrs, i));
+              if (m_aAttPattern.matches (context, context.ancestorStack.size (), false))
               {
                 final SAXEvent attrEvent = context.ancestorStack.peek ();
-                context.emitter.addAttribute (attrEvent.uri, attrEvent.qName, attrEvent.lName, attrEvent.value, this);
+                context.emitter.addAttribute (attrEvent.m_sURI,
+                                              attrEvent.m_sQName,
+                                              attrEvent.m_sLocalName,
+                                              attrEvent.m_sValue,
+                                              this);
               }
               // remove attribute
               context.ancestorStack.pop ();
@@ -168,30 +177,30 @@ public final class CopyFactory extends AbstractFactoryBase
           break;
         }
         case SAXEvent.TEXT:
-          context.emitter.characters (event.value.toCharArray (), 0, event.value.length (), this);
+          context.emitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
           next = successor;
           break;
         case SAXEvent.CDATA:
           context.emitter.startCDATA (this);
-          context.emitter.characters (event.value.toCharArray (), 0, event.value.length (), this);
+          context.emitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
           context.emitter.endCDATA ();
           next = successor;
           break;
         case SAXEvent.PI:
-          context.emitter.processingInstruction (event.qName, event.value, this);
+          context.emitter.processingInstruction (event.m_sQName, event.m_sValue, this);
           next = successor;
           break;
         case SAXEvent.COMMENT:
-          context.emitter.comment (event.value.toCharArray (), 0, event.value.length (), this);
+          context.emitter.comment (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
           next = successor;
           break;
         case SAXEvent.ATTRIBUTE:
-          context.emitter.addAttribute (event.uri, event.qName, event.lName, event.value, this);
+          context.emitter.addAttribute (event.m_sURI, event.m_sQName, event.m_sLocalName, event.m_sValue, this);
           next = successor;
           break;
         default:
-          log.error ("Unknown SAXEvent type " + event.type);
-          throw new SAXParseException ("Unknown SAXEvent type", publicId, systemId, lineNo, colNo);
+          log.error ("Unknown SAXEvent type " + event.m_nType);
+          throw new SAXParseException ("Unknown SAXEvent type", m_sPublicID, m_sSystemID, lineNo, colNo);
       }
       return CSTX.PR_CONTINUE;
     }
@@ -203,13 +212,13 @@ public final class CopyFactory extends AbstractFactoryBase
     public short processEnd (final Context context) throws SAXException
     {
       final SAXEvent event = context.ancestorStack.peek ();
-      if (event.type == SAXEvent.ELEMENT)
-        context.emitter.endElement (event.uri, event.lName, event.qName, this);
+      if (event.m_nType == SAXEvent.ELEMENT)
+        context.emitter.endElement (event.m_sURI, event.m_sLocalName, event.m_sQName, this);
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
@@ -217,8 +226,8 @@ public final class CopyFactory extends AbstractFactoryBase
         theCopy.contents = contents.deepCopy (copies);
       if (successor != null)
         theCopy.successor = successor.deepCopy (copies);
-      if (attPattern != null)
-        theCopy.attPattern = attPattern.deepCopy (copies);
+      if (m_aAttPattern != null)
+        theCopy.m_aAttPattern = m_aAttPattern.deepCopy (copies);
     }
   }
 }

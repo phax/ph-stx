@@ -120,7 +120,7 @@ public class TextFactory extends AbstractFactoryBase
         // use our StringEmitter
         buffer = new StringBuffer ();
         stxEmitter = new StringEmitter (buffer, markup == NO_MARKUP ? "('" +
-                                                                      qName +
+                                                                      m_sQName +
                                                                       "' with the 'markup' attribute set to '" +
                                                                       MARKUP_VALUES[NO_MARKUP] +
                                                                       "' started in line " +
@@ -155,7 +155,7 @@ public class TextFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

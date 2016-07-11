@@ -50,9 +50,9 @@ public final class UnionTree extends AbstractTree
     // This branch should be encountered only for patterns at other
     // places (for example in <stx:copy attributes="pattern" /> or
     // <stx:process-siblings while="pattern" />
-    if (left.matches (context, top, false))
+    if (m_aLeft.matches (context, top, false))
       return true;
-    return right.matches (context, top, false);
+    return m_aRight.matches (context, top, false);
   }
 
   @Override

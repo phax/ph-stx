@@ -36,17 +36,18 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of AttrLocalWildcardTree represent attribute tests nodes of the form
  * '@ns:*' in the syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.3 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
 public final class AttrLocalWildcardTree extends AbstractTree
 {
-  private final String prefix; // needed only in the error message
+  // needed only in the error message
+  private final String m_sPrefix;
 
   /**
    * Constructs an AttrLocalWildcardTree object with a given namespace prefix
-   * 
+   *
    * @param prefix
    *        the namespace prefix
    * @param context
@@ -55,9 +56,9 @@ public final class AttrLocalWildcardTree extends AbstractTree
   public AttrLocalWildcardTree (final String prefix, final ParseContext context) throws SAXParseException
   {
     super (ATTR_LOCAL_WILDCARD);
-    this.prefix = prefix;
-    uri = (String) context.nsSet.get (prefix);
-    if (uri == null)
+    this.m_sPrefix = prefix;
+    m_sURI = context.nsSet.get (prefix);
+    if (m_sURI == null)
       throw new SAXParseException ("Undeclared prefix '" + prefix + "'", context.locator);
   }
 
@@ -67,13 +68,13 @@ public final class AttrLocalWildcardTree extends AbstractTree
     // an attribute requires at least two ancestors
     if (top < 3)
       return false;
-    final SAXEvent e = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-    if (e.type != SAXEvent.ATTRIBUTE)
+    final SAXEvent e = context.ancestorStack.elementAt (top - 1);
+    if (e.m_nType != SAXEvent.ATTRIBUTE)
       return false;
     if (setPosition)
       context.position = 1; // position for attributes is undefined
 
-    if (uri.equals (e.uri))
+    if (m_sURI.equals (e.m_sURI))
       return true;
     return false;
   }
@@ -83,15 +84,15 @@ public final class AttrLocalWildcardTree extends AbstractTree
   {
     Value v1;
     // determine effective parent node sequence (-> v1)
-    if (left != null)
+    if (m_aLeft != null)
     { // preceding path
-      v1 = left.evaluate (context, top);
+      v1 = m_aLeft.evaluate (context, top);
       if (v1.type == Value.EMPTY)
         return v1;
     }
     else
       if (top > 0) // use current node
-        v1 = new Value ((SAXEvent) context.ancestorStack.elementAt (top - 1));
+        v1 = new Value (context.ancestorStack.elementAt (top - 1));
       else
         return Value.VAL_EMPTY;
 
@@ -102,29 +103,29 @@ public final class AttrLocalWildcardTree extends AbstractTree
       final SAXEvent e = v1.getNode ();
       if (e == null)
       {
-        context.errorHandler.error ("Current item for evaluating '@" +
-                                    prefix +
+        context.m_aErrorHandler.error ("Current item for evaluating '@" +
+                                    m_sPrefix +
                                     ":*' is not a node (got " +
                                     v1 +
                                     ")",
-                                    context.currentInstruction.publicId,
-                                    context.currentInstruction.systemId,
+                                    context.currentInstruction.m_sPublicID,
+                                    context.currentInstruction.m_sSystemID,
                                     context.currentInstruction.lineNo,
                                     context.currentInstruction.colNo);
         // if the errorHandler decides to continue ...
         return Value.VAL_EMPTY;
       }
 
-      final int len = e.attrs.getLength ();
+      final int len = e.m_aAttrs.getLength ();
       // iterate through attribute list
       for (int i = 0; i < len; i++)
       {
-        if (uri.equals (e.attrs.getURI (i)))
+        if (m_sURI.equals (e.m_aAttrs.getURI (i)))
         {
-          final Value v2 = new Value (SAXEvent.newAttribute (uri,
-                                                             e.attrs.getLocalName (i),
-                                                             e.attrs.getQName (i),
-                                                             e.attrs.getValue (i)));
+          final Value v2 = new Value (SAXEvent.newAttribute (m_sURI,
+                                                             e.m_aAttrs.getLocalName (i),
+                                                             e.m_aAttrs.getQName (i),
+                                                             e.m_aAttrs.getValue (i)));
           if (last != null)
             last.next = v2;
           else
@@ -137,8 +138,7 @@ public final class AttrLocalWildcardTree extends AbstractTree
 
     if (ret != null)
       return ret;
-    else
-      return Value.VAL_EMPTY;
+    return Value.VAL_EMPTY;
   }
 
   @Override

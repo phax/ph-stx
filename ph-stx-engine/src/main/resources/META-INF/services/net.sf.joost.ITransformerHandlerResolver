@@ -1,3 +1,3 @@
-net.sf.joost.plugins.saxfilter.THResolver
-net.sf.joost.plugins.traxfilter.THResolver
-net.sf.joost.plugins.httppostfilter.THResolver
+net.sf.joost.plugins.saxfilter.THSAXResolver
+net.sf.joost.plugins.traxfilter.THTrAXResolver
+net.sf.joost.plugins.httppostfilter.THHttpPostResolver

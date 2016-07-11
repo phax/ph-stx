@@ -53,9 +53,9 @@ public final class ListTree extends AbstractTree
   public Value evaluate (final Context context, final int top) throws SAXException
   {
     // this won't happen
-    context.errorHandler.fatalError ("'evaluate()' called for a LIST node",
-                                     context.currentInstruction.publicId,
-                                     context.currentInstruction.systemId,
+    context.m_aErrorHandler.fatalError ("'evaluate()' called for a LIST node",
+                                     context.currentInstruction.m_sPublicID,
+                                     context.currentInstruction.m_sSystemID,
                                      context.currentInstruction.lineNo,
                                      context.currentInstruction.colNo);
     return Value.VAL_EMPTY;

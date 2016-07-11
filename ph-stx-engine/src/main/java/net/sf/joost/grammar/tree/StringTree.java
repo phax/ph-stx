@@ -44,7 +44,7 @@ public final class StringTree extends AbstractTree
   public StringTree (final String s)
   {
     super (STRING, s);
-    theValue = new Value ((String) value);
+    theValue = new Value ((String) m_aValue);
   }
 
   @Override

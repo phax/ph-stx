@@ -33,7 +33,7 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of AddTree represent arithmetic plus nodes in the syntax tree of a
  * pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.1 $ $Date: 2004/09/29 05:59:50 $
  * @author Oliver Becker
  */
@@ -47,18 +47,16 @@ public final class AddTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    final Value v2 = right.evaluate (context, top);
+    final Value v2 = m_aRight.evaluate (context, top);
     if (v2.type == Value.EMPTY)
       return v2;
 
-    if (left == null) // positive sign
+    if (m_aLeft == null) // positive sign
       return new Value (v2.getNumberValue ());
-    else
-    {
-      final Value v1 = left.evaluate (context, top);
-      if (v1.type == Value.EMPTY)
-        return v1;
-      return new Value (v1.getNumberValue () + v2.getNumberValue ());
-    }
+
+    final Value v1 = m_aLeft.evaluate (context, top);
+    if (v1.type == Value.EMPTY)
+      return v1;
+    return new Value (v1.getNumberValue () + v2.getNumberValue ());
   }
 }

@@ -55,29 +55,25 @@ import net.sf.joost.trax.CTrAX;
 public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
 {
   // Logger initialization
-  private static Logger log = LoggerFactory.getLogger (AbstractStreamEmitter.class);
+  private static final Logger log = LoggerFactory.getLogger (AbstractStreamEmitter.class);
 
   /** Joost's HTML extension output method */
-  private static String HTML_METHOD = "{" + CSTX.JOOST_EXT_NS + "}html";
+  private static final String HTML_METHOD = "{" + CSTX.JOOST_EXT_NS + "}html";
 
   /** Writer for the resulting text */
-  protected Writer writer;
+  protected Writer m_aWriter;
 
   /** The used output encoding */
-  protected String encoding;
+  protected String m_sEncoding;
 
-  /** Encoder for the chosen {@link #encoding} */
-  protected CharsetEncoder charsetEncoder;
-
-  //
-  // Base constructor
-  //
+  /** Encoder for the chosen {@link #m_sEncoding} */
+  protected CharsetEncoder m_aCharsetEncoder;
 
   public AbstractStreamEmitter (final Writer writer, final String encoding)
   {
-    this.writer = writer;
-    this.encoding = encoding;
-    charsetEncoder = Charset.forName (encoding).newEncoder ();
+    this.m_aWriter = writer;
+    this.m_sEncoding = encoding;
+    m_aCharsetEncoder = Charset.forName (encoding).newEncoder ();
   }
 
   //
@@ -245,7 +241,7 @@ public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
    *
    * @param chars
    *        the character array
-   * @param index
+   * @param nIndex
    *        the current index
    * @param sb
    *        the buffer to append the encoded character
@@ -253,9 +249,10 @@ public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
    * @throws SAXException
    *         when there's no low surrogate
    */
-  protected int encodeCharacters (final char [] chars, int index, final StringBuffer sb) throws SAXException
+  protected int encodeCharacters (final char [] chars, final int nIndex, final StringBuffer sb) throws SAXException
   {
     // check surrogate pairs
+    int index = nIndex;
     if (chars[index] >= '\uD800' && chars[index] <= '\uDBFF')
     {
       // found a high surrogate
@@ -273,7 +270,7 @@ public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
     }
     // else: single character
     else
-      if (charsetEncoder.canEncode (chars[index]))
+      if (m_aCharsetEncoder.canEncode (chars[index]))
       {
         sb.append (chars[index]);
       }

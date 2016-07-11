@@ -35,7 +35,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Objects of LocalWildcardTree represent element name test "prefix:*" nodes in
  * the syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.3 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
@@ -43,7 +43,7 @@ public final class LocalWildcardTree extends AbstractTree
 {
   /**
    * Constructs a LocalWildcardTree object with a given namespace prefix.
-   * 
+   *
    * @param prefix
    *        the namespace prefix of the name test
    * @param context
@@ -53,8 +53,8 @@ public final class LocalWildcardTree extends AbstractTree
   {
     super (LOCAL_WILDCARD);
 
-    uri = (String) context.nsSet.get (prefix);
-    if (uri == null)
+    m_sURI = context.nsSet.get (prefix);
+    if (m_sURI == null)
       throw new SAXParseException ("Undeclared prefix '" + prefix + "'", context.locator);
   }
 
@@ -64,12 +64,12 @@ public final class LocalWildcardTree extends AbstractTree
     if (top < 2)
       return false;
 
-    final SAXEvent e = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-    if (e.type != SAXEvent.ELEMENT || !uri.equals (e.uri))
+    final SAXEvent e = context.ancestorStack.elementAt (top - 1);
+    if (e.m_nType != SAXEvent.ELEMENT || !m_sURI.equals (e.m_sURI))
       return false;
 
     if (setPosition)
-      context.position = ((SAXEvent) context.ancestorStack.elementAt (top - 2)).getPositionOf (uri, "*");
+      context.position = context.ancestorStack.elementAt (top - 2).getPositionOf (m_sURI, "*");
 
     return true;
   }

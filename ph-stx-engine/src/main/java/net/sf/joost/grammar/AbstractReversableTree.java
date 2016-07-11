@@ -26,11 +26,11 @@ package net.sf.joost.grammar;
 
 /**
  * A ReversableTree object can be reconstructed by reversing its associativity.
- * 
+ *
  * @version $Revision: 2.1 $ $Date: 2004/09/29 05:59:50 $
  * @author Oliver Becker
  */
-public abstract  class AbstractReversableTree extends AbstractTree
+public abstract class AbstractReversableTree extends AbstractTree
 {
   public AbstractReversableTree (final int type)
   {
@@ -45,22 +45,22 @@ public abstract  class AbstractReversableTree extends AbstractTree
   /**
    * Transforms a location path by reversing the associativity of the path
    * operators <code>/</code> and <code>//</code>
-   * 
+   *
    * @return the new root
    */
   @Override
   public AbstractTree reverseAssociativity ()
   {
     AbstractTree newRoot;
-    if (left != null)
+    if (m_aLeft != null)
     {
-      newRoot = left.reverseAssociativity ();
-      left.right = this;
+      newRoot = m_aLeft.reverseAssociativity ();
+      m_aLeft.m_aRight = this;
     }
     else
       newRoot = this;
-    left = right;
-    right = null;
+    m_aLeft = m_aRight;
+    m_aRight = null;
     return newRoot;
   }
 }

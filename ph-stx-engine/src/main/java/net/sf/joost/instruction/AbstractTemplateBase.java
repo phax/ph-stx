@@ -49,43 +49,43 @@ public abstract class AbstractTemplateBase extends AbstractNodeBase
   protected static final String [] VISIBILITY_VALUES = { "local", "group", "global" };
 
   /** The visibility of this template */
-  public int visibility;
+  public final int m_nVisibility;
 
   /** Whether this template is public */
-  public boolean isPublic;
+  public final boolean m_bIsPublic;
 
   /** Does this template establish a new scope for group variables? */
-  private final boolean newScope;
+  private final boolean m_bNewScope;
 
   /** The parent of this template */
-  public AbstractGroupBase parentGroup;
+  public AbstractGroupBase m_aParentGroup;
 
   //
   // Constructor
   //
 
   protected AbstractTemplateBase (final String qName,
-                                  final AbstractNodeBase parent,
+                                  final AbstractGroupBase parent,
                                   final ParseContext context,
                                   final int visibility,
                                   final boolean isPublic,
                                   final boolean newScope)
   {
     super (qName, parent, context, true);
-    parentGroup = (AbstractGroupBase) parent;
-    this.visibility = visibility;
-    this.isPublic = isPublic;
-    this.newScope = newScope;
+    m_aParentGroup = parent;
+    this.m_nVisibility = visibility;
+    this.m_bIsPublic = isPublic;
+    this.m_bNewScope = newScope;
   }
 
   @Override
   public short process (final Context context) throws SAXException
   {
-    context.currentGroup = parentGroup;
-    if (newScope)
+    context.currentGroup = m_aParentGroup;
+    if (m_bNewScope)
     {
       // initialize group variables
-      parentGroup.enterRecursionLevel (context);
+      m_aParentGroup.enterRecursionLevel (context);
     }
     return super.process (context);
   }
@@ -93,18 +93,18 @@ public abstract class AbstractTemplateBase extends AbstractNodeBase
   @Override
   public short processEnd (final Context context) throws SAXException
   {
-    if (newScope)
-      parentGroup.exitRecursionLevel (context);
+    if (m_bNewScope)
+      m_aParentGroup.exitRecursionLevel (context);
     return super.processEnd (context);
   }
 
   @Override
-  protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+  protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
   {
     super.onDeepCopy (copy, copies);
     final AbstractTemplateBase theCopy = (AbstractTemplateBase) copy;
-    if (parentGroup != null)
-      theCopy.parentGroup = (AbstractGroupBase) parentGroup.deepCopy (copies);
+    if (m_aParentGroup != null)
+      theCopy.m_aParentGroup = (AbstractGroupBase) m_aParentGroup.deepCopy (copies);
   }
 
 }

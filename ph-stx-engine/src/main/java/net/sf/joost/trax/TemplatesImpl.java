@@ -60,12 +60,12 @@ public class TemplatesImpl implements Templates
    * Holding a reference on a <code>TransformerFactoryImpl</code> should be
    * visible for {@link TrAXFilter TrAXFilter}
    */
-  protected TransformerFactoryImpl factory = null;
+  protected TransformerFactoryImpl m_aFactory;
 
   /**
    * Holding a reference on the Joost-STX-Processor <code>Processor</code>
    */
-  private Processor processor = null;
+  private Processor m_aProcessor;
 
   /**
    * Synch object to guard against setting values from the TrAX interface or
@@ -85,7 +85,7 @@ public class TemplatesImpl implements Templates
 
     if (CSTX.DEBUG)
       log.debug ("calling constructor with existing Parser");
-    this.factory = factory;
+    this.m_aFactory = factory;
     try
     {
       // configure the template
@@ -117,7 +117,7 @@ public class TemplatesImpl implements Templates
 
     if (CSTX.DEBUG)
       log.debug ("calling constructor with SystemId " + isource.getSystemId ());
-    this.factory = factory;
+    this.m_aFactory = factory;
     try
     {
       // configure template
@@ -125,7 +125,7 @@ public class TemplatesImpl implements Templates
     }
     catch (final TransformerConfigurationException tE)
     {
-      factory.defaultErrorListener.fatalError (tE);
+      factory.m_aDefaultErrorListener.fatalError (tE);
     }
   }
 
@@ -146,19 +146,19 @@ public class TemplatesImpl implements Templates
     try
     {
       // check if transformerfactory is in debug mode
-      final boolean debugmode = ((Boolean) this.factory.getAttribute (CTrAX.DEBUG_FEATURE)).booleanValue ();
+      final boolean debugmode = ((Boolean) this.m_aFactory.getAttribute (CTrAX.DEBUG_FEATURE)).booleanValue ();
 
       if (debugmode)
       {
         log.info ("init transformer in debug mode");
-        processor = new DebugProcessor (stxParser);
+        m_aProcessor = new DebugProcessor (stxParser);
       }
       else
       {
-        processor = new Processor (stxParser);
+        m_aProcessor = new Processor (stxParser);
       }
-      processor.setTransformerHandlerResolver (factory.thResolver);
-      processor.setOutputURIResolver (factory.outputUriResolver);
+      m_aProcessor.setTransformerHandlerResolver (m_aFactory.m_aTHResolver);
+      m_aProcessor.setOutputURIResolver (m_aFactory.m_aOutputUriResolver);
     }
     catch (final org.xml.sax.SAXException sE)
     {
@@ -196,25 +196,25 @@ public class TemplatesImpl implements Templates
        * {@link TransformerFactoryImpl#getErrorListener()} if available.
        */
       // check if transformerfactory is in debug mode
-      final boolean debugmode = ((Boolean) this.factory.getAttribute (CTrAX.DEBUG_FEATURE)).booleanValue ();
+      final boolean debugmode = ((Boolean) this.m_aFactory.getAttribute (CTrAX.DEBUG_FEATURE)).booleanValue ();
 
       final ParseContext pContext = new ParseContext ();
-      pContext.allowExternalFunctions = factory.allowExternalFunctions;
-      pContext.setErrorListener (factory.getErrorListener ());
-      pContext.uriResolver = factory.getURIResolver ();
+      pContext.allowExternalFunctions = m_aFactory.m_bAllowExternalFunctions;
+      pContext.setErrorListener (m_aFactory.getErrorListener ());
+      pContext.uriResolver = m_aFactory.getURIResolver ();
       if (debugmode)
       {
         if (CSTX.DEBUG)
           log.info ("init transformer in debug mode");
-        pContext.parserListener = factory.getParserListenerMgr ();
-        processor = new DebugProcessor (reader, isource, pContext, factory.getMessageEmitter ());
+        pContext.parserListener = m_aFactory.getParserListenerMgr ();
+        m_aProcessor = new DebugProcessor (reader, isource, pContext, m_aFactory.getMessageEmitter ());
       }
       else
       {
-        processor = new Processor (reader, isource, pContext);
+        m_aProcessor = new Processor (reader, isource, pContext);
       }
-      processor.setTransformerHandlerResolver (factory.thResolver);
-      processor.setOutputURIResolver (factory.outputUriResolver);
+      m_aProcessor.setTransformerHandlerResolver (m_aFactory.m_aTHResolver);
+      m_aProcessor.setOutputURIResolver (m_aFactory.m_aOutputUriResolver);
     }
     catch (final java.io.IOException iE)
     {
@@ -257,9 +257,9 @@ public class TemplatesImpl implements Templates
       try
       {
         // register the processor
-        final Transformer transformer = new TransformerImpl (processor.copy ());
-        if (factory.getURIResolver () != null)
-          transformer.setURIResolver (factory.getURIResolver ());
+        final Transformer transformer = new TransformerImpl (m_aProcessor.copy ());
+        if (m_aFactory.getURIResolver () != null)
+          transformer.setURIResolver (m_aFactory.getURIResolver ());
         return transformer;
       }
       catch (final SAXException e)
@@ -287,7 +287,7 @@ public class TemplatesImpl implements Templates
     {
       try
       {
-        factory.defaultErrorListener.fatalError (tE);
+        m_aFactory.m_aDefaultErrorListener.fatalError (tE);
       }
       catch (final TransformerConfigurationException e)
       {}

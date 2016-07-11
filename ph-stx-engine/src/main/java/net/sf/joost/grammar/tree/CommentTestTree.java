@@ -33,7 +33,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Objects of CommentTestTree represent comment test nodes ("comment()") in the
  * syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:43 $
  * @author Oliver Becker
  */
@@ -49,10 +49,10 @@ public final class CommentTestTree extends AbstractTree
   {
     if (top < 2)
       return false;
-    if (((SAXEvent) context.ancestorStack.elementAt (top - 1)).type == SAXEvent.COMMENT)
+    if (context.ancestorStack.elementAt (top - 1).m_nType == SAXEvent.COMMENT)
     {
       if (setPosition)
-        context.position = ((SAXEvent) context.ancestorStack.elementAt (top - 2)).getPositionOfComment ();
+        context.position = context.ancestorStack.elementAt (top - 2).getPositionOfComment ();
       return true;
     }
     return false;

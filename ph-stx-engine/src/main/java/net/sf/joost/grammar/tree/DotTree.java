@@ -28,7 +28,6 @@ import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.AbstractReversableTree;
 import net.sf.joost.stx.Context;
-import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
 
 /**
@@ -49,7 +48,7 @@ public final class DotTree extends AbstractReversableTree
   public Value evaluate (final Context context, final int top) throws SAXException
   {
     if (top > 0)
-      return new Value ((SAXEvent) context.ancestorStack.elementAt (top - 1));
+      return new Value (context.ancestorStack.get (top - 1));
     return Value.VAL_EMPTY;
   }
 

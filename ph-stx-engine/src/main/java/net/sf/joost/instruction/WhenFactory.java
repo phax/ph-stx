@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,7 +48,7 @@ import net.sf.joost.stx.ParseContext;
 public final class WhenFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames;
 
   //
   // Constructor
@@ -67,9 +68,9 @@ public final class WhenFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (!(parent instanceof ChooseFactory.Instance))
       throw new SAXParseException ("'" + qName + "' must be child of stx:choose", context.locator);
@@ -83,14 +84,16 @@ public final class WhenFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>when</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private AbstractTree test;
+    private AbstractTree m_aTest;
+    private AbstractInstruction m_aTrueNext, m_aFalseNext;
 
-    private AbstractInstruction trueNext, falseNext;
-
-    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree test)
+    protected Instance (final String qName,
+                        final AbstractNodeBase parent,
+                        final ParseContext context,
+                        final AbstractTree test)
     {
       super (qName, parent, context, true);
-      this.test = test;
+      this.m_aTest = test;
     }
 
     @Override
@@ -99,12 +102,12 @@ public final class WhenFactory extends AbstractFactoryBase
       if (pass == 0) // nodeEnd.next not available yet
         return true;
 
-      final AbstractInstruction siblingOfChoose = parent.nodeEnd.next;
-      if (next == nodeEnd)
+      final AbstractInstruction siblingOfChoose = m_aParent.m_aNodeEnd.next;
+      if (next == m_aNodeEnd)
         next = siblingOfChoose;
-      trueNext = next;
-      falseNext = nodeEnd.next; // the sibling
-      nodeEnd.next = siblingOfChoose;
+      m_aTrueNext = next;
+      m_aFalseNext = m_aNodeEnd.next; // the sibling
+      m_aNodeEnd.next = siblingOfChoose;
       return false;
     }
 
@@ -115,27 +118,27 @@ public final class WhenFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (test.evaluate (context, this).getBooleanValue ())
+      if (m_aTest.evaluate (context, this).getBooleanValue ())
       {
         super.process (context);
-        next = trueNext;
+        next = m_aTrueNext;
       }
       else
-        next = falseNext;
+        next = m_aFalseNext;
       return CSTX.PR_CONTINUE;
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (test != null)
-        theCopy.test = test.deepCopy (copies);
-      if (trueNext != null)
-        theCopy.trueNext = trueNext.deepCopy (copies);
-      if (falseNext != null)
-        theCopy.falseNext = falseNext.deepCopy (copies);
+      if (m_aTest != null)
+        theCopy.m_aTest = m_aTest.deepCopy (copies);
+      if (m_aTrueNext != null)
+        theCopy.m_aTrueNext = m_aTrueNext.deepCopy (copies);
+      if (m_aFalseNext != null)
+        theCopy.m_aFalseNext = m_aFalseNext.deepCopy (copies);
     }
 
     //
@@ -144,7 +147,7 @@ public final class WhenFactory extends AbstractFactoryBase
     @Override
     public String toString ()
     {
-      return "stx:when test='" + test + "'";
+      return "stx:when test='" + m_aTest + "'";
     }
   }
 }

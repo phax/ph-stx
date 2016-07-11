@@ -78,16 +78,16 @@ public final class Tokenize implements IInstance
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     String input, pattern, flags;
-    if (args.left.type == AbstractTree.LIST)
+    if (args.m_aLeft.m_nType == AbstractTree.LIST)
     { // three parameters
-      input = args.left.left.evaluate (context, top).getStringValue ();
-      pattern = args.left.right.evaluate (context, top).getStringValue ();
-      flags = args.right.evaluate (context, top).getStringValue ();
+      input = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
+      pattern = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
+      flags = args.m_aRight.evaluate (context, top).getStringValue ();
     }
     else
     { // two parameters
-      input = args.left.evaluate (context, top).getStringValue ();
-      pattern = args.right.evaluate (context, top).getStringValue ();
+      input = args.m_aLeft.evaluate (context, top).getStringValue ();
+      pattern = args.m_aRight.evaluate (context, top).getStringValue ();
       flags = "";
     }
 

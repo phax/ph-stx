@@ -37,12 +37,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ConfigurationErrListener implements ErrorListener
 {
-
   // Define a static logger variable so that it references the
   // Logger instance named "ConfigurationErrListener".
   private static Logger log = LoggerFactory.getLogger (ConfigurationErrListener.class);
 
-  private ErrorListener userErrorListener;
+  private ErrorListener m_aUserErrorListener;
 
   /**
    * Default constructor.
@@ -52,12 +51,12 @@ public class ConfigurationErrListener implements ErrorListener
 
   public ErrorListener getUserErrorListener ()
   {
-    return userErrorListener;
+    return m_aUserErrorListener;
   }
 
   public void setUserErrorListener (final ErrorListener userErrorListener)
   {
-    this.userErrorListener = userErrorListener;
+    this.m_aUserErrorListener = userErrorListener;
   }
 
   /**
@@ -65,11 +64,11 @@ public class ConfigurationErrListener implements ErrorListener
    */
   public void warning (final TransformerException tE) throws TransformerConfigurationException
   {
-    if (userErrorListener != null)
+    if (m_aUserErrorListener != null)
     {
       try
       {
-        userErrorListener.warning (tE);
+        m_aUserErrorListener.warning (tE);
       }
       catch (final TransformerException e2)
       {
@@ -95,11 +94,11 @@ public class ConfigurationErrListener implements ErrorListener
    */
   public void error (final TransformerException tE) throws TransformerConfigurationException
   {
-    if (userErrorListener != null)
+    if (m_aUserErrorListener != null)
     {
       try
       {
-        userErrorListener.error (tE);
+        m_aUserErrorListener.error (tE);
       }
       catch (final TransformerException e2)
       {
@@ -125,11 +124,11 @@ public class ConfigurationErrListener implements ErrorListener
    */
   public void fatalError (final TransformerException tE) throws TransformerConfigurationException
   {
-    if (userErrorListener != null)
+    if (m_aUserErrorListener != null)
     {
       try
       {
-        userErrorListener.fatalError (tE);
+        m_aUserErrorListener.fatalError (tE);
       }
       catch (final TransformerException e2)
       {

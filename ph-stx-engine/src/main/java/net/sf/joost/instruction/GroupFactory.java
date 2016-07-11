@@ -59,7 +59,7 @@ public final class GroupFactory extends AbstractFactoryBase
   // Constructor
   public GroupFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("pass-through");
     attrNames.add ("recognize-cdata");
@@ -75,13 +75,18 @@ public final class GroupFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     // check parent
     if (parent != null && !(parent instanceof AbstractGroupBase))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", context.locator);
+      throw new SAXParseException ("'" +
+                                   qName +
+                                   "' not allowed as child of '" +
+                                   parent.m_sQName +
+                                   "'",
+                                   context.locator);
 
     String groupName = null;
     final String nameAtt = attrs.getValue ("name");
@@ -89,11 +94,10 @@ public final class GroupFactory extends AbstractFactoryBase
     {
       groupName = getExpandedName (nameAtt, context);
 
-      final Hashtable <String, Object> namedGroups = ((AbstractGroupBase) parent).namedGroups;
+      final Hashtable <String, Object> namedGroups = ((AbstractGroupBase) parent).m_aNamedGroups;
       if (namedGroups.get (groupName) != null)
         throw new SAXParseException ("Group name '" + nameAtt + "' already used", context.locator);
-      else
-        namedGroups.put (groupName, groupName);
+      namedGroups.put (groupName, groupName);
       // value groupName (second parameter) is just a marker,
       // it will be replaced in GroupBase.compile()
     }
@@ -115,7 +119,7 @@ public final class GroupFactory extends AbstractFactoryBase
         break;
       case -1:
       case 3:
-        passThrough = pg.passThrough;
+        passThrough = pg.m_nPassThrough;
         break;
       default:
         // mustn't happen
@@ -133,7 +137,7 @@ public final class GroupFactory extends AbstractFactoryBase
         break;
       case -1:
       case 2:
-        stripSpace = pg.stripSpace;
+        stripSpace = pg.m_bStripSpace;
         break;
       default:
         // mustn't happen
@@ -151,7 +155,7 @@ public final class GroupFactory extends AbstractFactoryBase
         break;
       case -1:
       case 2:
-        recognizeCdata = pg.recognizeCdata;
+        recognizeCdata = pg.m_bRecognizeCdata;
         break;
       default:
         // mustn't happen
@@ -177,7 +181,7 @@ public final class GroupFactory extends AbstractFactoryBase
                         final boolean recognizeCdata)
     {
       super (qName, parent, context, passThrough, stripSpace, recognizeCdata);
-      this.groupName = groupName;
+      this.m_sGroupName = groupName;
     }
 
     /**
@@ -195,12 +199,12 @@ public final class GroupFactory extends AbstractFactoryBase
         super.insert (node);
       else
         throw new SAXParseException ("'" +
-                                     node.qName +
+                                     node.m_sQName +
                                      "' not allowed as child of '" +
-                                     qName +
+                                     m_sQName +
                                      "'",
-                                     node.publicId,
-                                     node.systemId,
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
                                      node.lineNo,
                                      node.colNo);
     }
@@ -209,7 +213,7 @@ public final class GroupFactory extends AbstractFactoryBase
     @Override
     public String toString ()
     {
-      return "group " + (groupName != null ? (groupName + " (") : "(") + lineNo + ") ";
+      return "group " + (m_sGroupName != null ? (m_sGroupName + " (") : "(") + lineNo + ") ";
     }
   }
 }

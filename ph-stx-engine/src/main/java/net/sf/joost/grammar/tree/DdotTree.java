@@ -28,13 +28,12 @@ import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.AbstractReversableTree;
 import net.sf.joost.stx.Context;
-import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
 
 /**
  * Objects of DdotTree represent a ".." step in the syntax tree of a pattern or
  * an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
@@ -50,16 +49,16 @@ public final class DdotTree extends AbstractReversableTree
   {
     if (top > 1)
     {
-      if (right != null)
-                        // path continues, evaluate recursively with top-1
-                        return right.evaluate (context, top - 1);
-      else
-                        // return the node at position top-1
-                        return new Value ((SAXEvent) context.ancestorStack.elementAt (top - 2));
+      if (m_aRight != null)
+      {
+        // path continues, evaluate recursively with top-1
+        return m_aRight.evaluate (context, top - 1);
+      }
+      // return the node at position top-1
+      return new Value (context.ancestorStack.elementAt (top - 2));
     }
-    else
-                 // path selects nothing
-                 return Value.VAL_EMPTY;
+    // path selects nothing
+    return Value.VAL_EMPTY;
   }
 
   @Override

@@ -108,9 +108,9 @@ public final class IfFactory extends AbstractFactoryBase
 
       // adjust true and false branches
       trueNext = next;
-      falseNext = nodeEnd.next;
+      falseNext = m_aNodeEnd.next;
       if (falseNext instanceof ElseFactory.Instance)
-        nodeEnd.next = ((ElseFactory.Instance) falseNext).nodeEnd.next;
+        m_aNodeEnd.next = ((ElseFactory.Instance) falseNext).m_aNodeEnd.next;
 
       return false; // done
     }
@@ -136,7 +136,7 @@ public final class IfFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

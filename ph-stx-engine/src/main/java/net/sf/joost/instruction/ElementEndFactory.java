@@ -83,7 +83,7 @@ public final class ElementEndFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>end-element</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private AbstractTree name, namespace;
+    private AbstractTree m_aName, m_aNamespace;
     private final Hashtable <String, String> nsSet;
 
     protected Instance (final String qName,
@@ -94,8 +94,8 @@ public final class ElementEndFactory extends AbstractFactoryBase
     {
       super (qName, parent, context, false);
       this.nsSet = new Hashtable<> (context.nsSet);
-      this.name = name;
-      this.namespace = namespace;
+      this.m_aName = name;
+      this.m_aNamespace = namespace;
     }
 
     /**
@@ -105,22 +105,22 @@ public final class ElementEndFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       String elName, elUri, elLocal;
-      elName = name.evaluate (context, this).getString ();
+      elName = m_aName.evaluate (context, this).getString ();
       final int colon = elName.indexOf (':');
       if (colon != -1)
       { // prefixed name
         final String prefix = elName.substring (0, colon);
         elLocal = elName.substring (colon + 1);
-        if (namespace != null)
+        if (m_aNamespace != null)
         { // namespace attribute present
-          elUri = namespace.evaluate (context, this).getString ();
+          elUri = m_aNamespace.evaluate (context, this).getString ();
           if (elUri.equals (""))
           {
-            context.errorHandler.fatalError ("Can't close element '" +
+            context.m_aErrorHandler.fatalError ("Can't close element '" +
                                              elName +
                                              "' in the null namespace",
-                                             publicId,
-                                             systemId,
+                                             m_sPublicID,
+                                             m_sSystemID,
                                              lineNo,
                                              colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
@@ -133,13 +133,13 @@ public final class ElementEndFactory extends AbstractFactoryBase
           elUri = nsSet.get (prefix);
           if (elUri == null)
           {
-            context.errorHandler.fatalError ("Attempt to close element '" +
+            context.m_aErrorHandler.fatalError ("Attempt to close element '" +
                                              elName +
                                              "' with undeclared prefix '" +
                                              prefix +
                                              "'",
-                                             publicId,
-                                             systemId,
+                                             m_sPublicID,
+                                             m_sSystemID,
                                              lineNo,
                                              colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
@@ -149,8 +149,8 @@ public final class ElementEndFactory extends AbstractFactoryBase
       else
       { // unprefixed name
         elLocal = elName;
-        if (namespace != null) // namespace attribute present
-          elUri = namespace.evaluate (context, this).getString ();
+        if (m_aNamespace != null) // namespace attribute present
+          elUri = m_aNamespace.evaluate (context, this).getString ();
         else
         {
           // no namespace attribute, see above
@@ -166,14 +166,14 @@ public final class ElementEndFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (name != null)
-        theCopy.name = name.deepCopy (copies);
-      if (namespace != null)
-        theCopy.namespace = namespace.deepCopy (copies);
+      if (m_aName != null)
+        theCopy.m_aName = m_aName.deepCopy (copies);
+      if (m_aNamespace != null)
+        theCopy.m_aNamespace = m_aNamespace.deepCopy (copies);
     }
   }
 }

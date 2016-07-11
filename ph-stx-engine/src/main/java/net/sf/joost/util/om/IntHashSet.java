@@ -21,7 +21,6 @@ import java.io.Serializable;
  */
 public class IntHashSet implements IIntSet, Serializable
 {
-
   private static final int NBIT = 30; // MAX_SIZE = 2^NBIT
 
   /**
@@ -168,10 +167,8 @@ public class IntHashSet implements IIntSet, Serializable
       }
       return true;
     }
-    else
-    {
-      return false; // leave set unchanged
-    }
+    // leave set unchanged
+    return false;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -213,10 +210,11 @@ public class IntHashSet implements IIntSet, Serializable
     return i;
   }
 
-  private void setCapacity (int capacity)
+  private void setCapacity (final int nCapacity)
   {
     // Changed MHK in 8.9 to use a constant factor of 0.25, thus avoiding
     // floating point arithmetic
+    int capacity = nCapacity;
     if (capacity < _size)
     {
       capacity = _size;
@@ -225,7 +223,7 @@ public class IntHashSet implements IIntSet, Serializable
     int nbit, nmax;
     for (nbit = 1, nmax = 2; nmax < capacity * 4 && nmax < MAX_SIZE; ++nbit, nmax *= 2)
     {
-      ;
+      // empty
     }
     final int nold = _nmax;
     if (nmax == nold)
@@ -373,10 +371,7 @@ public class IntHashSet implements IIntSet, Serializable
       final IntHashSet s = (IntHashSet) other;
       return (size () == s.size () && containsAll (s));
     }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 
   /**
@@ -415,13 +410,8 @@ public class IntHashSet implements IIntSet, Serializable
       while (i < _values.length)
       {
         if (_values[i] != ndv)
-        {
           return true;
-        }
-        else
-        {
-          i++;
-        }
+        i++;
       }
       return false;
     }

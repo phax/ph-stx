@@ -28,8 +28,8 @@ import java.util.List;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -68,7 +68,8 @@ public final class ExtSequence implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     Value v = args.evaluate (context, top);
     // in case there's no object
@@ -81,7 +82,7 @@ public final class ExtSequence implements IInstance
       objs = (Object []) vo;
     else
       if (vo instanceof List)
-        objs = ((List) vo).toArray ();
+        objs = ((List <?>) vo).toArray ();
 
     if (objs != null)
     {

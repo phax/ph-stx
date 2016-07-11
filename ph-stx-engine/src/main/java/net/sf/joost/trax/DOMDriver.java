@@ -54,7 +54,7 @@ public class DOMDriver implements Locator, XMLReader
   private final String [] elparts = new String [3];
   private final Hashtable <String, String> nsDeclarations = new Hashtable<> ();
   protected Node root = null;
-  protected String systemId;
+  protected String m_sSystemID;
 
   /**
    * Set the content handler.
@@ -176,7 +176,7 @@ public class DOMDriver implements Locator, XMLReader
   public void parse (final InputSource source) throws SAXException
   {
     parse ();
-  };
+  }
 
   /**
    * Parse from SystemId. The SystemId is ignored; it's there only to satisfy
@@ -186,7 +186,7 @@ public class DOMDriver implements Locator, XMLReader
   public void parse (final String source) throws SAXException
   {
     parse ();
-  };
+  }
 
   /**
    * Walk a document (traversing the nodes depth first)
@@ -348,10 +348,10 @@ public class DOMDriver implements Locator, XMLReader
             walkNode (element);
 
             contentHandler.endElement (uri, local, raw);
-            final Enumeration prefixes = nsSupport.getDeclaredPrefixes ();
+            final Enumeration <String> prefixes = nsSupport.getDeclaredPrefixes ();
             while (prefixes.hasMoreElements ())
             {
-              final String prefix = (String) prefixes.nextElement ();
+              final String prefix = prefixes.nextElement ();
               contentHandler.endPrefixMapping (prefix);
             }
             nsSupport.popContext ();
@@ -397,7 +397,7 @@ public class DOMDriver implements Locator, XMLReader
 
   public void setSystemId (final String systemId)
   {
-    this.systemId = systemId;
+    this.m_sSystemID = systemId;
   }
 
   public String getPublicId ()
@@ -407,7 +407,7 @@ public class DOMDriver implements Locator, XMLReader
 
   public String getSystemId ()
   {
-    return systemId;
+    return m_sSystemID;
   }
 
   public int getLineNumber ()

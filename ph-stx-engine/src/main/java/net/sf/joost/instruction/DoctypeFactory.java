@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,11 +48,11 @@ import net.sf.joost.stx.ParseContext;
 public class DoctypeFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   public DoctypeFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("public-id");
     attrNames.add ("system-id");
@@ -66,9 +67,9 @@ public class DoctypeFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
@@ -82,7 +83,7 @@ public class DoctypeFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>doctype</code> element. */
   public class Instance extends AbstractNodeBase
   {
-    private AbstractTree nameAVT, publicAVT, systemAVT;
+    private AbstractTree m_aNameAVT, m_aPublicAVT, m_aSystemAVT;
 
     public Instance (final String qName,
                      final AbstractNodeBase parent,
@@ -96,9 +97,9 @@ public class DoctypeFactory extends AbstractFactoryBase
              context,
              // current restriction: this element must be empty
              false);
-      this.nameAVT = nameAVT;
-      this.publicAVT = publicAVT;
-      this.systemAVT = systemAVT;
+      this.m_aNameAVT = nameAVT;
+      this.m_aPublicAVT = publicAVT;
+      this.m_aSystemAVT = systemAVT;
     }
 
     /**
@@ -108,24 +109,23 @@ public class DoctypeFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       context.emitter.createDTD (this,
-                                 nameAVT.evaluate (context, this).getStringValue (),
-                                 publicAVT != null ? publicAVT.evaluate (context, this).getStringValue () : null,
-                                 systemAVT != null ? systemAVT.evaluate (context, this).getStringValue () : null);
+                                 m_aNameAVT.evaluate (context, this).getStringValue (),
+                                 m_aPublicAVT != null ? m_aPublicAVT.evaluate (context, this).getStringValue () : null,
+                                 m_aSystemAVT != null ? m_aSystemAVT.evaluate (context, this).getStringValue () : null);
       return CSTX.PR_CONTINUE;
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (nameAVT != null)
-        theCopy.nameAVT = nameAVT.deepCopy (copies);
-      if (publicAVT != null)
-        theCopy.publicAVT = publicAVT.deepCopy (copies);
-      if (systemAVT != null)
-        theCopy.systemAVT = systemAVT.deepCopy (copies);
+      if (m_aNameAVT != null)
+        theCopy.m_aNameAVT = m_aNameAVT.deepCopy (copies);
+      if (m_aPublicAVT != null)
+        theCopy.m_aPublicAVT = m_aPublicAVT.deepCopy (copies);
+      if (m_aSystemAVT != null)
+        theCopy.m_aSystemAVT = m_aSystemAVT.deepCopy (copies);
     }
-
   }
 }

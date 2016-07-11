@@ -80,7 +80,7 @@ public final class NodeKind implements IInstance
                                v +
                                ")");
 
-    switch (event.type)
+    switch (event.m_nType)
     {
       case SAXEvent.ROOT:
         return new Value ("document");

@@ -81,7 +81,7 @@ public final class IncludeFactory extends AbstractFactoryBase
     if (parent == null)
       throw new SAXParseException ("'" + qName + "' not allowed as root element", pContext.locator);
     if (!(parent instanceof AbstractGroupBase))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", pContext.locator);
+      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.m_sQName + "'", pContext.locator);
 
     final String hrefAtt = getRequiredAttribute (qName, attrs, "href", pContext);
 
@@ -138,7 +138,7 @@ public final class IncludeFactory extends AbstractFactoryBase
     final TransformFactory.Instance tfi = stxParser.getTransformNode ();
     // transfer compilable nodes to the calling Parser object
     tfi.compilableNodes = stxParser.compilableNodes;
-    tfi.qName = qName; // replace name for error reporting
+    tfi.m_sQName = qName; // replace name for error reporting
     return tfi;
   }
 }

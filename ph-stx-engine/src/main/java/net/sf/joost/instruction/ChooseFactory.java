@@ -32,7 +32,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>choose</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.7 $ $Date: 2008/05/17 17:01:03 $
  * @author Oliver Becker
  */
@@ -48,9 +48,9 @@ public final class ChooseFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     checkAttributes (qName, attrs, null, context);
     return new Instance (qName, parent, context);
@@ -78,48 +78,47 @@ public final class ChooseFactory extends AbstractFactoryBase
       {
         if (((TextNode) node).isWhitespaceNode ())
           return;
-        else
-          throw new SAXParseException ("'" +
-                                       qName +
-                                       "' may only contain stx:when and stx:otherwise children " +
-                                       "(encountered text)",
-                                       node.publicId,
-                                       node.systemId,
-                                       node.lineNo,
-                                       node.colNo);
+        throw new SAXParseException ("'" +
+                                     m_sQName +
+                                     "' may only contain stx:when and stx:otherwise children " +
+                                     "(encountered text)",
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
+                                     node.lineNo,
+                                     node.colNo);
       }
 
       if (!(node instanceof WhenFactory.Instance || node instanceof OtherwiseFactory.Instance))
         throw new SAXParseException ("'" +
-                                     qName +
+                                     m_sQName +
                                      "' may only contain stx:when and stx:otherwise children " +
                                      "(encountered '" +
-                                     node.qName +
+                                     node.m_sQName +
                                      "')",
-                                     node.publicId,
-                                     node.systemId,
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
                                      node.lineNo,
                                      node.colNo);
 
       if (otherwisePresent)
         throw new SAXParseException ("'" +
-                                     qName +
+                                     m_sQName +
                                      "' must not have more children after stx:otherwise",
-                                     node.publicId,
-                                     node.systemId,
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
                                      node.lineNo,
                                      node.colNo);
 
       if (node instanceof OtherwiseFactory.Instance)
       {
-        if (lastChild == this)
+        if (m_aLastChild == this)
         {
           throw new SAXParseException ("'" +
-                                       qName +
+                                       m_sQName +
                                        "' must have at least one stx:when child " +
                                        "before stx:otherwise",
-                                       node.publicId,
-                                       node.systemId,
+                                       node.m_sPublicID,
+                                       node.m_sSystemID,
                                        node.lineNo,
                                        node.colNo);
         }
@@ -135,12 +134,12 @@ public final class ChooseFactory extends AbstractFactoryBase
     @Override
     public boolean compile (final int pass, final ParseContext context) throws SAXParseException
     {
-      if (lastChild == this)
+      if (m_aLastChild == this)
         throw new SAXParseException ("'" +
-                                     qName +
+                                     m_sQName +
                                      "' must have at least one stx:when child",
-                                     publicId,
-                                     systemId,
+                                     m_sPublicID,
+                                     m_sSystemID,
                                      lineNo,
                                      colNo);
 

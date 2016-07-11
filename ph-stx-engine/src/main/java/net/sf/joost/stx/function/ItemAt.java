@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -66,10 +66,11 @@ public final class ItemAt implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
-    Value seq = args.left.evaluate (context, top);
-    final double dpos = args.right.evaluate (context, top).getNumberValue ();
+    Value seq = args.m_aLeft.evaluate (context, top);
+    final double dpos = args.m_aRight.evaluate (context, top).getNumberValue ();
 
     if (seq.type == Value.EMPTY || Double.isNaN (dpos))
       return Value.VAL_EMPTY;
@@ -84,7 +85,6 @@ public final class ItemAt implements IInstance
                                " out of bounds in call to function '" +
                                getName ().substring (FunctionFactory.FNSP.length ()) +
                                "'");
-    else
-      return seq.singleCopy ();
+    return seq.singleCopy ();
   }
 }

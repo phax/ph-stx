@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 
 import org.xml.sax.Attributes;
@@ -84,8 +85,8 @@ public final class ElementStartFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>start-element</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private AbstractTree name, namespace;
-    private final Hashtable nsSet;
+    private AbstractTree m_aName, m_aNamespace;
+    private final Map <String, String> m_aNSSet;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -94,9 +95,9 @@ public final class ElementStartFactory extends AbstractFactoryBase
                         final AbstractTree namespace)
     {
       super (qName, parent, context, false);
-      this.nsSet = new Hashtable<> (context.nsSet);
-      this.name = name;
-      this.namespace = namespace;
+      this.m_aNSSet = new Hashtable<> (context.nsSet);
+      this.m_aName = name;
+      this.m_aNamespace = namespace;
     }
 
     /**
@@ -106,24 +107,24 @@ public final class ElementStartFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       String elName, elUri, elLocal;
-      elName = name.evaluate (context, this).getString ();
+      elName = m_aName.evaluate (context, this).getString ();
       final int colon = elName.indexOf (':');
       if (colon != -1)
       { // prefixed name
         final String prefix = elName.substring (0, colon);
         elLocal = elName.substring (colon + 1);
-        if (namespace != null)
+        if (m_aNamespace != null)
         { // namespace attribute present
-          elUri = namespace.evaluate (context, this).getString ();
+          elUri = m_aNamespace.evaluate (context, this).getString ();
           if (elUri.equals (""))
           {
-            context.errorHandler.fatalError ("Can't create element '" +
-                                             elName +
-                                             "' in the null namespace",
-                                             publicId,
-                                             systemId,
-                                             lineNo,
-                                             colNo);
+            context.m_aErrorHandler.fatalError ("Can't create element '" +
+                                                elName +
+                                                "' in the null namespace",
+                                                m_sPublicID,
+                                                m_sSystemID,
+                                                lineNo,
+                                                colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
@@ -131,18 +132,18 @@ public final class ElementStartFactory extends AbstractFactoryBase
         {
           // look into the set of in-scope namespaces
           // (of the transformation sheet)
-          elUri = (String) nsSet.get (prefix);
+          elUri = m_aNSSet.get (prefix);
           if (elUri == null)
           {
-            context.errorHandler.fatalError ("Attempt to create element '" +
-                                             elName +
-                                             "' with undeclared prefix '" +
-                                             prefix +
-                                             "'",
-                                             publicId,
-                                             systemId,
-                                             lineNo,
-                                             colNo);
+            context.m_aErrorHandler.fatalError ("Attempt to create element '" +
+                                                elName +
+                                                "' with undeclared prefix '" +
+                                                prefix +
+                                                "'",
+                                                m_sPublicID,
+                                                m_sSystemID,
+                                                lineNo,
+                                                colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
@@ -150,12 +151,12 @@ public final class ElementStartFactory extends AbstractFactoryBase
       else
       { // unprefixed name
         elLocal = elName;
-        if (namespace != null) // namespace attribute present
-          elUri = namespace.evaluate (context, this).getString ();
+        if (m_aNamespace != null) // namespace attribute present
+          elUri = m_aNamespace.evaluate (context, this).getString ();
         else
         {
           // no namespace attribute, see above
-          elUri = (String) nsSet.get ("");
+          elUri = m_aNSSet.get ("");
           if (elUri == null)
             elUri = "";
         }
@@ -167,14 +168,14 @@ public final class ElementStartFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (name != null)
-        theCopy.name = name.deepCopy (copies);
-      if (namespace != null)
-        theCopy.namespace = namespace.deepCopy (copies);
+      if (m_aName != null)
+        theCopy.m_aName = m_aName.deepCopy (copies);
+      if (m_aNamespace != null)
+        theCopy.m_aNamespace = m_aNamespace.deepCopy (copies);
     }
   }
 }

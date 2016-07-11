@@ -78,7 +78,7 @@ public final class CdataFactory extends AbstractFactoryBase
     private void init ()
     {
       buffer = new StringBuffer ();
-      strEmitter = new StringEmitter (buffer, "('" + qName + "' started in line " + lineNo + ")");
+      strEmitter = new StringEmitter (buffer, "('" + m_sQName + "' started in line " + lineNo + ")");
     }
 
     /**
@@ -89,7 +89,7 @@ public final class CdataFactory extends AbstractFactoryBase
     {
       if (context.emitter.isEmitterActive (strEmitter))
       {
-        context.errorHandler.error ("Can't create nested CDATA section here", publicId, systemId, lineNo, colNo);
+        context.m_aErrorHandler.error ("Can't create nested CDATA section here", m_sPublicID, m_sSystemID, lineNo, colNo);
         return CSTX.PR_CONTINUE; // if the errorHandler returns
       }
       super.process (context);
@@ -113,7 +113,7 @@ public final class CdataFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

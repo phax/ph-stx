@@ -47,9 +47,9 @@ public final class AndTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    if (!left.evaluate (context, top).getBooleanValue ())
+    if (!m_aLeft.evaluate (context, top).getBooleanValue ())
       return Value.VAL_FALSE;
-    if (!right.evaluate (context, top).getBooleanValue ())
+    if (!m_aRight.evaluate (context, top).getBooleanValue ())
       return Value.VAL_FALSE;
     return Value.VAL_TRUE;
   }

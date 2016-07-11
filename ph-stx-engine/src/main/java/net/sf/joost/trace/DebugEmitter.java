@@ -50,17 +50,16 @@ import net.sf.joost.stx.SAXEvent;
  */
 public class DebugEmitter extends Emitter
 {
-
   /** logger */
-  private static Logger log = LoggerFactory.getLogger (DebugEmitter.class);
+  private static final Logger log = LoggerFactory.getLogger (DebugEmitter.class);
 
   /** for dynamic tracing */
-  private TraceManager tmgr;
+  private TraceManager m_aTraceMgr;
 
   /** handle locator information */
-  private final LocatorImpl locator = new LocatorImpl ();
+  private final LocatorImpl m_aLocator = new LocatorImpl ();
 
-  public DebugWriter writer;
+  public DebugWriter m_aWriter;
 
   /**
    * constructor see {@link Emitter#Emitter(ErrorHandlerImpl)}
@@ -81,8 +80,8 @@ public class DebugEmitter extends Emitter
   private DebugEmitter (final DebugEmitter prev, final IStxEmitter handler)
   {
     super (prev, handler);
-    this.tmgr = prev.tmgr;
-    this.writer = prev.writer;
+    this.m_aTraceMgr = prev.m_aTraceMgr;
+    this.m_aWriter = prev.m_aWriter;
   }
 
   /*
@@ -96,24 +95,24 @@ public class DebugEmitter extends Emitter
   }
 
   /**
-   * setter for {@link #tmgr} property
+   * setter for {@link #m_aTraceMgr} property
    */
   public void setTraceManager (final TraceManager tmgr)
   {
-    this.tmgr = tmgr;
+    this.m_aTraceMgr = tmgr;
   }
 
   /**
-   * getter for {@link #tmgr} property
+   * getter for {@link #m_aTraceMgr} property
    */
   public TraceManager getTraceManager ()
   {
-    return this.tmgr;
+    return this.m_aTraceMgr;
   }
 
   public Locator getEmitterLocator ()
   {
-    return locator;
+    return m_aLocator;
   }
 
   /**
@@ -130,7 +129,7 @@ public class DebugEmitter extends Emitter
   {
     if (log.isDebugEnabled ())
       log.debug ("requesting writer for " + href);
-    return writer = new DebugWriter (href);
+    return m_aWriter = new DebugWriter (href);
   }
 
   // ------------------------------------------------------------------
@@ -147,7 +146,7 @@ public class DebugEmitter extends Emitter
       log.debug ("start resultdocument");
     // update locator
     updateLocator (null, null, -1, -1);
-    this.tmgr.fireStartResultDocument ();
+    this.m_aTraceMgr.fireStartResultDocument ();
   }
 
   /**
@@ -160,11 +159,11 @@ public class DebugEmitter extends Emitter
       log.debug ("end resultdocument");
     super.endDocument (instruction);
     // update locator
-    updateLocator (instruction.getNode ().publicId,
-                   instruction.getNode ().systemId,
+    updateLocator (instruction.getNode ().m_sPublicID,
+                   instruction.getNode ().m_sSystemID,
                    instruction.lineNo,
                    instruction.colNo);
-    this.tmgr.fireEndResultDocument ();
+    this.m_aTraceMgr.fireEndResultDocument ();
   }
 
   /**
@@ -185,8 +184,8 @@ public class DebugEmitter extends Emitter
 
     super.startElement (uri, lName, qName, attrs, namespaces, instruction);
     // update locator
-    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
-    this.tmgr.fireStartResultElement (saxevent);
+    updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
+    this.m_aTraceMgr.fireStartResultElement (saxevent);
   }
 
   /**
@@ -204,12 +203,12 @@ public class DebugEmitter extends Emitter
     // todo - namespace support - remove null value
     saxevent = SAXEvent.newElement (uri, lName, qName, null, true, null);
     // update locator
-    updateLocator (instruction.getNode ().publicId,
-                   instruction.getNode ().systemId,
+    updateLocator (instruction.getNode ().m_sPublicID,
+                   instruction.getNode ().m_sSystemID,
                    instruction.lineNo,
                    instruction.colNo);
     super.endElement (uri, lName, qName, instruction);
-    this.tmgr.fireEndResultElement (saxevent);
+    this.m_aTraceMgr.fireEndResultElement (saxevent);
   }
 
   /**
@@ -227,8 +226,8 @@ public class DebugEmitter extends Emitter
     saxevent = SAXEvent.newText (new String (ch, start, length));
     super.characters (ch, start, length, instruction);
     // update locator
-    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
-    this.tmgr.fireResultText (saxevent);
+    updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
+    this.m_aTraceMgr.fireResultText (saxevent);
   }
 
   /**
@@ -245,8 +244,8 @@ public class DebugEmitter extends Emitter
     saxevent = SAXEvent.newPI (target, data);
     super.processingInstruction (target, data, instruction);
     // update locator
-    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
-    this.tmgr.fireResultPI (saxevent);
+    updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
+    this.m_aTraceMgr.fireResultPI (saxevent);
   }
 
   /**
@@ -264,8 +263,8 @@ public class DebugEmitter extends Emitter
     saxevent = SAXEvent.newComment (new String (ch, start, length));
     super.comment (ch, start, length, instruction);
     // update locator
-    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
-    this.tmgr.fireResultComment (saxevent);
+    updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
+    this.m_aTraceMgr.fireResultComment (saxevent);
   }
 
   /**
@@ -278,8 +277,8 @@ public class DebugEmitter extends Emitter
       log.debug ("start CDATA in resultdoc");
     super.startCDATA (instruction);
     // update locator
-    updateLocator (instruction.publicId, instruction.systemId, instruction.lineNo, instruction.colNo);
-    this.tmgr.fireStartResultCDATA ();
+    updateLocator (instruction.m_sPublicID, instruction.m_sSystemID, instruction.lineNo, instruction.colNo);
+    this.m_aTraceMgr.fireStartResultCDATA ();
   }
 
   /**
@@ -293,7 +292,7 @@ public class DebugEmitter extends Emitter
     super.endCDATA ();
     // update locator
     updateLocator (null, null, -1, -1);
-    this.tmgr.fireEndResultCDATA ();
+    this.m_aTraceMgr.fireEndResultCDATA ();
   }
 
   // ------------------------------------------------------------------------
@@ -303,30 +302,28 @@ public class DebugEmitter extends Emitter
   {
     if (log.isDebugEnabled ())
       log.debug ("update emitterlocator " + publicId + " " + systemId + " " + lineNo + "," + colNo);
-    locator.setPublicId (publicId);
-    locator.setSystemId (systemId);
-    locator.setLineNumber (lineNo);
-    locator.setColumnNumber (colNo);
+    m_aLocator.setPublicId (publicId);
+    m_aLocator.setSystemId (systemId);
+    m_aLocator.setLineNumber (lineNo);
+    m_aLocator.setColumnNumber (colNo);
   }
 
   // ------------------------------------------------------------------------
   // Inner classes
   // ------------------------------------------------------------------------
 
-  public class DebugWriter extends StringWriter
+  public static class DebugWriter extends StringWriter
   {
-
-    private final String href;
+    private final String m_sHref;
 
     public DebugWriter (final String href)
     {
-      super ();
-      this.href = href;
+      this.m_sHref = href;
     }
 
     public String getHref ()
     {
-      return href;
+      return m_sHref;
     }
   }
 }

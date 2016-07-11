@@ -90,10 +90,10 @@ public final class Context implements Cloneable
   public Hashtable <String, Value> globalParameters = new Hashtable<> ();
 
   /** Parameters passed to the next template */
-  public Hashtable <String, Value> passedParameters = new Hashtable<> ();
+  public Hashtable <String, Value> m_aPassedParameters = new Hashtable<> ();
 
   /** An ErrorHandler for reporting errors and warnings */
-  public ErrorHandlerImpl errorHandler = new ErrorHandlerImpl ();
+  public ErrorHandlerImpl m_aErrorHandler = new ErrorHandlerImpl ();
 
   /** The default TransformerHandlerResolver */
   public TransformerHandlerResolverImpl defaultTransformerHandlerResolver = new TransformerHandlerResolverImpl ();
@@ -105,7 +105,7 @@ public final class Context implements Cloneable
   public TransformerHandler targetHandler;
 
   /** The URIResolver for <code>stx:process-document</code> */
-  public URIResolver uriResolver;
+  public URIResolver m_aURIResolver;
 
   /** The OutputURIResolver for <code>stx:result-document</code> */
   public IOutputURIResolver outputUriResolver;
@@ -127,15 +127,15 @@ public final class Context implements Cloneable
   /** re-use a previous emitter for the event stream */
   public void pushEmitter (final Emitter anEmitter)
   {
-    anEmitter.prev = emitter;
+    anEmitter.m_aPrev = emitter;
     emitter = anEmitter;
   }
 
   /** Restore previous emitter after finishing a result event stream */
   public IStxEmitter popEmitter ()
   {
-    final IStxEmitter stxEmitter = (IStxEmitter) emitter.contH;
-    emitter = emitter.prev;
+    final IStxEmitter stxEmitter = (IStxEmitter) emitter.m_aContH;
+    emitter = emitter.m_aPrev;
     return stxEmitter;
   }
 }

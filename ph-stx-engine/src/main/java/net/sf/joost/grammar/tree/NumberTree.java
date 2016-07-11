@@ -44,7 +44,7 @@ public final class NumberTree extends AbstractTree
   public NumberTree (final Number n)
   {
     super (NUMBER, n);
-    theValue = new Value (((Double) value).doubleValue ());
+    theValue = new Value (((Double) m_aValue).doubleValue ());
   }
 
   @Override

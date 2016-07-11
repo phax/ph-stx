@@ -33,7 +33,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Objects of NodeTestTree represent node test "node()" nodes in the syntax tree
  * of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
@@ -49,11 +49,11 @@ public final class NodeTestTree extends AbstractTree
   {
     // the node must be a child of another node,
     // i.e. we need at least two nodes and it is no attribute node
-    if (top < 2 || ((SAXEvent) context.ancestorStack.elementAt (top - 1)).type == SAXEvent.ATTRIBUTE)
+    if (top < 2 || context.ancestorStack.elementAt (top - 1).m_nType == SAXEvent.ATTRIBUTE)
       return false;
 
     if (setPosition)
-      context.position = ((SAXEvent) context.ancestorStack.elementAt (top - 2)).getPositionOfNode ();
+      context.position = context.ancestorStack.elementAt (top - 2).getPositionOfNode ();
 
     return true;
   }

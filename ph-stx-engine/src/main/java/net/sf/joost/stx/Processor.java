@@ -82,53 +82,56 @@ public class Processor extends XMLFilterImpl
    * Possible actions when no matching template was found. Set by
    * <code>stx:options' no-match-events</code>
    */
-  public static final byte PASS_THROUGH_NONE = 0x0, // default, see Context
-      PASS_THROUGH_ELEMENT = 0x1, PASS_THROUGH_TEXT = 0x2, PASS_THROUGH_COMMENT = 0x4, PASS_THROUGH_PI = 0x8,
-      PASS_THROUGH_ATTRIBUTE = 0x10, PASS_THROUGH_ALL = ~PASS_THROUGH_NONE; // all
-                                                                            // bits
-                                                                            // set
+  public static final byte PASS_THROUGH_NONE = 0x0; // default, see Context
+  public static final byte PASS_THROUGH_ELEMENT = 0x1;
+  public static final byte PASS_THROUGH_TEXT = 0x2;
+  public static final byte PASS_THROUGH_COMMENT = 0x4;
+  public static final byte PASS_THROUGH_PI = 0x8;
+  public static final byte PASS_THROUGH_ATTRIBUTE = 0x10;
+  // all bits set
+  public static final byte PASS_THROUGH_ALL = ~PASS_THROUGH_NONE;
 
   /** The node representing the transformation sheet */
-  private TransformFactory.Instance transformNode;
+  private TransformFactory.Instance m_aTransformNode;
 
   /**
    * Array of global visible templates (templates with an attribute
    * <code>visibility="global"</code>).
    */
-  private TemplateFactory.Instance [] globalTemplates;
+  private TemplateFactory.Instance [] m_aGlobalTemplates;
 
   /** The Context object */
-  private Context context;
+  private Context m_aContext;
 
   /**
    * Depth in the subtree to be skipped; increased by startElement and decreased
    * by endElement.
    */
-  private int skipDepth = 0;
+  private int m_nSkipDepth = 0;
 
   /**
    * Set to true between {@link #startCDATA} and {@link #endCDATA}, needed for
    * CDATA processing
    */
-  private boolean insideCDATA = false;
+  private boolean m_bInsideCDATA = false;
 
   /**
    * Set to true between {@link #startDTD} and {@link #endDTD}, needed for
    * ignoring comments
    */
-  private boolean insideDTD = false;
+  private boolean m_bInsideDTD = false;
 
   /** Buffer for collecting character data into single text nodes */
-  private StringBuffer collectedCharacters = new StringBuffer ();
+  private StringBuffer m_aCollectedCharacters = new StringBuffer ();
 
   /** Last event (this Processor uses one look-ahead) */
-  private SAXEvent lastElement = null;
+  private SAXEvent m_aLastElement = null;
 
   /** The namespaces of the current scope */
-  private Hashtable <String, String> inScopeNamespaces;
+  private Hashtable <String, String> m_aInScopeNamespaces;
 
   /** The namespace context as a stack */
-  private final Stack <Hashtable <String, String>> namespaceContext = new Stack<> ();
+  private final Stack <Hashtable <String, String>> m_aNamespaceContext = new Stack<> ();
 
   /** Flag that controls namespace contexts */
   private boolean nsContextActive = false;
@@ -141,18 +144,18 @@ public class Processor extends XMLFilterImpl
    * and removed immediately afterwards. This stack is needed for matching and
    * for position counting within the parent of each event.
    */
-  private Stack <SAXEvent> eventStack;
+  private Stack <SAXEvent> m_aEventStack;
 
   /**
    * Stack needed for inner processing (buffers, documents). This stack stores
    * the event stack for <code>stx:process-document</code> and character data
-   * that has been already read as look-ahead ({@link #collectedCharacters}).
+   * that has been already read as look-ahead ({@link #m_aCollectedCharacters}).
    */
-  private final Stack <Serializable> innerProcStack = new Stack<> ();
+  private final Stack <Serializable> m_aInnerProcStack = new Stack<> ();
 
-  public Properties outputProperties;
+  public Properties m_aOutputProperties;
 
-  private final boolean isProcessorClass = getClass ().equals (Processor.class);
+  private final boolean m_bIsProcessorClass = getClass ().equals (Processor.class);
 
   // **********************************************************************
   /**
@@ -264,13 +267,13 @@ public class Processor extends XMLFilterImpl
     // methods
 
     /** returns the value of {@link #passedParams} */
-    public Hashtable getPassedParams ()
+    public Hashtable <String, Value> getPassedParams ()
     {
       return passedParams;
     }
 
     /** returns the value of {@link #localVars} */
-    public Hashtable getLocalVars ()
+    public Hashtable <String, Value> getLocalVars ()
     {
       return localVars;
     }
@@ -290,7 +293,7 @@ public class Processor extends XMLFilterImpl
              "," +
              contextPosition +
              "," +
-             java.util.Arrays.asList (targetGroup.visibleTemplates) +
+             java.util.Arrays.asList (targetGroup.m_aVisibleTemplates) +
              "," +
              lastProcStatus +
              "}";
@@ -396,7 +399,7 @@ public class Processor extends XMLFilterImpl
    * Constructs a new <code>Processor</code> instance by parsing an STX
    * transformation sheet.
    *
-   * @param reader
+   * @param aReader
    *        the parser that is used for reading the transformation sheet
    * @param src
    *        the source for the STX transformation sheet
@@ -407,9 +410,10 @@ public class Processor extends XMLFilterImpl
    * @throws SAXException
    *         if a SAX parser couldn't be created
    */
-  public Processor (XMLReader reader, final InputSource src, final ParseContext pContext) throws IOException,
-                                                                                          SAXException
+  public Processor (final XMLReader aReader, final InputSource src, final ParseContext pContext) throws IOException,
+                                                                                                 SAXException
   {
+    XMLReader reader = aReader;
     if (reader == null)
       reader = createXMLReader ();
 
@@ -452,12 +456,12 @@ public class Processor extends XMLFilterImpl
    */
   public Processor (final Processor proc) throws SAXException
   {
-    final HashMap copies = new HashMap ();
-    globalTemplates = AbstractInstruction.deepTemplateArrayCopy (proc.globalTemplates, copies);
-    init ((TransformFactory.Instance) proc.transformNode.deepCopy (copies));
+    final HashMap <Object, Object> copies = new HashMap<> ();
+    m_aGlobalTemplates = AbstractInstruction.deepTemplateArrayCopy (proc.m_aGlobalTemplates, copies);
+    init ((TransformFactory.Instance) proc.m_aTransformNode.deepCopy (copies));
     setParent (createXMLReader ());
-    setTransformerHandlerResolver (proc.context.defaultTransformerHandlerResolver.customResolver);
-    setOutputURIResolver (proc.context.outputUriResolver);
+    setTransformerHandlerResolver (proc.m_aContext.defaultTransformerHandlerResolver.customResolver);
+    setOutputURIResolver (proc.m_aContext.outputUriResolver);
 
   }
 
@@ -534,31 +538,31 @@ public class Processor extends XMLFilterImpl
    */
   private void init (final TransformFactory.Instance pTransformNode)
   {
-    context = new Context ();
+    m_aContext = new Context ();
 
-    context.emitter = initializeEmitter (context);
+    m_aContext.emitter = initializeEmitter (m_aContext);
 
-    eventStack = context.ancestorStack;
+    m_aEventStack = m_aContext.ancestorStack;
 
-    setErrorHandler (context.errorHandler); // register error handler
+    setErrorHandler (m_aContext.m_aErrorHandler); // register error handler
 
-    context.currentProcessor = this;
-    context.currentGroup = context.targetGroup = transformNode = pTransformNode;
+    m_aContext.currentProcessor = this;
+    m_aContext.currentGroup = m_aContext.targetGroup = m_aTransformNode = pTransformNode;
 
     // first Data frame; needed for the first target group
-    dataStack.push (new Data (context));
+    dataStack.push (new Data (m_aContext));
 
     // initialize namespaces
     initNamespaces ();
 
     // array of global templates
-    if (globalTemplates == null)
+    if (m_aGlobalTemplates == null)
     {
       // note: getGlobalTemplates() returns null at the second invocation!
-      final Vector tempVec = transformNode.getGlobalTemplates ();
-      globalTemplates = new TemplateFactory.Instance [tempVec.size ()];
-      tempVec.toArray (globalTemplates);
-      Arrays.sort (globalTemplates);
+      final Vector <TemplateFactory.Instance> tempVec = m_aTransformNode.getGlobalTemplates ();
+      m_aGlobalTemplates = new TemplateFactory.Instance [tempVec.size ()];
+      tempVec.toArray (m_aGlobalTemplates);
+      Arrays.sort (m_aGlobalTemplates);
     }
     initOutputProperties ();
   }
@@ -568,8 +572,8 @@ public class Processor extends XMLFilterImpl
    */
   private void initNamespaces ()
   {
-    inScopeNamespaces = new Hashtable<> ();
-    inScopeNamespaces.put ("xml", NamespaceSupport.XMLNS);
+    m_aInScopeNamespaces = new Hashtable<> ();
+    m_aInScopeNamespaces.put ("xml", NamespaceSupport.XMLNS);
   }
 
   /**
@@ -581,7 +585,7 @@ public class Processor extends XMLFilterImpl
    */
   protected Emitter initializeEmitter (final Context ctx)
   {
-    return new Emitter (ctx.errorHandler);
+    return new Emitter (ctx.m_aErrorHandler);
   }
 
   /**
@@ -590,13 +594,13 @@ public class Processor extends XMLFilterImpl
    */
   public void initOutputProperties ()
   {
-    outputProperties = new Properties ();
-    outputProperties.setProperty (OutputKeys.ENCODING, transformNode.outputEncoding);
-    outputProperties.setProperty (OutputKeys.MEDIA_TYPE, "text/xml");
-    outputProperties.setProperty (OutputKeys.METHOD, transformNode.outputMethod);
-    outputProperties.setProperty (OutputKeys.OMIT_XML_DECLARATION, "no");
-    outputProperties.setProperty (OutputKeys.STANDALONE, "no");
-    outputProperties.setProperty (OutputKeys.VERSION, "1.0");
+    m_aOutputProperties = new Properties ();
+    m_aOutputProperties.setProperty (OutputKeys.ENCODING, m_aTransformNode.outputEncoding);
+    m_aOutputProperties.setProperty (OutputKeys.MEDIA_TYPE, "text/xml");
+    m_aOutputProperties.setProperty (OutputKeys.METHOD, m_aTransformNode.outputMethod);
+    m_aOutputProperties.setProperty (OutputKeys.OMIT_XML_DECLARATION, "no");
+    m_aOutputProperties.setProperty (OutputKeys.STANDALONE, "no");
+    m_aOutputProperties.setProperty (OutputKeys.VERSION, "1.0");
   }
 
   /**
@@ -625,7 +629,7 @@ public class Processor extends XMLFilterImpl
   @Override
   public void setContentHandler (final ContentHandler handler)
   {
-    context.emitter.setContentHandler (handler);
+    m_aContext.emitter.setContentHandler (handler);
   }
 
   /**
@@ -633,7 +637,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setLexicalHandler (final LexicalHandler handler)
   {
-    context.emitter.setLexicalHandler (handler);
+    m_aContext.emitter.setLexicalHandler (handler);
   }
 
   /**
@@ -667,7 +671,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setErrorListener (final ErrorListener listener)
   {
-    context.errorHandler.errorListener = listener;
+    m_aContext.m_aErrorHandler.m_aErrorListener = listener;
   }
 
   /**
@@ -675,7 +679,7 @@ public class Processor extends XMLFilterImpl
    */
   public String getOutputEncoding ()
   {
-    return transformNode.outputEncoding;
+    return m_aTransformNode.outputEncoding;
   }
 
   /**
@@ -690,7 +694,7 @@ public class Processor extends XMLFilterImpl
   {
     if (!name.startsWith ("{"))
       name = "{}" + name;
-    context.globalParameters.put (name, new Value (value));
+    m_aContext.globalParameters.put (name, new Value (value));
   }
 
   /**
@@ -705,7 +709,7 @@ public class Processor extends XMLFilterImpl
   {
     if (!name.startsWith ("{"))
       name = "{}" + name;
-    final Value param = context.globalParameters.get (name);
+    final Value param = m_aContext.globalParameters.get (name);
     try
     {
       if (param != null)
@@ -724,7 +728,7 @@ public class Processor extends XMLFilterImpl
    */
   public void clearParameters ()
   {
-    context.globalParameters.clear ();
+    m_aContext.globalParameters.clear ();
   }
 
   /**
@@ -735,7 +739,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setTransformerHandlerResolver (final ITransformerHandlerResolver resolver)
   {
-    context.defaultTransformerHandlerResolver.customResolver = resolver;
+    m_aContext.defaultTransformerHandlerResolver.customResolver = resolver;
   }
 
   /**
@@ -746,7 +750,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setURIResolver (final URIResolver resolver)
   {
-    context.uriResolver = resolver;
+    m_aContext.m_aURIResolver = resolver;
   }
 
   /**
@@ -758,7 +762,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setOutputURIResolver (final IOutputURIResolver resolver)
   {
-    context.outputUriResolver = resolver;
+    m_aContext.outputUriResolver = resolver;
   }
 
   /**
@@ -769,7 +773,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setMessageEmitter (final IStxEmitter emitter)
   {
-    context.messageEmitter = emitter;
+    m_aContext.messageEmitter = emitter;
   }
 
   /**
@@ -780,12 +784,12 @@ public class Processor extends XMLFilterImpl
   public void startInnerProcessing ()
   {
     // there might be characters already read
-    innerProcStack.push (collectedCharacters.toString ());
-    collectedCharacters.setLength (0);
-    innerProcStack.push (inScopeNamespaces);
+    m_aInnerProcStack.push (m_aCollectedCharacters.toString ());
+    m_aCollectedCharacters.setLength (0);
+    m_aInnerProcStack.push (m_aInScopeNamespaces);
     initNamespaces ();
     // possible jump to another group (changed visibleTemplates)
-    dataStack.push (new Data (CSTX.PR_BUFFER, null, null, null, context));
+    dataStack.push (new Data (CSTX.PR_BUFFER, null, null, null, m_aContext));
   }
 
   /**
@@ -794,19 +798,19 @@ public class Processor extends XMLFilterImpl
   public void endInnerProcessing () throws SAXException
   {
     // look-ahead mechanism
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (true);
 
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
       processCharacters ();
 
     // Clean up dataStack: terminate pending stx:process-siblings
     clearProcessSiblings ();
 
     // remove Data object from startInnerProcessing()
-    context.localVars = dataStack.pop ().localVars;
-    inScopeNamespaces = (Hashtable <String, String>) innerProcStack.pop ();
-    collectedCharacters.append (innerProcStack.pop ());
+    m_aContext.localVars = dataStack.pop ().localVars;
+    m_aInScopeNamespaces = (Hashtable <String, String>) m_aInnerProcStack.pop ();
+    m_aCollectedCharacters.append (m_aInnerProcStack.pop ());
   }
 
   /**
@@ -850,14 +854,14 @@ public class Processor extends XMLFilterImpl
     final boolean notSelf = (top.lastProcStatus != CSTX.PR_SELF);
 
     // the three precedence categories
-    final TemplateFactory.Instance precCats[][] = { top.targetGroup.visibleTemplates,
-                                                    top.targetGroup.groupTemplates,
-                                                    globalTemplates };
+    final TemplateFactory.Instance precCats[][] = { top.targetGroup.m_aVisibleTemplates,
+                                                    top.targetGroup.m_aGroupTemplates,
+                                                    m_aGlobalTemplates };
 
     // look up for a matching template in the categories
     for (int i = 0; i < precCats.length && category == null; i++)
       for (int j = 0; j < precCats[i].length; j++)
-        if (precCats[i][j].matches (context, true) && (notSelf || foundUnprocessedTemplate (precCats[i][j])))
+        if (precCats[i][j].matches (m_aContext, true) && (notSelf || foundUnprocessedTemplate (precCats[i][j])))
         {
           // bingo!
           category = precCats[i];
@@ -875,15 +879,15 @@ public class Processor extends XMLFilterImpl
       {
         for (; tempIndex < category.length && priority == category[tempIndex].getPriority (); tempIndex++)
         {
-          if (category[tempIndex].matches (context, false))
-            context.errorHandler.error ("Ambigous template rule with priority " +
-                                        priority +
-                                        ", found matching template rule already in line " +
-                                        found.lineNo,
-                                        category[tempIndex].publicId,
-                                        category[tempIndex].systemId,
-                                        category[tempIndex].lineNo,
-                                        category[tempIndex].colNo);
+          if (category[tempIndex].matches (m_aContext, false))
+            m_aContext.m_aErrorHandler.error ("Ambigous template rule with priority " +
+                                           priority +
+                                           ", found matching template rule already in line " +
+                                           found.lineNo,
+                                           category[tempIndex].m_sPublicID,
+                                           category[tempIndex].m_sSystemID,
+                                           category[tempIndex].lineNo,
+                                           category[tempIndex].colNo);
         }
       }
     }
@@ -916,7 +920,7 @@ public class Processor extends XMLFilterImpl
     while (inst != null && processStatus == CSTX.PR_CONTINUE)
     {
       // check, if this is the original class: call process() directly
-      if (isProcessorClass)
+      if (m_bIsProcessorClass)
       {
         while (inst != null && processStatus == CSTX.PR_CONTINUE)
         {
@@ -925,7 +929,7 @@ public class Processor extends XMLFilterImpl
             if (log.isDebugEnabled ())
               log.debug (inst.lineNo + ": " + inst);
 
-          processStatus = inst.process (context);
+          processStatus = inst.process (m_aContext);
           inst = inst.next;
         }
       }
@@ -936,7 +940,7 @@ public class Processor extends XMLFilterImpl
         {
           // skip ProcessBase if requested
           if (skipProcessBase && inst.getNode () instanceof AbstractProcessBase)
-            processStatus = inst.process (context);
+            processStatus = inst.process (m_aContext);
           else
             processStatus = processInstruction (inst, event);
           inst = inst.next;
@@ -947,7 +951,7 @@ public class Processor extends XMLFilterImpl
       {
         // stx:process-attributes encountered
         // (i.e. the current node must be an element with attributes)
-        processAttributes (event.attrs);
+        processAttributes (event.m_aAttrs);
         processStatus = CSTX.PR_CONTINUE;
       }
     }
@@ -969,7 +973,7 @@ public class Processor extends XMLFilterImpl
   protected int processInstruction (final AbstractInstruction inst, final SAXEvent event) throws SAXException
   {
     // process instruction
-    return inst.process (context);
+    return inst.process (m_aContext);
   }
 
   /**
@@ -977,12 +981,12 @@ public class Processor extends XMLFilterImpl
    */
   private void processEvent () throws SAXException
   {
-    final SAXEvent event = eventStack.peek ();
+    final SAXEvent event = m_aEventStack.peek ();
     if (CSTX.DEBUG)
       if (log.isDebugEnabled ())
       {
         log.debug (event.toString ());
-        log.debug (context.localVars.toString ());
+        log.debug (m_aContext.localVars.toString ());
       }
 
     if (dataStack.peek ().lastProcStatus == CSTX.PR_SIBLINGS)
@@ -992,8 +996,8 @@ public class Processor extends XMLFilterImpl
     if (temp != null)
     {
       AbstractInstruction inst = temp;
-      context.localVars.clear ();
-      final Hashtable currentParams = context.passedParameters;
+      m_aContext.localVars.clear ();
+      final Hashtable currentParams = m_aContext.m_aPassedParameters;
 
       inst = doProcessLoop (inst, event, false);
 
@@ -1001,83 +1005,83 @@ public class Processor extends XMLFilterImpl
         if (log.isDebugEnabled ())
         {
           log.debug ("stop " + processStatus);
-          log.debug (context.localVars.toString ());
+          log.debug (m_aContext.localVars.toString ());
         }
 
       switch (processStatus)
       {
         case CSTX.PR_CONTINUE:
           // templated finished
-          if (event.type == SAXEvent.ELEMENT || event.type == SAXEvent.ROOT)
+          if (event.m_nType == SAXEvent.ELEMENT || event.m_nType == SAXEvent.ROOT)
           {
-            skipDepth = 1;
-            collectedCharacters.setLength (0); // clear text
-            insideCDATA = false; // reset if there was a CDATA section
+            m_nSkipDepth = 1;
+            m_aCollectedCharacters.setLength (0); // clear text
+            m_bInsideCDATA = false; // reset if there was a CDATA section
           }
           break;
 
         case CSTX.PR_CHILDREN:
           // stx:process-children encountered
-          dataStack.push (new Data (CSTX.PR_CHILDREN, temp, inst, currentParams, context));
+          dataStack.push (new Data (CSTX.PR_CHILDREN, temp, inst, currentParams, m_aContext));
 
-          if (context.targetHandler != null)
+          if (m_aContext.targetHandler != null)
           {
             // instruction had a filter attribute
             startExternDocument ();
-            if (collectedCharacters.length () > 0)
+            if (m_aCollectedCharacters.length () > 0)
             {
-              context.targetHandler.characters (collectedCharacters.toString ().toCharArray (),
-                                                0,
-                                                collectedCharacters.length ());
-              collectedCharacters.setLength (0);
+              m_aContext.targetHandler.characters (m_aCollectedCharacters.toString ().toCharArray (),
+                                                   0,
+                                                   m_aCollectedCharacters.length ());
+              m_aCollectedCharacters.setLength (0);
             }
-            skipDepth = 1;
+            m_nSkipDepth = 1;
           }
           break;
 
         case CSTX.PR_SELF:
           // stx:process-self encountered
-          dataStack.push (new Data (CSTX.PR_SELF, temp, inst, currentParams, context));
-          if (context.targetHandler != null)
+          dataStack.push (new Data (CSTX.PR_SELF, temp, inst, currentParams, m_aContext));
+          if (m_aContext.targetHandler != null)
           {
             // instruction had a filter attribute
-            switch (event.type)
+            switch (event.m_nType)
             {
               case SAXEvent.ELEMENT:
                 startExternDocument ();
-                context.targetHandler.startElement (event.uri, event.lName, event.qName, event.attrs);
-                skipDepth = 1;
+                m_aContext.targetHandler.startElement (event.m_sURI, event.m_sLocalName, event.m_sQName, event.m_aAttrs);
+                m_nSkipDepth = 1;
                 break;
 
               case SAXEvent.TEXT:
                 startExternDocument ();
-                context.targetHandler.characters (event.value.toCharArray (), 0, event.value.length ());
+                m_aContext.targetHandler.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length ());
                 endExternDocument ();
                 break;
 
               case SAXEvent.CDATA:
                 startExternDocument ();
-                context.targetHandler.startCDATA ();
-                context.targetHandler.characters (event.value.toCharArray (), 0, event.value.length ());
-                context.targetHandler.endCDATA ();
+                m_aContext.targetHandler.startCDATA ();
+                m_aContext.targetHandler.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length ());
+                m_aContext.targetHandler.endCDATA ();
                 endExternDocument ();
                 break;
 
               case SAXEvent.PI:
                 startExternDocument ();
-                context.targetHandler.processingInstruction (event.qName, event.value);
+                m_aContext.targetHandler.processingInstruction (event.m_sQName, event.m_sValue);
                 endExternDocument ();
                 break;
 
               case SAXEvent.COMMENT:
                 startExternDocument ();
-                context.targetHandler.comment (event.value.toCharArray (), 0, event.value.length ());
+                m_aContext.targetHandler.comment (event.m_sValue.toCharArray (), 0, event.m_sValue.length ());
                 endExternDocument ();
                 break;
 
               case SAXEvent.ROOT:
-                context.targetHandler.startDocument ();
-                skipDepth = 1;
+                m_aContext.targetHandler.startDocument ();
+                m_nSkipDepth = 1;
                 break;
 
               case SAXEvent.ATTRIBUTE:
@@ -1090,11 +1094,11 @@ public class Processor extends XMLFilterImpl
           }
           else
             processEvent (); // recurse
-          if (event.type == SAXEvent.TEXT ||
-              event.type == SAXEvent.CDATA ||
-              event.type == SAXEvent.COMMENT ||
-              event.type == SAXEvent.PI ||
-              event.type == SAXEvent.ATTRIBUTE)
+          if (event.m_nType == SAXEvent.TEXT ||
+              event.m_nType == SAXEvent.CDATA ||
+              event.m_nType == SAXEvent.COMMENT ||
+              event.m_nType == SAXEvent.PI ||
+              event.m_nType == SAXEvent.ATTRIBUTE)
           {
             // no children present, continue processing
             dataStack.pop ();
@@ -1110,20 +1114,20 @@ public class Processor extends XMLFilterImpl
               case CSTX.PR_CHILDREN:
               case CSTX.PR_SELF:
                 final AbstractNodeBase start = inst.getNode ();
-                context.errorHandler.error ("Encountered '" +
-                                            start.qName +
-                                            "' after stx:process-self",
-                                            start.publicId,
-                                            start.systemId,
-                                            start.lineNo,
-                                            start.colNo);
+                m_aContext.m_aErrorHandler.error ("Encountered '" +
+                                               start.m_sQName +
+                                               "' after stx:process-self",
+                                               start.m_sPublicID,
+                                               start.m_sSystemID,
+                                               start.lineNo,
+                                               start.colNo);
                 // falls through, if the error handler returns
 
               case CSTX.PR_ERROR:
                 throw new SAXException ("Non-recoverable error");
 
               case CSTX.PR_SIBLINGS:
-                dataStack.push (new Data (CSTX.PR_SIBLINGS, temp, inst, currentParams, context, event));
+                dataStack.push (new Data (CSTX.PR_SIBLINGS, temp, inst, currentParams, m_aContext, event));
                 break;
               // case PR_ATTRIBUTES: won't happen
               // case PR_CONTINUE: nothing to do
@@ -1133,13 +1137,13 @@ public class Processor extends XMLFilterImpl
 
         case CSTX.PR_SIBLINGS:
           // stx:process-siblings encountered
-          if (event.type == SAXEvent.ELEMENT || event.type == SAXEvent.ROOT)
+          if (event.m_nType == SAXEvent.ELEMENT || event.m_nType == SAXEvent.ROOT)
           {
             // end of template reached, skip contents
-            skipDepth = 1;
-            collectedCharacters.setLength (0); // clear text
+            m_nSkipDepth = 1;
+            m_aCollectedCharacters.setLength (0); // clear text
           }
-          dataStack.push (new Data (CSTX.PR_SIBLINGS, temp, inst, currentParams, context, event));
+          dataStack.push (new Data (CSTX.PR_SIBLINGS, temp, inst, currentParams, m_aContext, event));
           break;
 
         // case PR_ATTRIBUTES: won't happen
@@ -1158,49 +1162,49 @@ public class Processor extends XMLFilterImpl
     else
     {
       // no template found, default action
-      final AbstractGroupBase tg = context.targetGroup;
-      final Emitter emitter = context.emitter;
-      switch (event.type)
+      final AbstractGroupBase tg = m_aContext.targetGroup;
+      final Emitter emitter = m_aContext.emitter;
+      switch (event.m_nType)
       {
         case SAXEvent.ROOT:
           dataStack.push (new Data (dataStack.peek ()));
           break;
 
         case SAXEvent.ELEMENT:
-          if ((tg.passThrough & PASS_THROUGH_ELEMENT) != 0)
-            emitter.startElement (event.uri, event.lName, event.qName, event.attrs, event.namespaces, tg);
+          if ((tg.m_nPassThrough & PASS_THROUGH_ELEMENT) != 0)
+            emitter.startElement (event.m_sURI, event.m_sLocalName, event.m_sQName, event.m_aAttrs, event.m_aNamespaces, tg);
           dataStack.push (new Data (dataStack.peek ()));
           break;
 
         case SAXEvent.TEXT:
-          if ((tg.passThrough & PASS_THROUGH_TEXT) != 0)
+          if ((tg.m_nPassThrough & PASS_THROUGH_TEXT) != 0)
           {
-            emitter.characters (event.value.toCharArray (), 0, event.value.length (), tg);
+            emitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), tg);
           }
           break;
 
         case SAXEvent.CDATA:
-          if ((tg.passThrough & PASS_THROUGH_TEXT) != 0)
+          if ((tg.m_nPassThrough & PASS_THROUGH_TEXT) != 0)
           {
             emitter.startCDATA (tg);
-            emitter.characters (event.value.toCharArray (), 0, event.value.length (), tg);
+            emitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), tg);
             emitter.endCDATA ();
           }
           break;
 
         case SAXEvent.COMMENT:
-          if ((tg.passThrough & PASS_THROUGH_COMMENT) != 0)
-            emitter.comment (event.value.toCharArray (), 0, event.value.length (), tg);
+          if ((tg.m_nPassThrough & PASS_THROUGH_COMMENT) != 0)
+            emitter.comment (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), tg);
           break;
 
         case SAXEvent.PI:
-          if ((tg.passThrough & PASS_THROUGH_PI) != 0)
-            emitter.processingInstruction (event.qName, event.value, tg);
+          if ((tg.m_nPassThrough & PASS_THROUGH_PI) != 0)
+            emitter.processingInstruction (event.m_sQName, event.m_sValue, tg);
           break;
 
         case SAXEvent.ATTRIBUTE:
-          if ((tg.passThrough & PASS_THROUGH_ATTRIBUTE) != 0)
-            emitter.addAttribute (event.uri, event.qName, event.lName, event.value, tg);
+          if ((tg.m_nPassThrough & PASS_THROUGH_ATTRIBUTE) != 0)
+            emitter.addAttribute (event.m_sURI, event.m_sQName, event.m_sLocalName, event.m_sValue, tg);
           break;
 
         default:
@@ -1210,34 +1214,34 @@ public class Processor extends XMLFilterImpl
   }
 
   /**
-   * Process last element start (stored as {@link #lastElement} in
+   * Process last element start (stored as {@link #m_aLastElement} in
    * {@link #startElement startElement})
    */
   private void processLastElement (final boolean hasChildren) throws SAXException
   {
     if (CSTX.DEBUG)
       if (log.isDebugEnabled ())
-        log.debug (lastElement.toString ());
+        log.debug (m_aLastElement.toString ());
 
     // determine if the look-ahead is a text node
-    final String s = collectedCharacters.toString ();
-    if (s.length () == 0 || (context.targetGroup.stripSpace && s.trim ().length () == 0))
+    final String s = m_aCollectedCharacters.toString ();
+    if (s.length () == 0 || (m_aContext.targetGroup.m_bStripSpace && s.trim ().length () == 0))
     {
       if (hasChildren)
-        lastElement.enableChildNodes (true);
+        m_aLastElement.enableChildNodes (true);
     }
     else
     {
       // set string value of the last element
-      lastElement.value = s;
-      lastElement.enableChildNodes (true);
+      m_aLastElement.m_sValue = s;
+      m_aLastElement.enableChildNodes (true);
     }
 
     // put last element on the event stack
-    eventStack.peek ().countElement (lastElement.uri, lastElement.lName);
-    eventStack.push (lastElement);
+    m_aEventStack.peek ().countElement (m_aLastElement.m_sURI, m_aLastElement.m_sLocalName);
+    m_aEventStack.push (m_aLastElement);
 
-    lastElement = null;
+    m_aLastElement = null;
     processEvent ();
   }
 
@@ -1247,49 +1251,49 @@ public class Processor extends XMLFilterImpl
    */
   private void processCharacters () throws SAXException
   {
-    final String s = collectedCharacters.toString ();
+    final String s = m_aCollectedCharacters.toString ();
 
     if (CSTX.DEBUG)
       if (log.isDebugEnabled ())
         log.debug ("'" + s + "'");
 
-    if (skipDepth > 0 && context.targetHandler != null)
+    if (m_nSkipDepth > 0 && m_aContext.targetHandler != null)
     {
-      if (insideCDATA)
+      if (m_bInsideCDATA)
       {
-        context.targetHandler.startCDATA ();
-        context.targetHandler.characters (s.toCharArray (), 0, s.length ());
-        context.targetHandler.endCDATA ();
+        m_aContext.targetHandler.startCDATA ();
+        m_aContext.targetHandler.characters (s.toCharArray (), 0, s.length ());
+        m_aContext.targetHandler.endCDATA ();
       }
       else
-        context.targetHandler.characters (s.toCharArray (), 0, s.length ());
-      collectedCharacters.setLength (0);
+        m_aContext.targetHandler.characters (s.toCharArray (), 0, s.length ());
+      m_aCollectedCharacters.setLength (0);
       return;
     }
 
-    if (context.targetGroup.stripSpace && s.trim ().length () == 0)
+    if (m_aContext.targetGroup.m_bStripSpace && s.trim ().length () == 0)
     {
-      collectedCharacters.setLength (0);
+      m_aCollectedCharacters.setLength (0);
       return; // white-space only characters found, do nothing
     }
 
     SAXEvent ev;
-    if (insideCDATA)
+    if (m_bInsideCDATA)
     {
-      eventStack.peek ().countCDATA ();
+      m_aEventStack.peek ().countCDATA ();
       ev = SAXEvent.newCDATA (s);
     }
     else
     {
-      eventStack.peek ().countText ();
+      m_aEventStack.peek ().countText ();
       ev = SAXEvent.newText (s);
     }
 
-    eventStack.push (ev);
+    m_aEventStack.push (ev);
     processEvent ();
-    eventStack.pop ();
+    m_aEventStack.pop ();
 
-    collectedCharacters.setLength (0);
+    m_aCollectedCharacters.setLength (0);
   }
 
   /**
@@ -1304,25 +1308,25 @@ public class Processor extends XMLFilterImpl
   {
     // actually only the target group need to be put on this stack ..
     // (for findMatchingTemplate)
-    dataStack.push (new Data (CSTX.PR_ATTRIBUTES, null, null, null, context));
+    dataStack.push (new Data (CSTX.PR_ATTRIBUTES, null, null, null, m_aContext));
     for (int i = 0; i < attrs.getLength (); i++)
     {
       if (CSTX.DEBUG)
         if (log.isDebugEnabled ())
           log.debug (attrs.getQName (i));
       final SAXEvent ev = SAXEvent.newAttribute (attrs, i);
-      eventStack.push (ev);
+      m_aEventStack.push (ev);
       processEvent ();
-      eventStack.pop ();
+      m_aEventStack.pop ();
       if (CSTX.DEBUG)
         if (log.isDebugEnabled ())
           log.debug ("done " + attrs.getQName (i));
     }
     final Data d = dataStack.pop ();
     // restore position, current group and variables
-    context.position = d.contextPosition;
-    context.currentGroup = d.currentGroup;
-    context.localVars = d.localVars;
+    m_aContext.position = d.contextPosition;
+    m_aContext.currentGroup = d.currentGroup;
+    m_aContext.localVars = d.localVars;
   }
 
   /**
@@ -1339,19 +1343,19 @@ public class Processor extends XMLFilterImpl
       // terminates
       int stackPos = dataStack.size () - 1;
       Data data = dataStack.peek ();
-      final Hashtable <String, Value> storedVars = context.localVars;
+      final Hashtable <String, Value> storedVars = m_aContext.localVars;
       stopData = null;
       do
       {
-        context.localVars = data.localVars;
-        if (!data.psiblings.matches (context))
+        m_aContext.localVars = data.localVars;
+        if (!data.psiblings.matches (m_aContext))
         {
           stopData = data;
           stopPos = stackPos;
         }
         data = dataStack.elementAt (--stackPos);
       } while (data.lastProcStatus == CSTX.PR_SIBLINGS);
-      context.localVars = storedVars;
+      m_aContext.localVars = storedVars;
       if (stopData != null) // the first of the non-matching process-sibs
         clearProcessSiblings (stopData, false);
       // If after clearing the process siblings instructions there is
@@ -1396,18 +1400,18 @@ public class Processor extends XMLFilterImpl
     // if clearLast==true then there's no event to remove,
     // because the end of of the parent has been encountered
     if (clearLast)
-      topEvent = eventStack.peek ();
+      topEvent = m_aEventStack.peek ();
     else
-      topEvent = eventStack.pop ();
-    final Hashtable storedVars = context.localVars;
+      topEvent = m_aEventStack.pop ();
+    final Hashtable storedVars = m_aContext.localVars;
     Data data;
     do
     {
       data = dataStack.pop ();
       // put back stored event
-      eventStack.push (data.sibEvent);
-      context.position = data.contextPosition; // restore position
-      context.localVars = data.localVars; // restore variables
+      m_aEventStack.push (data.sibEvent);
+      m_aContext.position = data.contextPosition; // restore position
+      m_aContext.localVars = data.localVars; // restore variables
       AbstractInstruction inst = data.instruction;
 
       do
@@ -1418,7 +1422,7 @@ public class Processor extends XMLFilterImpl
           if (log.isDebugEnabled ())
           {
             log.debug ("stop " + processStatus);
-            log.debug (String.valueOf (context.localVars));
+            log.debug (String.valueOf (m_aContext.localVars));
           }
 
         switch (processStatus)
@@ -1426,13 +1430,13 @@ public class Processor extends XMLFilterImpl
           case CSTX.PR_CHILDREN:
           case CSTX.PR_SELF:
             final AbstractNodeBase start = inst.getNode ();
-            context.errorHandler.error ("Encountered '" +
-                                        start.qName +
-                                        "' after stx:process-siblings",
-                                        start.publicId,
-                                        start.systemId,
-                                        start.lineNo,
-                                        start.colNo);
+            m_aContext.m_aErrorHandler.error ("Encountered '" +
+                                           start.m_sQName +
+                                           "' after stx:process-siblings",
+                                           start.m_sPublicID,
+                                           start.m_sSystemID,
+                                           start.lineNo,
+                                           start.colNo);
             // falls through, if the error handler returns
           case CSTX.PR_ERROR:
             throw new SAXException ("Non-recoverable error");
@@ -1450,14 +1454,14 @@ public class Processor extends XMLFilterImpl
         // put back the last stx:process-siblings instruction
         stopData.instruction = inst;
         // there might have been a group attribute
-        stopData.targetGroup = context.targetGroup;
-        stopData.psiblings = context.psiblings;
-        stopData.localVars = context.localVars;
-        context.localVars = storedVars;
+        stopData.targetGroup = m_aContext.targetGroup;
+        stopData.psiblings = m_aContext.psiblings;
+        stopData.localVars = m_aContext.localVars;
+        m_aContext.localVars = storedVars;
         dataStack.push (stopData);
       }
       // remove this event
-      eventStack.pop ();
+      m_aEventStack.pop ();
     } while (data != stopData); // last object
 
     // If the instruction before the last cleared process-siblings is a
@@ -1466,20 +1470,20 @@ public class Processor extends XMLFilterImpl
     {
       final SAXEvent selfEvent = data.sibEvent;
       // prepare the event stack
-      eventStack.push (selfEvent);
+      m_aEventStack.push (selfEvent);
       // put another namespace context on the stack because endElement()
       // will remove it
-      namespaceContext.push (namespaceContext.peek ());
+      m_aNamespaceContext.push (m_aNamespaceContext.peek ());
       // postpone the processing of character data
-      final StringBuffer postponedCharacters = collectedCharacters;
-      collectedCharacters = new StringBuffer ();
-      endElement (selfEvent.uri, selfEvent.lName, selfEvent.qName);
-      collectedCharacters = postponedCharacters;
+      final StringBuffer postponedCharacters = m_aCollectedCharacters;
+      m_aCollectedCharacters = new StringBuffer ();
+      endElement (selfEvent.m_sURI, selfEvent.m_sLocalName, selfEvent.m_sQName);
+      m_aCollectedCharacters = postponedCharacters;
     }
 
     // restore old event stack
     if (!clearLast)
-      eventStack.push (topEvent);
+      m_aEventStack.push (topEvent);
   }
 
   /**
@@ -1491,14 +1495,14 @@ public class Processor extends XMLFilterImpl
   {
     try
     {
-      context.targetHandler.startDocument ();
+      m_aContext.targetHandler.startDocument ();
 
       // declare current namespaces
-      for (final Enumeration <String> e = inScopeNamespaces.keys (); e.hasMoreElements ();)
+      for (final Enumeration <String> e = m_aInScopeNamespaces.keys (); e.hasMoreElements ();)
       {
         final String prefix = e.nextElement ();
         if (!prefix.equals ("xml"))
-          context.targetHandler.startPrefixMapping (prefix, inScopeNamespaces.get (prefix));
+          m_aContext.targetHandler.startPrefixMapping (prefix, m_aInScopeNamespaces.get (prefix));
       }
 
       // If the Map interface would be used:
@@ -1519,14 +1523,14 @@ public class Processor extends XMLFilterImpl
       java.io.StringWriter sw = null;
       sw = new java.io.StringWriter ();
       e.printStackTrace (new java.io.PrintWriter (sw));
-      final AbstractNodeBase nb = context.currentInstruction;
-      context.errorHandler.fatalError ("External processing failed: " +
-                                       sw,
-                                       nb.publicId,
-                                       nb.systemId,
-                                       nb.lineNo,
-                                       nb.colNo,
-                                       e);
+      final AbstractNodeBase nb = m_aContext.currentInstruction;
+      m_aContext.m_aErrorHandler.fatalError ("External processing failed: " +
+                                          sw,
+                                          nb.m_sPublicID,
+                                          nb.m_sSystemID,
+                                          nb.lineNo,
+                                          nb.colNo,
+                                          e);
     }
   }
 
@@ -1540,11 +1544,11 @@ public class Processor extends XMLFilterImpl
     try
     {
       // undeclare current namespaces
-      for (final Enumeration <String> e = inScopeNamespaces.keys (); e.hasMoreElements ();)
+      for (final Enumeration <String> e = m_aInScopeNamespaces.keys (); e.hasMoreElements ();)
       {
         final String prefix = e.nextElement ();
         if (!prefix.equals ("xml"))
-          context.targetHandler.endPrefixMapping (prefix);
+          m_aContext.targetHandler.endPrefixMapping (prefix);
       }
 
       // If the Map interface would be used
@@ -1557,8 +1561,8 @@ public class Processor extends XMLFilterImpl
       // context.targetHandler.endPrefixMapping(prefix);
       // }
 
-      context.targetHandler.endDocument ();
-      context.targetHandler = null;
+      m_aContext.targetHandler.endDocument ();
+      m_aContext.targetHandler = null;
     }
     catch (final RuntimeException e)
     {
@@ -1566,14 +1570,14 @@ public class Processor extends XMLFilterImpl
       java.io.StringWriter sw = null;
       sw = new java.io.StringWriter ();
       e.printStackTrace (new java.io.PrintWriter (sw));
-      final AbstractNodeBase nb = context.currentInstruction;
-      context.errorHandler.fatalError ("External processing failed: " +
-                                       sw,
-                                       nb.publicId,
-                                       nb.systemId,
-                                       nb.lineNo,
-                                       nb.colNo,
-                                       e);
+      final AbstractNodeBase nb = m_aContext.currentInstruction;
+      m_aContext.m_aErrorHandler.fatalError ("External processing failed: " +
+                                          sw,
+                                          nb.m_sPublicID,
+                                          nb.m_sSystemID,
+                                          nb.lineNo,
+                                          nb.colNo,
+                                          e);
     }
   }
 
@@ -1588,19 +1592,19 @@ public class Processor extends XMLFilterImpl
   {
     // perform this only at the begin of a transformation,
     // not at the begin of processing another document
-    if (innerProcStack.empty ())
+    if (m_aInnerProcStack.empty ())
     {
       // initialize all group stx:variables
-      transformNode.initGroupVariables (context);
-      context.emitter.startDocument ();
+      m_aTransformNode.initGroupVariables (m_aContext);
+      m_aContext.emitter.startDocument ();
     }
     else
     { // stx:process-document
-      innerProcStack.push (eventStack);
-      context.ancestorStack = eventStack = new Stack<> ();
+      m_aInnerProcStack.push (m_aEventStack);
+      m_aContext.ancestorStack = m_aEventStack = new Stack<> ();
     }
 
-    eventStack.push (SAXEvent.newRoot ());
+    m_aEventStack.push (SAXEvent.newRoot ());
 
     processEvent ();
   }
@@ -1608,23 +1612,23 @@ public class Processor extends XMLFilterImpl
   @Override
   public void endDocument () throws SAXException
   {
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
       processCharacters ();
 
-    if (skipDepth == 1 && context.targetHandler != null && dataStack.peek ().lastProcStatus == CSTX.PR_CHILDREN)
+    if (m_nSkipDepth == 1 && m_aContext.targetHandler != null && dataStack.peek ().lastProcStatus == CSTX.PR_CHILDREN)
     {
       // provisional fix for bug #765301
       // (see comment in endElement below)
-      skipDepth = 0;
+      m_nSkipDepth = 0;
       endExternDocument ();
     }
 
-    if (skipDepth == 0)
+    if (m_nSkipDepth == 0)
     {
       clearProcessSiblings ();
       final Data data = dataStack.pop ();
-      context.currentGroup = data.currentGroup;
-      context.targetGroup = data.targetGroup;
+      m_aContext.currentGroup = data.currentGroup;
+      m_aContext.targetGroup = data.targetGroup;
       final short prStatus = data.lastProcStatus;
       if (data.template == null)
       {
@@ -1633,26 +1637,27 @@ public class Processor extends XMLFilterImpl
       else
         if (prStatus == CSTX.PR_CHILDREN || prStatus == CSTX.PR_SELF)
         {
-          context.position = data.contextPosition; // restore position
-          context.localVars = data.localVars;
+          m_aContext.position = data.contextPosition; // restore position
+          m_aContext.localVars = data.localVars;
           AbstractInstruction inst = data.instruction;
-          inst = doProcessLoop (inst, eventStack.peek (), true);
+          inst = doProcessLoop (inst, m_aEventStack.peek (), true);
 
           switch (processStatus)
           {
             case CSTX.PR_CHILDREN:
             case CSTX.PR_SELF:
               final AbstractNodeBase start = inst.getNode ();
-              context.errorHandler.error ("Encountered '" +
-                                          start.qName +
-                                          "' after stx:process-" +
-                                          // prStatus must be either PR_CHILDREN
-                                          // or PR_SELF, see above
-                                          (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
-                                          start.publicId,
-                                          start.systemId,
-                                          start.lineNo,
-                                          start.colNo);
+              m_aContext.m_aErrorHandler.error ("Encountered '" +
+                                             start.m_sQName +
+                                             "' after stx:process-" +
+                                             // prStatus must be either
+                                             // PR_CHILDREN
+                                             // or PR_SELF, see above
+                                             (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
+                                             start.m_sPublicID,
+                                             start.m_sSystemID,
+                                             start.lineNo,
+                                             start.colNo);
               // falls through if the error handler returns
             case CSTX.PR_ERROR:
               throw new SAXException ("Non-recoverable error");
@@ -1669,31 +1674,31 @@ public class Processor extends XMLFilterImpl
     else
     {
       // no stx:process-children in match="/"
-      skipDepth--;
-      if (skipDepth == 0 && context.targetHandler != null)
+      m_nSkipDepth--;
+      if (m_nSkipDepth == 0 && m_aContext.targetHandler != null)
         endExternDocument ();
     }
 
-    if (skipDepth == 0)
+    if (m_nSkipDepth == 0)
     {
       // look at the previous process status on the stack
       if (dataStack.peek ().lastProcStatus == CSTX.PR_SELF)
         endDocument (); // recurse (process-self)
       else
       {
-        eventStack.pop ();
+        m_aEventStack.pop ();
 
-        if (innerProcStack.empty ())
+        if (m_aInnerProcStack.empty ())
         {
-          transformNode.exitRecursionLevel (context);
-          context.emitter.endDocument (transformNode);
+          m_aTransformNode.exitRecursionLevel (m_aContext);
+          m_aContext.emitter.endDocument (m_aTransformNode);
         }
         else
-          eventStack = context.ancestorStack = (Stack <SAXEvent>) innerProcStack.pop ();
+          m_aEventStack = m_aContext.ancestorStack = (Stack <SAXEvent>) m_aInnerProcStack.pop ();
       }
     }
     else
-      log.error ("skipDepth at document end: " + skipDepth);
+      log.error ("skipDepth at document end: " + m_nSkipDepth);
   }
 
   @Override
@@ -1706,31 +1711,31 @@ public class Processor extends XMLFilterImpl
       if (log.isDebugEnabled ())
       {
         log.debug (qName);
-        log.debug ("eventStack: " + eventStack);
+        log.debug ("eventStack: " + m_aEventStack);
         log.debug ("dataStack: " + dataStack);
       }
 
     // look-ahead mechanism
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (true);
 
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
       processCharacters ();
 
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      skipDepth++;
-      if (context.targetHandler != null)
-        context.targetHandler.startElement (uri, lName, qName, attrs);
+      m_nSkipDepth++;
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.startElement (uri, lName, qName, attrs);
       return;
     }
 
-    lastElement = SAXEvent.newElement (uri, lName, qName, attrs, false, inScopeNamespaces);
+    m_aLastElement = SAXEvent.newElement (uri, lName, qName, attrs, false, m_aInScopeNamespaces);
 
     if (!nsContextActive)
     {
-      namespaceContext.push (inScopeNamespaces);
-      inScopeNamespaces = (Hashtable <String, String>) inScopeNamespaces.clone ();
+      m_aNamespaceContext.push (m_aInScopeNamespaces);
+      m_aInScopeNamespaces = (Hashtable <String, String>) m_aInScopeNamespaces.clone ();
     }
     nsContextActive = false;
   }
@@ -1741,48 +1746,48 @@ public class Processor extends XMLFilterImpl
     if (CSTX.DEBUG)
       if (log.isDebugEnabled ())
       {
-        log.debug (qName + " (skipDepth: " + skipDepth + ")");
+        log.debug (qName + " (skipDepth: " + m_nSkipDepth + ")");
         // log.debug("eventStack: " + eventStack.toString());
         // log.debug("dataStack: " + dataStack.toString());
       }
 
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (false);
 
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
       processCharacters ();
 
-    if (skipDepth == 1 && context.targetHandler != null && dataStack.peek ().lastProcStatus == CSTX.PR_CHILDREN)
+    if (m_nSkipDepth == 1 && m_aContext.targetHandler != null && dataStack.peek ().lastProcStatus == CSTX.PR_CHILDREN)
     {
       // provisional fix for bug #765301
       // (This whole external filter stuff needs to be rewritten to
       // enable the functionality for stx:process-siblings. Using
       // skipDepth isn't really a good idea ...)
-      skipDepth = 0;
+      m_nSkipDepth = 0;
       endExternDocument ();
     }
 
-    if (skipDepth == 0)
+    if (m_nSkipDepth == 0)
     {
       clearProcessSiblings ();
 
       final Data data = dataStack.pop ();
       final short prStatus = data.lastProcStatus;
-      context.currentGroup = data.currentGroup;
-      context.targetGroup = dataStack.peek ().targetGroup;
+      m_aContext.currentGroup = data.currentGroup;
+      m_aContext.targetGroup = dataStack.peek ().targetGroup;
       if (data.template == null)
       {
         // perform default action?
-        if ((data.targetGroup.passThrough & PASS_THROUGH_ELEMENT) != 0)
-          context.emitter.endElement (uri, lName, qName, data.targetGroup);
+        if ((data.targetGroup.m_nPassThrough & PASS_THROUGH_ELEMENT) != 0)
+          m_aContext.emitter.endElement (uri, lName, qName, data.targetGroup);
       }
       else
         if (prStatus == CSTX.PR_CHILDREN || prStatus == CSTX.PR_SELF)
         {
-          context.position = data.contextPosition; // restore position
-          context.localVars = data.localVars;
+          m_aContext.position = data.contextPosition; // restore position
+          m_aContext.localVars = data.localVars;
           AbstractInstruction inst = data.instruction;
-          inst = doProcessLoop (inst, eventStack.peek (), true);
+          inst = doProcessLoop (inst, m_aEventStack.peek (), true);
 
           if (CSTX.DEBUG)
             if (log.isDebugEnabled ())
@@ -1794,16 +1799,17 @@ public class Processor extends XMLFilterImpl
             case CSTX.PR_SELF:
             {
               final AbstractNodeBase start = inst.getNode ();
-              context.errorHandler.error ("Encountered '" +
-                                          start.qName +
-                                          "' after stx:process-" +
-                                          // prStatus must be either PR_CHILDREN
-                                          // or PR_SELF, see above
-                                          (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
-                                          start.publicId,
-                                          start.systemId,
-                                          start.lineNo,
-                                          start.colNo);
+              m_aContext.m_aErrorHandler.error ("Encountered '" +
+                                             start.m_sQName +
+                                             "' after stx:process-" +
+                                             // prStatus must be either
+                                             // PR_CHILDREN
+                                             // or PR_SELF, see above
+                                             (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
+                                             start.m_sPublicID,
+                                             start.m_sSystemID,
+                                             start.lineNo,
+                                             start.colNo);
               throw new SAXException ("Non-recoverable error");
             }
 
@@ -1812,8 +1818,8 @@ public class Processor extends XMLFilterImpl
                                         data.template,
                                         inst,
                                         data.passedParams,
-                                        context,
-                                        eventStack.peek ()));
+                                        m_aContext,
+                                        m_aEventStack.peek ()));
               break;
 
             // case PR_ATTRIBUTES: won't happen
@@ -1829,16 +1835,16 @@ public class Processor extends XMLFilterImpl
     }
     else
     {
-      skipDepth--;
-      if (context.targetHandler != null)
+      m_nSkipDepth--;
+      if (m_aContext.targetHandler != null)
       {
-        context.targetHandler.endElement (uri, lName, qName);
-        if (skipDepth == 0)
+        m_aContext.targetHandler.endElement (uri, lName, qName);
+        if (m_nSkipDepth == 0)
           endExternDocument ();
       }
     }
 
-    if (skipDepth == 0)
+    if (m_nSkipDepth == 0)
     {
       // look at the previous process status on the data stack
       if (dataStack.peek ().lastProcStatus == CSTX.PR_SELF)
@@ -1847,8 +1853,8 @@ public class Processor extends XMLFilterImpl
       }
       else
       {
-        eventStack.pop ();
-        inScopeNamespaces = namespaceContext.pop ();
+        m_aEventStack.pop ();
+        m_aInScopeNamespaces = m_aNamespaceContext.pop ();
       }
     }
   }
@@ -1856,13 +1862,13 @@ public class Processor extends XMLFilterImpl
   @Override
   public void characters (final char [] ch, final int start, final int length) throws SAXException
   {
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      if (context.targetHandler != null)
-        context.targetHandler.characters (ch, start, length);
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.characters (ch, start, length);
       return;
     }
-    collectedCharacters.append (ch, start, length);
+    m_aCollectedCharacters.append (ch, start, length);
   }
 
   @Override
@@ -1874,62 +1880,62 @@ public class Processor extends XMLFilterImpl
   @Override
   public void processingInstruction (final String target, final String data) throws SAXException
   {
-    if (insideDTD)
+    if (m_bInsideDTD)
       return;
 
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (true);
 
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
       processCharacters ();
 
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      if (context.targetHandler != null)
-        context.targetHandler.processingInstruction (target, data);
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.processingInstruction (target, data);
       return;
     }
 
     // don't modify the event stack after process-self
-    eventStack.peek ().countPI (target);
+    m_aEventStack.peek ().countPI (target);
 
-    eventStack.push (SAXEvent.newPI (target, data));
+    m_aEventStack.push (SAXEvent.newPI (target, data));
 
     processEvent ();
 
-    eventStack.pop ();
+    m_aEventStack.pop ();
   }
 
   @Override
   public void startPrefixMapping (final String prefix, final String uri) throws SAXException
   {
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (true);
 
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      if (context.targetHandler != null)
-        context.targetHandler.startPrefixMapping (prefix, uri);
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.startPrefixMapping (prefix, uri);
       return;
     }
 
     if (!nsContextActive)
     {
-      namespaceContext.push (inScopeNamespaces);
-      inScopeNamespaces = (Hashtable <String, String>) inScopeNamespaces.clone ();
+      m_aNamespaceContext.push (m_aInScopeNamespaces);
+      m_aInScopeNamespaces = (Hashtable <String, String>) m_aInScopeNamespaces.clone ();
       nsContextActive = true;
     }
     if (uri.equals ("")) // undeclare namespace
-      inScopeNamespaces.remove (prefix);
+      m_aInScopeNamespaces.remove (prefix);
     else
-      inScopeNamespaces.put (prefix, uri);
+      m_aInScopeNamespaces.put (prefix, uri);
   }
 
   @Override
   public void endPrefixMapping (final String prefix) throws SAXException
   {
-    if (context.targetHandler != null)
-      context.targetHandler.endPrefixMapping (prefix);
+    if (m_aContext.targetHandler != null)
+      m_aContext.targetHandler.endPrefixMapping (prefix);
   }
 
   // public void skippedEntity(String name)
@@ -1942,7 +1948,7 @@ public class Processor extends XMLFilterImpl
   @Override
   public void setDocumentLocator (final Locator locator)
   {
-    context.locator = locator;
+    m_aContext.locator = locator;
   }
 
   //
@@ -1951,12 +1957,12 @@ public class Processor extends XMLFilterImpl
 
   public void startDTD (final String name, final String publicId, final String systemId)
   {
-    insideDTD = true;
+    m_bInsideDTD = true;
   }
 
   public void endDTD ()
   {
-    insideDTD = false;
+    m_bInsideDTD = false;
   }
 
   public void startEntity (final java.lang.String name) throws SAXException
@@ -1967,53 +1973,53 @@ public class Processor extends XMLFilterImpl
 
   public void startCDATA () throws SAXException
   {
-    if (!context.targetGroup.recognizeCdata)
+    if (!m_aContext.targetGroup.m_bRecognizeCdata)
       return;
 
     if (CSTX.DEBUG)
       log.debug ("");
 
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      if (context.targetHandler != null)
-        context.targetHandler.startCDATA ();
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.startCDATA ();
       return;
     }
 
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
     {
-      if (lastElement != null)
+      if (m_aLastElement != null)
         processLastElement (true);
       processCharacters ();
-      if (skipDepth > 0)
+      if (m_nSkipDepth > 0)
       {
-        if (context.targetHandler != null)
-          context.targetHandler.startCDATA ();
+        if (m_aContext.targetHandler != null)
+          m_aContext.targetHandler.startCDATA ();
         return;
       }
     }
 
-    insideCDATA = true;
+    m_bInsideCDATA = true;
   }
 
   public void endCDATA () throws SAXException
   {
-    if (!context.targetGroup.recognizeCdata)
+    if (!m_aContext.targetGroup.m_bRecognizeCdata)
       return;
 
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      if (context.targetHandler != null)
-        context.targetHandler.endCDATA ();
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.endCDATA ();
       return;
     }
 
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (true);
 
     processCharacters (); // test for emptiness occurs there
 
-    insideCDATA = false;
+    m_bInsideCDATA = false;
   }
 
   public void comment (final char [] ch, final int start, final int length) throws SAXException
@@ -2022,30 +2028,30 @@ public class Processor extends XMLFilterImpl
       if (log.isDebugEnabled ())
         log.debug (new String (ch, start, length));
 
-    if (insideDTD)
+    if (m_bInsideDTD)
       return;
 
-    if (lastElement != null)
+    if (m_aLastElement != null)
       processLastElement (true);
 
-    if (collectedCharacters.length () != 0)
+    if (m_aCollectedCharacters.length () != 0)
       processCharacters ();
 
-    if (skipDepth > 0)
+    if (m_nSkipDepth > 0)
     {
-      if (context.targetHandler != null)
-        context.targetHandler.comment (ch, start, length);
+      if (m_aContext.targetHandler != null)
+        m_aContext.targetHandler.comment (ch, start, length);
       return;
     }
 
     // don't modify the event stack after process-self
-    eventStack.peek ().countComment ();
+    m_aEventStack.peek ().countComment ();
 
-    eventStack.push (SAXEvent.newComment (new String (ch, start, length)));
+    m_aEventStack.push (SAXEvent.newComment (new String (ch, start, length)));
 
     processEvent ();
 
-    eventStack.pop ();
+    m_aEventStack.pop ();
   }
 
   //
@@ -2059,7 +2065,7 @@ public class Processor extends XMLFilterImpl
    */
   public Stack <SAXEvent> getEventStack ()
   {
-    return this.eventStack;
+    return this.m_aEventStack;
   }
 
   /**
@@ -2079,7 +2085,7 @@ public class Processor extends XMLFilterImpl
    */
   public Context getContext ()
   {
-    return this.context;
+    return this.m_aContext;
   }
 
   /**
@@ -2089,7 +2095,7 @@ public class Processor extends XMLFilterImpl
    */
   public Emitter getEmitter ()
   {
-    return context.emitter;
+    return m_aContext.emitter;
   }
 
   /**
@@ -2099,7 +2105,7 @@ public class Processor extends XMLFilterImpl
    */
   protected SAXEvent getLastElement ()
   {
-    return this.lastElement;
+    return this.m_aLastElement;
   }
 
   // **********************************************************************

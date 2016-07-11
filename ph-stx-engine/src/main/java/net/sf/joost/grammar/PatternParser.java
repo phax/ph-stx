@@ -773,7 +773,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 a.left = n; 
+		 a.m_aLeft = n; 
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -801,7 +801,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 a.left = n.reverseAssociativity(); 
+		 a.m_aLeft = n.reverseAssociativity(); 
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -829,7 +829,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 a.left = new RootTree(n.reverseAssociativity()); 
+		 a.m_aLeft = new RootTree(n.reverseAssociativity()); 
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -857,7 +857,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 a.left = new RootTree(new DescTree(null, n.reverseAssociativity()));
+		 a.m_aLeft = new RootTree(new DescTree(null, n.reverseAssociativity()));
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -922,8 +922,8 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 if (a.type == AbstractTree.DDOT) {
-            a.left = r;
+		 if (a.m_nType == AbstractTree.DDOT) {
+            a.m_aLeft = r;
             RESULT = a;
          }
          else
@@ -944,8 +944,8 @@ class CUP$PatternParser$actions {
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 AbstractTree d = new DescTree(r, null);
-         if (a.type == AbstractTree.DDOT) {
-            a.left = d;
+         if (a.m_nType == AbstractTree.DDOT) {
+            a.m_aLeft = d;
             RESULT = a;
          }
          else 
@@ -962,7 +962,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 if (a.type == AbstractTree.DDOT)
+		 if (a.m_nType == AbstractTree.DDOT)
             RESULT = a;
          else
             RESULT = new ChildTree(null, a);
@@ -1356,16 +1356,16 @@ class CUP$PatternParser$actions {
 		 // need to add an additional leaf for root
          AbstractTree tmp = t, last = null;
          // go down the tree to the left
-         while (tmp.type == AbstractTree.CHILD || tmp.type == AbstractTree.DESC) {
+         while (tmp.m_nType == AbstractTree.CHILD || tmp.m_nType == AbstractTree.DESC) {
             last = tmp;
-            tmp = tmp.left;
+            tmp = tmp.m_aLeft;
          }
          // create a new CHILD node
          tmp = new ChildTree(new RootTree(), tmp);
          if (last == null)
             RESULT = tmp;     // return new node
          else {
-            last.left = tmp;  // insert new node
+            last.m_aLeft = tmp;  // insert new node
             RESULT = t;       // return original
          }
       

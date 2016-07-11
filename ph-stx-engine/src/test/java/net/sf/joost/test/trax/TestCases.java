@@ -2091,10 +2091,7 @@ public class TestCases
 
       return true;
     }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 
   /**
@@ -2347,10 +2344,9 @@ public class TestCases
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     final ByteArrayOutputStream baoStream = new ByteArrayOutputStream ();
-    final Map resultMap = new HashMap ();
+    final Map <StreamResult, ByteArrayOutputStream> resultMap = new HashMap<> ();
     final IOutputURIResolver resolver = new IOutputURIResolver ()
     {
-
       public Result resolve (final String href,
                              final String base,
                              final Properties outputProperties,
@@ -2371,7 +2367,7 @@ public class TestCases
 
       public void close (final Result result) throws TransformerException
       {
-        final OutputStream stream = (OutputStream) resultMap.get (result);
+        final OutputStream stream = resultMap.get (result);
         try
         {
           if (stream != null)

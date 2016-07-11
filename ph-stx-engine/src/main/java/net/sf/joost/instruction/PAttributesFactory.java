@@ -25,6 +25,7 @@
 package net.sf.joost.instruction;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -46,12 +47,12 @@ import net.sf.joost.stx.SAXEvent;
 public class PAttributesFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public PAttributesFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("group");
   }
 
@@ -64,9 +65,9 @@ public class PAttributesFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String groupAtt = attrs.getValue ("group");
 
@@ -100,9 +101,9 @@ public class PAttributesFactory extends AbstractFactoryBase
       // no need to call super.processEnd(), there are no local
       // variable declarations
 
-      final SAXEvent event = (SAXEvent) context.ancestorStack.peek ();
+      final SAXEvent event = context.ancestorStack.peek ();
 
-      if (event.type != SAXEvent.ELEMENT || event.attrs.getLength () == 0)
+      if (event.m_nType != SAXEvent.ELEMENT || event.m_aAttrs.getLength () == 0)
         return CSTX.PR_CONTINUE;
       return CSTX.PR_ATTRIBUTES;
     }

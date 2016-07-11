@@ -41,6 +41,7 @@ import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.BufferReader;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Value;
 import net.sf.joost.util.VariableNotFoundException;
 import net.sf.joost.util.VariableUtils;
 
@@ -55,60 +56,60 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
   /** Instruction the clears the parameter stack */
   private class ProcessEnd extends AbstractInstruction
   {
-    private AbstractProcessBase node;
+    private AbstractProcessBase m_aNode;
 
     public ProcessEnd (final AbstractProcessBase node)
     {
-      this.node = node;
+      this.m_aNode = node;
     }
 
     @Override
     public AbstractNodeBase getNode ()
     {
-      return node;
+      return m_aNode;
     }
 
     @Override
     public short process (final Context ctx)
     {
-      ctx.passedParameters = (Hashtable) node.paramStack.pop ();
+      ctx.m_aPassedParameters = m_aNode.m_aParamStack.pop ();
       return CSTX.PR_CONTINUE;
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final ProcessEnd theCopy = (ProcessEnd) copy;
-      theCopy.node = (AbstractProcessBase) node.deepCopy (copies);
+      theCopy.m_aNode = (AbstractProcessBase) m_aNode.deepCopy (copies);
     }
   }
 
   // stack for parameters, used in the subclasses
-  private Stack paramStack = new Stack ();
+  private Stack <Hashtable <String, Value>> m_aParamStack = new Stack<> ();
 
-  protected Vector children = new Vector ();
+  protected Vector <AbstractInstruction> m_aChildren = new Vector<> ();
 
   // names of the "group" attribute (if present)
-  private String groupQName, groupExpName;
+  private String m_sGroupQName, m_sGroupExpName;
 
   // target group for the next processing
-  protected AbstractGroupBase targetGroup = null;
+  protected AbstractGroupBase m_aTargetGroup;
 
   // filter and src values
-  protected String useBufQName, useBufExpName;
-  protected AbstractTree filter;
-  private AbstractTree hrefTree;
-  private boolean bufScopeDetermined = false;
-  private AbstractGroupBase bufGroupScope = null;
+  protected String m_sUseBufQName, m_sUseBufExpName;
+  protected AbstractTree m_aFilter;
+  private AbstractTree m_aHrefTree;
+  private boolean m_bBufScopeDetermined = false;
+  private AbstractGroupBase m_aBufGroupScope;
 
   // Constructor
   public AbstractProcessBase (final String qName,
-                      final AbstractNodeBase parent,
-                      final ParseContext context,
-                      final String groupQName,
-                      final String method,
-                      String src) throws SAXParseException
+                              final AbstractNodeBase parent,
+                              final ParseContext context,
+                              final String groupQName,
+                              final String method,
+                              final String sSrc) throws SAXParseException
   {
     super (qName, parent, context, true);
 
@@ -116,13 +117,14 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
     // continuing the processing
     next.next = new ProcessEnd (this);
 
-    this.groupQName = groupQName;
+    this.m_sGroupQName = groupQName;
     if (groupQName != null)
-      this.groupExpName = AbstractFactoryBase.getExpandedName (groupQName, context);
+      this.m_sGroupExpName = AbstractFactoryBase.getExpandedName (groupQName, context);
 
     // Evaluate filter-method and filter-src attributes
     if (method != null)
-      filter = AbstractFactoryBase.parseAVT (method, context);
+      m_aFilter = AbstractFactoryBase.parseAVT (method, context);
+    String src = sSrc;
     if (src != null)
     {
       src = src.trim ();
@@ -134,13 +136,13 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
       if (src.startsWith ("url("))
       {
         // part between "url(" and ")" will be evaluated as an expression
-        hrefTree = AbstractFactoryBase.parseExpr (src.substring (4, src.length () - 1).trim (), context);
+        m_aHrefTree = AbstractFactoryBase.parseExpr (src.substring (4, src.length () - 1).trim (), context);
       }
       else
         if (src.startsWith ("buffer("))
         {
-          useBufQName = src.substring (7, src.length () - 1).trim ();
-          useBufExpName = "@" + AbstractFactoryBase.getExpandedName (useBufQName, context);
+          m_sUseBufQName = src.substring (7, src.length () - 1).trim ();
+          m_sUseBufExpName = "@" + AbstractFactoryBase.getExpandedName (m_sUseBufQName, context);
         }
         else
           throw new SAXParseException ("Invalid filter-src value '" +
@@ -158,7 +160,7 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
     while (ancestor != null &&
            !(ancestor instanceof AbstractTemplateBase) &&
            !(ancestor instanceof WithParamFactory.Instance))
-      ancestor = ancestor.parent;
+      ancestor = ancestor.m_aParent;
     if (ancestor == null)
       throw new SAXParseException ("'" +
                                    qName +
@@ -169,7 +171,7 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
       throw new SAXParseException ("'" +
                                    qName +
                                    "' must not be a descendant of '" +
-                                   ancestor.qName +
+                                   ancestor.m_sQName +
                                    "'",
                                    context.locator);
   }
@@ -184,30 +186,29 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
     {
       if (((TextNode) node).isWhitespaceNode ())
         return;
-      else
-        throw new SAXParseException ("'" +
-                                     qName +
-                                     "' must have only stx:with-param children " +
-                                     "(encountered text)",
-                                     node.publicId,
-                                     node.systemId,
-                                     node.lineNo,
-                                     node.colNo);
+      throw new SAXParseException ("'" +
+                                   m_sQName +
+                                   "' must have only stx:with-param children " +
+                                   "(encountered text)",
+                                   node.m_sPublicID,
+                                   node.m_sSystemID,
+                                   node.lineNo,
+                                   node.colNo);
     }
 
     if (!(node instanceof WithParamFactory.Instance))
       throw new SAXParseException ("'" +
-                                   qName +
+                                   m_sQName +
                                    "' must have only stx:with-param children " +
                                    "(encountered '" +
-                                   node.qName +
+                                   node.m_sQName +
                                    "')",
-                                   node.publicId,
-                                   node.systemId,
+                                   node.m_sPublicID,
+                                   node.m_sSystemID,
                                    node.lineNo,
                                    node.colNo);
 
-    children.addElement (node);
+    m_aChildren.addElement (node);
     super.insert (node);
   }
 
@@ -222,30 +223,30 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
 
     // determine parent group
     // parent is at most a TemplateBase; start with grand-parent
-    AbstractNodeBase tmp = parent.parent;
+    AbstractNodeBase tmp = m_aParent.m_aParent;
     while (!(tmp instanceof AbstractGroupBase))
-      tmp = tmp.parent;
+      tmp = tmp.m_aParent;
     final AbstractGroupBase parentGroup = (AbstractGroupBase) tmp;
 
     // Evaluate group attribute
-    if (groupExpName != null)
+    if (m_sGroupExpName != null)
     {
-      targetGroup = (AbstractGroupBase) parentGroup.namedGroups.get (groupExpName);
-      if (targetGroup == null)
+      m_aTargetGroup = (AbstractGroupBase) parentGroup.m_aNamedGroups.get (m_sGroupExpName);
+      if (m_aTargetGroup == null)
         throw new SAXParseException ("Unknown target group '" +
-                                     groupQName +
+                                     m_sGroupQName +
                                      "' specified for '" +
-                                     qName +
+                                     m_sQName +
                                      "'",
-                                     publicId,
-                                     systemId,
+                                     m_sPublicID,
+                                     m_sSystemID,
                                      lineNo,
                                      colNo);
     }
-    if (targetGroup == null)
+    if (m_aTargetGroup == null)
     { // means: still null
       // use current group
-      targetGroup = parentGroup;
+      m_aTargetGroup = parentGroup;
     }
     return false; // done
   }
@@ -256,63 +257,63 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
   @Override
   public short process (final Context context) throws SAXException
   {
-    context.targetGroup = targetGroup;
+    context.targetGroup = m_aTargetGroup;
 
-    paramStack.push (context.passedParameters);
-    context.passedParameters = new Hashtable ();
+    m_aParamStack.push (context.m_aPassedParameters);
+    context.m_aPassedParameters = new Hashtable<> ();
     return CSTX.PR_CONTINUE;
   }
 
   /**
    * Returns a handler that performs a transformation according to the specified
-   * {@link #filter} value.
+   * {@link #m_aFilter} value.
    *
    * @exception SAXException
    *            if this handler couldn't be created
    */
   protected TransformerHandler getProcessHandler (final Context context) throws SAXException
   {
-    final String filterMethod = filter.evaluate (context, this).getString ();
+    final String sFilterMethod = m_aFilter.evaluate (context, this).getString ();
 
     TransformerHandler handler;
     try
     {
-      if (useBufExpName != null)
+      if (m_sUseBufExpName != null)
       {
-        if (!bufScopeDetermined)
+        if (!m_bBufScopeDetermined)
         {
-          bufGroupScope = VariableUtils.findVariableScope (context, useBufExpName);
-          bufScopeDetermined = true;
+          m_aBufGroupScope = VariableUtils.findVariableScope (context, m_sUseBufExpName);
+          m_bBufScopeDetermined = true;
         }
-        handler = context.defaultTransformerHandlerResolver.resolve (filterMethod,
+        handler = context.defaultTransformerHandlerResolver.resolve (sFilterMethod,
                                                                      new BufferReader (context,
-                                                                                       useBufExpName,
-                                                                                       bufGroupScope,
-                                                                                       publicId,
-                                                                                       systemId),
-                                                                     context.uriResolver,
-                                                                     context.errorHandler.errorListener,
-                                                                     context.passedParameters);
+                                                                                       m_sUseBufExpName,
+                                                                                       m_aBufGroupScope,
+                                                                                       m_sPublicID,
+                                                                                       m_sSystemID),
+                                                                     context.m_aURIResolver,
+                                                                     context.m_aErrorHandler.m_aErrorListener,
+                                                                     context.m_aPassedParameters);
       }
       else
       {
-        final String href = (hrefTree != null) ? hrefTree.evaluate (context, this).getStringValue () : null;
-        handler = context.defaultTransformerHandlerResolver.resolve (filterMethod,
+        final String href = (m_aHrefTree != null) ? m_aHrefTree.evaluate (context, this).getStringValue () : null;
+        handler = context.defaultTransformerHandlerResolver.resolve (sFilterMethod,
                                                                      href,
-                                                                     systemId,
-                                                                     context.uriResolver,
-                                                                     context.errorHandler.errorListener,
-                                                                     context.passedParameters);
+                                                                     m_sSystemID,
+                                                                     context.m_aURIResolver,
+                                                                     context.m_aErrorHandler.m_aErrorListener,
+                                                                     context.m_aPassedParameters);
       }
       if (handler == null)
       {
-        context.errorHandler.fatalError ("Filter '" +
-                                         filterMethod +
-                                         "' not available",
-                                         publicId,
-                                         systemId,
-                                         lineNo,
-                                         colNo);
+        context.m_aErrorHandler.fatalError ("Filter '" +
+                                            sFilterMethod +
+                                            "' not available",
+                                            m_sPublicID,
+                                            m_sSystemID,
+                                            lineNo,
+                                            colNo);
         return null;
       }
     }
@@ -324,18 +325,18 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
     catch (final SAXException e)
     {
       // add locator information
-      context.errorHandler.fatalError (e.getMessage (), publicId, systemId, lineNo, colNo, e);
+      context.m_aErrorHandler.fatalError (e.getMessage (), m_sPublicID, m_sSystemID, lineNo, colNo, e);
       return null;
     }
     catch (final VariableNotFoundException e)
     {
-      context.errorHandler.error ("Can't process an undeclared buffer '" +
-                                  useBufQName +
-                                  "'",
-                                  publicId,
-                                  systemId,
-                                  lineNo,
-                                  colNo);
+      context.m_aErrorHandler.error ("Can't process an undeclared buffer '" +
+                                     m_sUseBufQName +
+                                     "'",
+                                     m_sPublicID,
+                                     m_sSystemID,
+                                     lineNo,
+                                     colNo);
       // if the error handler returns
       return null;
     }
@@ -346,24 +347,22 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
   }
 
   @Override
-  protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+  protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
   {
     super.onDeepCopy (copy, copies);
     final AbstractProcessBase theCopy = (AbstractProcessBase) copy;
-    theCopy.paramStack = new Stack ();
-    if (bufGroupScope != null)
-      theCopy.bufGroupScope = (AbstractGroupBase) bufGroupScope.deepCopy (copies);
-    if (targetGroup != null)
-      theCopy.targetGroup = (AbstractGroupBase) targetGroup.deepCopy (copies);
-    theCopy.children = new Vector ();
-    for (int i = 0; i < children.size (); i++)
-    {
-      theCopy.children.add (((AbstractInstruction) children.get (i)).deepCopy (copies));
-    }
-    if (filter != null)
-      theCopy.filter = filter.deepCopy (copies);
-    if (hrefTree != null)
-      theCopy.hrefTree = hrefTree.deepCopy (copies);
+    theCopy.m_aParamStack = new Stack<> ();
+    if (m_aBufGroupScope != null)
+      theCopy.m_aBufGroupScope = (AbstractGroupBase) m_aBufGroupScope.deepCopy (copies);
+    if (m_aTargetGroup != null)
+      theCopy.m_aTargetGroup = (AbstractGroupBase) m_aTargetGroup.deepCopy (copies);
+    theCopy.m_aChildren = new Vector<> (m_aChildren.size ());
+    for (final AbstractInstruction aChildI : m_aChildren)
+      theCopy.m_aChildren.add (aChildI.deepCopy (copies));
+    if (m_aFilter != null)
+      theCopy.m_aFilter = m_aFilter.deepCopy (copies);
+    if (m_aHrefTree != null)
+      theCopy.m_aHrefTree = m_aHrefTree.deepCopy (copies);
   }
 
 }

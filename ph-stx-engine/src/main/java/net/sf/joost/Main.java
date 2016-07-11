@@ -353,11 +353,11 @@ public class Main
         // Create XML output
         if (outFile != null)
         {
-          emitter = AbstractStreamEmitter.newEmitter (outFile, processor.outputProperties);
+          emitter = AbstractStreamEmitter.newEmitter (outFile, processor.m_aOutputProperties);
           emitter.setSystemId (new File (outFile).toURI ().toString ());
         }
         else
-          emitter = AbstractStreamEmitter.newEmitter (System.out, processor.outputProperties);
+          emitter = AbstractStreamEmitter.newEmitter (System.out, processor.m_aOutputProperties);
         processor.setContentHandler (emitter);
         processor.setLexicalHandler (emitter);
         // the previous line is a short-cut for

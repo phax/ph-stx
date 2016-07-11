@@ -55,30 +55,27 @@ import net.sf.joost.stx.Processor;
  */
 public class TransformerHandlerImpl implements TransformerHandler
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "TransformerHandlerImpl".
-  private static Logger log = LoggerFactory.getLogger (TransformerHandlerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger (TransformerHandlerImpl.class);
 
   /**
    * Processor is the joost-stx-engine
    */
-  private Processor processor = null;
-  private Transformer transformer = null;
+  private Processor m_aProcessor;
+  private final Transformer m_aTransformer;
   /**
    * Handler for constructing the Resulttype.
    */
-  private IStxEmitter stxEmitter = null;
+  private IStxEmitter m_aSTXEmitter;
 
   /**
    * Necessary for the document root.
    */
-  private String systemId = null;
+  private String m_sSystemID;
 
   /**
    * The according Result.
    */
-  private Result result = null;
+  private Result m_aResult;
 
   /**
    * Constructor.
@@ -87,11 +84,10 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   protected TransformerHandlerImpl (final Transformer transformer)
   {
-
     if (CSTX.DEBUG)
       log.debug ("calling constructor");
     // Save the reference to the transformer
-    this.transformer = transformer;
+    this.m_aTransformer = transformer;
   }
 
   // *************************************************************************
@@ -99,13 +95,13 @@ public class TransformerHandlerImpl implements TransformerHandler
   // *************************************************************************
 
   /**
-   * Getter for {@link #systemId}
+   * Getter for {@link #m_sSystemID}
    *
    * @return <code>String</code>
    */
   public String getSystemId ()
   {
-    return systemId;
+    return m_sSystemID;
   }
 
   /**
@@ -115,11 +111,11 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public Transformer getTransformer ()
   {
-    return transformer;
+    return m_aTransformer;
   }
 
   /**
-   * Setter for {@link #result}
+   * Setter for {@link #m_aResult}
    *
    * @param result
    *        A <code>Result</code>
@@ -133,18 +129,18 @@ public class TransformerHandlerImpl implements TransformerHandler
 
     try
     {
-      this.result = result;
+      this.m_aResult = result;
       // init saxresult
       init (result);
     }
     catch (final TransformerException e)
     {
-      if (transformer instanceof TransformerImpl)
+      if (m_aTransformer instanceof TransformerImpl)
       {
         final TransformerConfigurationException tE = new TransformerConfigurationException (e.getMessage (), e);
         try
         {
-          transformer.getErrorListener ().fatalError (tE);
+          m_aTransformer.getErrorListener ().fatalError (tE);
         }
         catch (final TransformerException innerE)
         {
@@ -160,14 +156,14 @@ public class TransformerHandlerImpl implements TransformerHandler
   }
 
   /**
-   * Setter for {@link #systemId}
+   * Setter for {@link #m_sSystemID}
    *
    * @param systemId
    *        the system identifier to set
    */
   public void setSystemId (final String systemId)
   {
-    this.systemId = systemId;
+    this.m_sSystemID = systemId;
   }
 
   // *************************************************************************
@@ -183,16 +179,16 @@ public class TransformerHandlerImpl implements TransformerHandler
     if (CSTX.DEBUG)
       log.debug ("init emitter-class according to result");
 
-    if (this.transformer instanceof TransformerImpl)
+    if (this.m_aTransformer instanceof TransformerImpl)
     {
-      this.processor = ((TransformerImpl) this.transformer).getStxProcessor ();
+      this.m_aProcessor = ((TransformerImpl) this.m_aTransformer).getStxProcessor ();
 
       // initialize Emitter --> DOM-, SAX- or StreamEmitter
-      stxEmitter = TrAXHelper.initStxEmitter (result, processor, null);
-      stxEmitter.setSystemId (result.getSystemId ());
+      m_aSTXEmitter = TrAXHelper.initStxEmitter (result, m_aProcessor, null);
+      m_aSTXEmitter.setSystemId (result.getSystemId ());
       // setting Handler
-      this.processor.setContentHandler (stxEmitter);
-      this.processor.setLexicalHandler (stxEmitter);
+      this.m_aProcessor.setContentHandler (m_aSTXEmitter);
+      this.m_aProcessor.setLexicalHandler (m_aSTXEmitter);
     }
   }
 
@@ -205,7 +201,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void setDocumentLocator (final Locator locator)
   {
-    processor.setDocumentLocator (locator);
+    m_aProcessor.setDocumentLocator (locator);
   }
 
   /**
@@ -213,7 +209,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void startDocument () throws SAXException
   {
-    processor.startDocument ();
+    m_aProcessor.startDocument ();
   }
 
   /**
@@ -221,16 +217,16 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void endDocument () throws SAXException
   {
-    processor.endDocument ();
+    m_aProcessor.endDocument ();
 
     // set the constructed DOM-Node on the DOMResult
-    if (result instanceof DOMResult)
+    if (m_aResult instanceof DOMResult)
     {
       if (CSTX.DEBUG)
         log.debug ("result is a DOMResult");
-      final Node nodeResult = ((DOMEmitter) stxEmitter).getDOMTree ();
+      final Node nodeResult = ((DOMEmitter) m_aSTXEmitter).getDOMTree ();
       // DOM specific Implementation
-      ((DOMResult) result).setNode (nodeResult);
+      ((DOMResult) m_aResult).setNode (nodeResult);
       return;
     }
   }
@@ -241,7 +237,7 @@ public class TransformerHandlerImpl implements TransformerHandler
   public void startPrefixMapping (final String prefix, final String uri) throws SAXException
   {
 
-    processor.startPrefixMapping (prefix, uri);
+    m_aProcessor.startPrefixMapping (prefix, uri);
   }
 
   /**
@@ -249,7 +245,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void endPrefixMapping (final String prefix) throws SAXException
   {
-    processor.endPrefixMapping (prefix);
+    m_aProcessor.endPrefixMapping (prefix);
   }
 
   /**
@@ -261,7 +257,7 @@ public class TransformerHandlerImpl implements TransformerHandler
                             final Attributes atts) throws SAXException
   {
 
-    processor.startElement (namespaceURI, localName, qName, atts);
+    m_aProcessor.startElement (namespaceURI, localName, qName, atts);
   }
 
   /**
@@ -270,7 +266,7 @@ public class TransformerHandlerImpl implements TransformerHandler
   public void endElement (final String namespaceURI, final String localName, final String qName) throws SAXException
   {
 
-    processor.endElement (namespaceURI, localName, qName);
+    m_aProcessor.endElement (namespaceURI, localName, qName);
   }
 
   /**
@@ -279,7 +275,7 @@ public class TransformerHandlerImpl implements TransformerHandler
   public void characters (final char [] ch, final int start, final int length) throws SAXException
   {
 
-    processor.characters (ch, start, length);
+    m_aProcessor.characters (ch, start, length);
   }
 
   /**
@@ -288,7 +284,7 @@ public class TransformerHandlerImpl implements TransformerHandler
   public void ignorableWhitespace (final char [] ch, final int start, final int length) throws SAXException
   {
 
-    processor.ignorableWhitespace (ch, start, length);
+    m_aProcessor.ignorableWhitespace (ch, start, length);
   }
 
   /**
@@ -297,7 +293,7 @@ public class TransformerHandlerImpl implements TransformerHandler
   public void processingInstruction (final String target, final String data) throws SAXException
   {
 
-    processor.processingInstruction (target, data);
+    m_aProcessor.processingInstruction (target, data);
   }
 
   /**
@@ -305,7 +301,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void skippedEntity (final String name) throws SAXException
   {
-    processor.skippedEntity (name);
+    m_aProcessor.skippedEntity (name);
   }
 
   /**
@@ -314,7 +310,7 @@ public class TransformerHandlerImpl implements TransformerHandler
   public void startDTD (final String name, final String publicId, final String systemId) throws SAXException
   {
 
-    processor.startDTD (name, publicId, systemId);
+    m_aProcessor.startDTD (name, publicId, systemId);
   }
 
   /**
@@ -322,7 +318,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void endDTD () throws SAXException
   {
-    processor.endDTD ();
+    m_aProcessor.endDTD ();
   }
 
   /**
@@ -330,7 +326,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void startEntity (final String name) throws SAXException
   {
-    processor.startEntity (name);
+    m_aProcessor.startEntity (name);
   }
 
   /**
@@ -338,7 +334,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void endEntity (final String name) throws SAXException
   {
-    processor.endEntity (name);
+    m_aProcessor.endEntity (name);
   }
 
   /**
@@ -346,7 +342,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void startCDATA () throws SAXException
   {
-    processor.startCDATA ();
+    m_aProcessor.startCDATA ();
   }
 
   /**
@@ -354,7 +350,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void endCDATA () throws SAXException
   {
-    processor.endCDATA ();
+    m_aProcessor.endCDATA ();
   }
 
   /**
@@ -362,7 +358,7 @@ public class TransformerHandlerImpl implements TransformerHandler
    */
   public void comment (final char [] ch, final int start, final int length) throws SAXException
   {
-    processor.comment (ch, start, length);
+    m_aProcessor.comment (ch, start, length);
   }
 
   /**

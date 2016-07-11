@@ -68,8 +68,8 @@ public final class StringPad implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    final String str = args.left.evaluate (context, top).getStringValue ();
-    final Value arg2 = args.right.evaluate (context, top);
+    final String str = args.m_aLeft.evaluate (context, top).getStringValue ();
+    final Value arg2 = args.m_aRight.evaluate (context, top);
 
     final double dcount = arg2.getNumberValue ();
     long count = Math.round (dcount);

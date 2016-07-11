@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -48,12 +49,12 @@ import net.sf.joost.stx.ParseContext;
 public final class PIFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public PIFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }
@@ -67,9 +68,9 @@ public final class PIFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final AbstractTree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
@@ -108,7 +109,7 @@ public final class PIFactory extends AbstractFactoryBase
     private void init ()
     {
       buffer = new StringBuffer ();
-      strEmitter = new StringEmitter (buffer, "('" + qName + "' started in line " + lineNo + ")");
+      strEmitter = new StringEmitter (buffer, "('" + m_sQName + "' started in line " + lineNo + ")");
     }
 
     /**
@@ -126,9 +127,9 @@ public final class PIFactory extends AbstractFactoryBase
         // check for nesting of this stx:processing-instruction
         if (context.emitter.isEmitterActive (strEmitter))
         {
-          context.errorHandler.error ("Can't create nested processing instruction here",
-                                      publicId,
-                                      systemId,
+          context.m_aErrorHandler.error ("Can't create nested processing instruction here",
+                                      m_sPublicID,
+                                      m_sSystemID,
                                       lineNo,
                                       colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
@@ -173,7 +174,7 @@ public final class PIFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

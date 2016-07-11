@@ -55,12 +55,12 @@ public abstract class XMLElement
         if (s instanceof ComplexSymbol)
         {
           final ComplexSymbol cs = (ComplexSymbol) s;
-          if (cs.value != null)
+          if (cs.m_aValue != null)
           {
             writer.writeStartElement ("token");
             writer.writeAttribute ("name", cs.getName ());
             cs.getLeft ().toXML (writer, "left");
-            writer.writeCharacters (cs.value + "");
+            writer.writeCharacters (cs.m_aValue + "");
             cs.getRight ().toXML (writer, "right");
             writer.writeEndElement ();
           }
@@ -104,13 +104,13 @@ public abstract class XMLElement
 
   public List <XMLElement> getChildren ()
   {
-    return new LinkedList <> ();
-  };
+    return new LinkedList<> ();
+  }
 
   public boolean hasChildren ()
   {
     return false;
-  };
+  }
 
   public static class NonTerminal extends XMLElement
   {
@@ -129,7 +129,7 @@ public abstract class XMLElement
     @Override
     public List <XMLElement> selectById (final String s)
     {
-      final LinkedList <XMLElement> response = new LinkedList <> ();
+      final LinkedList <XMLElement> response = new LinkedList<> ();
       if (tagname.equals (s))
         response.add (this);
       for (final XMLElement e : list)
@@ -153,7 +153,7 @@ public abstract class XMLElement
     {
       this.tagname = tagname;
       this.variant = variant;
-      list = new LinkedList <> (Arrays.asList (l));
+      list = new LinkedList<> (Arrays.asList (l));
     }
 
     @Override
@@ -232,7 +232,7 @@ public abstract class XMLElement
     @Override
     public List <XMLElement> selectById (final String s)
     {
-      return new LinkedList <> ();
+      return new LinkedList<> ();
     }
 
     Location l, r;
@@ -282,13 +282,13 @@ public abstract class XMLElement
     @Override
     public List <XMLElement> selectById (final String s)
     {
-      final List <XMLElement> ret = new LinkedList <> ();
+      final List <XMLElement> ret = new LinkedList<> ();
       if (tagname.equals (s))
       {
         ret.add (this);
       }
       return ret;
-    };
+    }
 
     Location l, r;
     Object value;

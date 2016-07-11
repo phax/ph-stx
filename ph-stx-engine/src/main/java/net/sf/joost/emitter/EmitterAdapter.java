@@ -51,15 +51,14 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
 public class EmitterAdapter implements ContentHandler, LexicalHandler
 {
-  private final Emitter emitter;
-  private final Map <String, String> nsTable = new Hashtable <> ();
-
-  private final AbstractNodeBase instruction;
+  private final Emitter m_aEmitter;
+  private final Map <String, String> nsTable = new Hashtable<> ();
+  private final AbstractNodeBase m_aInstruction;
 
   public EmitterAdapter (final Emitter emitter, final AbstractNodeBase instruction)
   {
-    this.emitter = emitter;
-    this.instruction = instruction;
+    m_aEmitter = emitter;
+    m_aInstruction = instruction;
   }
 
   //
@@ -100,28 +99,28 @@ public class EmitterAdapter implements ContentHandler, LexicalHandler
                                    atts.getValue (i));
     }
 
-    emitter.startElement (uri, lName, qName, filteredAtts, nsTable, instruction);
+    m_aEmitter.startElement (uri, lName, qName, filteredAtts, nsTable, m_aInstruction);
     nsTable.clear ();
   }
 
   public void endElement (final String uri, final String lName, final String qName) throws SAXException
   {
-    emitter.endElement (uri, lName, qName, instruction);
+    m_aEmitter.endElement (uri, lName, qName, m_aInstruction);
   }
 
   public void characters (final char [] ch, final int start, final int length) throws SAXException
   {
-    emitter.characters (ch, start, length, instruction);
+    m_aEmitter.characters (ch, start, length, m_aInstruction);
   }
 
   public void ignorableWhitespace (final char [] ch, final int start, final int length) throws SAXException
   {
-    emitter.characters (ch, start, length, instruction);
+    m_aEmitter.characters (ch, start, length, m_aInstruction);
   }
 
   public void processingInstruction (final String target, final String data) throws SAXException
   {
-    emitter.processingInstruction (target, data, instruction);
+    m_aEmitter.processingInstruction (target, data, m_aInstruction);
   }
 
   public void skippedEntity (final String name)
@@ -145,16 +144,16 @@ public class EmitterAdapter implements ContentHandler, LexicalHandler
 
   public void startCDATA () throws SAXException
   {
-    emitter.startCDATA (instruction);
+    m_aEmitter.startCDATA (m_aInstruction);
   }
 
   public void endCDATA () throws SAXException
   {
-    emitter.endCDATA ();
+    m_aEmitter.endCDATA ();
   }
 
   public void comment (final char [] ch, final int start, final int length) throws SAXException
   {
-    emitter.comment (ch, start, length, instruction);
+    m_aEmitter.comment (ch, start, length, m_aInstruction);
   }
 }

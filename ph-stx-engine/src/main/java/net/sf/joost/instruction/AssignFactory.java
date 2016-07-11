@@ -88,12 +88,12 @@ public final class AssignFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>assign</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    public String varName, expName;
-    private AbstractTree select;
-    private final String errorMessage;
+    public String m_sVarName, m_sExpName;
+    private AbstractTree m_aSelect;
+    private final String m_sErrorMessage;
 
-    private boolean scopeDetermined = false;
-    private AbstractGroupBase groupScope = null;
+    private boolean m_bScopeDetermined = false;
+    private AbstractGroupBase m_aGroupScope;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -107,10 +107,10 @@ public final class AssignFactory extends AbstractFactoryBase
              context,
              // this element must be empty if there is a select attribute
              select == null);
-      this.varName = varName;
-      this.expName = expName;
-      this.select = select;
-      this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
+      this.m_sVarName = varName;
+      this.m_sExpName = expName;
+      this.m_aSelect = select;
+      this.m_sErrorMessage = "('" + qName + "' started in line " + lineNo + ")";
     }
 
     /**
@@ -120,9 +120,9 @@ public final class AssignFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       // does this variable have a select attribute?
-      if (select != null)
+      if (m_aSelect != null)
       {
-        final Value v = select.evaluate (context, this);
+        final Value v = m_aSelect.evaluate (context, this);
         processVar (v, context);
       }
       else
@@ -131,7 +131,7 @@ public final class AssignFactory extends AbstractFactoryBase
         super.process (context);
         // create a new StringEmitter for this instance and put it
         // on the emitter stack
-        context.pushEmitter (new StringEmitter (new StringBuffer (), errorMessage));
+        context.pushEmitter (new StringEmitter (new StringBuffer (), m_sErrorMessage));
       }
       return CSTX.PR_CONTINUE;
     }
@@ -161,42 +161,42 @@ public final class AssignFactory extends AbstractFactoryBase
      */
     private void processVar (final Value v, final Context context) throws SAXException
     {
-      if (!scopeDetermined)
+      if (!m_bScopeDetermined)
       {
         try
         {
-          groupScope = VariableUtils.findVariableScope (context, expName);
+          m_aGroupScope = VariableUtils.findVariableScope (context, m_sExpName);
         }
         catch (final VariableNotFoundException e)
         {
-          context.errorHandler.error ("Can't assign to undeclared variable '" +
-                                      varName +
-                                      "'",
-                                      publicId,
-                                      systemId,
-                                      lineNo,
-                                      colNo);
+          context.m_aErrorHandler.error ("Can't assign to undeclared variable '" +
+                                         m_sVarName +
+                                         "'",
+                                         m_sPublicID,
+                                         m_sSystemID,
+                                         lineNo,
+                                         colNo);
           return; // if the errorHandler returns
         }
-        scopeDetermined = true;
+        m_bScopeDetermined = true;
       }
 
-      final Hashtable <String, Value> vars = (groupScope == null) ? context.localVars
-                                                                  : context.groupVars.get (groupScope).peek ();
+      final Hashtable <String, Value> vars = (m_aGroupScope == null) ? context.localVars
+                                                                     : context.groupVars.get (m_aGroupScope).peek ();
 
       // assign new value
-      vars.put (expName, v);
+      vars.put (m_sExpName, v);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (groupScope != null)
-        theCopy.groupScope = (AbstractGroupBase) groupScope.deepCopy (copies);
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aGroupScope != null)
+        theCopy.m_aGroupScope = (AbstractGroupBase) m_aGroupScope.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
 
   }

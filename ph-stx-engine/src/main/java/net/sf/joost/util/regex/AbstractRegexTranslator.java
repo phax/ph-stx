@@ -21,24 +21,23 @@ import net.sf.joost.util.om.XMLChar;
  */
 public abstract class AbstractRegexTranslator
 {
-
   protected CharSequence m_aRegExp;
-  protected boolean isXPath;
-  protected boolean ignoreWhitespace;
-  protected boolean inCharClassExpr;
-  protected boolean caseBlind;
-  protected int pos = 0;
+  protected boolean m_bIsXPath;
+  protected boolean m_bIgnoreWhitespace;
+  protected boolean m_bInCharClassExpr;
+  protected boolean m_bCaseBlind;
+  protected int m_nPos = 0;
   protected int m_nLength;
-  protected char curChar;
-  protected boolean eos = false;
-  protected int currentCapture = 0;
-  protected IntHashSet captures = new IntHashSet ();
-  protected final StringBuilder result = new StringBuilder (32);
+  protected char m_cCurChar;
+  protected boolean m_bEOS = false;
+  protected int m_nCurrentCapture = 0;
+  protected IntHashSet m_aCaptures = new IntHashSet ();
+  protected final StringBuilder m_aResult = new StringBuilder (32);
 
   protected void translateTop () throws RegexSyntaxException
   {
     translateRegExp ();
-    if (!eos)
+    if (!m_bEOS)
     {
       throw makeException ("expected end of string");
     }
@@ -47,7 +46,7 @@ public abstract class AbstractRegexTranslator
   protected void translateRegExp () throws RegexSyntaxException
   {
     translateBranch ();
-    while (curChar == '|')
+    while (m_cCurChar == '|')
     {
       copyCurChar ();
       translateBranch ();
@@ -64,7 +63,7 @@ public abstract class AbstractRegexTranslator
 
   protected void translateQuantifier () throws RegexSyntaxException
   {
-    switch (curChar)
+    switch (m_cCurChar)
     {
       case '*':
       case '?':
@@ -80,7 +79,7 @@ public abstract class AbstractRegexTranslator
       default:
         return;
     }
-    if (curChar == '?' && isXPath)
+    if (m_cCurChar == '?' && m_bIsXPath)
     {
       copyCurChar ();
     }
@@ -93,29 +92,29 @@ public abstract class AbstractRegexTranslator
     try
     {
       lowerValue = Integer.parseInt (lower);
-      result.append (lower);
+      m_aResult.append (lower);
     }
     catch (final NumberFormatException e)
     {
       // JDK 1.4 cannot handle ranges bigger than this
-      result.append ("" + Integer.MAX_VALUE);
+      m_aResult.append ("" + Integer.MAX_VALUE);
     }
-    if (curChar == ',')
+    if (m_cCurChar == ',')
     {
       copyCurChar ();
-      if (curChar != '}')
+      if (m_cCurChar != '}')
       {
         final String upper = parseQuantExact ().toString ();
         try
         {
           final int upperValue = Integer.parseInt (upper);
-          result.append (upper);
+          m_aResult.append (upper);
           if (lowerValue < 0 || upperValue < lowerValue)
             throw makeException ("invalid range in quantifier");
         }
         catch (final NumberFormatException e)
         {
-          result.append ("" + Integer.MAX_VALUE);
+          m_aResult.append ("" + Integer.MAX_VALUE);
           if (lowerValue < 0 && new BigDecimal (lower).compareTo (new BigDecimal (upper)) > 0)
             throw makeException ("invalid range in quantifier");
         }
@@ -128,17 +127,17 @@ public abstract class AbstractRegexTranslator
     final StringBuilder buf = new StringBuilder (10);
     do
     {
-      if ("0123456789".indexOf (curChar) < 0)
+      if ("0123456789".indexOf (m_cCurChar) < 0)
         throw makeException ("expected digit in quantifier");
-      buf.append (curChar);
+      buf.append (m_cCurChar);
       advance ();
-    } while (curChar != ',' && curChar != '}');
+    } while (m_cCurChar != ',' && m_cCurChar != '}');
     return buf;
   }
 
   protected void copyCurChar ()
   {
-    result.append (curChar);
+    m_aResult.append (m_cCurChar);
     advance ();
   }
 
@@ -152,35 +151,35 @@ public abstract class AbstractRegexTranslator
 
   public static final class Range implements Comparable <Range>
   {
-    private final int min;
-    private final int max;
+    private final int m_nMin;
+    private final int m_nMax;
 
     public Range (final int min, final int max)
     {
-      this.min = min;
-      this.max = max;
+      this.m_nMin = min;
+      this.m_nMax = max;
     }
 
     public int getMin ()
     {
-      return min;
+      return m_nMin;
     }
 
     public int getMax ()
     {
-      return max;
+      return m_nMax;
     }
 
     public int compareTo (final Range o)
     {
       final Range other = o;
-      if (this.min < other.min)
+      if (this.m_nMin < other.m_nMin)
         return -1;
-      if (this.min > other.min)
+      if (this.m_nMin > other.m_nMin)
         return 1;
-      if (this.max > other.max)
+      if (this.m_nMax > other.m_nMax)
         return -1;
-      if (this.max < other.max)
+      if (this.m_nMax < other.m_nMax)
         return 1;
       return 0;
     }
@@ -188,12 +187,12 @@ public abstract class AbstractRegexTranslator
 
   protected void advance ()
   {
-    if (pos < m_nLength)
+    if (m_nPos < m_nLength)
     {
-      curChar = m_aRegExp.charAt (pos++);
-      if (ignoreWhitespace && !inCharClassExpr)
+      m_cCurChar = m_aRegExp.charAt (m_nPos++);
+      if (m_bIgnoreWhitespace && !m_bInCharClassExpr)
       {
-        while (Whitespace.isWhitespace (curChar))
+        while (Whitespace.isWhitespace (m_cCurChar))
         {
           advance ();
         }
@@ -201,46 +200,43 @@ public abstract class AbstractRegexTranslator
     }
     else
     {
-      pos++;
-      curChar = RegexData.EOS;
-      eos = true;
+      m_nPos++;
+      m_cCurChar = RegexData.EOS;
+      m_bEOS = true;
     }
   }
 
   protected int absorbSurrogatePair () throws RegexSyntaxException
   {
-    if (XMLChar.isSurrogate (curChar))
+    if (XMLChar.isSurrogate (m_cCurChar))
     {
-      if (!XMLChar.isHighSurrogate (curChar))
+      if (!XMLChar.isHighSurrogate (m_cCurChar))
         throw makeException ("invalid surrogate pair");
-      final char c1 = curChar;
+      final char c1 = m_cCurChar;
       advance ();
-      if (!XMLChar.isLowSurrogate (curChar))
+      if (!XMLChar.isLowSurrogate (m_cCurChar))
         throw makeException ("invalid surrogate pair");
-      return XMLChar.supplemental (c1, curChar);
+      return XMLChar.supplemental (c1, m_cCurChar);
     }
-    else
-    {
-      return curChar;
-    }
+    return m_cCurChar;
   }
 
   protected void recede ()
   {
     // The caller must ensure we don't fall off the start of the expression
-    if (eos)
+    if (m_bEOS)
     {
-      curChar = m_aRegExp.charAt (m_nLength - 1);
-      pos = m_nLength;
-      eos = false;
+      m_cCurChar = m_aRegExp.charAt (m_nLength - 1);
+      m_nPos = m_nLength;
+      m_bEOS = false;
     }
     else
     {
-      curChar = m_aRegExp.charAt ((--pos) - 1);
+      m_cCurChar = m_aRegExp.charAt ((--m_nPos) - 1);
     }
-    if (ignoreWhitespace && !inCharClassExpr)
+    if (m_bIgnoreWhitespace && !m_bInCharClassExpr)
     {
-      while (Whitespace.isWhitespace (curChar))
+      while (Whitespace.isWhitespace (m_cCurChar))
       {
         recede ();
       }
@@ -249,7 +245,7 @@ public abstract class AbstractRegexTranslator
 
   protected void expect (final char c) throws RegexSyntaxException
   {
-    if (curChar != c)
+    if (m_cCurChar != c)
     {
       throw makeException ("expected", new String (new char [] { c }));
     }
@@ -261,7 +257,7 @@ public abstract class AbstractRegexTranslator
     // return new RegexSyntaxException("Error at character " + (pos - 1) +
     // " in regular expression " + Err.wrap(regExp, Err.VALUE) + ": " + key);
     return new RegexSyntaxException ("Error at character " +
-                                     (pos - 1) +
+                                     (m_nPos - 1) +
                                      " in regular expression '" +
                                      m_aRegExp +
                                      "' : " +
@@ -275,7 +271,7 @@ public abstract class AbstractRegexTranslator
     // " in regular expression " + Err.wrap(regExp, Err.VALUE) + ": " + key +
     // " (" + arg + ')');
     return new RegexSyntaxException ("Error at character " +
-                                     (pos - 1) +
+                                     (m_nPos - 1) +
                                      " in regular expression '" +
                                      m_aRegExp +
                                      "': " +
@@ -310,12 +306,12 @@ public abstract class AbstractRegexTranslator
     return false;
   }
 
-  protected static String highSurrogateRanges (final List ranges)
+  protected static String highSurrogateRanges (final List <Range> ranges)
   {
     final StringBuilder highRanges = new StringBuilder (ranges.size () * 2);
     for (int i = 0, len = ranges.size (); i < len; i++)
     {
-      final Range r = (Range) ranges.get (i);
+      final Range r = ranges.get (i);
       char min1 = XMLChar.highSurrogate (r.getMin ());
       final char min2 = XMLChar.lowSurrogate (r.getMin ());
       char max1 = XMLChar.highSurrogate (r.getMax ());
@@ -337,12 +333,12 @@ public abstract class AbstractRegexTranslator
     return highRanges.toString ();
   }
 
-  protected static String lowSurrogateRanges (final List ranges)
+  protected static String lowSurrogateRanges (final List <Range> ranges)
   {
     final StringBuilder lowRanges = new StringBuilder (ranges.size () * 2);
     for (int i = 0, len = ranges.size (); i < len; i++)
     {
-      final Range r = (Range) ranges.get (i);
+      final Range r = ranges.get (i);
       final char min1 = XMLChar.highSurrogate (r.getMin ());
       final char min2 = XMLChar.lowSurrogate (r.getMin ());
       final char max1 = XMLChar.highSurrogate (r.getMax ());
@@ -375,7 +371,7 @@ public abstract class AbstractRegexTranslator
     return lowRanges.toString ();
   }
 
-  protected static void sortRangeList (final List ranges)
+  protected static void sortRangeList (final List <Range> ranges)
   {
     Collections.sort (ranges);
     int toIndex = 0;
@@ -383,12 +379,12 @@ public abstract class AbstractRegexTranslator
     int len = ranges.size ();
     while (fromIndex < len)
     {
-      Range r = (Range) ranges.get (fromIndex);
+      Range r = ranges.get (fromIndex);
       final int min = r.getMin ();
       int max = r.getMax ();
       while (++fromIndex < len)
       {
-        final Range r2 = (Range) ranges.get (fromIndex);
+        final Range r2 = ranges.get (fromIndex);
         if (r2.getMin () > max + 1)
           break;
         if (r2.getMax () > max)

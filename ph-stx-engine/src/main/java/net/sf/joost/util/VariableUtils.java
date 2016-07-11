@@ -24,9 +24,6 @@
 
 package net.sf.joost.util;
 
-import java.util.Hashtable;
-import java.util.Stack;
-
 import net.sf.joost.instruction.AbstractGroupBase;
 import net.sf.joost.stx.Context;
 
@@ -51,27 +48,25 @@ public final class VariableUtils
    *         if the variable couldn't be found
    */
   public static AbstractGroupBase findVariableScope (final Context context,
-                                             final String expName) throws VariableNotFoundException
+                                                     final String expName) throws VariableNotFoundException
   {
     AbstractGroupBase groupScope = null;
 
+    // Must be object because Emitter is contained
     Object obj = context.localVars.get (expName);
     if (obj == null)
     {
       AbstractGroupBase group = context.currentGroup;
       while (obj == null && group != null)
       {
-        obj = ((Hashtable) ((Stack) context.groupVars.get (group)).peek ()).get (expName);
+        obj = context.groupVars.get (group).peek ().get (expName);
         groupScope = group;
-        group = group.parentGroup;
+        group = group.m_aParentGroup;
       }
 
       if (obj == null)
-      {
         throw new VariableNotFoundException ();
-      }
     }
     return groupScope;
   }
-
 }

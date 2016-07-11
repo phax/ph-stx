@@ -38,24 +38,24 @@ import org.xml.sax.SAXException;
 public final class StringEmitter extends AbstractStxEmitterBase
 {
   /** the string buffer */
-  private final StringBuffer buffer;
+  private final StringBuffer m_aBuffer;
 
   /**
    * additional info for error messages, <code>null</code> means: don't report
    * errors
    */
-  private final String errorInfo;
+  private final String m_sErrorInfo;
 
   public StringEmitter (final StringBuffer buffer, final String errorInfo)
   {
-    this.buffer = buffer;
-    this.errorInfo = errorInfo;
+    m_aBuffer = buffer;
+    m_sErrorInfo = errorInfo;
   }
 
   /** @return the string buffer for this emitter */
   public StringBuffer getBuffer ()
   {
-    return buffer;
+    return m_aBuffer;
   }
 
   //
@@ -88,8 +88,8 @@ public final class StringEmitter extends AbstractStxEmitterBase
                             final String qName,
                             final Attributes atts) throws SAXException
   {
-    if (errorInfo != null)
-      throw new SAXException ("Can't create element '" + qName + "' here " + errorInfo);
+    if (m_sErrorInfo != null)
+      throw new SAXException ("Can't create element '" + qName + "' here " + m_sErrorInfo);
   }
 
   /** not allowed */
@@ -102,7 +102,7 @@ public final class StringEmitter extends AbstractStxEmitterBase
   /** Add the characters to the internal buffer */
   public void characters (final char [] ch, final int start, final int length) throws SAXException
   {
-    buffer.append (ch, start, length);
+    m_aBuffer.append (ch, start, length);
   }
 
   /** not used */
@@ -114,8 +114,8 @@ public final class StringEmitter extends AbstractStxEmitterBase
   /** not allowed */
   public void processingInstruction (final String target, final String data) throws SAXException
   {
-    if (errorInfo != null)
-      throw new SAXException ("Can't create processing instruction '" + target + "' here " + errorInfo);
+    if (m_sErrorInfo != null)
+      throw new SAXException ("Can't create processing instruction '" + target + "' here " + m_sErrorInfo);
   }
 
   /** not used */
@@ -145,8 +145,8 @@ public final class StringEmitter extends AbstractStxEmitterBase
   /** not allowed */
   public void startCDATA () throws SAXException
   {
-    if (errorInfo != null)
-      throw new SAXException ("Can't create CDATA section here " + errorInfo);
+    if (m_sErrorInfo != null)
+      throw new SAXException ("Can't create CDATA section here " + m_sErrorInfo);
   }
 
   /** not allowed */
@@ -159,7 +159,7 @@ public final class StringEmitter extends AbstractStxEmitterBase
   /** not allowed */
   public void comment (final char [] ch, final int start, final int length) throws SAXException
   {
-    if (errorInfo != null)
-      throw new SAXException ("Can't create comment here " + errorInfo);
+    if (m_sErrorInfo != null)
+      throw new SAXException ("Can't create comment here " + m_sErrorInfo);
   }
 }

@@ -241,7 +241,7 @@ public class Parser implements ContentHandler // , ErrorHandler
   private void processCharacters () throws SAXParseException
   {
     final String s = collectedCharacters.toString ();
-    if (currentNode.preserveSpace || s.trim ().length () != 0)
+    if (currentNode.m_bPreserveSpace || s.trim ().length () != 0)
     {
       if (currentNode instanceof AbstractGroupBase)
       {
@@ -366,7 +366,7 @@ public class Parser implements ContentHandler // , ErrorHandler
       { // attribute present
         final String spaceAtt = attrs.getValue (spaceIndex);
         if ("preserve".equals (spaceAtt))
-          newNode.preserveSpace = true;
+          newNode.m_bPreserveSpace = true;
         else
           if (!"default".equals (spaceAtt))
             throw new SAXParseException ("Value of attribute '" +
@@ -382,11 +382,11 @@ public class Parser implements ContentHandler // , ErrorHandler
           // these elements behave as
           // if xml:space was set to
           // "preserve"
-          newNode.preserveSpace = true;
+          newNode.m_bPreserveSpace = true;
         else
           if (currentNode != null)
             // inherit from parent
-            newNode.preserveSpace = currentNode.preserveSpace;
+            newNode.m_bPreserveSpace = currentNode.m_bPreserveSpace;
 
       if (currentNode != null)
         currentNode.insert (newNode);

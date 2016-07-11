@@ -39,20 +39,20 @@ import net.sf.joost.trax.SourceLocatorImpl;
 /**
  * Class for receiving notifications of warnings and errors and for passing them
  * to a registered ErrorListener object.
- * 
+ *
  * @version $Revision: 1.4 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
 public final class ErrorHandlerImpl implements ErrorHandler
 {
   /** Optional <code>ErrorListener</code> object */
-  public ErrorListener errorListener;
+  public ErrorListener m_aErrorListener;
 
   /**
    * if set to <code>true</code> this object creates
    * TransformerConfigurationExceptions
    */
-  private boolean configurationFlag = false;
+  private boolean m_bConfigurationFlag = false;
 
   //
   // Constructors
@@ -64,18 +64,18 @@ public final class ErrorHandlerImpl implements ErrorHandler
 
   /**
    * Constructs an ErrorHandlerImpl and registers an ErrorListener.
-   * 
+   *
    * @param el
    *        the ErrorLister for this object
    */
   public ErrorHandlerImpl (final ErrorListener el)
   {
-    errorListener = el;
+    m_aErrorListener = el;
   }
 
   /**
    * Constructs an ErrorHandlerImpl, no ErrorListener registered
-   * 
+   *
    * @param configurationFlag
    *        if set to <code>true</code> then this handler constructs
    *        {@link TransformerConfigurationException}s rather than
@@ -83,12 +83,12 @@ public final class ErrorHandlerImpl implements ErrorHandler
    */
   public ErrorHandlerImpl (final boolean configurationFlag)
   {
-    this.configurationFlag = configurationFlag;
+    this.m_bConfigurationFlag = configurationFlag;
   }
 
   /**
    * Constructs an ErrorHandlerImpl and registers an ErrorListener.
-   * 
+   *
    * @param el
    *        the ErrorLister for this object
    * @param configurationFlag
@@ -98,25 +98,25 @@ public final class ErrorHandlerImpl implements ErrorHandler
    */
   public ErrorHandlerImpl (final ErrorListener el, final boolean configurationFlag)
   {
-    errorListener = el;
-    this.configurationFlag = configurationFlag;
+    m_aErrorListener = el;
+    this.m_bConfigurationFlag = configurationFlag;
   }
 
   /**
-   * Creates an Exception dependent from the value of {@link #configurationFlag}
+   * Creates an Exception dependent from the value of
+   * {@link #m_bConfigurationFlag}
    */
   private TransformerException newException (final String msg, final SourceLocator sl, final Throwable cause)
   {
-    if (configurationFlag)
+    if (m_bConfigurationFlag)
       return new TransformerConfigurationException (msg, sl, cause);
-    else
-      return new TransformerException (msg, sl, cause);
+    return new TransformerException (msg, sl, cause);
   }
 
   /**
-   * Reports a warning to a registered {@link #errorListener}. Does nothing if
-   * there's no such listener object.
-   * 
+   * Reports a warning to a registered {@link #m_aErrorListener}. Does nothing
+   * if there's no such listener object.
+   *
    * @param msg
    *        the message of this warning
    * @param loc
@@ -132,9 +132,9 @@ public final class ErrorHandlerImpl implements ErrorHandler
   }
 
   /**
-   * Reports a warning to a registered {@link #errorListener}. Does nothing if
-   * there's no such listener object.
-   * 
+   * Reports a warning to a registered {@link #m_aErrorListener}. Does nothing
+   * if there's no such listener object.
+   *
    * @param msg
    *        the message of this warning
    * @param pubId
@@ -169,12 +169,14 @@ public final class ErrorHandlerImpl implements ErrorHandler
                        final String sysId,
                        final int lineNo,
                        final int colNo) throws SAXException
-  {}
+  {
+    warning (msg, pubId, sysId, lineNo, colNo, null);
+  }
 
   /**
-   * Reports a warning to a registered {@link #errorListener}. Does nothing if
-   * there's no such listener object.
-   * 
+   * Reports a warning to a registered {@link #m_aErrorListener}. Does nothing
+   * if there's no such listener object.
+   *
    * @param te
    *        the warning encapsulated in a <code>TransformerException</code>
    * @throws SAXException
@@ -184,9 +186,9 @@ public final class ErrorHandlerImpl implements ErrorHandler
   {
     try
     {
-      if (errorListener == null)
+      if (m_aErrorListener == null)
         return; // default: do nothing
-      errorListener.warning (te);
+      m_aErrorListener.warning (te);
     }
     catch (final TransformerException ex)
     {
@@ -196,23 +198,23 @@ public final class ErrorHandlerImpl implements ErrorHandler
 
   /**
    * Receive a notification of a warning from the parser. If an
-   * {@link #errorListener} was registered, the provided parameter
+   * {@link #m_aErrorListener} was registered, the provided parameter
    * <code>SAXParseException</code> will be passed to this object wrapped in a
    * {@link TransformerException}
-   * 
+   *
    * @throws SAXException
    *         wrapping {@link TransformerException}
    */
   public void warning (final SAXParseException pe) throws SAXException
   {
-    if (errorListener == null)
+    if (m_aErrorListener == null)
       return;
     warning (pe.getMessage (), pe.getPublicId (), pe.getSystemId (), pe.getLineNumber (), pe.getColumnNumber (), pe);
   }
 
   /**
-   * Reports a recoverable error to a registered {@link #errorListener}.
-   * 
+   * Reports a recoverable error to a registered {@link #m_aErrorListener}.
+   *
    * @param msg
    *        the message of this error
    * @param loc
@@ -228,8 +230,8 @@ public final class ErrorHandlerImpl implements ErrorHandler
   }
 
   /**
-   * Reports a recoverable error to a registered {@link #errorListener}.
-   * 
+   * Reports a recoverable error to a registered {@link #m_aErrorListener}.
+   *
    * @param msg
    *        the message of this error
    * @param pubId
@@ -269,8 +271,8 @@ public final class ErrorHandlerImpl implements ErrorHandler
   }
 
   /**
-   * Reports a recoverable error to a registered {@link #errorListener}.
-   * 
+   * Reports a recoverable error to a registered {@link #m_aErrorListener}.
+   *
    * @param te
    *        the error encapsulated in a <code>TransformerException</code>
    * @throws SAXException
@@ -280,9 +282,9 @@ public final class ErrorHandlerImpl implements ErrorHandler
   {
     try
     {
-      if (errorListener == null)
+      if (m_aErrorListener == null)
         throw te;
-      errorListener.error (te);
+      m_aErrorListener.error (te);
     }
     catch (final TransformerException ex)
     {
@@ -292,10 +294,10 @@ public final class ErrorHandlerImpl implements ErrorHandler
 
   /**
    * Receive a notification of a recoverable error from the parser. If an
-   * {@link #errorListener} was registered, the provided parameter
+   * {@link #m_aErrorListener} was registered, the provided parameter
    * <code>SAXParseException</code> will be passed to this object wrapped in a
    * {@link TransformerException}
-   * 
+   *
    * @throws SAXException
    *         wrapping a {@link TransformerException}
    */
@@ -308,8 +310,8 @@ public final class ErrorHandlerImpl implements ErrorHandler
   }
 
   /**
-   * Reports a non-recoverable error to a registered {@link #errorListener}.
-   * 
+   * Reports a non-recoverable error to a registered {@link #m_aErrorListener}.
+   *
    * @param msg
    *        the message of this error
    * @param loc
@@ -325,8 +327,8 @@ public final class ErrorHandlerImpl implements ErrorHandler
   }
 
   /**
-   * Reports a non-recoverable error to a registered {@link #errorListener}
-   * 
+   * Reports a non-recoverable error to a registered {@link #m_aErrorListener}
+   *
    * @param msg
    *        the message of this error
    * @param pubId
@@ -366,8 +368,8 @@ public final class ErrorHandlerImpl implements ErrorHandler
   }
 
   /**
-   * Reports a non-recoverable error to a registered {@link #errorListener}
-   * 
+   * Reports a non-recoverable error to a registered {@link #m_aErrorListener}
+   *
    * @param te
    *        the error encapsulated in a <code>TransformerException</code>
    * @throws SAXException
@@ -377,9 +379,9 @@ public final class ErrorHandlerImpl implements ErrorHandler
   {
     try
     {
-      if (errorListener == null)
+      if (m_aErrorListener == null)
         throw te;
-      errorListener.fatalError (te);
+      m_aErrorListener.fatalError (te);
     }
     catch (final TransformerException ex)
     {
@@ -389,10 +391,10 @@ public final class ErrorHandlerImpl implements ErrorHandler
 
   /**
    * Receive a notification of a non-recoverable error from the parser. If an
-   * {@link #errorListener} was registered, the provided parameter
+   * {@link #m_aErrorListener} was registered, the provided parameter
    * <code>SAXParseException</code> will be passed to this object wrapped in a
    * {@link TransformerException}
-   * 
+   *
    * @throws SAXException
    *         wrapping a {@link TransformerException}
    */

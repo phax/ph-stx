@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -48,12 +49,12 @@ import net.sf.joost.stx.SAXEvent;
 public class PSiblingsFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public PSiblingsFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("group");
     attrNames.add ("while");
     attrNames.add ("until");
@@ -68,9 +69,9 @@ public class PSiblingsFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String groupAtt = attrs.getValue ("group");
 
@@ -102,7 +103,7 @@ public class PSiblingsFactory extends AbstractFactoryBase
 
       // determine parent group (needed for matches())
       do // parent itself is not a group
-        parent = parent.parent;
+        parent = parent.m_aParent;
       while (!(parent instanceof AbstractGroupBase));
       parentGroup = (AbstractGroupBase) parent;
     }
@@ -115,8 +116,8 @@ public class PSiblingsFactory extends AbstractFactoryBase
     {
       // no need to call super.processEnd(), there are no local
       // variable declarations
-      final SAXEvent event = (SAXEvent) context.ancestorStack.peek ();
-      if (event.type == SAXEvent.ATTRIBUTE || event.type == SAXEvent.ROOT)
+      final SAXEvent event = context.ancestorStack.peek ();
+      if (event.m_nType == SAXEvent.ATTRIBUTE || event.m_nType == SAXEvent.ROOT)
       {
         // These nodes don't have siblings, keep processing.
         return CSTX.PR_CONTINUE;
@@ -145,7 +146,7 @@ public class PSiblingsFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
@@ -156,6 +157,5 @@ public class PSiblingsFactory extends AbstractFactoryBase
       if (whilePattern != null)
         theCopy.whilePattern = whilePattern.deepCopy (copies);
     }
-
   }
 }

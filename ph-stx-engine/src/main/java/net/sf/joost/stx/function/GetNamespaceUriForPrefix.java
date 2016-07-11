@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
@@ -70,11 +70,12 @@ public final class GetNamespaceUriForPrefix implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
-    final String prefix = args.left.evaluate (context, top).getStringValue ();
+    final String prefix = args.m_aLeft.evaluate (context, top).getStringValue ();
 
-    final Value v = args.right.evaluate (context, top);
+    final Value v = args.m_aRight.evaluate (context, top);
     final SAXEvent e = v.getNode ();
     if (e == null)
       throw new EvalException ("The second parameter passed to the '" +
@@ -83,13 +84,12 @@ public final class GetNamespaceUriForPrefix implements IInstance
                                v +
                                ")");
 
-    if (e.namespaces == null)
+    if (e.m_aNamespaces == null)
       return Value.VAL_EMPTY;
 
-    final String uri = (String) e.namespaces.get (prefix);
+    final String uri = e.m_aNamespaces.get (prefix);
     if (uri == null)
       return Value.VAL_EMPTY;
-    else
-      return new Value (uri);
+    return new Value (uri);
   }
 }

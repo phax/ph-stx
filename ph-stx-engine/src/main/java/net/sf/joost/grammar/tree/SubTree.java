@@ -33,7 +33,7 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of SubTree represent arithmeric minus nodes in the syntax tree of a
  * pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.1 $ $Date: 2004/09/29 05:59:51 $
  * @author Oliver Becker
  */
@@ -48,23 +48,23 @@ public final class SubTree extends AbstractTree
   public Value evaluate (final Context context, final int top) throws SAXException
   {
     Value v1;
-    if (left != null)
+    if (m_aLeft != null)
     {
-      v1 = left.evaluate (context, top);
+      v1 = m_aLeft.evaluate (context, top);
       if (v1.type == Value.EMPTY)
         return v1;
     }
     else
       v1 = null; // negative sign
 
-    final Value v2 = right.evaluate (context, top);
+    final Value v2 = m_aRight.evaluate (context, top);
     if (v2.type == Value.EMPTY)
       return v2;
 
     // none of the operands is empty, ok: perform the operation
-    if (left == null) // negative sign
+    if (m_aLeft == null) // negative sign
       return new Value (-v2.getNumberValue ());
-    else
-      return new Value (v1.getNumberValue () - v2.getNumberValue ());
+
+    return new Value (v1.getNumberValue () - v2.getNumberValue ());
   }
 }

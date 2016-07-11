@@ -341,7 +341,7 @@ public class TransformerImpl extends Transformer
   {
 
     if (supportedProperties.contains (name))
-      return m_aProcessor.outputProperties.getProperty (name);
+      return m_aProcessor.m_aOutputProperties.getProperty (name);
     if (ignoredProperties.contains (name))
       return null;
     final IllegalArgumentException iE = new IllegalArgumentException ("Unsupported property " + name);
@@ -371,7 +371,7 @@ public class TransformerImpl extends Transformer
         log.error (iE.getMessage (), iE);
         throw iE;
       }
-      m_aProcessor.outputProperties.setProperty (name, value);
+      m_aProcessor.m_aOutputProperties.setProperty (name, value);
     }
     else
       if (ignoredProperties.contains (name))
@@ -387,18 +387,18 @@ public class TransformerImpl extends Transformer
   }
 
   /**
-   * Getter for {@link Processor#outputProperties}
+   * Getter for {@link Processor#m_aOutputProperties}
    *
    * @return a copy of the current output properties
    */
   @Override
   public Properties getOutputProperties ()
   {
-    return (Properties) m_aProcessor.outputProperties.clone ();
+    return (Properties) m_aProcessor.m_aOutputProperties.clone ();
   }
 
   /**
-   * Setter for {@link Processor#outputProperties}
+   * Setter for {@link Processor#m_aOutputProperties}
    *
    * @param oformat
    *        A <code>Properties</code> object, that replaces the current set of
@@ -438,7 +438,7 @@ public class TransformerImpl extends Transformer
           throw iE;
         }
       }
-      m_aProcessor.outputProperties = (Properties) oformat.clone ();
+      m_aProcessor.m_aOutputProperties = (Properties) oformat.clone ();
     }
   }
 
@@ -447,8 +447,8 @@ public class TransformerImpl extends Transformer
    */
   private boolean isValidOutputMethod (final String value)
   {
-    return value.startsWith ("{") // qualified name
-           || "xml".equals (value) || "text".equals (value);
+    // qualified name
+    return value.startsWith ("{") || "xml".equals (value) || "text".equals (value);
   }
 
   /**

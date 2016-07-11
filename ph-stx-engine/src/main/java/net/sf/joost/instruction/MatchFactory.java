@@ -52,7 +52,7 @@ public final class MatchFactory extends AbstractFactoryBase
   // Constructor
   public MatchFactory ()
   {
-    attrNames = new HashSet <String> ();
+    attrNames = new HashSet <> ();
     attrNames.add ("regex");
     attrNames.add ("flags");
   }
@@ -66,9 +66,9 @@ public final class MatchFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (!(parent instanceof AnalyzeTextFactory.Instance))
       throw new SAXParseException ("'" + qName + "' must be child of stx:analyze-text", context.locator);
@@ -114,7 +114,7 @@ public final class MatchFactory extends AbstractFactoryBase
     @Override
     public boolean compile (final int pass, final ParseContext context) throws SAXException
     {
-      nodeEnd.next = analyzeText.nodeEnd; // back to stx:analyze-text
+      m_aNodeEnd.next = analyzeText.m_aNodeEnd; // back to stx:analyze-text
       return false;
     }
 
@@ -135,7 +135,7 @@ public final class MatchFactory extends AbstractFactoryBase
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

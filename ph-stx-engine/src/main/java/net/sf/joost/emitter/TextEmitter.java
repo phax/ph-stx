@@ -65,7 +65,7 @@ public class TextEmitter extends AbstractStreamEmitter
   {
     try
     {
-      writer.flush ();
+      m_aWriter.flush ();
     }
     catch (final IOException ex)
     {
@@ -93,16 +93,16 @@ public class TextEmitter extends AbstractStreamEmitter
   {
     // Check that the characters can be represented in the current encoding
     for (int i = 0; i < length; i++)
-      if (!charsetEncoder.canEncode (ch[start + i]))
+      if (!m_aCharsetEncoder.canEncode (ch[start + i]))
         throw new SAXException ("Cannot output character with code " +
                                 (int) ch[start + i] +
                                 " in the encoding '" +
-                                encoding +
+                                m_sEncoding +
                                 "'");
 
     try
     {
-      writer.write (ch, start, length);
+      m_aWriter.write (ch, start, length);
       if (CSTX.DEBUG)
         log.debug ("'" + new String (ch, start, length) + "'");
     }

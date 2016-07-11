@@ -25,8 +25,7 @@
 package net.sf.joost.instruction;
 
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Stack;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -49,12 +48,12 @@ import net.sf.joost.stx.ParseContext;
 public final class ResultBufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public ResultBufferFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("clear");
   }
@@ -68,9 +67,9 @@ public final class ResultBufferFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     // buffers are special variables with an "@" prefix
@@ -116,30 +115,30 @@ public final class ResultBufferFactory extends AbstractFactoryBase
         AbstractGroupBase group = context.currentGroup;
         while (emitter == null && group != null)
         {
-          emitter = ((Hashtable) ((Stack) context.groupVars.get (group)).peek ()).get (expName);
-          group = group.parentGroup;
+          emitter = context.groupVars.get (group).peek ().get (expName);
+          group = group.m_aParentGroup;
         }
       }
       if (emitter == null)
       {
-        context.errorHandler.error ("Can't fill an undeclared buffer '" +
+        context.m_aErrorHandler.error ("Can't fill an undeclared buffer '" +
                                     bufName +
                                     "'",
-                                    publicId,
-                                    systemId,
+                                    m_sPublicID,
+                                    m_sSystemID,
                                     lineNo,
                                     colNo);
         return CSTX.PR_CONTINUE;
       }
 
-      final BufferEmitter buffer = (BufferEmitter) ((Emitter) emitter).contH;
+      final BufferEmitter buffer = (BufferEmitter) ((Emitter) emitter).m_aContH;
       if (context.emitter.isEmitterActive (buffer))
       {
-        context.errorHandler.error ("Buffer '" +
+        context.m_aErrorHandler.error ("Buffer '" +
                                     bufName +
                                     "' acts already as result buffer",
-                                    publicId,
-                                    systemId,
+                                    m_sPublicID,
+                                    m_sSystemID,
                                     lineNo,
                                     colNo);
         return CSTX.PR_CONTINUE;

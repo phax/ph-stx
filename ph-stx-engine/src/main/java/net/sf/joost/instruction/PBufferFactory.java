@@ -24,8 +24,11 @@
 
 package net.sf.joost.instruction;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.transform.sax.TransformerHandler;
 
@@ -38,7 +41,6 @@ import net.sf.joost.stx.BufferReader;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
-import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.util.VariableNotFoundException;
 import net.sf.joost.util.VariableUtils;
 
@@ -53,14 +55,14 @@ import net.sf.joost.util.VariableUtils;
 public class PBufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   //
   // Constructor
   //
   public PBufferFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("group");
     attrNames.add ("filter-method");
@@ -76,9 +78,9 @@ public class PBufferFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     // buffers are special variables with an "@" prefix
@@ -129,7 +131,7 @@ public class PBufferFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      this.localFieldStack.push (context.targetGroup);
+      this.m_aLocalFieldStack.push (context.targetGroup);
       return super.process (context);
     }
 
@@ -149,11 +151,11 @@ public class PBufferFactory extends AbstractFactoryBase
         }
         catch (final VariableNotFoundException e)
         {
-          context.errorHandler.error ("Can't process an undeclared buffer '" +
+          context.m_aErrorHandler.error ("Can't process an undeclared buffer '" +
                                       bufName +
                                       "'",
-                                      publicId,
-                                      systemId,
+                                      m_sPublicID,
+                                      m_sSystemID,
                                       lineNo,
                                       colNo);
           // if the error handler returns
@@ -162,9 +164,9 @@ public class PBufferFactory extends AbstractFactoryBase
         scopeDetermined = true;
       }
 
-      final BufferReader br = new BufferReader (context, expName, groupScope, publicId, systemId);
+      final BufferReader br = new BufferReader (context, expName, groupScope, m_sPublicID, m_sSystemID);
 
-      if (filter != null)
+      if (m_aFilter != null)
       {
         // use external SAX filter (TransformerHandler)
         final TransformerHandler handler = getProcessHandler (context);
@@ -180,17 +182,16 @@ public class PBufferFactory extends AbstractFactoryBase
         catch (final SAXException e)
         {
           // add locator information
-          context.errorHandler.fatalError (e.getMessage (), publicId, systemId, lineNo, colNo, e);
+          context.m_aErrorHandler.fatalError (e.getMessage (), m_sPublicID, m_sSystemID, lineNo, colNo, e);
           return CSTX.PR_ERROR;
         }
         // catch any unchecked exception
         catch (final RuntimeException e)
         {
           // wrap exception
-          java.io.StringWriter sw = null;
-          sw = new java.io.StringWriter ();
-          e.printStackTrace (new java.io.PrintWriter (sw));
-          context.errorHandler.fatalError ("External processing failed: " + sw, publicId, systemId, lineNo, colNo, e);
+          final StringWriter sw = new StringWriter ();
+          e.printStackTrace (new PrintWriter (sw));
+          context.m_aErrorHandler.fatalError ("External processing failed: " + sw, m_sPublicID, m_sSystemID, lineNo, colNo, e);
           return CSTX.PR_ERROR;
         }
       }
@@ -203,7 +204,7 @@ public class PBufferFactory extends AbstractFactoryBase
 
         // ensure, that position counters on the top most event are
         // available
-        ((SAXEvent) context.ancestorStack.peek ()).enableChildNodes (false);
+        context.ancestorStack.peek ().enableChildNodes (false);
 
         final Processor proc = context.currentProcessor;
         proc.startInnerProcessing ();
@@ -216,13 +217,13 @@ public class PBufferFactory extends AbstractFactoryBase
         // restore current group
         context.currentGroup = prevGroup;
       }
-      context.targetGroup = (AbstractGroupBase) localFieldStack.pop ();
+      context.targetGroup = (AbstractGroupBase) m_aLocalFieldStack.pop ();
 
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;

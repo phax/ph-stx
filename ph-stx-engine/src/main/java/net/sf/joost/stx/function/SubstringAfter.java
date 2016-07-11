@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -70,14 +70,14 @@ public final class SubstringAfter implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
-    final String s1 = args.left.evaluate (context, top).getStringValue ();
-    final String s2 = args.right.evaluate (context, top).getStringValue ();
+    final String s1 = args.m_aLeft.evaluate (context, top).getStringValue ();
+    final String s2 = args.m_aRight.evaluate (context, top).getStringValue ();
     final int index = s1.indexOf (s2);
     if (index != -1)
       return new Value (s1.substring (index + s2.length ()));
-    else
-      return Value.VAL_EMPTY_STRING;
+    return Value.VAL_EMPTY_STRING;
   }
 }

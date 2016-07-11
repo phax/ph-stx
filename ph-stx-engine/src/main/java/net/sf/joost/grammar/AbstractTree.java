@@ -36,72 +36,72 @@ import net.sf.joost.stx.Value;
 /**
  * Objects of Tree represent nodes in the syntax tree of a pattern or an STXPath
  * expression.
- * 
+ *
  * @version $Revision: 2.14 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 public abstract class AbstractTree implements Cloneable
 {
-  /** Node type constants for {@link #type} */
-  public static final int ROOT = 1, // root node
-      CHILD = 2, // child axis "/"
-      DESC = 3, // descendend axis "//"
-      UNION = 4, // "|"
-      NAME_TEST = 5, // an element name (qname)
-      WILDCARD = 6, // "*"
-      URI_WILDCARD = 7, // "*:ncname"
-      LOCAL_WILDCARD = 8, // "prefix:*"
-      NODE_TEST = 9, // "node()"
-      TEXT_TEST = 10, // "text()"
-      CDATA_TEST = 100, // "cdata()"
-      COMMENT_TEST = 11, // "comment()"
-      PI_TEST = 12, // "pi()", "pi(...)"
-      FUNCTION = 13, // a function call
-      PREDICATE = 14, // a predicate "[" ... "]"
-      NUMBER = 15, // a number
-      STRING = 16, // a quoted string
-      ADD = 17, // "+"
-      SUB = 18, // "-"
-      MULT = 19, // "*"
-      DIV = 20, // "div"
-      MOD = 21, // "mod"
-      AND = 22, // "and"
-      OR = 23, // "or"
-      EQ = 24, // "="
-      NE = 25, // "!="
-      LT = 26, // "<"
-      LE = 27, // "<="
-      GT = 28, // ">"
-      GE = 29, // ">="
-      ATTR = 30, // "@qname"
-      ATTR_WILDCARD = 31, // "@*"
-      ATTR_URI_WILDCARD = 32, // "@*:ncname"
-      ATTR_LOCAL_WILDCARD = 33, // "@prefix:*"
-      LIST = 34, // "," in parameter list
-      SEQ = 35, // "," in sequences
-      AVT = 36, // "{" ... "}"
-      VAR = 37, // "$qname"
-      DOT = 38, // "."
-      DDOT = 39, // ".."
-      VALUE = 40; // internal: a constructed value leaf
+  /** Node type constants for {@link #m_nType} */
+  public static final int ROOT = 1; // root node
+  public static final int CHILD = 2; // child axis "/"
+  public static final int DESC = 3; // descendend axis "//"
+  public static final int UNION = 4; // "|"
+  public static final int NAME_TEST = 5; // an element name (qname)
+  public static final int WILDCARD = 6; // "*"
+  public static final int URI_WILDCARD = 7; // "*:ncname"
+  public static final int LOCAL_WILDCARD = 8; // "prefix:*"
+  public static final int NODE_TEST = 9; // "node()"
+  public static final int TEXT_TEST = 10; // "text()"
+  public static final int CDATA_TEST = 100; // "cdata()"
+  public static final int COMMENT_TEST = 11; // "comment()"
+  public static final int PI_TEST = 12; // "pi()"; "pi(...)"
+  public static final int FUNCTION = 13; // a function call
+  public static final int PREDICATE = 14; // a predicate "[" ... "]"
+  public static final int NUMBER = 15; // a number
+  public static final int STRING = 16; // a quoted string
+  public static final int ADD = 17; // "+"
+  public static final int SUB = 18; // "-"
+  public static final int MULT = 19; // "*"
+  public static final int DIV = 20; // "div"
+  public static final int MOD = 21; // "mod"
+  public static final int AND = 22; // "and"
+  public static final int OR = 23; // "or"
+  public static final int EQ = 24; // "="
+  public static final int NE = 25; // "!="
+  public static final int LT = 26; // "<"
+  public static final int LE = 27; // "<="
+  public static final int GT = 28; // ">"
+  public static final int GE = 29; // ">="
+  public static final int ATTR = 30; // "@qname"
+  public static final int ATTR_WILDCARD = 31; // "@*"
+  public static final int ATTR_URI_WILDCARD = 32; // "@*:ncname"
+  public static final int ATTR_LOCAL_WILDCARD = 33; // "@prefix:*"
+  public static final int LIST = 34; // ";" in parameter list
+  public static final int SEQ = 35; // ";" in sequences
+  public static final int AVT = 36; // "{" ... "}"
+  public static final int VAR = 37; // "$qname"
+  public static final int DOT = 38; // "."
+  public static final int DDOT = 39; // ".."
+  public static final int VALUE = 40; // internal: a constructed value leaf
 
   /** The type of the node in the Tree. */
-  public int type;
+  public int m_nType;
 
   /** The left subtree. */
-  public AbstractTree left;
+  public AbstractTree m_aLeft;
 
   /** The right subtree. */
-  public AbstractTree right;
+  public AbstractTree m_aRight;
 
   /** The value of this node as an object. */
-  public Object value;
+  public Object m_aValue;
 
-  /** URI if {@link #value} is a qualified name. */
-  public String uri;
+  /** URI if {@link #m_aValue} is a qualified name. */
+  public String m_sURI;
 
-  /** Local name if {@link #value} is a qualified name. */
-  public String lName;
+  /** Local name if {@link #m_aValue} is a qualified name. */
+  public String m_sLocalName;
 
   //
   // Constructors
@@ -110,25 +110,22 @@ public abstract class AbstractTree implements Cloneable
   /** The most general constructor */
   private AbstractTree (final int type, final AbstractTree left, final AbstractTree right, final Object value)
   {
-    this.type = type;
-    this.left = left;
-    this.right = right;
-    this.value = value;
-    // System.err.println("Tree-Constructor 1: " + this);
+    this.m_nType = type;
+    this.m_aLeft = left;
+    this.m_aRight = right;
+    this.m_aValue = value;
   }
 
   /** Constructs a Tree object as a node with two subtrees. */
   public AbstractTree (final int type, final AbstractTree left, final AbstractTree right)
   {
     this (type, left, right, null);
-    // System.err.println("Tree-Constructor 2: " + this);
   }
 
   /** Constructs a Tree object as a leaf. */
   public AbstractTree (final int type, final Object value)
   {
     this (type, null, null, value);
-    // System.err.println("Tree-Constructor 3: " + this);
   }
 
   /** Constructs a Tree object as a leaf without a value. */
@@ -154,10 +151,10 @@ public abstract class AbstractTree implements Cloneable
    */
   public boolean matches (final Context context, final int top, final boolean setPosition) throws SAXException
   {
-    context.errorHandler.fatalError ("Fatal: unprocessed type in matching: " +
+    context.m_aErrorHandler.fatalError ("Fatal: unprocessed type in matching: " +
                                      this,
-                                     context.currentInstruction.publicId,
-                                     context.currentInstruction.systemId,
+                                     context.currentInstruction.m_sPublicID,
+                                     context.currentInstruction.m_sSystemID,
                                      context.currentInstruction.lineNo,
                                      context.currentInstruction.colNo);
     return false;
@@ -165,7 +162,7 @@ public abstract class AbstractTree implements Cloneable
 
   /**
    * Evaluates the current Tree if it represents an expression.
-   * 
+   *
    * @param context
    *        the current Context
    * @param instruction
@@ -181,7 +178,7 @@ public abstract class AbstractTree implements Cloneable
 
   /**
    * Evaluates the current Tree if it represents an expression.
-   * 
+   *
    * @param context
    *        the current Context
    * @param top
@@ -191,10 +188,10 @@ public abstract class AbstractTree implements Cloneable
    */
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    context.errorHandler.fatalError ("Fatal: unprocessed type in evaluating: " +
+    context.m_aErrorHandler.fatalError ("Fatal: unprocessed type in evaluating: " +
                                      this,
-                                     context.currentInstruction.publicId,
-                                     context.currentInstruction.systemId,
+                                     context.currentInstruction.m_sPublicID,
+                                     context.currentInstruction.m_sSystemID,
                                      context.currentInstruction.lineNo,
                                      context.currentInstruction.colNo);
     return null;
@@ -220,18 +217,18 @@ public abstract class AbstractTree implements Cloneable
    */
   public boolean isConstant ()
   {
-    return (right == null || right.isConstant ()) && (left == null || left.isConstant ());
+    return (m_aRight == null || m_aRight.isConstant ()) && (m_aLeft == null || m_aLeft.isConstant ());
   }
 
   /**
    * Creates a deep copy of this Tree
-   * 
+   *
    * @param copies
    *        the map of already copied objects that need to be remembered (mainly
    *        of {@link AbstractInstruction})
    * @return the created copy
    */
-  public AbstractTree deepCopy (final HashMap copies)
+  public AbstractTree deepCopy (final HashMap <Object, Object> copies)
   {
     // no need to keep Tree instances in the copies map because there are
     // no circular references of Trees
@@ -240,15 +237,15 @@ public abstract class AbstractTree implements Cloneable
     {
       copy = (AbstractTree) clone ();
     }
-    catch (final CloneNotSupportedException e)
+    catch (final CloneNotSupportedException ex)
     {
-      // mustn't happen since this class implements Cloneable
-      throw new RuntimeException (e);
+      throw new RuntimeException ("this is not cloneable", ex);
     }
-    if (left != null)
-      copy.left = left.deepCopy (copies);
-    if (right != null)
-      copy.right = right.deepCopy (copies);
+
+    if (m_aLeft != null)
+      copy.m_aLeft = m_aLeft.deepCopy (copies);
+    if (m_aRight != null)
+      copy.m_aRight = m_aRight.deepCopy (copies);
     // note: cannot clone the value
     return copy;
   }
@@ -258,7 +255,7 @@ public abstract class AbstractTree implements Cloneable
   public String toString ()
   {
     String ret = "{";
-    switch (type)
+    switch (m_nType)
     {
       case ROOT:
         ret += "ROOT";
@@ -300,12 +297,12 @@ public abstract class AbstractTree implements Cloneable
         ret += "..";
         break;
       default:
-        ret += type;
+        ret += m_nType;
         break;
     }
-    ret += "," + left + "," + right + "," + value;
-    if (type == NAME_TEST || type == URI_WILDCARD || type == LOCAL_WILDCARD)
-      ret += "(" + uri + "|" + lName + ")";
+    ret += "," + m_aLeft + "," + m_aRight + "," + m_aValue;
+    if (m_nType == NAME_TEST || m_nType == URI_WILDCARD || m_nType == LOCAL_WILDCARD)
+      ret += "(" + m_sURI + "|" + m_sLocalName + ")";
     return ret + "}";
   }
 }

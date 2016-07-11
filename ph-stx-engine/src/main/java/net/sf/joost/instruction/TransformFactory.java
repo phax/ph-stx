@@ -83,7 +83,7 @@ public class TransformFactory extends AbstractFactoryBase
                                       final Attributes attrs,
                                       final ParseContext context) throws SAXParseException
   {
-    if (parent != null && parent.systemId.equals (context.locator.getSystemId ()))
+    if (parent != null && parent.m_sSystemID.equals (context.locator.getSystemId ()))
       throw new SAXParseException ("'" + qName + "' is allowed only as root element", context.locator);
     // parent.systemId != locator.systemId means: it is included
 
@@ -228,9 +228,9 @@ public class TransformFactory extends AbstractFactoryBase
       super (qName, parent, context, passThrough, stripSpace, recognizeCdata);
       if (parent == null)
       {
-        namedGroups = new Hashtable (); // shared with all sub-groups
-        globalProcedures = new Hashtable (); // also shared
-        namespaceAliases = new Hashtable (); // also shared
+        m_aNamedGroups = new Hashtable<> (); // shared with all sub-groups
+        m_aGlobalProcedures = new Hashtable<> (); // also shared
+        namespaceAliases = new Hashtable<> (); // also shared
       }
       else
       {
@@ -239,7 +239,7 @@ public class TransformFactory extends AbstractFactoryBase
         // context.transformNode is still null
         // -> should be improved/fixed)
         while (!(parent instanceof TransformFactory.Instance))
-          parent = parent.parent;
+          parent = parent.m_aParent;
         namespaceAliases = ((TransformFactory.Instance) parent).namespaceAliases;
       }
 
@@ -254,25 +254,25 @@ public class TransformFactory extends AbstractFactoryBase
     }
 
     /** @return all top level elements of the transformation sheet */
-    public Vector getChildren ()
+    public Vector <AbstractNodeBase> getChildren ()
     {
-      return children;
+      return m_aChildren;
     }
 
     @Override
     public void insert (final AbstractNodeBase node) throws SAXParseException
     {
       if (compilableNodes != null)
-        // will only happen after this transform
-        // element was inserted by
-        // an stx:include instruction
-        throw new SAXParseException ("'" +
-                                     qName +
-                                     "' must be empty",
-                                     node.publicId,
-                                     node.systemId,
-                                     node.lineNo,
-                                     node.colNo);
+                                  // will only happen after this transform
+                                  // element was inserted by
+                                  // an stx:include instruction
+                                  throw new SAXParseException ("'" +
+                                                               m_sQName +
+                                                               "' must be empty",
+                                                               node.m_sPublicID,
+                                                               node.m_sSystemID,
+                                                               node.lineNo,
+                                                               node.colNo);
 
       if (node instanceof AbstractTemplateBase || // template, procedure
           node instanceof AbstractGroupBase || // group, transform (= include)
@@ -285,10 +285,10 @@ public class TransformFactory extends AbstractFactoryBase
         }
         else
           throw new SAXParseException ("'" +
-                                       node.qName +
+                                       node.m_sQName +
                                        "' not allowed as top level element",
-                                       node.publicId,
-                                       node.systemId,
+                                       node.m_sPublicID,
+                                       node.m_sSystemID,
                                        node.lineNo,
                                        node.colNo);
     }

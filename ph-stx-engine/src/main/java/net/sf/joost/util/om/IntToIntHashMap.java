@@ -186,7 +186,7 @@ public class IntToIntHashMap implements Serializable
 
   /**
    * Get an iterator over the integer key values held in the hash map
-   * 
+   *
    * @return an iterator whose next() call returns the key values (in arbitrary
    *         order)
    */
@@ -249,8 +249,9 @@ public class IntToIntHashMap implements Serializable
     }
   }
 
-  private void setCapacity (int capacity)
+  private void setCapacity (final int nCapacity)
   {
+    int capacity = nCapacity;
     if (capacity < _n)
     {
       capacity = _n;
@@ -259,7 +260,7 @@ public class IntToIntHashMap implements Serializable
     int nbit, nmax;
     for (nbit = 1, nmax = 2; nmax * factor < capacity && nmax < NMAX; ++nbit, nmax *= 2)
     {
-      ;
+      // empty
     }
     final int nold = _nmax;
     if (nmax == nold)
@@ -309,13 +310,8 @@ public class IntToIntHashMap implements Serializable
       while (i < _key.length)
       {
         if (_filled[i])
-        {
           return true;
-        }
-        else
-        {
-          i++;
-        }
+        i++;
       }
       return false;
     }
@@ -325,7 +321,6 @@ public class IntToIntHashMap implements Serializable
       return _key[i++];
     }
   }
-
 }
 
 //

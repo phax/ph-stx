@@ -55,7 +55,7 @@ public class ElseFactory extends AbstractFactoryBase
   {
     checkAttributes (qName, attrs, null, context);
 
-    if (!(parent.lastChild.getNode () instanceof IfFactory.Instance))
+    if (!(parent.m_aLastChild.getNode () instanceof IfFactory.Instance))
       throw new SAXParseException ("Found '" + qName + "' without stx:if", context.locator);
 
     return new Instance (qName, parent, context);

@@ -28,8 +28,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -38,7 +38,7 @@ import net.sf.joost.stx.function.FunctionFactory;
 /**
  * Objects of FunctionTree represent function calls in the syntax tree of a
  * pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.8 $ $Date: 2009/08/21 12:46:18 $
  * @author Oliver Becker
  */
@@ -49,7 +49,7 @@ public final class FunctionTree extends AbstractTree
 
   /**
    * Constructs a FunctionTree object.
-   * 
+   *
    * @param qName
    *        the qualified function name
    * @param left
@@ -64,20 +64,20 @@ public final class FunctionTree extends AbstractTree
     final int colon = qName.indexOf (":");
     if (colon != -1)
     {
-      uri = (String) context.nsSet.get (qName.substring (0, colon));
-      if (uri == null)
+      m_sURI = context.nsSet.get (qName.substring (0, colon));
+      if (m_sURI == null)
       {
         throw new SAXParseException ("Undeclared prefix '" + qName.substring (0, colon) + "'", context.locator);
       }
-      lName = qName.substring (colon + 1);
+      m_sLocalName = qName.substring (colon + 1);
     }
     else
     {
-      uri = CSTX.FUNC_NS;
-      lName = qName;
+      m_sURI = CSTX.FUNC_NS;
+      m_sLocalName = qName;
     }
 
-    func = context.getFunctionFactory ().getFunction (uri, lName, qName, left);
+    func = context.getFunctionFactory ().getFunction (m_sURI, m_sLocalName, qName, left);
   }
 
   @Override
@@ -85,13 +85,13 @@ public final class FunctionTree extends AbstractTree
   {
     try
     {
-      return func.evaluate (context, top, left);
+      return func.evaluate (context, top, m_aLeft);
     }
     catch (final EvalException e)
     {
-      context.errorHandler.error (e.getMessage (),
-                                  context.currentInstruction.publicId,
-                                  context.currentInstruction.systemId,
+      context.m_aErrorHandler.error (e.getMessage (),
+                                  context.currentInstruction.m_sPublicID,
+                                  context.currentInstruction.m_sSystemID,
                                   context.currentInstruction.lineNo,
                                   context.currentInstruction.colNo,
                                   e);
@@ -103,6 +103,6 @@ public final class FunctionTree extends AbstractTree
   @Override
   public boolean isConstant ()
   {
-    return func.isConstant () && (left == null || left.isConstant ());
+    return func.isConstant () && (m_aLeft == null || m_aLeft.isConstant ());
   }
 }

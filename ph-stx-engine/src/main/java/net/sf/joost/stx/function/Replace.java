@@ -76,18 +76,18 @@ public final class Replace implements IInstance
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     String input, pattern, replacement, flags;
-    if (args.left.left.type == AbstractTree.LIST)
+    if (args.m_aLeft.m_aLeft.m_nType == AbstractTree.LIST)
     { // four parameters
-      input = args.left.left.left.evaluate (context, top).getStringValue ();
-      pattern = args.left.left.right.evaluate (context, top).getStringValue ();
-      replacement = args.left.right.evaluate (context, top).getStringValue ();
-      flags = args.right.evaluate (context, top).getStringValue ();
+      input = args.m_aLeft.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
+      pattern = args.m_aLeft.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
+      replacement = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
+      flags = args.m_aRight.evaluate (context, top).getStringValue ();
     }
     else
     { // three parameters
-      input = args.left.left.evaluate (context, top).getStringValue ();
-      pattern = args.left.right.evaluate (context, top).getStringValue ();
-      replacement = args.right.evaluate (context, top).getStringValue ();
+      input = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
+      pattern = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
+      replacement = args.m_aRight.evaluate (context, top).getStringValue ();
       flags = "";
     }
     final IRegularExpression re = new JRegularExpression (pattern, true, flags);

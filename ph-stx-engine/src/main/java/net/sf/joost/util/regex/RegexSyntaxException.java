@@ -12,7 +12,7 @@ package net.sf.joost.util.regex;
  */
 public class RegexSyntaxException extends Exception
 {
-  private final int position;
+  private final int m_nPosition;
 
   /**
    * Represents an unknown position within a string containing a regular
@@ -28,7 +28,7 @@ public class RegexSyntaxException extends Exception
   public RegexSyntaxException (final String detail, final int position)
   {
     super (detail);
-    this.position = position;
+    this.m_nPosition = position;
   }
 
   /**
@@ -40,6 +40,6 @@ public class RegexSyntaxException extends Exception
    */
   public int getPosition ()
   {
-    return position;
+    return m_nPosition;
   }
 }

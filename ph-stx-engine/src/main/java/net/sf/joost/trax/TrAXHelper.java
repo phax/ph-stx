@@ -69,9 +69,6 @@ import net.sf.joost.stx.Processor;
  */
 public class TrAXHelper
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "TrAXHelper".
   private static final Logger log = LoggerFactory.getLogger (TrAXHelper.class);
 
   /**
@@ -194,16 +191,18 @@ public class TrAXHelper
    *
    * @param result
    *        A <code>Result</code> object.
-   * @return An <code>StxEmitter</code>.
+   * @param processor
+   * @param aOutputProperties
+   * @return An {@link IStxEmitter}
    * @throws javax.xml.transform.TransformerException
    */
   public static IStxEmitter initStxEmitter (final Result result,
                                             final Processor processor,
-                                            Properties outputProperties) throws TransformerException
+                                            final Properties aOutputProperties) throws TransformerException
   {
-
+    Properties outputProperties = aOutputProperties;
     if (outputProperties == null)
-      outputProperties = processor.outputProperties;
+      outputProperties = processor.m_aOutputProperties;
 
     if (CSTX.DEBUG)
       log.debug ("init StxEmitter");

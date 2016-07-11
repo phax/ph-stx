@@ -253,7 +253,7 @@ public class Value implements Cloneable
       case STRING:
         return string;
       case NODE:
-        return event.value;
+        return event.m_sValue;
       case EMPTY:
         return "";
       case BOOLEAN:
@@ -539,7 +539,7 @@ public class Value implements Cloneable
         case EMPTY:
           return null;
         case NODE:
-          return event.value;
+          return event.m_sValue;
         case BOOLEAN:
           return new Boolean (bool);
         case NUMBER:

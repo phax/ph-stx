@@ -90,7 +90,7 @@ public class ErrorManager
 
   private static String convSymbol (final Symbol symbol)
   {
-    final String result = (symbol.value == null) ? "" : " (\"" + symbol.value.toString () + "\")";
+    final String result = (symbol.m_aValue == null) ? "" : " (\"" + symbol.m_aValue.toString () + "\")";
     final Field [] fields = sym.class.getFields ();
     for (int i = 0; i < fields.length; i++)
     {

@@ -66,9 +66,9 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
   private static final AbstractCharClass ESC_D = new Complement (ESC_d);
 
-  private static final AbstractCharClass ESC_W = new Union (new AbstractCharClass [] { computeCategoryCharClass ('P'),
-                                                                                       computeCategoryCharClass ('Z'),
-                                                                                       computeCategoryCharClass ('C') });
+  private static final AbstractCharClass ESC_W = new Union (new AbstractCharClass [] { _computeCategoryCharClass ('P'),
+                                                                                       _computeCategoryCharClass ('Z'),
+                                                                                       _computeCategoryCharClass ('C') });
   // was: new Property("P"), new Property("Z"), new Property("C") }
 
   private static final AbstractCharClass ESC_w = new Complement (ESC_W);
@@ -80,15 +80,15 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
   private static final AbstractCharClass ESC_S = new Complement (ESC_s);
 
-  private static final AbstractCharClass ESC_i = makeCharClass (RegexData.NMSTRT_CATEGORIES,
-                                                                RegexData.NMSTRT_INCLUDES,
-                                                                RegexData.NMSTRT_EXCLUDE_RANGES);
+  private static final AbstractCharClass ESC_i = _makeCharClass (RegexData.NMSTRT_CATEGORIES,
+                                                                 RegexData.NMSTRT_INCLUDES,
+                                                                 RegexData.NMSTRT_EXCLUDE_RANGES);
 
   private static final AbstractCharClass ESC_I = new Complement (ESC_i);
 
-  private static final AbstractCharClass ESC_c = makeCharClass (RegexData.NMCHAR_CATEGORIES,
-                                                                RegexData.NMCHAR_INCLUDES,
-                                                                RegexData.NMCHAR_EXCLUDE_RANGES);
+  private static final AbstractCharClass ESC_c = _makeCharClass (RegexData.NMCHAR_CATEGORIES,
+                                                                 RegexData.NMCHAR_INCLUDES,
+                                                                 RegexData.NMCHAR_EXCLUDE_RANGES);
 
   private static final AbstractCharClass ESC_C = new Complement (ESC_c);
 
@@ -128,16 +128,16 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
     // System.err.println("Input regex: " + regexp);
     final JDK15RegexTranslator tr = new JDK15RegexTranslator (regexp);
-    tr.isXPath = xpath;
-    tr.ignoreWhitespace = ignoreWhitespace;
-    tr.caseBlind = caseBlind;
+    tr.m_bIsXPath = xpath;
+    tr.m_bIgnoreWhitespace = ignoreWhitespace;
+    tr.m_bCaseBlind = caseBlind;
     tr.advance ();
     tr.translateTop ();
     // System.err.println("Output regex: " + tr.result.toString());
-    return tr.result.toString ();
+    return tr.m_aResult.toString ();
   }
 
-  private static void appendWideChar (final StringBuilder buf, final int ch)
+  private static void _appendWideChar (final StringBuilder buf, final int ch)
   {
     if (ch > 0xffff)
     {
@@ -235,7 +235,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
             buf.append ("\\x20");
             break;
           default:
-            appendWideChar (buf, m_c);
+            _appendWideChar (buf, m_c);
         }
       }
       return;
@@ -279,47 +279,47 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
   static class CharRange extends AbstractSimpleCharClass
   {
-    private final int lower;
-    private final int upper;
+    private final int m_nLower;
+    private final int m_nUpper;
 
     CharRange (final int lower, final int upper)
     {
-      this.lower = lower;
-      this.upper = upper;
+      this.m_nLower = lower;
+      this.m_nUpper = upper;
     }
 
     @Override
     void inClassOutput (final StringBuilder buf)
     {
-      if (isJavaMetaChar (lower))
+      if (isJavaMetaChar (m_nLower))
       {
         buf.append ('\\');
       }
-      appendWideChar (buf, lower);
+      _appendWideChar (buf, m_nLower);
       buf.append ('-');
-      if (isJavaMetaChar (upper))
+      if (isJavaMetaChar (m_nUpper))
       {
         buf.append ('\\');
       }
-      appendWideChar (buf, upper);
+      _appendWideChar (buf, m_nUpper);
     }
 
   }
 
   static class Property extends AbstractSimpleCharClass
   {
-    private final String name;
+    private final String m_sName;
 
     Property (final String name)
     {
-      this.name = name;
+      this.m_sName = name;
     }
 
     @Override
     void inClassOutput (final StringBuilder buf)
     {
       buf.append ("\\p{");
-      buf.append (name);
+      buf.append (m_sName);
       buf.append ('}');
     }
 
@@ -327,31 +327,31 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     void outputComplement (final StringBuilder buf)
     {
       buf.append ("\\P{");
-      buf.append (name);
+      buf.append (m_sName);
       buf.append ('}');
     }
   }
 
   static class Subtraction extends AbstractCharClass
   {
-    private final AbstractCharClass cc1;
-    private final AbstractCharClass cc2;
+    private final AbstractCharClass m_aCC1;
+    private final AbstractCharClass m_aCC2;
 
     Subtraction (final AbstractCharClass cc1, final AbstractCharClass cc2)
     {
       // min corresponds to intersection
       // complement corresponds to negation
-      this.cc1 = cc1;
-      this.cc2 = cc2;
+      this.m_aCC1 = cc1;
+      this.m_aCC2 = cc2;
     }
 
     @Override
     void output (final StringBuilder buf)
     {
       buf.append ('[');
-      cc1.output (buf);
+      m_aCC1.output (buf);
       buf.append ("&&");
-      cc2.outputComplement (buf);
+      m_aCC2.outputComplement (buf);
       buf.append (']');
     }
 
@@ -359,15 +359,15 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     void outputComplement (final StringBuilder buf)
     {
       buf.append ('[');
-      cc1.outputComplement (buf);
-      cc2.output (buf);
+      m_aCC1.outputComplement (buf);
+      m_aCC2.output (buf);
       buf.append (']');
     }
   }
 
   static class Union extends AbstractCharClass
   {
-    private final List <AbstractCharClass> members;
+    private final List <AbstractCharClass> m_aMembers;
 
     Union (final AbstractCharClass [] v)
     {
@@ -384,16 +384,16 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
     Union (final List <AbstractCharClass> members)
     {
-      this.members = members;
+      this.m_aMembers = members;
     }
 
     @Override
     void output (final StringBuilder buf)
     {
       buf.append ('[');
-      for (int i = 0, len = members.size (); i < len; i++)
+      for (int i = 0, len = m_aMembers.size (); i < len; i++)
       {
-        final AbstractCharClass cc = members.get (i);
+        final AbstractCharClass cc = m_aMembers.get (i);
         cc.output (buf);
       }
       buf.append (']');
@@ -403,10 +403,10 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     void outputComplement (final StringBuilder buf)
     {
       boolean first = true;
-      final int len = members.size ();
+      final int len = m_aMembers.size ();
       for (int i = 0; i < len; i++)
       {
-        final AbstractCharClass cc = members.get (i);
+        final AbstractCharClass cc = m_aMembers.get (i);
         if (cc instanceof AbstractSimpleCharClass)
         {
           if (first)
@@ -419,7 +419,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       }
       for (int i = 0; i < len; i++)
       {
-        final AbstractCharClass cc = members.get (i);
+        final AbstractCharClass cc = m_aMembers.get (i);
         if (!(cc instanceof AbstractSimpleCharClass))
         {
           if (first)
@@ -438,7 +438,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       {
         // empty union, so the complement is everything
         buf.append ("[\u0001-");
-        appendWideChar (buf, RegexData.NONBMP_MAX);
+        _appendWideChar (buf, RegexData.NONBMP_MAX);
         buf.append ("]");
       }
       else
@@ -450,11 +450,11 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
   static class BackReference extends AbstractCharClass
   {
-    private final int i;
+    private final int m_nI;
 
     BackReference (final int i)
     {
-      this.i = i;
+      this.m_nI = i;
     }
 
     @Override
@@ -471,11 +471,11 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
     void inClassOutput (final StringBuilder buf)
     {
-      if (i != -1)
+      if (m_nI != -1)
       {
         // terminate the back-reference with a
         // syntactic separator
-        buf.append ("(?:\\" + i + ")");
+        buf.append ("(?:\\" + m_nI + ")");
       }
       else
       {
@@ -488,33 +488,33 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
 
   static class Complement extends AbstractCharClass
   {
-    private final AbstractCharClass cc;
+    private final AbstractCharClass m_aCC;
 
     Complement (final AbstractCharClass cc)
     {
-      this.cc = cc;
+      this.m_aCC = cc;
     }
 
     @Override
     void output (final StringBuilder buf)
     {
-      cc.outputComplement (buf);
+      m_aCC.outputComplement (buf);
     }
 
     @Override
     void outputComplement (final StringBuilder buf)
     {
-      cc.output (buf);
+      m_aCC.output (buf);
     }
   }
 
   @Override
   protected boolean translateAtom () throws RegexSyntaxException
   {
-    switch (curChar)
+    switch (m_cCurChar)
     {
       case RegexData.EOS:
-        if (!eos)
+        if (!m_bEOS)
           break;
         // else fall through
       case '?':
@@ -528,43 +528,43 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
         return false;
       case '(':
         copyCurChar ();
-        final int thisCapture = ++currentCapture;
+        final int thisCapture = ++m_nCurrentCapture;
         translateRegExp ();
         expect (')');
-        captures.add (thisCapture);
+        m_aCaptures.add (thisCapture);
         copyCurChar ();
         return true;
       case '\\':
         advance ();
-        parseEsc ().output (result);
+        _parseEsc ().output (m_aResult);
         return true;
       case '[':
-        inCharClassExpr = true;
+        m_bInCharClassExpr = true;
         advance ();
-        parseCharClassExpr ().output (result);
+        _parseCharClassExpr ().output (m_aResult);
         return true;
       case '.':
-        if (isXPath)
+        if (m_bIsXPath)
         {
           // under XPath, "." has the same meaning as in JDK 1.5
           break;
         }
         // under XMLSchema, "." means anything except \n or \r, which is
         // different from the XPath/JDK rule
-        DOT_SCHEMA.output (result);
+        DOT_SCHEMA.output (m_aResult);
         advance ();
         return true;
       case '$':
       case '^':
-        if (isXPath)
+        if (m_bIsXPath)
         {
           copyCurChar ();
           return true;
         }
-        result.append ('\\');
+        m_aResult.append ('\\');
         break;
       default:
-        if (caseBlind)
+        if (m_bCaseBlind)
         {
           final int thisChar = absorbSurrogatePair ();
           final int [] variants = CaseVariants.getCaseVariants (thisChar);
@@ -577,7 +577,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
               chars[i + 1] = new SingleChar (variants[i]);
             }
             final Union union = new Union (chars);
-            union.output (result);
+            union.output (m_aResult);
             advance ();
             return true;
           }
@@ -588,9 +588,9 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     return true;
   }
 
-  private static AbstractCharClass makeCharClass (final String categories,
-                                                  final String includes,
-                                                  final String excludeRanges)
+  private static AbstractCharClass _makeCharClass (final String categories,
+                                                   final String includes,
+                                                   final String excludeRanges)
   {
     final List <AbstractCharClass> includeList = new ArrayList<> (5);
     for (int i = 0, len = categories.length (); i < len; i += 2)
@@ -628,9 +628,9 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     return new Subtraction (new Union (includeList), new Union (excludeList));
   }
 
-  private AbstractCharClass parseEsc () throws RegexSyntaxException
+  private AbstractCharClass _parseEsc () throws RegexSyntaxException
   {
-    switch (curChar)
+    switch (m_cCurChar)
     {
       case 'n':
         advance ();
@@ -688,10 +688,10 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
         return ESC_W;
       case 'p':
         advance ();
-        return parseProp ();
+        return _parseProp ();
       case 'P':
         advance ();
-        return new Complement (parseProp ());
+        return new Complement (_parseProp ());
       case '0':
       case '1':
       case '2':
@@ -702,12 +702,12 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       case '7':
       case '8':
       case '9':
-        if (isXPath)
+        if (m_bIsXPath)
         {
-          final char c = curChar;
+          final char c = m_cCurChar;
           final int c0 = (c - '0');
           advance ();
-          final int c1 = "0123456789".indexOf (curChar);
+          final int c1 = "0123456789".indexOf (m_cCurChar);
           if (c1 >= 0)
           {
             // limit a back-reference to two digits, but only allow two if there
@@ -716,32 +716,23 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
             // back-reference to two.
             final int n = c0 * 10 + c1;
             advance ();
-            if (captures.contains (n))
+            if (m_aCaptures.contains (n))
             {
               // treat it as a two-digit back-reference
               return new BackReference (n);
             }
-            else
-            {
-              recede ();
-            }
+            recede ();
           }
-          if (captures.contains (c0))
+          if (m_aCaptures.contains (c0))
           {
             return new BackReference (c0);
           }
-          else
-          {
-            // match a zero-length string
-            return new BackReference (-1);
-          }
+          // match a zero-length string
+          return new BackReference (-1);
         }
-        else
-        {
-          throw makeException ("digit not allowed after \\");
-        }
+        throw makeException ("digit not allowed after \\");
       case '$':
-        if (isXPath)
+        if (m_bIsXPath)
         {
           break;
         }
@@ -749,25 +740,25 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       default:
         throw makeException ("invalid escape sequence");
     }
-    final AbstractCharClass tem = new SingleChar (curChar);
+    final AbstractCharClass tem = new SingleChar (m_cCurChar);
     advance ();
     return tem;
   }
 
-  private AbstractCharClass parseProp () throws RegexSyntaxException
+  private AbstractCharClass _parseProp () throws RegexSyntaxException
   {
     expect ('{');
-    final int start = pos;
+    final int start = m_nPos;
     for (;;)
     {
       advance ();
-      if (curChar == '}')
+      if (m_cCurChar == '}')
         break;
-      if (!isAsciiAlnum (curChar) && curChar != '-')
+      if (!isAsciiAlnum (m_cCurChar) && m_cCurChar != '-')
         expect ('}');
     }
-    CharSequence propertyNameCS = m_aRegExp.subSequence (start, pos - 1);
-    if (ignoreWhitespace && !inCharClassExpr)
+    CharSequence propertyNameCS = m_aRegExp.subSequence (start, m_nPos - 1);
+    if (m_bIgnoreWhitespace && !m_bInCharClassExpr)
     {
       propertyNameCS = Whitespace.removeAllWhitespace (propertyNameCS);
     }
@@ -781,12 +772,12 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
         final int sci = RegexData.subCategories.indexOf (propertyName);
         if (sci < 0 || sci % 2 == 1)
           throw makeException ("unknown category");
-        return getSubCategoryCharClass (sci / 2);
+        return _getSubCategoryCharClass (sci / 2);
       case 1:
         final int ci = RegexData.categories.indexOf (propertyName.charAt (0));
         if (ci < 0)
           throw makeException ("unknown category", propertyName);
-        return getCategoryCharClass (ci);
+        return _getCategoryCharClass (ci);
       default:
         if (!propertyName.startsWith ("Is"))
           break;
@@ -801,10 +792,10 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     throw makeException ("invalid property name", propertyName);
   }
 
-  private AbstractCharClass parseCharClassExpr () throws RegexSyntaxException
+  private AbstractCharClass _parseCharClassExpr () throws RegexSyntaxException
   {
     boolean compl;
-    if (curChar == '^')
+    if (m_cCurChar == '^')
     {
       advance ();
       compl = true;
@@ -817,22 +808,22 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     // boolean firstOrLast = true;
     do
     {
-      final AbstractCharClass lower = parseCharClassEscOrXmlChar (true);
+      final AbstractCharClass lower = _parseCharClassEscOrXmlChar (true);
       members.add (lower);
-      if (curChar == ']' || eos)
+      if (m_cCurChar == ']' || m_bEOS)
       {
-        addCaseVariant (lower, members);
+        _addCaseVariant (lower, members);
         break;
       }
       // firstOrLast = isLastInGroup();
-      if (curChar == '-')
+      if (m_cCurChar == '-')
       {
-        final char next = m_aRegExp.charAt (pos);
+        final char next = m_aRegExp.charAt (m_nPos);
         if (next == '[')
         {
           // hyphen denotes subtraction
           // TODO: subtraction can't be used in a negative character group
-          addCaseVariant (lower, members);
+          _addCaseVariant (lower, members);
           advance ();
           break;
         }
@@ -840,7 +831,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
           if (next == ']')
           {
             // hyphen denotes a regular character - no need to do anything
-            addCaseVariant (lower, members);
+            _addCaseVariant (lower, members);
             // TODO: the spec rules are unclear here. We are allowing hyphen to
             // represent
             // itself in contexts like [A-Z-0-9]
@@ -849,13 +840,13 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
           {
             // hyphen denotes a character range
             advance ();
-            final AbstractCharClass upper = parseCharClassEscOrXmlChar (true);
+            final AbstractCharClass upper = _parseCharClassEscOrXmlChar (true);
             if (lower.getSingleChar () < 0 || upper.getSingleChar () < 0)
               throw makeException ("multi_range");
             if (lower.getSingleChar () > upper.getSingleChar ())
               throw makeException ("invalid range (start > end)");
             members.set (members.size () - 1, new CharRange (lower.getSingleChar (), upper.getSingleChar ()));
-            if (caseBlind)
+            if (m_bCaseBlind)
             {
               // Special-case A-Z and a-z
               if (lower.getSingleChar () == 'a' && upper.getSingleChar () == 'z')
@@ -888,7 +879,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
                 }
             }
             // look for a subtraction
-            if (curChar == '-' && m_aRegExp.charAt (pos) == '[')
+            if (m_cCurChar == '-' && m_aRegExp.charAt (m_nPos) == '[')
             {
               advance ();
               // expect('[');
@@ -898,10 +889,10 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       }
       else
       {
-        addCaseVariant (lower, members);
+        _addCaseVariant (lower, members);
       }
-    } while (curChar != ']');
-    if (eos)
+    } while (m_cCurChar != ']');
+    if (m_bEOS)
     {
       expect (']');
     }
@@ -912,20 +903,20 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       result = new Union (members);
     if (compl)
       result = new Complement (result);
-    if (curChar == '[')
+    if (m_cCurChar == '[')
     {
       advance ();
-      result = new Subtraction (result, parseCharClassExpr ());
+      result = new Subtraction (result, _parseCharClassExpr ());
       expect (']');
     }
-    inCharClassExpr = false;
+    m_bInCharClassExpr = false;
     advance ();
     return result;
   }
 
-  private void addCaseVariant (final AbstractCharClass lower, final List <AbstractCharClass> members)
+  private void _addCaseVariant (final AbstractCharClass lower, final List <AbstractCharClass> members)
   {
-    if (caseBlind)
+    if (m_bCaseBlind)
     {
       final int [] variants = CaseVariants.getCaseVariants (lower.getSingleChar ());
       for (final int variant : variants)
@@ -935,32 +926,31 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     }
   }
 
-  private boolean isLastInGroup ()
+  private boolean _isLastInGroup ()
   {
     // look ahead at the next character
-    final char c = m_aRegExp.charAt (pos);
+    final char c = m_aRegExp.charAt (m_nPos);
     return (c == ']' || c == '[');
   }
 
-  private AbstractCharClass parseCharClassEscOrXmlChar (final boolean firstOrLast) throws RegexSyntaxException
+  private AbstractCharClass _parseCharClassEscOrXmlChar (final boolean firstOrLast) throws RegexSyntaxException
   {
-    switch (curChar)
+    switch (m_cCurChar)
     {
       case RegexData.EOS:
-        if (eos)
+        if (m_bEOS)
           expect (']');
         break;
       case '\\':
         advance ();
-        return parseEsc ();
+        return _parseEsc ();
       case '[':
       case ']':
-        throw makeException ("character must be escaped", new String (new char [] { curChar }));
+        throw makeException ("character must be escaped", new String (new char [] { m_cCurChar }));
       case '-':
-        // if (!firstOrLast) {
-        // throw makeException("character must be escaped", new String(new
-        // char[]{curChar}));
-        // }
+        if (false)
+          if (!firstOrLast)
+            throw makeException ("character must be escaped", new String (new char [] { m_cCurChar }));
         break;
     }
     final AbstractCharClass tem = new SingleChar (absorbSurrogatePair ());
@@ -968,23 +958,23 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     return tem;
   }
 
-  private static synchronized AbstractCharClass getCategoryCharClass (final int ci)
+  private static synchronized AbstractCharClass _getCategoryCharClass (final int ci)
   {
     if (categoryCharClasses[ci] == null)
-      categoryCharClasses[ci] = computeCategoryCharClass (RegexData.categories.charAt (ci));
+      categoryCharClasses[ci] = _computeCategoryCharClass (RegexData.categories.charAt (ci));
     return categoryCharClasses[ci];
   }
 
-  private static synchronized AbstractCharClass getSubCategoryCharClass (final int sci)
+  private static synchronized AbstractCharClass _getSubCategoryCharClass (final int sci)
   {
     if (subCategoryCharClasses[sci] == null)
-      subCategoryCharClasses[sci] = computeSubCategoryCharClass (RegexData.subCategories.substring (sci *
-                                                                                                    2,
-                                                                                                    (sci + 1) * 2));
+      subCategoryCharClasses[sci] = _computeSubCategoryCharClass (RegexData.subCategories.substring (sci *
+                                                                                                     2,
+                                                                                                     (sci + 1) * 2));
     return subCategoryCharClasses[sci];
   }
 
-  private static AbstractCharClass computeCategoryCharClass (final char code)
+  private static AbstractCharClass _computeCategoryCharClass (final char code)
   {
     final List <AbstractCharClass> classes = new ArrayList<> (5);
     classes.add (new Property (new String (new char [] { code })));
@@ -996,7 +986,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
         classes.add (new CharRange (addRanges[i], addRanges[i + 1]));
     }
     if (code == 'P')
-      classes.add (makeCharClass (RegexData.CATEGORY_Pi + RegexData.CATEGORY_Pf));
+      classes.add (_makeCharClass (RegexData.CATEGORY_Pi + RegexData.CATEGORY_Pf));
     if (code == 'L')
     {
       classes.add (new SingleChar (RegexData.UNICODE_3_1_ADD_Ll));
@@ -1020,7 +1010,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     return new Union (classes);
   }
 
-  private static AbstractCharClass computeSubCategoryCharClass (final String name)
+  private static AbstractCharClass _computeSubCategoryCharClass (final String name)
   {
     final AbstractCharClass base = new Property (name);
     final int sci = RegexData.CATEGORY_NAMES.indexOf (name);
@@ -1041,9 +1031,9 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
                                 new Union (assignedRanges));
       }
       if (name.equals ("Pi"))
-        return makeCharClass (RegexData.CATEGORY_Pi);
+        return _makeCharClass (RegexData.CATEGORY_Pi);
       if (name.equals ("Pf"))
-        return makeCharClass (RegexData.CATEGORY_Pf);
+        return _makeCharClass (RegexData.CATEGORY_Pf);
       return base;
     }
     final List <AbstractCharClass> classes = new ArrayList<> (5);
@@ -1068,7 +1058,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     return new Union (classes);
   }
 
-  private static AbstractCharClass makeCharClass (final String members)
+  private static AbstractCharClass _makeCharClass (final String members)
   {
     final List <AbstractCharClass> list = new ArrayList<> (5);
     for (int i = 0, len = members.length (); i < len; i++)

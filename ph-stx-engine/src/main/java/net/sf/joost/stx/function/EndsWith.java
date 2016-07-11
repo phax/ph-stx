@@ -71,8 +71,8 @@ public final class EndsWith implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    final String s1 = args.left.evaluate (context, top).getStringValue ();
-    final String s2 = args.right.evaluate (context, top).getStringValue ();
+    final String s1 = args.m_aLeft.evaluate (context, top).getStringValue ();
+    final String s2 = args.m_aRight.evaluate (context, top).getStringValue ();
     return Value.getBoolean (s1.endsWith (s2));
   }
 }

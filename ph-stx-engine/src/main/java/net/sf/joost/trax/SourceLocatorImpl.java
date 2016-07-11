@@ -41,22 +41,22 @@ public class SourceLocatorImpl implements SourceLocator
   /**
    * Unique public key
    */
-  private String publicId;
+  private String m_sPublicID;
 
   /**
    * Unique system key
    */
-  private String systemId;
+  private String m_sSystemID;
 
   /**
    * Indicates the line number in the document
    */
-  private int lineNo = -1;
+  private int m_nLineNo = -1;
 
   /**
    * Indicates the column number in the document
    */
-  private int columnNo = -1;
+  private int m_nColumnNo = -1;
 
   /**
    * Constructor
@@ -69,10 +69,10 @@ public class SourceLocatorImpl implements SourceLocator
 
     if (locator != null)
     {
-      this.publicId = locator.getPublicId ();
-      this.systemId = locator.getSystemId ();
-      this.lineNo = locator.getLineNumber ();
-      this.columnNo = locator.getColumnNumber ();
+      this.m_sPublicID = locator.getPublicId ();
+      this.m_sSystemID = locator.getSystemId ();
+      this.m_nLineNo = locator.getLineNumber ();
+      this.m_nColumnNo = locator.getColumnNumber ();
     }
   }
 
@@ -91,51 +91,51 @@ public class SourceLocatorImpl implements SourceLocator
   public SourceLocatorImpl (final String publicId, final String systemId, final int lineNo, final int colNo)
   {
 
-    this.publicId = publicId;
-    this.systemId = systemId;
-    this.lineNo = lineNo;
-    this.columnNo = colNo;
+    this.m_sPublicID = publicId;
+    this.m_sSystemID = systemId;
+    this.m_nLineNo = lineNo;
+    this.m_nColumnNo = colNo;
   }
 
   /**
-   * Getting the attribute {@link #publicId}
+   * Getting the attribute {@link #m_sPublicID}
    * 
    * @return A string containing the public identifier, or null if none is
    *         available
    */
   public String getPublicId ()
   {
-    return this.publicId;
+    return this.m_sPublicID;
   }
 
   /**
-   * Getting the attribute {@link #systemId}
+   * Getting the attribute {@link #m_sSystemID}
    * 
    * @return A string containing the system identifier, or null if none is
    *         available
    */
   public String getSystemId ()
   {
-    return this.systemId;
+    return this.m_sSystemID;
   }
 
   /**
-   * Getting the attribute {@link #lineNo}
+   * Getting the attribute {@link #m_nLineNo}
    * 
    * @return The line number, or -1 if none is available
    */
   public int getLineNumber ()
   {
-    return this.lineNo;
+    return this.m_nLineNo;
   }
 
   /**
-   * Getting the attribute {@link #columnNo}
+   * Getting the attribute {@link #m_nColumnNo}
    * 
    * @return The column number, or -1 if none is available
    */
   public int getColumnNumber ()
   {
-    return this.columnNo;
+    return this.m_nColumnNo;
   }
 }

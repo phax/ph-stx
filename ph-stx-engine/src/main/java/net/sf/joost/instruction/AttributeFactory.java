@@ -87,9 +87,9 @@ public final class AttributeFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>attribute</code> element. */
   public final class Instance extends AbstractNodeBase
   {
-    private AbstractTree name, namespace, select;
-    private final Hashtable <String, String> nsSet;
-    private StringEmitter strEmitter;
+    private AbstractTree m_aName, m_aNamespace, m_aSelect;
+    private final Hashtable <String, String> m_aNSSet;
+    private StringEmitter m_aStrEmitter;
 
     protected Instance (final String elementName,
                         final AbstractNodeBase parent,
@@ -103,16 +103,16 @@ public final class AttributeFactory extends AbstractFactoryBase
              context,
              // this element must be empty if there is a select attribute
              select == null);
-      this.nsSet = new Hashtable<> (context.nsSet);
-      this.name = name;
-      this.namespace = namespace;
-      this.select = select;
-      init ();
+      this.m_aNSSet = new Hashtable<> (context.nsSet);
+      this.m_aName = name;
+      this.m_aNamespace = namespace;
+      this.m_aSelect = select;
+      _init ();
     }
 
-    private void init ()
+    private void _init ()
     {
-      strEmitter = new StringEmitter (new StringBuffer (), "('" + qName + "' started in line " + lineNo + ")");
+      m_aStrEmitter = new StringEmitter (new StringBuffer (), "('" + m_sQName + "' started in line " + lineNo + ")");
     }
 
     /**
@@ -124,39 +124,39 @@ public final class AttributeFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       // check for nesting of this stx:attribute
-      if (context.emitter.isEmitterActive (strEmitter))
+      if (context.emitter.isEmitterActive (m_aStrEmitter))
       {
-        context.errorHandler.error ("Can't create nested attribute", publicId, systemId, lineNo, colNo);
+        context.m_aErrorHandler.error ("Can't create nested attribute", m_sPublicID, m_sSystemID, lineNo, colNo);
         return 0; // if the errorHandler returns
       }
-      if (select == null)
+      if (m_aSelect == null)
       {
         // contents and end instruction present
         super.process (context);
-        strEmitter.getBuffer ().setLength (0);
-        context.pushEmitter (strEmitter);
+        m_aStrEmitter.getBuffer ().setLength (0);
+        context.pushEmitter (m_aStrEmitter);
       }
 
       String attName, attUri, attLocal;
       // determine attribute name
-      attName = name.evaluate (context, this).getString ();
+      attName = m_aName.evaluate (context, this).getString ();
       final int colon = attName.indexOf (':');
       if (colon != -1)
       { // prefixed name
         final String prefix = attName.substring (0, colon);
         attLocal = attName.substring (colon + 1);
-        if (namespace != null)
+        if (m_aNamespace != null)
         { // namespace attribute present
-          attUri = namespace.evaluate (context, this).getString ();
+          attUri = m_aNamespace.evaluate (context, this).getString ();
           if (attUri.equals (""))
           {
-            context.errorHandler.error ("Can't put attribute '" +
-                                        attName +
-                                        "' into the null namespace",
-                                        publicId,
-                                        systemId,
-                                        lineNo,
-                                        colNo);
+            context.m_aErrorHandler.error ("Can't put attribute '" +
+                                           attName +
+                                           "' into the null namespace",
+                                           m_sPublicID,
+                                           m_sSystemID,
+                                           lineNo,
+                                           colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
@@ -164,18 +164,18 @@ public final class AttributeFactory extends AbstractFactoryBase
         { // no namespace attribute
           // look into the set of in-scope namespaces
           // (of the transformation sheet)
-          attUri = nsSet.get (prefix);
+          attUri = m_aNSSet.get (prefix);
           if (attUri == null)
           {
-            context.errorHandler.error ("Attempt to create attribute '" +
-                                        attName +
-                                        "' with undeclared prefix '" +
-                                        prefix +
-                                        "'",
-                                        publicId,
-                                        systemId,
-                                        lineNo,
-                                        colNo);
+            context.m_aErrorHandler.error ("Attempt to create attribute '" +
+                                           attName +
+                                           "' with undeclared prefix '" +
+                                           prefix +
+                                           "'",
+                                           m_sPublicID,
+                                           m_sSystemID,
+                                           lineNo,
+                                           colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
@@ -184,38 +184,38 @@ public final class AttributeFactory extends AbstractFactoryBase
       { // unprefixed name
         attLocal = attName;
         attUri = "";
-        if (namespace != null)
+        if (m_aNamespace != null)
         { // namespace attribute present
-          attUri = namespace.evaluate (context, this).getString ();
+          attUri = m_aNamespace.evaluate (context, this).getString ();
           if (!attUri.equals (""))
           {
-            context.errorHandler.error ("Can't put attribute '" +
-                                        attName +
-                                        "' into the non-null namespace '" +
-                                        attUri +
-                                        "'",
-                                        publicId,
-                                        systemId,
-                                        lineNo,
-                                        colNo);
+            context.m_aErrorHandler.error ("Can't put attribute '" +
+                                           attName +
+                                           "' into the non-null namespace '" +
+                                           attUri +
+                                           "'",
+                                           m_sPublicID,
+                                           m_sSystemID,
+                                           lineNo,
+                                           colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
       }
 
-      if (select != null)
+      if (m_aSelect != null)
       {
         context.emitter.addAttribute (attUri,
                                       attName,
                                       attLocal,
-                                      select.evaluate (context, this).getStringValue (),
+                                      m_aSelect.evaluate (context, this).getStringValue (),
                                       this);
       }
       else
       {
-        localFieldStack.push (attUri);
-        localFieldStack.push (attLocal);
-        localFieldStack.push (attName);
+        m_aLocalFieldStack.push (attUri);
+        m_aLocalFieldStack.push (attLocal);
+        m_aLocalFieldStack.push (attName);
       }
 
       return CSTX.PR_CONTINUE;
@@ -228,27 +228,26 @@ public final class AttributeFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      final String attName = (String) localFieldStack.pop ();
-      final String attLocal = (String) localFieldStack.pop ();
-      final String attUri = (String) localFieldStack.pop ();
+      final String attName = (String) m_aLocalFieldStack.pop ();
+      final String attLocal = (String) m_aLocalFieldStack.pop ();
+      final String attUri = (String) m_aLocalFieldStack.pop ();
       context.popEmitter ();
-      context.emitter.addAttribute (attUri, attName, attLocal, strEmitter.getBuffer ().toString (), this);
+      context.emitter.addAttribute (attUri, attName, attLocal, m_aStrEmitter.getBuffer ().toString (), this);
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      theCopy.init ();
-      if (name != null)
-        theCopy.name = name.deepCopy (copies);
-      if (namespace != null)
-        theCopy.namespace = namespace.deepCopy (copies);
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      theCopy._init ();
+      if (m_aName != null)
+        theCopy.m_aName = m_aName.deepCopy (copies);
+      if (m_aNamespace != null)
+        theCopy.m_aNamespace = m_aNamespace.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
-
   }
 }

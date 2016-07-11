@@ -59,46 +59,46 @@ public abstract class AbstractNodeBase extends AbstractInstruction
     /**
      * The appropriate start tag.
      */
-    private AbstractNodeBase start;
+    private AbstractNodeBase m_aStart;
 
     private End (final AbstractNodeBase start)
     {
-      this.start = start;
+      m_aStart = start;
     }
 
     /**
-     * @return {@link #start}
+     * @return {@link #m_aStart}
      */
     @Override
     public AbstractNodeBase getNode ()
     {
-      return start;
+      return m_aStart;
     }
 
     /**
      * Calls the {@link AbstractNodeBase#processEnd} method in its
-     * {@link #start} object.
+     * {@link #m_aStart} object.
      */
     @Override
     public short process (final Context context) throws SAXException
     {
-      return start.processEnd (context);
+      return m_aStart.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final End theCopy = (End) copy;
-      if (start != null)
-        theCopy.start = (AbstractNodeBase) start.deepCopy (copies);
+      if (m_aStart != null)
+        theCopy.m_aStart = (AbstractNodeBase) m_aStart.deepCopy (copies);
     }
 
     // for debugging
     @Override
     public String toString ()
     {
-      return "end " + start;
+      return "end " + m_aStart;
     }
   }
 
@@ -109,44 +109,44 @@ public abstract class AbstractNodeBase extends AbstractInstruction
   //
 
   /** The qualified name of this node */
-  public String qName;
+  public String m_sQName;
 
   /** The parent of this node */
-  public AbstractNodeBase parent;
+  public AbstractNodeBase m_aParent;
 
   /**
    * The reference to the last child, needed for inserting additional nodes
    * while parsing the transformation sheet.
    */
-  protected AbstractInstruction lastChild;
+  protected AbstractInstruction m_aLastChild;
 
   /**
    * The reference to the end instruction. <code>null</code> means: must be an
    * empty element.
    */
-  protected AbstractInstruction nodeEnd;
+  protected AbstractInstruction m_aNodeEnd;
 
   /** The public identifier of the transformation sheet */
-  public String publicId = "";
+  public String m_sPublicID = "";
 
   /** The system identifier of the transformation sheet */
-  public String systemId = "";
+  public String m_sSystemID = "";
 
   /**
    * <code>true</code> if the attribute <code>xml:space</code> on the nearest
    * ancestor element was set to <code>preserve</code>, <code>false</code>
    * otherwise. This field is set in the {@link net.sf.joost.stx.Parser} object.
    */
-  public boolean preserveSpace;
+  public boolean m_bPreserveSpace;
 
   /**
    * The names of local declared variables of this element, available only if
    * this node has stx:variable children
    */
-  protected Vector <String> scopedVariables;
+  protected Vector <String> m_aScopedVariables;
 
   /** Stack for storing local fields from this or derived classes */
-  protected Stack <Object> localFieldStack = new Stack<> ();
+  protected Stack <Object> m_aLocalFieldStack = new Stack<> ();
 
   // ---------------------------------------------------------------------
 
@@ -166,21 +166,21 @@ public abstract class AbstractNodeBase extends AbstractInstruction
                               final ParseContext context,
                               final boolean mayHaveChildren)
   {
-    this.qName = qName;
-    this.parent = parent;
+    this.m_sQName = qName;
+    this.m_aParent = parent;
     if (context.locator != null)
     {
-      publicId = context.locator.getPublicId ();
-      systemId = context.locator.getSystemId ();
+      m_sPublicID = context.locator.getPublicId ();
+      m_sSystemID = context.locator.getSystemId ();
       lineNo = context.locator.getLineNumber ();
       colNo = context.locator.getColumnNumber ();
     }
 
     if (mayHaveChildren)
     {
-      next = nodeEnd = new End (this);
+      next = m_aNodeEnd = new End (this);
       // indicates that children are allowed
-      lastChild = this;
+      m_aLastChild = this;
     }
   }
 
@@ -204,12 +204,12 @@ public abstract class AbstractNodeBase extends AbstractInstruction
    */
   public void insert (final AbstractNodeBase node) throws SAXParseException
   {
-    if (lastChild == null)
+    if (m_aLastChild == null)
       throw new SAXParseException ("'" +
-                                   qName +
+                                   m_sQName +
                                    "' must be empty",
-                                   node.publicId,
-                                   node.systemId,
+                                   node.m_sPublicID,
+                                   node.m_sSystemID,
                                    node.lineNo,
                                    node.colNo);
 
@@ -219,14 +219,14 @@ public abstract class AbstractNodeBase extends AbstractInstruction
     while (newLast.next != null)
       newLast = newLast.next;
     // then: insert the subtree
-    newLast.next = lastChild.next;
-    lastChild.next = node;
+    newLast.next = m_aLastChild.next;
+    m_aLastChild.next = node;
     // adjust lastChild
-    lastChild = newLast;
+    m_aLastChild = newLast;
 
     // create vector for variable names if necessary
-    if (node instanceof AbstractVariableBase && scopedVariables == null)
-      scopedVariables = new Vector<> ();
+    if (node instanceof AbstractVariableBase && m_aScopedVariables == null)
+      m_aScopedVariables = new Vector<> ();
   }
 
   /**
@@ -238,10 +238,10 @@ public abstract class AbstractNodeBase extends AbstractInstruction
    */
   public final void setEndLocation (final ParseContext context)
   {
-    if (nodeEnd != null && context.locator != null)
+    if (m_aNodeEnd != null && context.locator != null)
     {
-      nodeEnd.lineNo = context.locator.getLineNumber ();
-      nodeEnd.colNo = context.locator.getColumnNumber ();
+      m_aNodeEnd.lineNo = context.locator.getLineNumber ();
+      m_aNodeEnd.colNo = context.locator.getColumnNumber ();
     }
   }
 
@@ -260,6 +260,8 @@ public abstract class AbstractNodeBase extends AbstractInstruction
    * @return <code>true</code> if another invocation in the next pass is
    *         necessary, <code>false</code> if the compiling is complete. This
    *         instance returns <code>false</code>.
+   * @throws SAXException
+   *         in case of error
    */
   public boolean compile (final int pass, final ParseContext context) throws SAXException
   {
@@ -267,19 +269,19 @@ public abstract class AbstractNodeBase extends AbstractInstruction
   }
 
   /**
-   * Removes (if possible) the end node ({@link #nodeEnd}) of this instruction
-   * from the execution chain. May be invoked from
+   * Removes (if possible) the end node ({@link #m_aNodeEnd}) of this
+   * instruction from the execution chain. May be invoked from
    * {@link #compile(int, ParseContext)} of concrete instructions only if
    * {@link #processEnd(Context)} hasn't been overridden.
    */
   protected final void mayDropEnd ()
   {
-    if (scopedVariables == null)
+    if (m_aScopedVariables == null)
     {
-      lastChild.next = nodeEnd.next;
-      if (parent.lastChild == nodeEnd)
-        parent.lastChild = lastChild;
-      nodeEnd = lastChild;
+      m_aLastChild.next = m_aNodeEnd.next;
+      if (m_aParent.m_aLastChild == m_aNodeEnd)
+        m_aParent.m_aLastChild = m_aLastChild;
+      m_aNodeEnd = m_aLastChild;
     }
   }
 
@@ -291,7 +293,7 @@ public abstract class AbstractNodeBase extends AbstractInstruction
    */
   protected final void declareVariable (final String name)
   {
-    scopedVariables.addElement (name);
+    m_aScopedVariables.addElement (name);
   }
 
   /**
@@ -313,11 +315,11 @@ public abstract class AbstractNodeBase extends AbstractInstruction
   @Override
   public short process (final Context context) throws SAXException
   {
-    if (scopedVariables != null)
+    if (m_aScopedVariables != null)
     {
       // store list of local variables (from another instantiation)
-      localFieldStack.push (scopedVariables.clone ());
-      scopedVariables.clear ();
+      m_aLocalFieldStack.push (m_aScopedVariables.clone ());
+      m_aScopedVariables.clear ();
     }
     return CSTX.PR_CONTINUE;
   }
@@ -334,47 +336,47 @@ public abstract class AbstractNodeBase extends AbstractInstruction
    */
   protected short processEnd (final Context context) throws SAXException
   {
-    if (scopedVariables != null)
+    if (m_aScopedVariables != null)
     {
       // remove all local variables
-      final Object [] objs = scopedVariables.toArray ();
+      final Object [] objs = m_aScopedVariables.toArray ();
       for (final Object obj : objs)
         context.localVars.remove (obj);
-      scopedVariables = (Vector <String>) localFieldStack.pop ();
+      m_aScopedVariables = (Vector <String>) m_aLocalFieldStack.pop ();
     }
     return CSTX.PR_CONTINUE;
   }
 
   /**
-   * Getter for {@link #nodeEnd} used by
+   * Getter for {@link #m_aNodeEnd} used by
    * {@link net.sf.joost.stx.Processor#processEvent}.
    *
    * @return a final ref on <code>AbstractInstruction</code>
    */
   public final AbstractInstruction getNodeEnd ()
   {
-    return this.nodeEnd;
+    return this.m_aNodeEnd;
   }
 
   @Override
-  protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+  protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
   {
     super.onDeepCopy (copy, copies);
     final AbstractNodeBase theCopy = (AbstractNodeBase) copy;
-    theCopy.localFieldStack = (Stack) copies.get (localFieldStack);
-    if (theCopy.localFieldStack == null)
+    theCopy.m_aLocalFieldStack = (Stack <Object>) copies.get (m_aLocalFieldStack);
+    if (theCopy.m_aLocalFieldStack == null)
     {
-      theCopy.localFieldStack = new Stack ();
-      copies.put (localFieldStack, theCopy.localFieldStack);
+      theCopy.m_aLocalFieldStack = new Stack<> ();
+      copies.put (m_aLocalFieldStack, theCopy.m_aLocalFieldStack);
     }
-    if (lastChild != null)
-      theCopy.lastChild = lastChild.deepCopy (copies);
-    if (nodeEnd != null)
-      theCopy.nodeEnd = nodeEnd.deepCopy (copies);
-    if (parent != null)
-      theCopy.parent = (AbstractNodeBase) parent.deepCopy (copies);
-    if (scopedVariables != null)
-      theCopy.scopedVariables = new Vector<> ();
+    if (m_aLastChild != null)
+      theCopy.m_aLastChild = m_aLastChild.deepCopy (copies);
+    if (m_aNodeEnd != null)
+      theCopy.m_aNodeEnd = m_aNodeEnd.deepCopy (copies);
+    if (m_aParent != null)
+      theCopy.m_aParent = (AbstractNodeBase) m_aParent.deepCopy (copies);
+    if (m_aScopedVariables != null)
+      theCopy.m_aScopedVariables = new Vector<> ();
   }
 
   // for debugging

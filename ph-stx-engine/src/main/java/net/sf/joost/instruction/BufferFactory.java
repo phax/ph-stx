@@ -25,7 +25,7 @@
 package net.sf.joost.instruction;
 
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 
 import org.xml.sax.Attributes;
@@ -84,7 +84,7 @@ public final class BufferFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>buffer</code> element. */
   public final class Instance extends AbstractVariableBase
   {
-    private final String varName;
+    private final String m_sVarName;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -93,7 +93,7 @@ public final class BufferFactory extends AbstractFactoryBase
                         final String expName)
     {
       super (qName, parent, context, expName, false, true);
-      this.varName = varName;
+      this.m_sVarName = varName;
     }
 
     /**
@@ -103,24 +103,31 @@ public final class BufferFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       super.process (context);
-      Hashtable varTable;
-      if (parent instanceof AbstractGroupBase) // group scope
-        varTable = context.groupVars.get (parent).peek ();
+      Map varTable;
+      if (m_aParent instanceof AbstractGroupBase) // group scope
+        varTable = context.groupVars.get (m_aParent).peek ();
       else
         varTable = context.localVars;
 
-      if (varTable.get (expName) != null)
+      if (varTable.get (m_sExpName) != null)
       {
-        context.errorHandler.error ("Buffer '" + varName + "' already declared", publicId, systemId, lineNo, colNo);
-        return CSTX.PR_CONTINUE; // if the errorHandler returns
+        context.m_aErrorHandler.error ("Buffer '" +
+                                       m_sVarName +
+                                       "' already declared",
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo);
+        // if the errorHandler returns
+        return CSTX.PR_CONTINUE;
       }
 
       final BufferEmitter buffer = new BufferEmitter ();
       context.pushEmitter (buffer);
-      varTable.put (expName, context.emitter);
+      varTable.put (m_sExpName, context.emitter);
 
       if (varTable == context.localVars)
-        parent.declareVariable (expName);
+        m_aParent.declareVariable (m_sExpName);
 
       return CSTX.PR_CONTINUE;
     }

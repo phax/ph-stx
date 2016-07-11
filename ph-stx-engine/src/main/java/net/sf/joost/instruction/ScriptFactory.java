@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -49,12 +50,12 @@ import net.sf.joost.stx.ParseContext;
 public final class ScriptFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public ScriptFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("prefix");
     attrNames.add ("language");
     attrNames.add ("src");
@@ -69,13 +70,13 @@ public final class ScriptFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     // check parent
     if (parent != null && !(parent instanceof AbstractGroupBase))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", context.locator);
+      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.m_sQName + "'", context.locator);
 
     // check that prefix points to a declared namespace
     final String prefixAtt = getRequiredAttribute (qName, attrs, "prefix", context);
@@ -88,7 +89,7 @@ public final class ScriptFactory extends AbstractFactoryBase
                                    "'",
                                    context.locator);
     }
-    final String scriptUri = (String) context.nsSet.get (prefixAtt);
+    final String scriptUri = context.nsSet.get (prefixAtt);
 
     // check if the prefix has been already defined
     // TODO
@@ -163,13 +164,13 @@ public final class ScriptFactory extends AbstractFactoryBase
       if (!(node instanceof TextNode))
       {
         throw new SAXParseException ("'" +
-                                     qName +
+                                     m_sQName +
                                      "' may only contain text (script code)" +
                                      "(encountered '" +
-                                     node.qName +
+                                     node.m_sQName +
                                      "')",
-                                     node.publicId,
-                                     node.systemId,
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
                                      node.lineNo,
                                      node.colNo);
       }
@@ -177,11 +178,11 @@ public final class ScriptFactory extends AbstractFactoryBase
       if (src != null)
       {
         throw new SAXParseException ("'" +
-                                     qName +
+                                     m_sQName +
                                      "' may not contain text (script code) if the 'src' " +
                                      "attribute is used",
-                                     node.publicId,
-                                     node.systemId,
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
                                      node.lineNo,
                                      node.colNo);
       }
@@ -218,7 +219,7 @@ public final class ScriptFactory extends AbstractFactoryBase
         }
         catch (final IOException e)
         {
-          throw new SAXParseException ("Exception while reading from " + src, publicId, systemId, lineNo, colNo, e);
+          throw new SAXParseException ("Exception while reading from " + src, m_sPublicID, m_sSystemID, lineNo, colNo, e);
         }
       }
 
@@ -240,7 +241,7 @@ public final class ScriptFactory extends AbstractFactoryBase
     @Override
     public short process (final Context c) throws SAXException
     {
-      throw new SAXParseException ("process called for " + qName, publicId, systemId, lineNo, colNo);
+      throw new SAXParseException ("process called for " + m_sQName, m_sPublicID, m_sSystemID, lineNo, colNo);
     }
 
     public String getLang ()

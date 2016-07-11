@@ -62,11 +62,11 @@ public final class RootTree extends AbstractTree
   @Override
   public Value evaluate (final Context context, final int top) throws SAXException
   {
-    if (left == null)
+    if (m_aLeft == null)
       return Value.VAL_EMPTY;
 
     // set top to 1
-    return left.evaluate (context, 1);
+    return m_aLeft.evaluate (context, 1);
   }
 
   @Override

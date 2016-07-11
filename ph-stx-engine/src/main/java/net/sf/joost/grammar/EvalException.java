@@ -26,7 +26,7 @@ package net.sf.joost.grammar;
 
 /**
  * Signals an error while evaluating an expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2006/03/17 19:54:31 $
  * @author Oliver Becker
  */
@@ -58,8 +58,7 @@ public class EvalException extends Exception
     final Throwable cause = getCause ();
     if (message == null && cause != null)
       return cause.getMessage ();
-    else
-      return message;
+    return message;
   }
 
   /**

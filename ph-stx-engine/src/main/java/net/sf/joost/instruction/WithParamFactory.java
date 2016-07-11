@@ -69,9 +69,9 @@ public final class WithParamFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (parent == null || !(parent instanceof AbstractProcessBase))
     {
@@ -86,10 +86,10 @@ public final class WithParamFactory extends AbstractFactoryBase
     final String expName = getExpandedName (nameAtt, context);
 
     // Check for uniqueness
-    final Vector siblings = ((AbstractProcessBase) parent).children;
+    final Vector <AbstractInstruction> siblings = ((AbstractProcessBase) parent).m_aChildren;
     if (siblings != null)
       for (int i = 0; i < siblings.size (); i++)
-        if (((Instance) siblings.elementAt (i)).expName.equals (expName))
+        if (((Instance) siblings.elementAt (i)).m_sExpName.equals (expName))
           throw new SAXParseException ("Parameter '" +
                                        nameAtt +
                                        "' already passed in line " +
@@ -105,9 +105,9 @@ public final class WithParamFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>with-param</code> element. */
   public class Instance extends AbstractNodeBase
   {
-    private final String expName;
-    private AbstractTree select;
-    private final String errorMessage;
+    private final String m_sExpName;
+    private AbstractTree m_aSelect;
+    private final String m_sErrorMessage;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -120,23 +120,23 @@ public final class WithParamFactory extends AbstractFactoryBase
              context,
              // this element may have children if there is no select attr
              select == null);
-      this.expName = expName;
-      this.select = select;
-      this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
+      this.m_sExpName = expName;
+      this.m_aSelect = select;
+      this.m_sErrorMessage = "('" + qName + "' started in line " + lineNo + ")";
     }
 
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (select == null)
+      if (m_aSelect == null)
       {
         super.process (context);
         // create a new StringEmitter for this instance and put it
         // on the emitter stack
-        context.pushEmitter (new StringEmitter (new StringBuffer (), errorMessage));
+        context.pushEmitter (new StringEmitter (new StringBuffer (), m_sErrorMessage));
       }
       else
-        context.passedParameters.put (expName, select.evaluate (context, this));
+        context.m_aPassedParameters.put (m_sExpName, m_aSelect.evaluate (context, this));
 
       return CSTX.PR_CONTINUE;
     }
@@ -144,19 +144,19 @@ public final class WithParamFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      context.passedParameters.put (expName,
+      context.m_aPassedParameters.put (m_sExpName,
                                     new Value (((StringEmitter) context.popEmitter ()).getBuffer ().toString ()));
 
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
 
   }

@@ -27,6 +27,7 @@ package net.sf.joost.stx;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -58,23 +59,23 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
 public class Emitter
 {
-  public ContentHandler contH;
-  private LexicalHandler lexH;
-  private final ErrorHandlerImpl errorHandler; // set in the constructor
+  public ContentHandler m_aContH;
+  private LexicalHandler m_aLexH;
+  private final ErrorHandlerImpl m_aErrorHandler; // set in the constructor
 
   // for namespace handling
-  private final NamespaceSupport nsSupport;
-  private final Stack <String> nsStack;
-  private String nsDefault;
+  private final NamespaceSupport m_aNSSupport;
+  private final Stack <String> m_aNSStack;
+  private String m_sNSDefault;
 
   /** Stack for emitted start events, allows well-formedness check */
-  private final Stack <String> openedElements;
+  private final Stack <String> m_aOpenedElements;
 
   /**
    * Previous emitter. A new one will be created for each new result event
    * stream.
    */
-  public Emitter prev;
+  public Emitter m_aPrev;
 
   // properties of the last element
   private String lastUri, lastLName, lastQName;
@@ -86,22 +87,22 @@ public class Emitter
 
   public Emitter (final ErrorHandlerImpl errorHandler)
   {
-    nsSupport = new NamespaceSupport ();
-    nsDefault = "";
-    nsStack = new Stack<> ();
+    m_aNSSupport = new NamespaceSupport ();
+    m_sNSDefault = "";
+    m_aNSStack = new Stack<> ();
 
-    openedElements = new Stack<> ();
-    this.errorHandler = errorHandler;
+    m_aOpenedElements = new Stack<> ();
+    this.m_aErrorHandler = errorHandler;
   }
 
   /** Called from {@link #pushEmitter(IStxEmitter)} */
   protected Emitter (final Emitter prev, final IStxEmitter handler)
   {
-    this (prev.errorHandler);
+    this (prev.m_aErrorHandler);
 
-    this.prev = prev;
-    this.contH = handler;
-    this.lexH = handler;
+    this.m_aPrev = prev;
+    this.m_aContH = handler;
+    this.m_aLexH = handler;
   }
 
   /**
@@ -114,23 +115,23 @@ public class Emitter
    */
   public Emitter pushEmitter (final IStxEmitter handler)
   {
-    if (handler.getSystemId () == null && contH instanceof IStxEmitter)
+    if (handler.getSystemId () == null && m_aContH instanceof IStxEmitter)
     {
       // if the new handler doesn't have its own system identifier set
       // then use the system identifier of the parent
-      handler.setSystemId (((IStxEmitter) contH).getSystemId ());
+      handler.setSystemId (((IStxEmitter) m_aContH).getSystemId ());
     }
     return new Emitter (this, handler);
   }
 
   public void setContentHandler (final ContentHandler handler)
   {
-    contH = handler;
+    m_aContH = handler;
   }
 
   public void setLexicalHandler (final LexicalHandler handler)
   {
-    lexH = handler;
+    m_aLexH = handler;
   }
 
   /** Process a stored element start tag (from startElement) */
@@ -138,21 +139,21 @@ public class Emitter
   {
     try
     {
-      contH.startElement (lastUri, lastLName, lastQName, lastAttrs);
+      m_aContH.startElement (lastUri, lastLName, lastQName, lastAttrs);
       dtdAllowed = false;
     }
     catch (final SAXException se)
     {
-      errorHandler.error (se.getMessage (),
-                          lastInstruction.publicId,
-                          lastInstruction.systemId,
-                          lastInstruction.lineNo,
-                          lastInstruction.colNo,
-                          se);
+      m_aErrorHandler.error (se.getMessage (),
+                             lastInstruction.m_sPublicID,
+                             lastInstruction.m_sSystemID,
+                             lastInstruction.lineNo,
+                             lastInstruction.colNo,
+                             se);
     }
 
-    openedElements.push (lastUri);
-    openedElements.push (lastQName);
+    m_aOpenedElements.push (lastUri);
+    m_aOpenedElements.push (lastQName);
 
     lastAttrs = null; // flag: there's no startElement pending
   }
@@ -171,16 +172,16 @@ public class Emitter
   {
     if (lastAttrs == null)
     {
-      errorHandler.error ("Can't create an attribute if there's " +
-                          "no opened element",
-                          instruction.publicId,
-                          instruction.systemId,
-                          instruction.lineNo,
-                          instruction.colNo);
+      m_aErrorHandler.error ("Can't create an attribute if there's " +
+                             "no opened element",
+                             instruction.m_sPublicID,
+                             instruction.m_sSystemID,
+                             instruction.lineNo,
+                             instruction.colNo);
       return; // if #errorHandler returns
     }
 
-    if (contH != null)
+    if (m_aContH != null)
     {
 
       final int index = lastAttrs.getIndex (uri, lName);
@@ -198,11 +199,11 @@ public class Emitter
       if (colon != -1)
       { // look only at prefixed attributes
         final String prefix = qName.substring (0, colon);
-        if (!uri.equals (nsSupport.getURI (prefix)))
+        if (!uri.equals (m_aNSSupport.getURI (prefix)))
         {
-          nsSupport.declarePrefix (prefix, uri);
-          nsStack.push (prefix);
-          contH.startPrefixMapping (prefix, uri);
+          m_aNSSupport.declarePrefix (prefix, uri);
+          m_aNSStack.push (prefix);
+          m_aContH.startPrefixMapping (prefix, uri);
         }
       }
     }
@@ -210,8 +211,8 @@ public class Emitter
 
   public void startDocument () throws SAXException
   {
-    if (contH != null)
-      contH.startDocument ();
+    if (m_aContH != null)
+      m_aContH.startDocument ();
   }
 
   /**
@@ -222,22 +223,22 @@ public class Emitter
    */
   public void endDocument (final AbstractInstruction instruction) throws SAXException
   {
-    if (contH != null)
+    if (m_aContH != null)
     {
       if (lastAttrs != null)
         processLastElement ();
-      if (!openedElements.isEmpty ())
+      if (!m_aOpenedElements.isEmpty ())
       {
-        errorHandler.fatalError ("Missing end tag for '" +
-                                 openedElements.pop () +
-                                 "' at the end of the " +
-                                 (contH instanceof BufferEmitter ? "buffer" : "document"),
-                                 instruction.getNode ().publicId,
-                                 instruction.getNode ().systemId,
-                                 instruction.lineNo,
-                                 instruction.colNo);
+        m_aErrorHandler.fatalError ("Missing end tag for '" +
+                                    m_aOpenedElements.pop () +
+                                    "' at the end of the " +
+                                    (m_aContH instanceof BufferEmitter ? "buffer" : "document"),
+                                    instruction.getNode ().m_sPublicID,
+                                    instruction.getNode ().m_sSystemID,
+                                    instruction.lineNo,
+                                    instruction.colNo);
       }
-      contH.endDocument ();
+      m_aContH.endDocument ();
     }
   }
 
@@ -254,34 +255,34 @@ public class Emitter
                             final Map <String, String> namespaces,
                             final AbstractNodeBase instruction) throws SAXException
   {
-    if (contH != null)
+    if (m_aContH != null)
     {
       if (lastAttrs != null)
         processLastElement ();
 
-      nsSupport.pushContext ();
-      nsStack.push (null); // marker
+      m_aNSSupport.pushContext ();
+      m_aNSStack.push (null); // marker
 
       // is this element in an undeclared namespace?
       final int colon = qName.indexOf (":");
       if (colon != -1)
       {
         final String prefix = qName.substring (0, colon);
-        if (!uri.equals (nsSupport.getURI (prefix)))
+        if (!uri.equals (m_aNSSupport.getURI (prefix)))
         {
-          nsSupport.declarePrefix (prefix, uri);
-          nsStack.push (prefix);
-          contH.startPrefixMapping (prefix, uri);
+          m_aNSSupport.declarePrefix (prefix, uri);
+          m_aNSStack.push (prefix);
+          m_aContH.startPrefixMapping (prefix, uri);
         }
       }
       else
       {
-        if (!uri.equals (nsDefault))
+        if (!uri.equals (m_sNSDefault))
         {
-          nsSupport.declarePrefix ("", uri);
-          nsDefault = uri;
-          nsStack.push ("");
-          contH.startPrefixMapping ("", uri);
+          m_aNSSupport.declarePrefix ("", uri);
+          m_sNSDefault = uri;
+          m_aNSStack.push ("");
+          m_aContH.startPrefixMapping ("", uri);
         }
       }
       // no need to check also the attributes
@@ -305,20 +306,20 @@ public class Emitter
           final String theUri = e.getValue ();
           if ("".equals (thePrefix))
           { // default namespace
-            if (!theUri.equals (nsDefault))
+            if (!theUri.equals (m_sNSDefault))
             {
-              contH.startPrefixMapping ("", theUri);
-              nsSupport.declarePrefix ("", theUri);
-              nsDefault = theUri;
-              nsStack.push ("");
+              m_aContH.startPrefixMapping ("", theUri);
+              m_aNSSupport.declarePrefix ("", theUri);
+              m_sNSDefault = theUri;
+              m_aNSStack.push ("");
             }
           }
           else
-            if (!theUri.equals (nsSupport.getURI (thePrefix)))
+            if (!theUri.equals (m_aNSSupport.getURI (thePrefix)))
             {
-              contH.startPrefixMapping (thePrefix, theUri);
-              nsSupport.declarePrefix (thePrefix, theUri);
-              nsStack.push (thePrefix);
+              m_aContH.startPrefixMapping (thePrefix, theUri);
+              m_aNSSupport.declarePrefix (thePrefix, theUri);
+              m_aNSStack.push (thePrefix);
             }
         }
       }
@@ -340,70 +341,70 @@ public class Emitter
                           final String qName,
                           final AbstractInstruction instruction) throws SAXException
   {
-    if (contH != null)
+    if (m_aContH != null)
     {
       if (lastAttrs != null)
         processLastElement ();
 
-      if (openedElements.isEmpty ())
+      if (m_aOpenedElements.isEmpty ())
       {
-        errorHandler.fatalError ("Attempt to emit unmatched end tag " +
-                                 (qName != null ? "'" + qName + "' " : "") +
-                                 "(no element opened)",
-                                 instruction.getNode ().publicId,
-                                 instruction.getNode ().systemId,
-                                 instruction.lineNo,
-                                 instruction.colNo);
+        m_aErrorHandler.fatalError ("Attempt to emit unmatched end tag " +
+                                    (qName != null ? "'" + qName + "' " : "") +
+                                    "(no element opened)",
+                                    instruction.getNode ().m_sPublicID,
+                                    instruction.getNode ().m_sSystemID,
+                                    instruction.lineNo,
+                                    instruction.colNo);
         return; // if #errorHandler returns
       }
-      final String elQName = openedElements.pop ();
-      final String elUri = openedElements.pop ();
+      final String elQName = m_aOpenedElements.pop ();
+      final String elUri = m_aOpenedElements.pop ();
       if (!qName.equals (elQName))
       {
-        errorHandler.fatalError ("Attempt to emit unmatched end tag '" +
-                                 qName +
-                                 "' ('" +
-                                 elQName +
-                                 "' expected)",
-                                 instruction.getNode ().publicId,
-                                 instruction.getNode ().systemId,
-                                 instruction.lineNo,
-                                 instruction.colNo);
+        m_aErrorHandler.fatalError ("Attempt to emit unmatched end tag '" +
+                                    qName +
+                                    "' ('" +
+                                    elQName +
+                                    "' expected)",
+                                    instruction.getNode ().m_sPublicID,
+                                    instruction.getNode ().m_sSystemID,
+                                    instruction.lineNo,
+                                    instruction.colNo);
         return; // if #errorHandler returns
       }
       if (!uri.equals (elUri))
       {
-        errorHandler.fatalError ("Attempt to emit unmatched end tag '{" +
-                                 uri +
-                                 "}" +
-                                 qName +
-                                 "' ('{" +
-                                 elUri +
-                                 "}" +
-                                 elQName +
-                                 "' expected)",
-                                 instruction.getNode ().publicId,
-                                 instruction.getNode ().systemId,
-                                 instruction.lineNo,
-                                 instruction.colNo);
+        m_aErrorHandler.fatalError ("Attempt to emit unmatched end tag '{" +
+                                    uri +
+                                    "}" +
+                                    qName +
+                                    "' ('{" +
+                                    elUri +
+                                    "}" +
+                                    elQName +
+                                    "' expected)",
+                                    instruction.getNode ().m_sPublicID,
+                                    instruction.getNode ().m_sSystemID,
+                                    instruction.lineNo,
+                                    instruction.colNo);
         return; // if #errorHandler returns
       }
 
-      contH.endElement (uri, lName, qName);
+      m_aContH.endElement (uri, lName, qName);
 
       // send endPrefixMapping events, prefixes are on #nsStack
-      nsSupport.popContext ();
-      String thePrefix = nsStack.pop ();
+      m_aNSSupport.popContext ();
+      String thePrefix = m_aNSStack.pop ();
       while (thePrefix != null)
       { // null is the marker for a new context
-        contH.endPrefixMapping (thePrefix);
+        m_aContH.endPrefixMapping (thePrefix);
         if (thePrefix == "")
         {
-          nsDefault = nsSupport.getURI ("");
-          if (nsDefault == null)
-            nsDefault = "";
+          m_sNSDefault = m_aNSSupport.getURI ("");
+          if (m_sNSDefault == null)
+            m_sNSDefault = "";
         }
-        thePrefix = nsStack.pop ();
+        thePrefix = m_aNSStack.pop ();
       }
     }
   }
@@ -421,7 +422,7 @@ public class Emitter
   {
     if (length == 0)
       return;
-    if (contH != null)
+    if (m_aContH != null)
     {
       if (lastAttrs != null)
         processLastElement ();
@@ -435,25 +436,25 @@ public class Emitter
           {
             // "]]>" found; split between "]]" and ">"
             index += 2;
-            contH.characters (str.substring (0, index).toCharArray (), 0, index);
-            lexH.endCDATA (); // #lexH will be != null,
-            lexH.startCDATA (); // because #insideCDATA was true
+            m_aContH.characters (str.substring (0, index).toCharArray (), 0, index);
+            m_aLexH.endCDATA (); // #lexH will be != null,
+            m_aLexH.startCDATA (); // because #insideCDATA was true
             str = str.substring (index);
             index = str.indexOf ("]]>");
           }
-          contH.characters (str.toCharArray (), 0, str.length ());
+          m_aContH.characters (str.toCharArray (), 0, str.length ());
         }
         else
-          contH.characters (ch, start, length);
+          m_aContH.characters (ch, start, length);
       }
       catch (final SAXException ex)
       {
-        errorHandler.fatalError (ex.getMessage (),
-                                 instruction.publicId,
-                                 instruction.systemId,
-                                 instruction.lineNo,
-                                 instruction.colNo,
-                                 ex);
+        m_aErrorHandler.fatalError (ex.getMessage (),
+                                    instruction.m_sPublicID,
+                                    instruction.m_sSystemID,
+                                    instruction.lineNo,
+                                    instruction.colNo,
+                                    ex);
       }
     }
   }
@@ -468,22 +469,22 @@ public class Emitter
                                      final String data,
                                      final AbstractNodeBase instruction) throws SAXException
   {
-    if (contH != null)
+    if (m_aContH != null)
     {
       if (lastAttrs != null)
         processLastElement ();
       try
       {
-        contH.processingInstruction (target, data);
+        m_aContH.processingInstruction (target, data);
       }
       catch (final SAXException se)
       {
-        errorHandler.error (se.getMessage (),
-                            instruction.publicId,
-                            instruction.systemId,
-                            instruction.lineNo,
-                            instruction.colNo,
-                            se);
+        m_aErrorHandler.error (se.getMessage (),
+                               instruction.m_sPublicID,
+                               instruction.m_sSystemID,
+                               instruction.lineNo,
+                               instruction.colNo,
+                               se);
       }
     }
   }
@@ -499,22 +500,22 @@ public class Emitter
                        final int length,
                        final AbstractNodeBase instruction) throws SAXException
   {
-    if (contH != null && lastAttrs != null)
+    if (m_aContH != null && lastAttrs != null)
       processLastElement ();
-    if (lexH != null)
+    if (m_aLexH != null)
     {
       try
       {
-        lexH.comment (ch, start, length);
+        m_aLexH.comment (ch, start, length);
       }
       catch (final SAXException se)
       {
-        errorHandler.error (se.getMessage (),
-                            instruction.publicId,
-                            instruction.systemId,
-                            instruction.lineNo,
-                            instruction.colNo,
-                            se);
+        m_aErrorHandler.error (se.getMessage (),
+                               instruction.m_sPublicID,
+                               instruction.m_sSystemID,
+                               instruction.lineNo,
+                               instruction.colNo,
+                               se);
       }
     }
   }
@@ -527,22 +528,22 @@ public class Emitter
    */
   public void startCDATA (final AbstractNodeBase instruction) throws SAXException
   {
-    if (contH != null && lastAttrs != null)
+    if (m_aContH != null && lastAttrs != null)
       processLastElement ();
-    if (lexH != null)
+    if (m_aLexH != null)
     {
       try
       {
-        lexH.startCDATA ();
+        m_aLexH.startCDATA ();
       }
       catch (final SAXException se)
       {
-        errorHandler.error (se.getMessage (),
-                            instruction.publicId,
-                            instruction.systemId,
-                            instruction.lineNo,
-                            instruction.colNo,
-                            se);
+        m_aErrorHandler.error (se.getMessage (),
+                               instruction.m_sPublicID,
+                               instruction.m_sSystemID,
+                               instruction.lineNo,
+                               instruction.colNo,
+                               se);
       }
       insideCDATA = true;
     }
@@ -550,9 +551,9 @@ public class Emitter
 
   public void endCDATA () throws SAXException
   {
-    if (lexH != null)
+    if (m_aLexH != null)
     {
-      lexH.endCDATA ();
+      m_aLexH.endCDATA ();
       insideCDATA = false;
     }
   }
@@ -562,36 +563,36 @@ public class Emitter
                          final String publicId,
                          final String systemId) throws SAXException
   {
-    if (contH != null && lastAttrs != null)
+    if (m_aContH != null && lastAttrs != null)
       processLastElement ();
     if (!dtdAllowed)
     {
-      errorHandler.error ("Cannot create a document type declaration for '" +
-                          name +
-                          "' when an element or another DTD has already " +
-                          "been output",
-                          instruction.publicId,
-                          instruction.systemId,
-                          instruction.lineNo,
-                          instruction.colNo);
+      m_aErrorHandler.error ("Cannot create a document type declaration for '" +
+                             name +
+                             "' when an element or another DTD has already " +
+                             "been output",
+                             instruction.m_sPublicID,
+                             instruction.m_sSystemID,
+                             instruction.lineNo,
+                             instruction.colNo);
       return;
     }
-    if (lexH != null)
+    if (m_aLexH != null)
     {
       try
       {
-        lexH.startDTD (name, publicId, systemId);
-        lexH.endDTD ();
+        m_aLexH.startDTD (name, publicId, systemId);
+        m_aLexH.endDTD ();
         dtdAllowed = false;
       }
       catch (final SAXException se)
       {
-        errorHandler.error (se.getMessage (),
-                            instruction.publicId,
-                            instruction.systemId,
-                            instruction.lineNo,
-                            instruction.colNo,
-                            se);
+        m_aErrorHandler.error (se.getMessage (),
+                               instruction.m_sPublicID,
+                               instruction.m_sSystemID,
+                               instruction.lineNo,
+                               instruction.colNo,
+                               se);
       }
     }
   }
@@ -601,10 +602,10 @@ public class Emitter
    */
   public boolean isEmitterActive (final IStxEmitter emitter)
   {
-    if (contH == emitter)
+    if (m_aContH == emitter)
       return true;
-    if (prev != null)
-      return prev.isEmitterActive (emitter);
+    if (m_aPrev != null)
+      return m_aPrev.isEmitterActive (emitter);
     return false;
   }
 
@@ -629,7 +630,7 @@ public class Emitter
    *        existing file
    */
   public Writer getResultWriter (final String href,
-                                 String encoding,
+                                 final String encoding,
                                  final String publicId,
                                  final String systemId,
                                  final int lineNo,
@@ -641,9 +642,9 @@ public class Emitter
 
     File hrefFile = null; // the file object representing href
 
-    if (contH instanceof IStxEmitter)
+    if (m_aContH instanceof IStxEmitter)
     { // we may extract a base URI
-      final String base = ((IStxEmitter) contH).getSystemId ();
+      final String base = ((IStxEmitter) m_aContH).getSystemId ();
       if (base != null)
         hrefFile = new File (new URI (base).resolve (href));
     }
@@ -668,11 +669,11 @@ public class Emitter
     {
       osw = new OutputStreamWriter (fos, encoding);
     }
-    catch (final java.io.UnsupportedEncodingException e)
+    catch (final UnsupportedEncodingException e)
     {
       final String msg = "Unsupported encoding '" + encoding + "', using " + CSTX.DEFAULT_ENCODING;
-      errorHandler.warning (msg, publicId, systemId, lineNo, colNo, e);
-      osw = new OutputStreamWriter (fos, encoding = CSTX.DEFAULT_ENCODING);
+      m_aErrorHandler.warning (msg, publicId, systemId, lineNo, colNo, e);
+      osw = new OutputStreamWriter (fos, CSTX.DEFAULT_ENCODING);
     }
     return osw;
   }

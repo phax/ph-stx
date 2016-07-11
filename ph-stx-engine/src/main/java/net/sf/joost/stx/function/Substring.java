@@ -26,8 +26,8 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -69,18 +69,19 @@ public final class Substring implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     // XPath 1.0 semantics
     // The following somewhat complicated algorithm is needed for
     // the correct handling of NaN and +/- infinity.
     try
     {
-      if (args.left.type == AbstractTree.LIST)
+      if (args.m_aLeft.m_nType == AbstractTree.LIST)
       { // three parameters
-        final String str = args.left.left.evaluate (context, top).getStringValue ();
-        final double arg2 = args.left.right.evaluate (context, top).getNumberValue ();
-        final double arg3 = args.right.evaluate (context, top).getNumberValue ();
+        final String str = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
+        final double arg2 = args.m_aLeft.m_aRight.evaluate (context, top).getNumberValue ();
+        final double arg3 = args.m_aRight.evaluate (context, top).getNumberValue ();
 
         // extra test, because round(NaN) gives 0
         if (Double.isNaN (arg2) || Double.isNaN (arg2 + arg3))
@@ -99,24 +100,22 @@ public final class Substring implements IInstance
 
         return new Value (str.substring (begin, end));
       }
-      else
-      { // two parameters
-        final String str = args.left.evaluate (context, top).getStringValue ();
-        final double arg2 = args.right.evaluate (context, top).getNumberValue ();
 
-        if (Double.isNaN (arg2))
-          return Value.VAL_EMPTY_STRING;
-        if (arg2 < 1)
-          return new Value (str);
+      // two parameters
+      final String str = args.m_aLeft.evaluate (context, top).getStringValue ();
+      final double arg2 = args.m_aRight.evaluate (context, top).getNumberValue ();
 
-        // the first character of a string in STXPath is at position 1,
-        // in Java it is at position 0
-        final int offset = Math.round ((float) (arg2 - 1.0));
-        if (offset > str.length ())
-          return Value.VAL_EMPTY_STRING;
-        else
-          return new Value (str.substring (offset));
-      }
+      if (Double.isNaN (arg2))
+        return Value.VAL_EMPTY_STRING;
+      if (arg2 < 1)
+        return new Value (str);
+
+      // the first character of a string in STXPath is at position 1,
+      // in Java it is at position 0
+      final int offset = Math.round ((float) (arg2 - 1.0));
+      if (offset > str.length ())
+        return Value.VAL_EMPTY_STRING;
+      return new Value (str.substring (offset));
     }
     catch (final IndexOutOfBoundsException ex)
     {

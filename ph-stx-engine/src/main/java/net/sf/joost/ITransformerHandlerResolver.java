@@ -33,8 +33,6 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import net.sf.joost.stx.Value;
-
 /**
  * Basic interface for resolving external {@link TransformerHandler} objects.
  * <p>
@@ -72,7 +70,6 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.8 $ $Date: 2009/09/22 21:13:44 $
  * @author Oliver Becker
  */
-
 public interface ITransformerHandlerResolver
 {
   /**
@@ -108,7 +105,7 @@ public interface ITransformerHandlerResolver
                               String base,
                               URIResolver uriResolver,
                               ErrorListener errorListener,
-                              Hashtable <String, Value> params) throws SAXException;
+                              Hashtable <String, Object> params) throws SAXException;
 
   /**
    * Resolves a {@link TransformerHandler} object for an external
@@ -141,7 +138,7 @@ public interface ITransformerHandlerResolver
                               XMLReader reader,
                               URIResolver uriResolver,
                               ErrorListener errorListener,
-                              Hashtable <String, Value> params) throws SAXException;
+                              Hashtable <String, Object> params) throws SAXException;
 
   /**
    * Determines whether a requested filter is available or not, used by the STX
@@ -155,7 +152,7 @@ public interface ITransformerHandlerResolver
   boolean available (String method);
 
   /**
-   * Return all supported filter-method URIs Each one must return
+   * Return all supported filter-method URIs. Each one must return
    * <code>true</code> when checked against {@link #available(String)}.
    *
    * @return array of supported URIs

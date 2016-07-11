@@ -33,7 +33,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Objects of PiTree represent processing-instruction node test nodes in the
  * syntax tree of a pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
@@ -56,7 +56,7 @@ public final class PiTestTree extends AbstractTree
   /**
    * Constructs a PiTextTree that represents a processing-instruction test that
    * contains a string literal.
-   * 
+   *
    * @param literal
    *        the string literal
    */
@@ -73,13 +73,13 @@ public final class PiTestTree extends AbstractTree
     if (top < 2)
       return false;
 
-    final SAXEvent e = (SAXEvent) context.ancestorStack.elementAt (top - 1);
-    if (e.type == SAXEvent.PI)
+    final SAXEvent e = context.ancestorStack.elementAt (top - 1);
+    if (e.m_nType == SAXEvent.PI)
     {
-      if (value != null && !value.equals (e.qName))
+      if (m_aValue != null && !m_aValue.equals (e.m_sQName))
         return false;
       if (setPosition)
-        context.position = ((SAXEvent) context.ancestorStack.elementAt (top - 2)).getPositionOfPI (piKeyName);
+        context.position = context.ancestorStack.elementAt (top - 2).getPositionOfPI (piKeyName);
       return true;
     }
     return false;
@@ -88,10 +88,9 @@ public final class PiTestTree extends AbstractTree
   @Override
   public double getPriority ()
   {
-    if (value != null)
+    if (m_aValue != null)
       return 0;
-    else
-      return -0.5;
+    return -0.5;
   }
 
   @Override

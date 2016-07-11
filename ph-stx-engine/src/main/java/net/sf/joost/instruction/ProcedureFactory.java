@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -34,6 +35,7 @@ import org.xml.sax.SAXParseException;
 import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
+import net.sf.joost.stx.Value;
 
 /**
  * Factory for <code>procedure</code> elements, which are represented by the
@@ -46,12 +48,12 @@ import net.sf.joost.stx.ParseContext;
 public final class ProcedureFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
-  private final HashSet attrNames;
+  private final Set <String> attrNames;
 
   // Constructor
   public ProcedureFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("visibility");
     attrNames.add ("public");
@@ -67,9 +69,9 @@ public final class ProcedureFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (parent == null || !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" +
@@ -101,7 +103,7 @@ public final class ProcedureFactory extends AbstractFactoryBase
 
     checkAttributes (qName, attrs, attrNames, context);
 
-    return new Instance (qName, parent, context, nameAtt, expName, visibility, isPublic, newScope);
+    return new Instance (qName, (AbstractGroupBase) parent, context, nameAtt, expName, visibility, isPublic, newScope);
   }
 
   // -----------------------------------------------------------------------
@@ -110,14 +112,14 @@ public final class ProcedureFactory extends AbstractFactoryBase
   public final class Instance extends AbstractTemplateBase
   {
     /** The expanded name of this procedure */
-    protected String expName;
+    final String m_sExpName;
 
     /** The qualified name of this procedure */
-    protected String procName;
+    final String m_sProcName;
 
     // Constructor
     protected Instance (final String qName,
-                        final AbstractNodeBase parent,
+                        final AbstractGroupBase parent,
                         final ParseContext context,
                         final String procName,
                         final String expName,
@@ -126,8 +128,8 @@ public final class ProcedureFactory extends AbstractFactoryBase
                         final boolean newScope)
     {
       super (qName, parent, context, visibility, isPublic, newScope);
-      this.expName = expName;
-      this.procName = procName;
+      this.m_sExpName = expName;
+      this.m_sProcName = procName;
     }
 
     /*
@@ -139,9 +141,9 @@ public final class ProcedureFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      localFieldStack.push (context.currentGroup);
+      m_aLocalFieldStack.push (context.currentGroup);
       // save and reset local variables
-      localFieldStack.push (context.localVars.clone ());
+      m_aLocalFieldStack.push (context.localVars.clone ());
       context.localVars.clear ();
       return super.process (context);
     }
@@ -151,8 +153,8 @@ public final class ProcedureFactory extends AbstractFactoryBase
     {
       super.processEnd (context);
       // restore local variables
-      context.localVars = (Hashtable) localFieldStack.pop ();
-      context.currentGroup = (AbstractGroupBase) localFieldStack.pop ();
+      context.localVars = (Hashtable <String, Value>) m_aLocalFieldStack.pop ();
+      context.currentGroup = (AbstractGroupBase) m_aLocalFieldStack.pop ();
       return CSTX.PR_CONTINUE;
     }
 
@@ -160,7 +162,7 @@ public final class ProcedureFactory extends AbstractFactoryBase
     @Override
     public String toString ()
     {
-      return "procedure:" + procName + "(" + lineNo + ")";
+      return "procedure:" + m_sProcName + "(" + lineNo + ")";
     }
   }
 }

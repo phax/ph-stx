@@ -71,8 +71,8 @@ public final class StringJoin implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
-    Value seq = args.left.evaluate (context, top);
-    final String sep = args.right.evaluate (context, top).getStringValue ();
+    Value seq = args.m_aLeft.evaluate (context, top);
+    final String sep = args.m_aRight.evaluate (context, top).getStringValue ();
     if (seq.type == Value.EMPTY)
       return Value.VAL_EMPTY_STRING;
     final StringBuffer buf = new StringBuffer ();

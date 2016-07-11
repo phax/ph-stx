@@ -57,13 +57,13 @@ public class DebugProcessor extends Processor
 {
 
   /** the TraceManager for dynamic tracing */
-  private TraceManager tmgr;
+  private TraceManager m_aTraceMgr;
   /** the TrAX-Transformer */
-  private TransformerImpl transformer;
+  private TransformerImpl m_aTransformer;
   /** the ParserListener for static tracing */
   private IParserListener parserListener;
 
-  private Locator locator;
+  private Locator m_aLocator;
 
   /** logger */
   private static Logger log = LoggerFactory.getLogger (DebugProcessor.class);
@@ -138,12 +138,12 @@ public class DebugProcessor extends Processor
   public void setDocumentLocator (final Locator locator)
   {
     super.setDocumentLocator (locator);
-    this.locator = locator;
+    this.m_aLocator = locator;
   }
 
   public Locator getDocumentLocator ()
   {
-    return locator;
+    return m_aLocator;
   }
 
   /**
@@ -153,7 +153,7 @@ public class DebugProcessor extends Processor
   protected Emitter initializeEmitter (final Context ctx)
   {
     log.info ("initialize DebugProcessor ...");
-    return new DebugEmitter (ctx.errorHandler);
+    return new DebugEmitter (ctx.m_aErrorHandler);
   }
 
   /**
@@ -175,7 +175,7 @@ public class DebugProcessor extends Processor
     int ret = -1;
 
     // check, if transformation should be cancelled
-    if (transformer.cancelTransformation)
+    if (m_aTransformer.cancelTransformation)
     {
       return CSTX.PR_ERROR;
     }
@@ -184,7 +184,7 @@ public class DebugProcessor extends Processor
     if (inst instanceof AbstractNodeBase.End)
     {
       // end node
-      tmgr.fireLeaveInstructionNode (inst, event);
+      m_aTraceMgr.fireLeaveInstructionNode (inst, event);
     }
     else
     {
@@ -195,16 +195,16 @@ public class DebugProcessor extends Processor
         atomicnode = true;
       }
       // fire callback on tracemanager
-      tmgr.fireEnterInstructionNode (inst, event);
+      m_aTraceMgr.fireEnterInstructionNode (inst, event);
     }
 
     // process instruction
     ret = inst.process (getContext ());
 
-    if (atomicnode && tmgr != null)
+    if (atomicnode && m_aTraceMgr != null)
     {
       // fire callback on tracemanager
-      tmgr.fireLeaveInstructionNode (inst, event);
+      m_aTraceMgr.fireLeaveInstructionNode (inst, event);
       atomicnode = false;
     }
     return ret;
@@ -219,35 +219,35 @@ public class DebugProcessor extends Processor
   }
 
   /**
-   * setter for property {@link #tmgr}
+   * setter for property {@link #m_aTraceMgr}
    */
   public void setTraceManager (final TraceManager tmgr)
   {
-    this.tmgr = tmgr;
+    this.m_aTraceMgr = tmgr;
   }
 
   /**
-   * getter for property {@link #tmgr}
+   * getter for property {@link #m_aTraceMgr}
    */
   public TraceManager getTraceManager ()
   {
-    return this.tmgr;
+    return this.m_aTraceMgr;
   }
 
   /**
-   * getter for property {@link #transformer}
+   * getter for property {@link #m_aTransformer}
    */
   public TransformerImpl getTransformer ()
   {
-    return transformer;
+    return m_aTransformer;
   }
 
   /**
-   * setter for property {@link #transformer}
+   * setter for property {@link #m_aTransformer}
    */
   public void setTransformer (final TransformerImpl transformer)
   {
-    this.transformer = transformer;
+    this.m_aTransformer = transformer;
   }
 
   // --------------------------------------------------------------
@@ -263,7 +263,7 @@ public class DebugProcessor extends Processor
     // process event
     super.startDocument ();
     // fire startprocessing event to tracelistener
-    this.tmgr.fireStartSourceDocument ();
+    this.m_aTraceMgr.fireStartSourceDocument ();
   }
 
   /**
@@ -275,7 +275,7 @@ public class DebugProcessor extends Processor
     // process event
     super.endDocument ();
     // fire endprocessing event to tracelistener
-    this.tmgr.fireEndSourceDocument ();
+    this.m_aTraceMgr.fireEndSourceDocument ();
   }
 
   /**
@@ -295,7 +295,7 @@ public class DebugProcessor extends Processor
     // process event
     super.startElement (uri, lName, qName, attrs);
     // inform debugger
-    this.tmgr.fireStartSourceElement (saxevent);
+    this.m_aTraceMgr.fireStartSourceElement (saxevent);
   }
 
   /**
@@ -312,7 +312,7 @@ public class DebugProcessor extends Processor
     // process event
     super.endElement (uri, lName, qName);
     // inform debugger
-    this.tmgr.fireEndSourceElement (saxevent);
+    this.m_aTraceMgr.fireEndSourceElement (saxevent);
   }
 
   /**
@@ -327,7 +327,7 @@ public class DebugProcessor extends Processor
     // process event
     super.characters (ch, start, length);
     // inform debugger
-    this.tmgr.fireSourceText (saxevent);
+    this.m_aTraceMgr.fireSourceText (saxevent);
   }
 
   /**
@@ -342,7 +342,7 @@ public class DebugProcessor extends Processor
     // process event
     super.processingInstruction (target, data);
     // inform debugger
-    this.tmgr.fireSourcePI (saxevent);
+    this.m_aTraceMgr.fireSourcePI (saxevent);
   }
 
   /**
@@ -357,7 +357,7 @@ public class DebugProcessor extends Processor
     // process event
     super.startPrefixMapping (prefix, uri);
     // inform debugger
-    this.tmgr.fireSourceMapping (saxevent);
+    this.m_aTraceMgr.fireSourceMapping (saxevent);
   }
 
   /**
@@ -372,7 +372,7 @@ public class DebugProcessor extends Processor
     // process event
     super.comment (ch, start, length);
     // inform debugger
-    this.tmgr.fireSourceComment (saxevent);
+    this.m_aTraceMgr.fireSourceComment (saxevent);
   }
 
   /**

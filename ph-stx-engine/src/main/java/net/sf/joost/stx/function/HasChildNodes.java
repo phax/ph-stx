@@ -26,7 +26,6 @@ package net.sf.joost.stx.function;
 
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
-import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
@@ -65,8 +64,7 @@ public final class HasChildNodes implements IInstance
 
   public Value evaluate (final Context context, final int top, final AbstractTree args)
   {
-    return Value.getBoolean (context.ancestorStack.size () == 1 ||
-                             ((SAXEvent) context.ancestorStack.peek ()).hasChildNodes);
+    return Value.getBoolean (context.ancestorStack.size () == 1 || context.ancestorStack.peek ().m_bHasChildNodes);
     // size() == 1 means: the context node is the document node
   }
 }

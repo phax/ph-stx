@@ -34,8 +34,8 @@ import net.sf.joost.stx.ParseContext;
  */
 public abstract class AbstractVariableBase extends AbstractNodeBase
 {
-  protected String expName;
-  protected boolean keepValue;
+  protected final String m_sExpName;
+  protected final boolean m_bKeepValue;
 
   public AbstractVariableBase (final String qName,
                                final AbstractNodeBase parent,
@@ -45,7 +45,7 @@ public abstract class AbstractVariableBase extends AbstractNodeBase
                                final boolean mayHaveChildren)
   {
     super (qName, parent, context, mayHaveChildren);
-    this.expName = expName;
-    this.keepValue = keepValue;
+    this.m_sExpName = expName;
+    this.m_bKeepValue = keepValue;
   }
 }

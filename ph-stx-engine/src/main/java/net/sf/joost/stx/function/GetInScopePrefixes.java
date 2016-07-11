@@ -81,11 +81,11 @@ public final class GetInScopePrefixes implements IInstance
                                v +
                                ")");
 
-    if (e.namespaces == null)
+    if (e.m_aNamespaces == null)
       return Value.VAL_EMPTY;
 
     Value ret = null, last = null;
-    for (final String en : e.namespaces.values ())
+    for (final String en : e.m_aNamespaces.values ())
     {
       v = new Value (en);
       if (last != null)

@@ -163,8 +163,8 @@ public final class LitElementFactory
       }
 
       if (namespaceAliases.size () == 0)
-        // no aliases declared
-        return false;
+                                        // no aliases declared
+                                        return false;
 
       // Change namespace URI of this element
       String toNS = namespaceAliases.get (uri);
@@ -172,16 +172,16 @@ public final class LitElementFactory
       {
         uri = toNS;
         int colon;
-        if (toNS == "" && (colon = qName.indexOf (':')) != -1)
+        if (toNS == "" && (colon = m_sQName.indexOf (':')) != -1)
         {
           // target null namespace must be used unprefixed
-          qName = qName.substring (colon + 1);
+          m_sQName = m_sQName.substring (colon + 1);
         }
         else
           if (NamespaceSupport.XMLNS.equals (toNS))
           {
             // target XML namespace must use the xml prefix
-            qName = "xml:" + qName.substring (qName.indexOf (':') + 1);
+            m_sQName = "xml:" + m_sQName.substring (m_sQName.indexOf (':') + 1);
           }
       }
 
@@ -248,7 +248,7 @@ public final class LitElementFactory
         for (int i = 0; i < avtList.length; i++)
           if (avtList[i] != null)
             attrs.setValue (i, avtList[i].evaluate (context, this).getString ());
-        context.emitter.startElement (uri, lName, qName, attrs, namespaces, this);
+        context.emitter.startElement (uri, lName, m_sQName, attrs, namespaces, this);
       }
       return CSTX.PR_CONTINUE;
     }
@@ -259,7 +259,7 @@ public final class LitElementFactory
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      context.emitter.endElement (uri, lName, qName, nodeEnd);
+      context.emitter.endElement (uri, lName, m_sQName, m_aNodeEnd);
       return super.processEnd (context);
     }
 
@@ -273,7 +273,7 @@ public final class LitElementFactory
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
@@ -289,7 +289,7 @@ public final class LitElementFactory
     @Override
     public String toString ()
     {
-      return "LitElement <" + qName + ">";
+      return "LitElement <" + m_sQName + ">";
     }
   }
 }

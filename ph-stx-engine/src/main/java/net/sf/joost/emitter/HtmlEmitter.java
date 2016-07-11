@@ -27,6 +27,7 @@ package net.sf.joost.emitter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.transform.Result;
 
@@ -43,21 +44,17 @@ public class HtmlEmitter extends AbstractStreamEmitter
 {
   /** output property: omit-xml-declaration */
   private boolean propOmitXmlDeclaration = false;
-
   private boolean insideCDATA = false;
-
   private boolean supportDisableOutputEscaping = false;
-
   private boolean disabledOutputEscaping = false;
-
   /**
    * Empty HTML 4.01 elements according to
    * http://www.w3.org/TR/1999/REC-html401-19991224/index/elements.html
    */
-  private static final HashSet <String> emptyHTMLElements;
+  private static final Set <String> emptyHTMLElements;
   static
   {
-    emptyHTMLElements = new HashSet <String> ();
+    emptyHTMLElements = new HashSet<> ();
     emptyHTMLElements.add ("AREA");
     emptyHTMLElements.add ("BASE");
     emptyHTMLElements.add ("BASEFONT");
@@ -109,7 +106,7 @@ public class HtmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write ("<!DOCTYPE HTML PUBLIC " + "\"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+      m_aWriter.write ("<!DOCTYPE HTML PUBLIC " + "\"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
     }
     catch (final IOException ex)
     {
@@ -124,8 +121,8 @@ public class HtmlEmitter extends AbstractStreamEmitter
   {
     try
     {
-      writer.write ("\n");
-      writer.flush ();
+      m_aWriter.write ("\n");
+      m_aWriter.flush ();
     }
     catch (final IOException ex)
     {
@@ -188,7 +185,7 @@ public class HtmlEmitter extends AbstractStreamEmitter
 
     try
     {
-      writer.write (out.toString ());
+      m_aWriter.write (out.toString ());
     }
     catch (final IOException ex)
     {
@@ -206,9 +203,9 @@ public class HtmlEmitter extends AbstractStreamEmitter
     {
       try
       {
-        writer.write ("</");
-        writer.write (qName);
-        writer.write (">");
+        m_aWriter.write ("</");
+        m_aWriter.write (qName);
+        m_aWriter.write (">");
       }
       catch (final IOException ex)
       {
@@ -229,13 +226,13 @@ public class HtmlEmitter extends AbstractStreamEmitter
         // Check that the characters can be represented in the current
         // encoding
         for (int i = 0; i < length; i++)
-          if (!charsetEncoder.canEncode (ch[start + i]))
+          if (!m_aCharsetEncoder.canEncode (ch[start + i]))
             throw new SAXException ("Cannot output character with code " +
                                     (int) ch[start + i] +
                                     " in the encoding '" +
-                                    encoding +
+                                    m_sEncoding +
                                     "'");
-        writer.write (ch, start, length);
+        m_aWriter.write (ch, start, length);
       }
       else
       {
@@ -259,7 +256,7 @@ public class HtmlEmitter extends AbstractStreamEmitter
             default:
               i = encodeCharacters (ch, start + i, out) - start;
           }
-        writer.write (out.toString ());
+        m_aWriter.write (out.toString ());
       }
     }
     catch (final IOException ex)
@@ -276,9 +273,9 @@ public class HtmlEmitter extends AbstractStreamEmitter
   {
     try
     {
-      writer.write ("<!--");
-      writer.write (ch, start, length);
-      writer.write ("-->");
+      m_aWriter.write ("<!--");
+      m_aWriter.write (ch, start, length);
+      m_aWriter.write ("-->");
     }
     catch (final IOException ex)
     {

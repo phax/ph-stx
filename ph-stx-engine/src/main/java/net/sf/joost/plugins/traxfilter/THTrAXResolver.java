@@ -52,7 +52,6 @@ import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.plugins.attributes.AbstractAttribute;
 import net.sf.joost.plugins.attributes.BooleanAttribute;
 import net.sf.joost.plugins.attributes.StringAttribute;
-import net.sf.joost.stx.Value;
 import net.sf.joost.trax.CTrAX;
 import net.sf.joost.trax.TransformerFactoryImpl;
 
@@ -106,9 +105,8 @@ import net.sf.joost.trax.TransformerFactoryImpl;
  * @version $Revision: 1.11 $ $Date: 2009/09/22 21:13:44 $
  * @author fikin
  */
-public class THResolver implements ITransformerHandlerResolver
+public class THTrAXResolver implements ITransformerHandlerResolver
 {
-
   /** supported methods */
   public static final String STX_METHOD = CSTX.STX_NS;
   public static final String XSLT_METHOD = "http://www.w3.org/1999/XSL/Transform";
@@ -176,7 +174,7 @@ public class THResolver implements ITransformerHandlerResolver
   private static Object SYNCHRONIZE_GUARD = new Object ();
 
   /** logging object */
-  private static Logger log = LoggerFactory.getLogger (THResolver.class);
+  private static Logger log = LoggerFactory.getLogger (THTrAXResolver.class);
 
   /*
    * (non-Javadoc)
@@ -190,17 +188,17 @@ public class THResolver implements ITransformerHandlerResolver
     return METHODS;
   }
 
-  /**
+  /*
    * @see net.sf.joost.ITransformerHandlerResolver#resolve(java.lang.String,
-   *      java.lang.String, java.lang.String, javax.xml.transform.URIResolver,
-   *      javax.xml.transform.ErrorListener, java.util.Hashtable)
+   * java.lang.String, java.lang.String, javax.xml.transform.URIResolver,
+   * javax.xml.transform.ErrorListener, java.util.Hashtable)
    */
   public TransformerHandler resolve (final String method,
                                      final String href,
                                      final String base,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable <String, Value> params) throws SAXException
+                                     final Hashtable <String, Object> params) throws SAXException
   {
     if (!available (method))
       throw new SAXException ("Not supported filter-method:" + method);
@@ -268,16 +266,16 @@ public class THResolver implements ITransformerHandlerResolver
     return th;
   }
 
-  /**
+  /*
    * @see net.sf.joost.ITransformerHandlerResolver#resolve(java.lang.String,
-   *      org.xml.sax.XMLReader, javax.xml.transform.URIResolver,
-   *      javax.xml.transform.ErrorListener, java.util.Hashtable)
+   * org.xml.sax.XMLReader, javax.xml.transform.URIResolver,
+   * javax.xml.transform.ErrorListener, java.util.Hashtable)
    */
   public TransformerHandler resolve (final String method,
                                      final XMLReader reader,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable <String, Value> params) throws SAXException
+                                     final Hashtable <String, Object> params) throws SAXException
   {
     if (!available (method))
       throw new SAXException ("Not supported filter-method:" + method);
@@ -396,7 +394,7 @@ public class THResolver implements ITransformerHandlerResolver
    */
   protected TransformerHandler newTHOutOfTrAX (final String method,
                                                final Source source,
-                                               final Hashtable <String, Value> params,
+                                               final Hashtable <String, Object> params,
                                                final ErrorListener errorListener,
                                                final URIResolver uriResolver) throws SAXException
   {
@@ -526,7 +524,7 @@ public class THResolver implements ITransformerHandlerResolver
    * Set to the SAX TrAX Factory attributes by inspecting the given parameters
    * for those which are from TrAX namespace
    */
-  protected void setTraxFactoryAttributes (final SAXTransformerFactory saxtf, final Hashtable <String, Value> params)
+  protected void setTraxFactoryAttributes (final SAXTransformerFactory saxtf, final Hashtable <String, Object> params)
   {
     // loop over all parameters
     final Enumeration <String> e = params.keys ();
@@ -555,7 +553,7 @@ public class THResolver implements ITransformerHandlerResolver
    * @param th
    * @param params
    */
-  protected void prepareTh (final TransformerHandler th, final Hashtable <String, Value> params)
+  protected void prepareTh (final TransformerHandler th, final Hashtable <String, Object> params)
   {
     if (CSTX.DEBUG)
       log.debug ("prepareTh()");
@@ -588,7 +586,7 @@ public class THResolver implements ITransformerHandlerResolver
    *
    * @param params
    */
-  protected void setFilterAttributes (final Hashtable <String, Value> params)
+  protected void setFilterAttributes (final Hashtable <String, Object> params)
   {
     if (CSTX.DEBUG)
       log.debug ("setFilterAttributes()");
@@ -602,10 +600,9 @@ public class THResolver implements ITransformerHandlerResolver
       // is this a parameter from filter's namespace?
       if (key.startsWith (tmp_FILTER_ATTR_NS))
       {
-
         // it is, extract the name of the attribute and set its value
         final String name = key.substring (tmp_FILTER_ATTR_NS.length ()).toLowerCase ();
-        final AbstractAttribute a = (attrs.get (name));
+        final AbstractAttribute a = attrs.get (name);
         if (a == null)
           throw new IllegalArgumentException ("setFilterAttributes() : " + name + " not supported");
 

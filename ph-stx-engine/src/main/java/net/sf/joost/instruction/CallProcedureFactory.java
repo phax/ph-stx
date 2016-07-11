@@ -84,8 +84,8 @@ public class CallProcedureFactory extends AbstractFactoryBase
   /** The inner Instance class */
   public class Instance extends AbstractProcessBase
   {
-    String procQName, procExpName;
-    ProcedureFactory.Instance procedure = null;
+    final String m_sProcQName, m_sProcExpName;
+    ProcedureFactory.Instance m_aProcedure;
 
     // Constructor
     public Instance (final String qName,
@@ -97,8 +97,8 @@ public class CallProcedureFactory extends AbstractFactoryBase
     {
       super (qName, parent, context, groupQName, null, null);
       // external filter not possible here (last two params = null)
-      this.procQName = procQName;
-      this.procExpName = procExpName;
+      this.m_sProcQName = procQName;
+      this.m_sProcExpName = procExpName;
     }
 
     /**
@@ -113,31 +113,31 @@ public class CallProcedureFactory extends AbstractFactoryBase
       // determine procedure object
       // targetGroup stems from compile() in ProcessBase
       super.compile (pass, context);
-      procedure = targetGroup.visibleProcedures.get (procExpName);
-      if (procedure == null)
+      m_aProcedure = m_aTargetGroup.m_aVisibleProcedures.get (m_sProcExpName);
+      if (m_aProcedure == null)
       {
         // not found, search group procedures
-        procedure = targetGroup.groupProcedures.get (procExpName);
+        m_aProcedure = m_aTargetGroup.m_aGroupProcedures.get (m_sProcExpName);
       }
-      if (procedure == null)
+      if (m_aProcedure == null)
       {
         // still not found, search global procedures
-        procedure = targetGroup.globalProcedures.get (procExpName);
+        m_aProcedure = m_aTargetGroup.m_aGlobalProcedures.get (m_sProcExpName);
       }
 
-      if (procedure == null)
+      if (m_aProcedure == null)
       {
         throw new SAXParseException ("Unknown procedure '" +
-                                     procQName +
+                                     m_sProcQName +
                                      "' called with '" +
-                                     qName +
+                                     m_sQName +
                                      "'",
-                                     publicId,
-                                     systemId,
+                                     m_sPublicID,
+                                     m_sSystemID,
                                      lineNo,
                                      colNo);
       }
-      lastChild.next = procedure;
+      m_aLastChild.next = m_aProcedure;
 
       return false; // done
     }
@@ -150,25 +150,25 @@ public class CallProcedureFactory extends AbstractFactoryBase
     {
       super.process (context);
 
-      localFieldStack.push (procedure.nodeEnd.next);
-      procedure.nodeEnd.next = nodeEnd;
+      m_aLocalFieldStack.push (m_aProcedure.m_aNodeEnd.next);
+      m_aProcedure.m_aNodeEnd.next = m_aNodeEnd;
       return CSTX.PR_CONTINUE;
     }
 
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      procedure.nodeEnd.next = (AbstractInstruction) localFieldStack.pop ();
+      m_aProcedure.m_aNodeEnd.next = (AbstractInstruction) m_aLocalFieldStack.pop ();
       return super.processEnd (context);
     }
 
     @Override
-    protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
+    protected void onDeepCopy (final AbstractInstruction copy, final HashMap <Object, Object> copies)
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (procedure != null)
-        theCopy.procedure = (ProcedureFactory.Instance) procedure.deepCopy (copies);
+      if (m_aProcedure != null)
+        theCopy.m_aProcedure = (ProcedureFactory.Instance) m_aProcedure.deepCopy (copies);
     }
   }
 }
