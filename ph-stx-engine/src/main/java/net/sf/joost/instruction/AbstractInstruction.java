@@ -38,7 +38,7 @@ import net.sf.joost.stx.Context;
  * transformation sheet two objects (derived from
  * <code>AbstractInstruction</code>) will be created: the first to be processed
  * at the beginning of the element, the second to be processed at the end (see
- * {@link NodeBase}).
+ * {@link AbstractNodeBase}).
  *
  * @version $Revision: 2.3 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
@@ -66,7 +66,7 @@ public abstract class AbstractInstruction implements Cloneable
   /**
    * @return the node this instruction belongs to
    */
-  public abstract NodeBase getNode ();
+  public abstract AbstractNodeBase getNode ();
 
   /**
    * The method that does the actual processing. This method will be called
@@ -91,7 +91,7 @@ public abstract class AbstractInstruction implements Cloneable
    *        the map of already copied objects
    * @return the copy of this instruction
    */
-  final public AbstractInstruction deepCopy (final HashMap <AbstractInstruction, AbstractInstruction> copies)
+  public final AbstractInstruction deepCopy (final HashMap <AbstractInstruction, AbstractInstruction> copies)
   {
     AbstractInstruction copy = copies.get (this);
     if (copy == null)

@@ -39,7 +39,7 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
  * @version $Revision: 1.20 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
-final public class SAXEvent
+public final class SAXEvent
 {
   public static final int ROOT = 0;
   public static final int ELEMENT = 1;

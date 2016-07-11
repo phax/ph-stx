@@ -73,7 +73,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import junit.framework.Assert;
 import net.sf.joost.OutputURIResolver;
-import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.CTrAX;
 
 /**
  * @author Zubow
@@ -2384,7 +2384,7 @@ public class TestCases
       }
     };
 
-    tfactory.setAttribute (TrAXConstants.KEY_OUTPUT_URI_RESOLVER, resolver);
+    tfactory.setAttribute (CTrAX.KEY_OUTPUT_URI_RESOLVER, resolver);
 
     // Create a transformer for the stylesheet.
     final Transformer transformer = tfactory.newTransformer (getSource ("data/result-doc.stx"));
@@ -2408,7 +2408,7 @@ public class TestCases
     final Templates templates = tfactory.newTemplates (getSource ("data/doe.stx"));
 
     Transformer transformer = templates.newTransformer ();
-    transformer.setOutputProperty (TrAXConstants.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING, "yes");
+    transformer.setOutputProperty (CTrAX.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING, "yes");
     transformer.transform (getSource (sourceId), new StreamResult (baos));
 
     String result = new String (baos.toByteArray (), "UTF-8");

@@ -37,7 +37,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.EmitterAdapter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.BufferReader;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -50,20 +50,20 @@ import net.sf.joost.util.VariableUtils;
  * @version $Revision: 2.20 $ $Date: 2009/09/22 21:13:44 $
  * @author Oliver Becker
  */
-public class ProcessBase extends NodeBase
+public abstract class AbstractProcessBase extends AbstractNodeBase
 {
   /** Instruction the clears the parameter stack */
   private class ProcessEnd extends AbstractInstruction
   {
-    private ProcessBase node;
+    private AbstractProcessBase node;
 
-    public ProcessEnd (final ProcessBase node)
+    public ProcessEnd (final AbstractProcessBase node)
     {
       this.node = node;
     }
 
     @Override
-    public NodeBase getNode ()
+    public AbstractNodeBase getNode ()
     {
       return node;
     }
@@ -80,7 +80,7 @@ public class ProcessBase extends NodeBase
     {
       super.onDeepCopy (copy, copies);
       final ProcessEnd theCopy = (ProcessEnd) copy;
-      theCopy.node = (ProcessBase) node.deepCopy (copies);
+      theCopy.node = (AbstractProcessBase) node.deepCopy (copies);
     }
   }
 
@@ -93,18 +93,18 @@ public class ProcessBase extends NodeBase
   private String groupQName, groupExpName;
 
   // target group for the next processing
-  protected GroupBase targetGroup = null;
+  protected AbstractGroupBase targetGroup = null;
 
   // filter and src values
   protected String useBufQName, useBufExpName;
-  protected Tree filter;
-  private Tree hrefTree;
+  protected AbstractTree filter;
+  private AbstractTree hrefTree;
   private boolean bufScopeDetermined = false;
-  private GroupBase bufGroupScope = null;
+  private AbstractGroupBase bufGroupScope = null;
 
   // Constructor
-  public ProcessBase (final String qName,
-                      final NodeBase parent,
+  public AbstractProcessBase (final String qName,
+                      final AbstractNodeBase parent,
                       final ParseContext context,
                       final String groupQName,
                       final String method,
@@ -118,11 +118,11 @@ public class ProcessBase extends NodeBase
 
     this.groupQName = groupQName;
     if (groupQName != null)
-      this.groupExpName = FactoryBase.getExpandedName (groupQName, context);
+      this.groupExpName = AbstractFactoryBase.getExpandedName (groupQName, context);
 
     // Evaluate filter-method and filter-src attributes
     if (method != null)
-      filter = FactoryBase.parseAVT (method, context);
+      filter = AbstractFactoryBase.parseAVT (method, context);
     if (src != null)
     {
       src = src.trim ();
@@ -134,13 +134,13 @@ public class ProcessBase extends NodeBase
       if (src.startsWith ("url("))
       {
         // part between "url(" and ")" will be evaluated as an expression
-        hrefTree = FactoryBase.parseExpr (src.substring (4, src.length () - 1).trim (), context);
+        hrefTree = AbstractFactoryBase.parseExpr (src.substring (4, src.length () - 1).trim (), context);
       }
       else
         if (src.startsWith ("buffer("))
         {
           useBufQName = src.substring (7, src.length () - 1).trim ();
-          useBufExpName = "@" + FactoryBase.getExpandedName (useBufQName, context);
+          useBufExpName = "@" + AbstractFactoryBase.getExpandedName (useBufQName, context);
         }
         else
           throw new SAXParseException ("Invalid filter-src value '" +
@@ -154,8 +154,10 @@ public class ProcessBase extends NodeBase
 
     // prohibit this instruction inside of group variables
     // and stx:with-param instructions
-    NodeBase ancestor = parent;
-    while (ancestor != null && !(ancestor instanceof TemplateBase) && !(ancestor instanceof WithParamFactory.Instance))
+    AbstractNodeBase ancestor = parent;
+    while (ancestor != null &&
+           !(ancestor instanceof AbstractTemplateBase) &&
+           !(ancestor instanceof WithParamFactory.Instance))
       ancestor = ancestor.parent;
     if (ancestor == null)
       throw new SAXParseException ("'" +
@@ -176,7 +178,7 @@ public class ProcessBase extends NodeBase
    * Ensure that only stx:with-param children will be inserted
    */
   @Override
-  public void insert (final NodeBase node) throws SAXParseException
+  public void insert (final AbstractNodeBase node) throws SAXParseException
   {
     if (node instanceof TextNode)
     {
@@ -220,15 +222,15 @@ public class ProcessBase extends NodeBase
 
     // determine parent group
     // parent is at most a TemplateBase; start with grand-parent
-    NodeBase tmp = parent.parent;
-    while (!(tmp instanceof GroupBase))
+    AbstractNodeBase tmp = parent.parent;
+    while (!(tmp instanceof AbstractGroupBase))
       tmp = tmp.parent;
-    final GroupBase parentGroup = (GroupBase) tmp;
+    final AbstractGroupBase parentGroup = (AbstractGroupBase) tmp;
 
     // Evaluate group attribute
     if (groupExpName != null)
     {
-      targetGroup = (GroupBase) parentGroup.namedGroups.get (groupExpName);
+      targetGroup = (AbstractGroupBase) parentGroup.namedGroups.get (groupExpName);
       if (targetGroup == null)
         throw new SAXParseException ("Unknown target group '" +
                                      groupQName +
@@ -347,12 +349,12 @@ public class ProcessBase extends NodeBase
   protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
   {
     super.onDeepCopy (copy, copies);
-    final ProcessBase theCopy = (ProcessBase) copy;
+    final AbstractProcessBase theCopy = (AbstractProcessBase) copy;
     theCopy.paramStack = new Stack ();
     if (bufGroupScope != null)
-      theCopy.bufGroupScope = (GroupBase) bufGroupScope.deepCopy (copies);
+      theCopy.bufGroupScope = (AbstractGroupBase) bufGroupScope.deepCopy (copies);
     if (targetGroup != null)
-      theCopy.targetGroup = (GroupBase) targetGroup.deepCopy (copies);
+      theCopy.targetGroup = (AbstractGroupBase) targetGroup.deepCopy (copies);
     theCopy.children = new Vector ();
     for (int i = 0; i < children.size (); i++)
     {

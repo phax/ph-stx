@@ -35,7 +35,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.SAXEvent;
@@ -48,7 +48,7 @@ import net.sf.joost.stx.SAXEvent;
  * @author Oliver Becker
  */
 
-final public class CopyFactory extends FactoryBase
+public final class CopyFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
   private final HashSet attrNames;
@@ -74,25 +74,25 @@ final public class CopyFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree attributesPattern = parsePattern (attrs.getValue ("attributes"), context);
+    final AbstractTree attributesPattern = parsePattern (attrs.getValue ("attributes"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, attributesPattern);
   }
 
   /** Represents an instance of the <code>copy</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     /**
      * the pattern in the <code>attributes</code> attribute, <code>null</code>
      * if this attribute is missing
      */
-    private Tree attPattern;
+    private AbstractTree attPattern;
 
     /**
      * <code>true</code> if {@link #attPattern} is a wildcard (<code>@*</code>)
@@ -106,11 +106,11 @@ final public class CopyFactory extends FactoryBase
     // Constructor
     //
 
-    public Instance (final String qName, final NodeBase parent, final ParseContext context, final Tree attPattern)
+    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree attPattern)
     {
       super (qName, parent, context, true);
       this.attPattern = attPattern;
-      if (attPattern != null && attPattern.type == Tree.ATTR_WILDCARD)
+      if (attPattern != null && attPattern.type == AbstractTree.ATTR_WILDCARD)
         attrWildcard = true;
     }
 

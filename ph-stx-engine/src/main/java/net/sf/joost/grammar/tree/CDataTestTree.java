@@ -26,7 +26,7 @@ package net.sf.joost.grammar.tree;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.SAXEvent;
 
@@ -37,7 +37,7 @@ import net.sf.joost.stx.SAXEvent;
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class CDataTestTree extends Tree
+public final class CDataTestTree extends AbstractTree
 {
   public CDataTestTree ()
   {

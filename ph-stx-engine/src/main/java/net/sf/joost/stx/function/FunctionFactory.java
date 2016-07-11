@@ -31,7 +31,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.SAXEvent;
@@ -43,7 +43,7 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.6 $ $Date: 2007/11/25 14:18:00 $
  * @author Oliver Becker, Nikolay Fiykov
  */
-final public class FunctionFactory
+public final class FunctionFactory
 {
   /**
    * Type for all functions
@@ -80,7 +80,7 @@ final public class FunctionFactory
      * @exception EvalException
      *            if an error occurs while processing
      */
-    public Value evaluate (Context context, int top, Tree args) throws SAXException, EvalException;
+    public Value evaluate (Context context, int top, AbstractTree args) throws SAXException, EvalException;
   } // end of Instance
 
   // namespace to be prepended before function names
@@ -184,7 +184,7 @@ final public class FunctionFactory
   public Instance getFunction (final String uri,
                                final String lName,
                                final String qName,
-                               final Tree args) throws SAXParseException
+                               final AbstractTree args) throws SAXParseException
   {
     // execute java methods
     if (uri.startsWith ("java:"))
@@ -211,11 +211,11 @@ final public class FunctionFactory
 
     // Count parameters in args
     int argc = 0;
-    Tree aArgs = args;
+    AbstractTree aArgs = args;
     if (aArgs != null)
     {
       argc = 1;
-      while (aArgs.type == Tree.LIST)
+      while (aArgs.type == AbstractTree.LIST)
       {
         aArgs = aArgs.left;
         argc++;
@@ -246,7 +246,7 @@ final public class FunctionFactory
    * @exception SAXException
    *            from evaluating <code>args</code>
    */
-  static Value getOptionalValue (final Context context, final int top, final Tree args) throws SAXException
+  static Value getOptionalValue (final Context context, final int top, final AbstractTree args) throws SAXException
   {
     // argument present
     if (args != null)

@@ -40,7 +40,7 @@ import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.IStxEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.trax.SourceLocatorImpl;
@@ -53,7 +53,7 @@ import net.sf.joost.trax.SourceLocatorImpl;
  * @author Oliver Becker
  */
 
-final public class MessageFactory extends FactoryBase
+public final class MessageFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final Set <String> attrNames;
@@ -82,13 +82,13 @@ final public class MessageFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
-    final Tree terminateAVT = parseAVT (attrs.getValue ("terminate"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree terminateAVT = parseAVT (attrs.getValue ("terminate"), context);
     final int level = getEnumAttValue ("level", attrs, LEVEL_VALUES, context);
 
     final String loggerAtt = attrs.getValue ("logger");
@@ -104,9 +104,9 @@ final public class MessageFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>message</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree select, terminate;
+    private AbstractTree select, terminate;
     private Logger log;
     private final int level;
 
@@ -115,10 +115,10 @@ final public class MessageFactory extends FactoryBase
     private IStxEmitter emitter; // initialized on first processing
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree select,
-                        final Tree terminate,
+                        final AbstractTree select,
+                        final AbstractTree terminate,
                         final int level,
                         final String logger)
     {

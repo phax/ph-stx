@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.4 $ $Date: 2007/11/25 14:18:00 $
  * @author Oliver Becker
  */
-final public class InsertBefore implements Instance
+public final class InsertBefore implements Instance
 {
   /** @return 3 */
   public int getMinParCount ()
@@ -69,7 +69,7 @@ final public class InsertBefore implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     Value target = args.left.left.evaluate (context, top);
     final Value arg2 = args.left.right.evaluate (context, top);

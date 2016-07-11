@@ -26,8 +26,8 @@ package net.sf.joost.grammar.tree;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.ReversableTree;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractReversableTree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 
@@ -38,9 +38,9 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class DescTree extends ReversableTree
+public final class DescTree extends AbstractReversableTree
 {
-  public DescTree (final Tree left, final Tree right)
+  public DescTree (final AbstractTree left, final AbstractTree right)
   {
     super (DESC, left, right);
   }

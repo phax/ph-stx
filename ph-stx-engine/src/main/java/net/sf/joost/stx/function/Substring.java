@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class Substring implements Instance
+public final class Substring implements Instance
 {
   /** @return 2 **/
   public int getMinParCount ()
@@ -69,14 +69,14 @@ final public class Substring implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     // XPath 1.0 semantics
     // The following somewhat complicated algorithm is needed for
     // the correct handling of NaN and +/- infinity.
     try
     {
-      if (args.left.type == Tree.LIST)
+      if (args.left.type == AbstractTree.LIST)
       { // three parameters
         final String str = args.left.left.evaluate (context, top).getStringValue ();
         final double arg2 = args.left.right.evaluate (context, top).getNumberValue ();

@@ -26,7 +26,7 @@ package net.sf.joost.grammar.tree;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 
@@ -37,9 +37,9 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.1 $ $Date: 2004/09/29 05:59:51 $
  * @author Oliver Becker
  */
-final public class SubTree extends Tree
+public final class SubTree extends AbstractTree
 {
-  public SubTree (final Tree left, final Tree right)
+  public SubTree (final AbstractTree left, final AbstractTree right)
   {
     super (SUB, left, right);
   }

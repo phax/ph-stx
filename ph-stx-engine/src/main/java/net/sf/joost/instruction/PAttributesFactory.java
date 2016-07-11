@@ -43,7 +43,7 @@ import net.sf.joost.stx.SAXEvent;
  * @author Oliver Becker
  */
 
-public class PAttributesFactory extends FactoryBase
+public class PAttributesFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -63,7 +63,7 @@ public class PAttributesFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -76,11 +76,11 @@ public class PAttributesFactory extends FactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends ProcessBase
+  public class Instance extends AbstractProcessBase
   {
     // Constructor
     public Instance (final String qName,
-                     final NodeBase parent,
+                     final AbstractNodeBase parent,
                      final ParseContext context,
                      final String groupQName) throws SAXParseException
     {

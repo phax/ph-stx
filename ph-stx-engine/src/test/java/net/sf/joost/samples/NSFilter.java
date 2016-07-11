@@ -45,7 +45,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 import net.sf.joost.TransformerHandlerResolver;
-import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.CTrAX;
 
 /**
  * Example class that demonstrates the usage of external filters in Joost.
@@ -82,7 +82,7 @@ public class NSFilter extends XMLFilterImpl implements TransformerHandler, Trans
       final TransformerFactory factory = TransformerFactory.newInstance ();
 
       // register the resolver
-      factory.setAttribute (TrAXConstants.KEY_TH_RESOLVER, filter);
+      factory.setAttribute (CTrAX.KEY_TH_RESOLVER, filter);
 
       final Transformer transformer = factory.newTransformer (new StreamSource (NSFilter.class.getResourceAsStream (testSTX)));
 

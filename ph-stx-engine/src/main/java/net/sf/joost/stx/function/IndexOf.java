@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.grammar.tree.EqTree;
 import net.sf.joost.grammar.tree.ValueTree;
 import net.sf.joost.stx.Context;
@@ -46,7 +46,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class IndexOf implements Instance
+public final class IndexOf implements Instance
 {
   /** @return 2 */
   public int getMinParCount ()
@@ -72,7 +72,7 @@ final public class IndexOf implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     Value seq = args.left.evaluate (context, top);
     final Value item = args.right.evaluate (context, top);
@@ -80,11 +80,11 @@ final public class IndexOf implements Instance
     if (seq.type == Value.EMPTY)
       return seq;
 
-    final Tree tSeq = new ValueTree (seq);
+    final AbstractTree tSeq = new ValueTree (seq);
     item.next = null;
-    final Tree tItem = new ValueTree (item);
+    final AbstractTree tItem = new ValueTree (item);
     // use the implemented = semantics
-    final Tree equals = new EqTree (tSeq, tItem);
+    final AbstractTree equals = new EqTree (tSeq, tItem);
 
     Value next, last = null, result = Value.VAL_EMPTY;
     long index = 1;

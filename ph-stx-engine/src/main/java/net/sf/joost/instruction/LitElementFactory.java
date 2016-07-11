@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -35,7 +36,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -47,15 +48,15 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class LitElementFactory
+public final class LitElementFactory
 {
-  public NodeBase createNode (final NodeBase parent,
-                              final String uri,
-                              final String lName,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context,
-                              final Hashtable newNamespaces) throws SAXParseException
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
+                                      final String uri,
+                                      final String lName,
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context,
+                                      final Hashtable <String, String> newNamespaces) throws SAXParseException
   {
     if (parent == null)
     {
@@ -64,8 +65,7 @@ final public class LitElementFactory
                                      CSTX.STX_NS +
                                      "' for the 'transform' element",
                                      context.locator);
-      else
-        throw new SAXParseException ("File is not an STX transformation sheet, found " + qName, context.locator);
+      throw new SAXParseException ("File is not an STX transformation sheet, found " + qName, context.locator);
     }
 
     if (parent instanceof TransformFactory.Instance)
@@ -74,31 +74,31 @@ final public class LitElementFactory
                                    "' may occur only within templates",
                                    context.locator);
 
-    final Tree [] avtList = new Tree [attrs.getLength ()];
+    final AbstractTree [] avtList = new AbstractTree [attrs.getLength ()];
     for (int i = 0; i < avtList.length; i++)
-      avtList[i] = FactoryBase.parseAVT (attrs.getValue (i), context);
+      avtList[i] = AbstractFactoryBase.parseAVT (attrs.getValue (i), context);
 
     return new Instance (uri, lName, qName, attrs, avtList, parent, context, newNamespaces);
   }
 
   /** Represents a literal result element. */
 
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     private String uri;
     private final String lName;
     private final AttributesImpl attrs;
-    private Tree [] avtList;
+    private AbstractTree [] avtList;
     // the namespaces that possibly need a declaration in the output
     private Hashtable <String, String> namespaces;
-    private final Hashtable <String, String> namespaceAliases;
+    private final Map <String, String> namespaceAliases;
 
     protected Instance (final String uri,
                         final String lName,
                         final String qName,
                         final Attributes attrs,
-                        final Tree [] avtList,
-                        final NodeBase parent,
+                        final AbstractTree [] avtList,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final Hashtable <String, String> newNamespaces)
     {
@@ -155,7 +155,7 @@ final public class LitElementFactory
             allConstant = false;
         }
         if (allConstant) // no need to iterate over the array
-          avtList = new Tree [0];
+          avtList = new AbstractTree [0];
 
         // For applying the declared namespaces we have to wait until the
         // whole STX sheet has been parsed
@@ -267,9 +267,9 @@ final public class LitElementFactory
      * @return a copy of the namespaces that have to be checked for a possible
      *         redeclaration
      */
-    public Hashtable getNamespaces ()
+    public Hashtable <String, String> getNamespaces ()
     {
-      return namespaces != null ? (Hashtable) namespaces.clone () : new Hashtable ();
+      return namespaces != null ? new Hashtable<> (namespaces) : new Hashtable<> ();
     }
 
     @Override
@@ -277,7 +277,7 @@ final public class LitElementFactory
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      theCopy.avtList = new Tree [avtList.length];
+      theCopy.avtList = new AbstractTree [avtList.length];
       for (int i = 0; i < avtList.length; i++)
         if (avtList[i] != null)
           theCopy.avtList[i] = avtList[i].deepCopy (copies);

@@ -45,7 +45,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
@@ -60,20 +60,20 @@ import net.sf.joost.trax.TrAXHelper;
  * @author Oliver Becker
  */
 
-public class PDocumentFactory extends FactoryBase
+public class PDocumentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Logger initialization
-  private static Logger log = OptionalLog.getLog (PDocumentFactory.class);
+  private static final Logger log = OptionalLog.getLog (PDocumentFactory.class);
 
   //
   // Constructor
   //
   public PDocumentFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet<> ();
     attrNames.add ("href");
     attrNames.add ("base");
     attrNames.add ("group");
@@ -89,14 +89,14 @@ public class PDocumentFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
-    final Tree href = parseRequiredExpr (qName, attrs, "href", context);
+    final AbstractTree href = parseRequiredExpr (qName, attrs, "href", context);
 
-    final Tree baseAVT = parseAVT (attrs.getValue ("base"), context);
+    final AbstractTree baseAVT = parseAVT (attrs.getValue ("base"), context);
 
     final String groupAtt = attrs.getValue ("group");
 
@@ -120,16 +120,16 @@ public class PDocumentFactory extends FactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends ProcessBase
+  public class Instance extends AbstractProcessBase
   {
-    private Tree href, baseUri;
+    private AbstractTree href, baseUri;
 
     // Constructor
     public Instance (final String qName,
-                     final NodeBase parent,
+                     final AbstractNodeBase parent,
                      final ParseContext context,
-                     final Tree href,
-                     final Tree baseUri,
+                     final AbstractTree href,
+                     final AbstractTree baseUri,
                      final String groupQName,
                      final String method,
                      final String src)

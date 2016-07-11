@@ -60,10 +60,10 @@ import net.sf.joost.TransformerHandlerResolver;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.instruction.AbstractInstruction;
-import net.sf.joost.instruction.GroupBase;
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractGroupBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.instruction.PSiblingsFactory;
-import net.sf.joost.instruction.ProcessBase;
+import net.sf.joost.instruction.AbstractProcessBase;
 import net.sf.joost.instruction.TemplateFactory;
 import net.sf.joost.instruction.TransformFactory;
 
@@ -174,13 +174,13 @@ public class Processor extends XMLFilterImpl
     private AbstractInstruction instruction;
 
     /** The current group */
-    public GroupBase currentGroup;
+    public AbstractGroupBase currentGroup;
 
     /** The context position of the current node (from {@link Context}) */
     private long contextPosition;
 
     /** Next group in the processing, contains the visible templates */
-    private GroupBase targetGroup;
+    private AbstractGroupBase targetGroup;
 
     /** current table of local variables in {@link #template} */
     private Hashtable <String, Value> localVars;
@@ -276,7 +276,7 @@ public class Processor extends XMLFilterImpl
     }
 
     /** returns the value of {@link #targetGroup} */
-    public GroupBase getTargetGroup ()
+    public AbstractGroupBase getTargetGroup ()
     {
       return targetGroup;
     }
@@ -934,7 +934,7 @@ public class Processor extends XMLFilterImpl
         while (inst != null && processStatus == CSTX.PR_CONTINUE)
         {
           // skip ProcessBase if requested
-          if (skipProcessBase && inst.getNode () instanceof ProcessBase)
+          if (skipProcessBase && inst.getNode () instanceof AbstractProcessBase)
             processStatus = inst.process (context);
           else
             processStatus = processInstruction (inst, event);
@@ -1108,7 +1108,7 @@ public class Processor extends XMLFilterImpl
             {
               case CSTX.PR_CHILDREN:
               case CSTX.PR_SELF:
-                final NodeBase start = inst.getNode ();
+                final AbstractNodeBase start = inst.getNode ();
                 context.errorHandler.error ("Encountered '" +
                                             start.qName +
                                             "' after stx:process-self",
@@ -1157,7 +1157,7 @@ public class Processor extends XMLFilterImpl
     else
     {
       // no template found, default action
-      final GroupBase tg = context.targetGroup;
+      final AbstractGroupBase tg = context.targetGroup;
       final Emitter emitter = context.emitter;
       switch (event.type)
       {
@@ -1424,7 +1424,7 @@ public class Processor extends XMLFilterImpl
         {
           case CSTX.PR_CHILDREN:
           case CSTX.PR_SELF:
-            final NodeBase start = inst.getNode ();
+            final AbstractNodeBase start = inst.getNode ();
             context.errorHandler.error ("Encountered '" +
                                         start.qName +
                                         "' after stx:process-siblings",
@@ -1518,7 +1518,7 @@ public class Processor extends XMLFilterImpl
       java.io.StringWriter sw = null;
       sw = new java.io.StringWriter ();
       e.printStackTrace (new java.io.PrintWriter (sw));
-      final NodeBase nb = context.currentInstruction;
+      final AbstractNodeBase nb = context.currentInstruction;
       context.errorHandler.fatalError ("External processing failed: " +
                                        sw,
                                        nb.publicId,
@@ -1565,7 +1565,7 @@ public class Processor extends XMLFilterImpl
       java.io.StringWriter sw = null;
       sw = new java.io.StringWriter ();
       e.printStackTrace (new java.io.PrintWriter (sw));
-      final NodeBase nb = context.currentInstruction;
+      final AbstractNodeBase nb = context.currentInstruction;
       context.errorHandler.fatalError ("External processing failed: " +
                                        sw,
                                        nb.publicId,
@@ -1641,7 +1641,7 @@ public class Processor extends XMLFilterImpl
           {
             case CSTX.PR_CHILDREN:
             case CSTX.PR_SELF:
-              final NodeBase start = inst.getNode ();
+              final AbstractNodeBase start = inst.getNode ();
               context.errorHandler.error ("Encountered '" +
                                           start.qName +
                                           "' after stx:process-" +
@@ -1792,7 +1792,7 @@ public class Processor extends XMLFilterImpl
             case CSTX.PR_CHILDREN:
             case CSTX.PR_SELF:
             {
-              final NodeBase start = inst.getNode ();
+              final AbstractNodeBase start = inst.getNode ();
               context.errorHandler.error ("Encountered '" +
                                           start.qName +
                                           "' after stx:process-" +

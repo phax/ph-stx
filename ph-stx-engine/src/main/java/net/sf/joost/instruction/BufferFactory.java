@@ -44,7 +44,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class BufferFactory extends FactoryBase
+public final class BufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -63,7 +63,7 @@ final public class BufferFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -81,12 +81,12 @@ final public class BufferFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>buffer</code> element. */
-  final public class Instance extends VariableBase
+  public final class Instance extends AbstractVariableBase
   {
     private final String varName;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String varName,
                         final String expName)
@@ -103,7 +103,7 @@ final public class BufferFactory extends FactoryBase
     {
       super.process (context);
       Hashtable varTable;
-      if (parent instanceof GroupBase) // group scope
+      if (parent instanceof AbstractGroupBase) // group scope
         varTable = context.groupVars.get (parent).peek ();
       else
         varTable = context.localVars;

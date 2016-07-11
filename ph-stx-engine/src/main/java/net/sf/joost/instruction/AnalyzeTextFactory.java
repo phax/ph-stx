@@ -36,7 +36,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.util.regex.JRegularExpression;
@@ -49,7 +49,7 @@ import net.sf.joost.util.regex.JRegularExpression;
  * @author Oliver Becker
  */
 
-final public class AnalyzeTextFactory extends FactoryBase
+public final class AnalyzeTextFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -71,31 +71,31 @@ final public class AnalyzeTextFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
+    final AbstractTree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, selectExpr);
   }
 
   /** Represents an instance of the <code>analyze-text</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree select;
+    private AbstractTree select;
 
     private AbstractInstruction successor;
 
     // this instruction manages its children itself
-    private Vector <NodeBase> mVector = new Vector <NodeBase> ();
+    private Vector <AbstractNodeBase> mVector = new Vector <AbstractNodeBase> ();
     private MatchFactory.Instance [] matchChildren;
-    private NodeBase noMatchChild;
+    private AbstractNodeBase noMatchChild;
 
     // Constructor
-    protected Instance (final String qName, final NodeBase parent, final ParseContext context, final Tree select)
+    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree select)
     {
       super (qName, parent, context, true);
       this.select = select;
@@ -106,7 +106,7 @@ final public class AnalyzeTextFactory extends FactoryBase
      * children will be inserted.
      */
     @Override
-    public void insert (final NodeBase node) throws SAXParseException
+    public void insert (final AbstractNodeBase node) throws SAXParseException
     {
       if (node instanceof MatchFactory.Instance)
       {
@@ -356,7 +356,7 @@ final public class AnalyzeTextFactory extends FactoryBase
         }
       }
       if (noMatchChild != null)
-        theCopy.noMatchChild = (NodeBase) noMatchChild.deepCopy (copies);
+        theCopy.noMatchChild = (AbstractNodeBase) noMatchChild.deepCopy (copies);
       if (successor != null)
         theCopy.successor = successor.deepCopy (copies);
       if (select != null)

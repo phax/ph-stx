@@ -29,7 +29,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -42,7 +42,7 @@ import net.sf.joost.stx.function.FunctionFactory;
  * @version $Revision: 1.8 $ $Date: 2009/08/21 12:46:18 $
  * @author Oliver Becker
  */
-final public class FunctionTree extends Tree
+public final class FunctionTree extends AbstractTree
 {
   /*** the function instance */
   private final FunctionFactory.Instance func;
@@ -57,7 +57,7 @@ final public class FunctionTree extends Tree
    * @param context
    *        the parse context
    */
-  public FunctionTree (final String qName, final Tree left, final ParseContext context) throws SAXParseException
+  public FunctionTree (final String qName, final AbstractTree left, final ParseContext context) throws SAXParseException
   {
     super (FUNCTION, left, null);
 

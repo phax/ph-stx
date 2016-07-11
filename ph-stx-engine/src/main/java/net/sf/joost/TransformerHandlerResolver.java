@@ -47,7 +47,7 @@ import net.sf.joost.stx.Value;
  * {@link net.sf.joost.stx.Processor#setTransformerHandlerResolver} method, or
  * (using JAXP) by calling
  * {@link javax.xml.transform.TransformerFactory#setAttribute} with the string
- * {@link net.sf.joost.trax.TrAXConstants#KEY_TH_RESOLVER} as its first
+ * {@link net.sf.joost.trax.CTrAX#KEY_TH_RESOLVER} as its first
  * argument.
  * <p>
  * Also <code><strong>TransformerHandlerResolver</strong></code> can be

@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -44,7 +44,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class IfFactory extends FactoryBase
+public final class IfFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -64,22 +64,22 @@ final public class IfFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree testExpr = parseRequiredExpr (qName, attrs, "test", context);
+    final AbstractTree testExpr = parseRequiredExpr (qName, attrs, "test", context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, testExpr);
   }
 
   /** Represents an instance of the <code>if</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     /** the parsed <code>select</code> expression */
-    private Tree test;
+    private AbstractTree test;
 
     /** next instruction if the test evaluates to true */
     private AbstractInstruction trueNext;
@@ -87,7 +87,7 @@ final public class IfFactory extends FactoryBase
     /** next instruction if the test evaluates to false */
     private AbstractInstruction falseNext;
 
-    protected Instance (final String qName, final NodeBase parent, final ParseContext context, final Tree test)
+    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree test)
     {
       super (qName, parent, context, true);
       this.test = test;

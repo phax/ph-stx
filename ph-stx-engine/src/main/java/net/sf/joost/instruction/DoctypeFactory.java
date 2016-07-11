@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -44,7 +44,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public class DoctypeFactory extends FactoryBase
+public class DoctypeFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -65,31 +65,31 @@ public class DoctypeFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
+    final AbstractTree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
-    final Tree publicAVT = parseAVT (attrs.getValue ("public-id"), context);
-    final Tree systemAVT = parseAVT (attrs.getValue ("system-id"), context);
+    final AbstractTree publicAVT = parseAVT (attrs.getValue ("public-id"), context);
+    final AbstractTree systemAVT = parseAVT (attrs.getValue ("system-id"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, nameAVT, publicAVT, systemAVT);
   }
 
   /** Represents an instance of the <code>doctype</code> element. */
-  public class Instance extends NodeBase
+  public class Instance extends AbstractNodeBase
   {
-    private Tree nameAVT, publicAVT, systemAVT;
+    private AbstractTree nameAVT, publicAVT, systemAVT;
 
     public Instance (final String qName,
-                     final NodeBase parent,
+                     final AbstractNodeBase parent,
                      final ParseContext context,
-                     final Tree nameAVT,
-                     final Tree publicAVT,
-                     final Tree systemAVT)
+                     final AbstractTree nameAVT,
+                     final AbstractTree publicAVT,
+                     final AbstractTree systemAVT)
     {
       super (qName,
              parent,

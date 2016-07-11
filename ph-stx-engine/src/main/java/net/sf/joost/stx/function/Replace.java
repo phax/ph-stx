@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -47,7 +47,7 @@ import net.sf.joost.util.regex.IRegularExpression;
  * @version $Revision: 1.2 $ $Date: 2007/06/13 20:29:07 $
  * @author Oliver Becker
  */
-final public class Replace implements Instance
+public final class Replace implements Instance
 {
   /** @return 3 **/
   public int getMinParCount ()
@@ -73,10 +73,10 @@ final public class Replace implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     String input, pattern, replacement, flags;
-    if (args.left.left.type == Tree.LIST)
+    if (args.left.left.type == AbstractTree.LIST)
     { // four parameters
       input = args.left.left.left.evaluate (context, top).getStringValue ();
       pattern = args.left.left.right.evaluate (context, top).getStringValue ();

@@ -41,7 +41,7 @@ import org.xml.sax.helpers.LocatorImpl;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.BufferEmitter;
-import net.sf.joost.instruction.GroupBase;
+import net.sf.joost.instruction.AbstractGroupBase;
 
 /**
  * An XMLReader object that uses the events from a buffer.
@@ -81,7 +81,7 @@ public class BufferReader implements XMLReader
    */
   public BufferReader (final Context context,
                        final String bufExpName,
-                       final GroupBase groupScope,
+                       final AbstractGroupBase groupScope,
                        final String publicId,
                        final String systemId) throws SAXException
   {

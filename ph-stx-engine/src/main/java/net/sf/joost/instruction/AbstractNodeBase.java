@@ -42,7 +42,7 @@ import net.sf.joost.stx.ParseContext;
  * @version $Revision: 2.15 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
-public abstract class NodeBase extends AbstractInstruction
+public abstract class AbstractNodeBase extends AbstractInstruction
 {
   //
   // Inner classes
@@ -52,16 +52,16 @@ public abstract class NodeBase extends AbstractInstruction
    * Generic class that represents the end of an element in the STX
    * transformation sheet (the end tag). Its {@link #process} method simply
    * calls {@link #processEnd(Context context)} in the appropriate
-   * {@link NodeBase} object.
+   * {@link AbstractNodeBase} object.
    */
   public final class End extends AbstractInstruction
   {
     /**
      * The appropriate start tag.
      */
-    private NodeBase start;
+    private AbstractNodeBase start;
 
-    private End (final NodeBase start)
+    private End (final AbstractNodeBase start)
     {
       this.start = start;
     }
@@ -70,14 +70,14 @@ public abstract class NodeBase extends AbstractInstruction
      * @return {@link #start}
      */
     @Override
-    public NodeBase getNode ()
+    public AbstractNodeBase getNode ()
     {
       return start;
     }
 
     /**
-     * Calls the {@link NodeBase#processEnd} method in its {@link #start}
-     * object.
+     * Calls the {@link AbstractNodeBase#processEnd} method in its
+     * {@link #start} object.
      */
     @Override
     public short process (final Context context) throws SAXException
@@ -91,7 +91,7 @@ public abstract class NodeBase extends AbstractInstruction
       super.onDeepCopy (copy, copies);
       final End theCopy = (End) copy;
       if (start != null)
-        theCopy.start = (NodeBase) start.deepCopy (copies);
+        theCopy.start = (AbstractNodeBase) start.deepCopy (copies);
     }
 
     // for debugging
@@ -100,8 +100,7 @@ public abstract class NodeBase extends AbstractInstruction
     {
       return "end " + start;
     }
-
-  }; // inner class End
+  }
 
   // ---------------------------------------------------------------------
 
@@ -113,7 +112,7 @@ public abstract class NodeBase extends AbstractInstruction
   public String qName;
 
   /** The parent of this node */
-  public NodeBase parent;
+  public AbstractNodeBase parent;
 
   /**
    * The reference to the last child, needed for inserting additional nodes
@@ -162,10 +161,10 @@ public abstract class NodeBase extends AbstractInstruction
    * @param context the current parse context
    * @param mayHaveChildren <code>true</code> if the node may have children
    */
-  protected NodeBase (final String qName,
-                      final NodeBase parent,
-                      final ParseContext context,
-                      final boolean mayHaveChildren)
+  protected AbstractNodeBase (final String qName,
+                              final AbstractNodeBase parent,
+                              final ParseContext context,
+                              final boolean mayHaveChildren)
   {
     this.qName = qName;
     this.parent = parent;
@@ -192,7 +191,7 @@ public abstract class NodeBase extends AbstractInstruction
   //
 
   @Override
-  public final NodeBase getNode ()
+  public final AbstractNodeBase getNode ()
   {
     return this;
   }
@@ -203,7 +202,7 @@ public abstract class NodeBase extends AbstractInstruction
    * @param node
    *        the node to be inserted
    */
-  public void insert (final NodeBase node) throws SAXParseException
+  public void insert (final AbstractNodeBase node) throws SAXParseException
   {
     if (lastChild == null)
       throw new SAXParseException ("'" +
@@ -226,7 +225,7 @@ public abstract class NodeBase extends AbstractInstruction
     lastChild = newLast;
 
     // create vector for variable names if necessary
-    if (node instanceof VariableBase && scopedVariables == null)
+    if (node instanceof AbstractVariableBase && scopedVariables == null)
       scopedVariables = new Vector<> ();
   }
 
@@ -361,7 +360,7 @@ public abstract class NodeBase extends AbstractInstruction
   protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
   {
     super.onDeepCopy (copy, copies);
-    final NodeBase theCopy = (NodeBase) copy;
+    final AbstractNodeBase theCopy = (AbstractNodeBase) copy;
     theCopy.localFieldStack = (Stack) copies.get (localFieldStack);
     if (theCopy.localFieldStack == null)
     {
@@ -373,7 +372,7 @@ public abstract class NodeBase extends AbstractInstruction
     if (nodeEnd != null)
       theCopy.nodeEnd = nodeEnd.deepCopy (copies);
     if (parent != null)
-      theCopy.parent = (NodeBase) parent.deepCopy (copies);
+      theCopy.parent = (AbstractNodeBase) parent.deepCopy (copies);
     if (scopedVariables != null)
       theCopy.scopedVariables = new Vector<> ();
   }

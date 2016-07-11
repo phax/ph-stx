@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -49,7 +49,7 @@ import net.sf.joost.util.VariableUtils;
  * @author Oliver Becker
  */
 
-final public class AssignFactory extends FactoryBase
+public final class AssignFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -70,7 +70,7 @@ final public class AssignFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -78,28 +78,28 @@ final public class AssignFactory extends FactoryBase
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     final String varName = getExpandedName (nameAtt, context);
 
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, nameAtt, varName, selectExpr);
   }
 
   /** Represents an instance of the <code>assign</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     public String varName, expName;
-    private Tree select;
+    private AbstractTree select;
     private final String errorMessage;
 
     private boolean scopeDetermined = false;
-    private GroupBase groupScope = null;
+    private AbstractGroupBase groupScope = null;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String varName,
                         final String expName,
-                        final Tree select)
+                        final AbstractTree select)
     {
       super (qName,
              parent,
@@ -193,7 +193,7 @@ final public class AssignFactory extends FactoryBase
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
       if (groupScope != null)
-        theCopy.groupScope = (GroupBase) groupScope.deepCopy (copies);
+        theCopy.groupScope = (AbstractGroupBase) groupScope.deepCopy (copies);
       if (select != null)
         theCopy.select = select.deepCopy (copies);
     }

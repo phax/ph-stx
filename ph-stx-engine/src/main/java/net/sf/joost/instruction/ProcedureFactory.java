@@ -43,7 +43,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public final class ProcedureFactory extends FactoryBase
+public final class ProcedureFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
   private final HashSet attrNames;
@@ -66,12 +66,12 @@ public final class ProcedureFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    if (parent == null || !(parent instanceof GroupBase))
+    if (parent == null || !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" +
                                    qName +
                                    "' must be a top level " +
@@ -81,9 +81,9 @@ public final class ProcedureFactory extends FactoryBase
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     final String expName = getExpandedName (nameAtt, context);
 
-    int visibility = getEnumAttValue ("visibility", attrs, TemplateBase.VISIBILITY_VALUES, context);
+    int visibility = getEnumAttValue ("visibility", attrs, AbstractTemplateBase.VISIBILITY_VALUES, context);
     if (visibility == -1)
-      visibility = TemplateBase.LOCAL_VISIBLE; // default value
+      visibility = AbstractTemplateBase.LOCAL_VISIBLE; // default value
 
     final int publicAttVal = getEnumAttValue ("public", attrs, YESNO_VALUES, context);
     // default value depends on the parent:
@@ -107,7 +107,7 @@ public final class ProcedureFactory extends FactoryBase
   // -----------------------------------------------------------------------
 
   /** The inner Instance class */
-  public final class Instance extends TemplateBase
+  public final class Instance extends AbstractTemplateBase
   {
     /** The expanded name of this procedure */
     protected String expName;
@@ -117,7 +117,7 @@ public final class ProcedureFactory extends FactoryBase
 
     // Constructor
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String procName,
                         final String expName,
@@ -152,7 +152,7 @@ public final class ProcedureFactory extends FactoryBase
       super.processEnd (context);
       // restore local variables
       context.localVars = (Hashtable) localFieldStack.pop ();
-      context.currentGroup = (GroupBase) localFieldStack.pop ();
+      context.currentGroup = (AbstractGroupBase) localFieldStack.pop ();
       return CSTX.PR_CONTINUE;
     }
 

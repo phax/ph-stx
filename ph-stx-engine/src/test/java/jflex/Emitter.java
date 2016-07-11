@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class Emitter
+public final class Emitter
 {
   private static final Pattern JAVADOC_COMMENT_AND_MAYBE_ANNOTATIONS_PATTERN = Pattern.compile (".*/\\*\\*(.*)\\*/" // javadoc
                                                                                                                     // comment,

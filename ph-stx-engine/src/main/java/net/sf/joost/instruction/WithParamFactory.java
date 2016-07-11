@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -47,7 +47,7 @@ import net.sf.joost.stx.Value;
  * @author Oliver Becker
  */
 
-final public class WithParamFactory extends FactoryBase
+public final class WithParamFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -68,12 +68,12 @@ final public class WithParamFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    if (parent == null || !(parent instanceof ProcessBase))
+    if (parent == null || !(parent instanceof AbstractProcessBase))
     {
       throw new SAXParseException ("'" +
                                    qName +
@@ -86,34 +86,34 @@ final public class WithParamFactory extends FactoryBase
     final String expName = getExpandedName (nameAtt, context);
 
     // Check for uniqueness
-    final Vector siblings = ((ProcessBase) parent).children;
+    final Vector siblings = ((AbstractProcessBase) parent).children;
     if (siblings != null)
       for (int i = 0; i < siblings.size (); i++)
         if (((Instance) siblings.elementAt (i)).expName.equals (expName))
           throw new SAXParseException ("Parameter '" +
                                        nameAtt +
                                        "' already passed in line " +
-                                       ((NodeBase) siblings.elementAt (i)).lineNo,
+                                       ((AbstractNodeBase) siblings.elementAt (i)).lineNo,
                                        context.locator);
 
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, expName, selectExpr);
   }
 
   /** Represents an instance of the <code>with-param</code> element. */
-  public class Instance extends NodeBase
+  public class Instance extends AbstractNodeBase
   {
     private final String expName;
-    private Tree select;
+    private AbstractTree select;
     private final String errorMessage;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String expName,
-                        final Tree select)
+                        final AbstractTree select)
     {
       super (qName,
              parent,

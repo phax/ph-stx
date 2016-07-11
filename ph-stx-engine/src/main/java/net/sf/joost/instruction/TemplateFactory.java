@@ -31,7 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -43,7 +43,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public final class TemplateFactory extends FactoryBase
+public final class TemplateFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
   private final HashSet attrNames;
@@ -67,19 +67,19 @@ public final class TemplateFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    if (parent == null || !(parent instanceof GroupBase))
+    if (parent == null || !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" +
                                    qName +
                                    "' must be a top level " +
                                    "element or a child of stx:group",
                                    context.locator);
 
-    final Tree matchPattern = parseRequiredPattern (qName, attrs, "match", context);
+    final AbstractTree matchPattern = parseRequiredPattern (qName, attrs, "match", context);
 
     final String priorityAtt = attrs.getValue ("priority");
     double priority;
@@ -99,9 +99,9 @@ public final class TemplateFactory extends FactoryBase
       priority = matchPattern.getPriority ();
     }
 
-    int visibility = getEnumAttValue ("visibility", attrs, TemplateBase.VISIBILITY_VALUES, context);
+    int visibility = getEnumAttValue ("visibility", attrs, AbstractTemplateBase.VISIBILITY_VALUES, context);
     if (visibility == -1)
-      visibility = TemplateBase.LOCAL_VISIBLE; // default value
+      visibility = AbstractTemplateBase.LOCAL_VISIBLE; // default value
 
     final int publicAttVal = getEnumAttValue ("public", attrs, YESNO_VALUES, context);
     // default value depends on the parent:
@@ -125,10 +125,10 @@ public final class TemplateFactory extends FactoryBase
   // -----------------------------------------------------------------------
 
   /** The inner Instance class */
-  public final class Instance extends TemplateBase implements Comparable <Instance>
+  public final class Instance extends AbstractTemplateBase implements Comparable <Instance>
   {
     /** The match pattern */
-    private Tree match;
+    private AbstractTree match;
 
     /** The priority of this template */
     private double priority;
@@ -137,9 +137,9 @@ public final class TemplateFactory extends FactoryBase
     // Constructor
     //
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree match,
+                        final AbstractTree match,
                         final double priority,
                         final int visibility,
                         final boolean isPublic,
@@ -178,7 +178,7 @@ public final class TemplateFactory extends FactoryBase
      */
     public Instance split () throws SAXException
     {
-      if (match.type != Tree.UNION)
+      if (match.type != AbstractTree.UNION)
         return null;
 
       Instance copy = null;
@@ -210,7 +210,7 @@ public final class TemplateFactory extends FactoryBase
     /**
      * @return the match pattern
      */
-    public Tree getMatchPattern ()
+    public AbstractTree getMatchPattern ()
     {
       return match;
     }

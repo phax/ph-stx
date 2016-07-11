@@ -26,7 +26,7 @@ package net.sf.joost.grammar.tree;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
@@ -38,7 +38,7 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.3 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
-final public class AttrWildcardTree extends Tree
+public final class AttrWildcardTree extends AbstractTree
 {
   /**
    * Constructs an AttrWildcardTree object.

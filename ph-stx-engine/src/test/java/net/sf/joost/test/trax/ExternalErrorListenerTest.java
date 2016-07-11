@@ -19,7 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.CTrAX;
 import net.sf.joost.trax.TransformerFactoryImpl;
 
 public class ExternalErrorListenerTest
@@ -30,7 +30,7 @@ public class ExternalErrorListenerTest
   public void setUp () throws Exception
   {
     props = System.getProperties ();
-    System.setProperty (TrAXConstants.KEY_XSLT_FACTORY, "org.apache.xalan.processor.TransformerFactoryImpl");
+    System.setProperty (CTrAX.KEY_XSLT_FACTORY, "org.apache.xalan.processor.TransformerFactoryImpl");
   }
 
   @After

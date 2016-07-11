@@ -29,7 +29,7 @@ import java.util.HashMap;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.instruction.AbstractInstruction;
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 
@@ -40,7 +40,7 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 2.14 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
-public abstract class Tree implements Cloneable
+public abstract class AbstractTree implements Cloneable
 {
   /** Node type constants for {@link #type} */
   public static final int ROOT = 1, // root node
@@ -89,10 +89,10 @@ public abstract class Tree implements Cloneable
   public int type;
 
   /** The left subtree. */
-  public Tree left;
+  public AbstractTree left;
 
   /** The right subtree. */
-  public Tree right;
+  public AbstractTree right;
 
   /** The value of this node as an object. */
   public Object value;
@@ -108,7 +108,7 @@ public abstract class Tree implements Cloneable
   //
 
   /** The most general constructor */
-  private Tree (final int type, final Tree left, final Tree right, final Object value)
+  private AbstractTree (final int type, final AbstractTree left, final AbstractTree right, final Object value)
   {
     this.type = type;
     this.left = left;
@@ -118,21 +118,21 @@ public abstract class Tree implements Cloneable
   }
 
   /** Constructs a Tree object as a node with two subtrees. */
-  public Tree (final int type, final Tree left, final Tree right)
+  public AbstractTree (final int type, final AbstractTree left, final AbstractTree right)
   {
     this (type, left, right, null);
     // System.err.println("Tree-Constructor 2: " + this);
   }
 
   /** Constructs a Tree object as a leaf. */
-  public Tree (final int type, final Object value)
+  public AbstractTree (final int type, final Object value)
   {
     this (type, null, null, value);
     // System.err.println("Tree-Constructor 3: " + this);
   }
 
   /** Constructs a Tree object as a leaf without a value. */
-  public Tree (final int type)
+  public AbstractTree (final int type)
   {
     this (type, null, null, null);
   }
@@ -173,7 +173,7 @@ public abstract class Tree implements Cloneable
    *        the event of an error
    * @return a new computed Value object containing the result
    */
-  public Value evaluate (final Context context, final NodeBase instruction) throws SAXException
+  public Value evaluate (final Context context, final AbstractNodeBase instruction) throws SAXException
   {
     context.currentInstruction = instruction;
     return evaluate (context, context.ancestorStack.size ());
@@ -201,7 +201,7 @@ public abstract class Tree implements Cloneable
   }
 
   /** May be overridden to reconstruct the current tree */
-  public Tree reverseAssociativity ()
+  public AbstractTree reverseAssociativity ()
   {
     return this;
   }
@@ -231,14 +231,14 @@ public abstract class Tree implements Cloneable
    *        of {@link AbstractInstruction})
    * @return the created copy
    */
-  public Tree deepCopy (final HashMap copies)
+  public AbstractTree deepCopy (final HashMap copies)
   {
     // no need to keep Tree instances in the copies map because there are
     // no circular references of Trees
-    Tree copy;
+    AbstractTree copy;
     try
     {
-      copy = (Tree) clone ();
+      copy = (AbstractTree) clone ();
     }
     catch (final CloneNotSupportedException e)
     {

@@ -38,23 +38,14 @@ import org.xml.sax.SAXException;
 public final class StringEmitter extends AbstractStxEmitterBase
 {
   /** the string buffer */
-  private StringBuffer buffer;
+  private final StringBuffer buffer;
 
   /**
    * additional info for error messages, <code>null</code> means: don't report
    * errors
    */
-  private String errorInfo;
+  private final String errorInfo;
 
-  //
-  // Default constructor
-  //
-  public StringEmitter ()
-  {}
-
-  //
-  // Constructor
-  //
   public StringEmitter (final StringBuffer buffer, final String errorInfo)
   {
     this.buffer = buffer;

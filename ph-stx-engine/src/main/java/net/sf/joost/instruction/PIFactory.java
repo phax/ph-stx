@@ -33,7 +33,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -45,7 +45,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class PIFactory extends FactoryBase
+public final class PIFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -66,14 +66,14 @@ final public class PIFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
+    final AbstractTree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, nameAVT, selectExpr);
@@ -82,18 +82,18 @@ final public class PIFactory extends FactoryBase
   /**
    * Represents an instance of the <code>processing-instruction</code> element.
    */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree name, select;
+    private AbstractTree name, select;
     private StringEmitter strEmitter;
     private StringBuffer buffer;
     private String piName;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree name,
-                        final Tree select)
+                        final AbstractTree name,
+                        final AbstractTree select)
     {
       super (qName,
              parent,

@@ -34,8 +34,8 @@ import org.xml.sax.Locator;
 
 import net.sf.joost.OutputURIResolver;
 import net.sf.joost.emitter.IStxEmitter;
-import net.sf.joost.instruction.GroupBase;
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractGroupBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.instruction.PSiblingsFactory;
 
 /**
@@ -60,10 +60,10 @@ public final class Context implements Cloneable
   public long position;
 
   /** The currently processed statement in the transformation sheet */
-  public NodeBase currentInstruction;
+  public AbstractNodeBase currentInstruction;
 
   /** The group, the current template is a child of */
-  public GroupBase currentGroup;
+  public AbstractGroupBase currentGroup;
 
   /** The Processor object (needed by <code>stx:process-buffer</code>) */
   public Processor currentProcessor;
@@ -71,7 +71,7 @@ public final class Context implements Cloneable
   /**
    * The target group, set by <code>stx:process-<em>xxx</em></code> instructions
    */
-  public GroupBase targetGroup;
+  public AbstractGroupBase targetGroup;
 
   /** Encountered <code>stx:process-siblings</code> instruction */
   public PSiblingsFactory.Instance psiblings;
@@ -80,7 +80,7 @@ public final class Context implements Cloneable
    * Hashtable for Stacks of group variables (key=group instance, value=Stack of
    * Hashtables).
    */
-  public Hashtable <GroupBase, Stack <Hashtable <String, Value>>> groupVars = new Hashtable<> ();
+  public Hashtable <AbstractGroupBase, Stack <Hashtable <String, Value>>> groupVars = new Hashtable<> ();
 
   /** Local defined variables of a template. */
   public Hashtable <String, Value> localVars = new Hashtable<> ();

@@ -30,8 +30,8 @@ import java.util.Hashtable;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.grammar.Tree;
-import net.sf.joost.instruction.GroupBase;
+import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.instruction.AbstractGroupBase;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -45,13 +45,13 @@ import net.sf.joost.util.VariableUtils;
  * @version $Revision: 1.6 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
-final public class VarTree extends Tree
+public final class VarTree extends AbstractTree
 {
   /** The expanded name of the variable */
   private final String expName;
 
   private boolean scopeDetermined = false;
-  private GroupBase groupScope = null;
+  private AbstractGroupBase groupScope = null;
 
   /*
    * Constructs a Tree object with a String value. If the type is a {@link
@@ -119,12 +119,12 @@ final public class VarTree extends Tree
   }
 
   @Override
-  public Tree deepCopy (final HashMap copies)
+  public AbstractTree deepCopy (final HashMap copies)
   {
     final VarTree copy = (VarTree) super.deepCopy (copies);
     if (scopeDetermined && groupScope != null)
     {
-      copy.groupScope = (GroupBase) groupScope.deepCopy (copies);
+      copy.groupScope = (AbstractGroupBase) groupScope.deepCopy (copies);
     }
     return copy;
   }

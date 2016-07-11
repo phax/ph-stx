@@ -67,12 +67,12 @@ import net.sf.joost.stx.Processor;
  *
  * @author Anatolij Zubow, Oliver Becker
  */
-public class TrAXHelper implements TrAXConstants
+public class TrAXHelper
 {
 
   // Define a static logger variable so that it references the
   // Logger instance named "TrAXHelper".
-  private static Logger log = OptionalLog.getLog (TrAXHelper.class);
+  private static final Logger log = OptionalLog.getLog (TrAXHelper.class);
 
   /**
    * Defaultconstructor

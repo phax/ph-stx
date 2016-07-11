@@ -15,7 +15,7 @@ package jflex;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class StatePairList
+public final class StatePairList
 {
 
   // implemented as two arrays of integers.

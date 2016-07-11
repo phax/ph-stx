@@ -50,7 +50,7 @@ import net.sf.joost.util.VariableUtils;
  * @author Oliver Becker
  */
 
-public class PBufferFactory extends FactoryBase
+public class PBufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -75,7 +75,7 @@ public class PBufferFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -105,15 +105,15 @@ public class PBufferFactory extends FactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends ProcessBase
+  public class Instance extends AbstractProcessBase
   {
     private final String bufName, expName;
     private boolean scopeDetermined = false;
-    private GroupBase groupScope = null;
+    private AbstractGroupBase groupScope = null;
 
     // Constructor
     public Instance (final String qName,
-                     final NodeBase parent,
+                     final AbstractNodeBase parent,
                      final ParseContext context,
                      final String bufName,
                      final String expName,
@@ -199,7 +199,7 @@ public class PBufferFactory extends FactoryBase
         // process the events using STX instructions
 
         // store current group
-        final GroupBase prevGroup = context.currentGroup;
+        final AbstractGroupBase prevGroup = context.currentGroup;
 
         // ensure, that position counters on the top most event are
         // available
@@ -216,7 +216,7 @@ public class PBufferFactory extends FactoryBase
         // restore current group
         context.currentGroup = prevGroup;
       }
-      context.targetGroup = (GroupBase) localFieldStack.pop ();
+      context.targetGroup = (AbstractGroupBase) localFieldStack.pop ();
 
       return super.processEnd (context);
     }
@@ -227,7 +227,7 @@ public class PBufferFactory extends FactoryBase
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
       if (groupScope != null)
-        theCopy.groupScope = (GroupBase) groupScope.deepCopy (copies);
+        theCopy.groupScope = (AbstractGroupBase) groupScope.deepCopy (copies);
     }
 
   }

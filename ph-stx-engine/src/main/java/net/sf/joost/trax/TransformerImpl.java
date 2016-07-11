@@ -65,7 +65,7 @@ import net.sf.joost.trace.TraceManager;
  *
  * @author Zubow
  */
-public class TransformerImpl extends Transformer implements TrAXConstants
+public class TransformerImpl extends Transformer
 {
 
   // Define a static logger variable so that it references the
@@ -136,7 +136,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
     supportedProperties.add (OutputKeys.OMIT_XML_DECLARATION);
     supportedProperties.add (OutputKeys.STANDALONE);
     supportedProperties.add (OutputKeys.VERSION);
-    supportedProperties.add (TrAXConstants.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING);
+    supportedProperties.add (CTrAX.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING);
 
     ignoredProperties.add (OutputKeys.CDATA_SECTION_ELEMENTS);
     ignoredProperties.add (OutputKeys.DOCTYPE_PUBLIC);

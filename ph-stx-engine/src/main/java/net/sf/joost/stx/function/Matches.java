@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -45,7 +45,7 @@ import net.sf.joost.util.regex.JRegularExpression;
  * @version $Revision: 1.2 $ $Date: 2007/06/13 20:29:07 $
  * @author Oliver Becker
  */
-final public class Matches implements Instance
+public final class Matches implements Instance
 {
   /** @return 2 **/
   public int getMinParCount ()
@@ -71,10 +71,10 @@ final public class Matches implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     String input, pattern, flags;
-    if (args.left.type == Tree.LIST)
+    if (args.left.type == AbstractTree.LIST)
     { // three parameters
       input = args.left.left.evaluate (context, top).getStringValue ();
       pattern = args.left.right.evaluate (context, top).getStringValue ();

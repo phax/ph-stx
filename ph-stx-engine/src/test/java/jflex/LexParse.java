@@ -40,10 +40,10 @@ public class LexParse extends java_cup.runtime.lr_parser
   }
 
   @Override
-  public Class getSymbolContainer ()
+  public Class <?> getSymbolContainer ()
   {
     return sym.class;
-  };
+  }
 
   /** Production table. */
   protected static final short _production_table[][] = unpackFromStrings (new String [] { "\000\161\000\002\002\004\000\002\005\006\000\002\005" +

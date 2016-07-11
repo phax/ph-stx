@@ -16,7 +16,7 @@ package jflex;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class Action
+public final class Action
 {
 
   /** A normal action */

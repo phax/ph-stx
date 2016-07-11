@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -42,7 +42,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class BooleanConv implements Instance
+public final class BooleanConv implements Instance
 {
   /** @return 1 */
   public int getMinParCount ()
@@ -68,7 +68,7 @@ final public class BooleanConv implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     return args.evaluate (context, top).getBooleanValue () ? Value.VAL_TRUE : Value.VAL_FALSE;
   }

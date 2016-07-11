@@ -24,7 +24,7 @@
 
 package net.sf.joost.stx;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.URIResolver;
@@ -48,7 +48,7 @@ public final class ParseContext
   public Locator locator;
 
   /** The set of namespaces currently in scope */
-  public Hashtable <String, String> nsSet;
+  public Map <String, String> nsSet;
 
   /** The error handler for the parser */
   private ErrorHandler errorHandler;

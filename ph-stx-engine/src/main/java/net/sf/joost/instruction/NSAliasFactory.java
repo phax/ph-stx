@@ -41,7 +41,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class NSAliasFactory extends FactoryBase
+public final class NSAliasFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -63,7 +63,7 @@ final public class NSAliasFactory extends FactoryBase
 
   /** Returns an instance of {@link Instance} */
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXException
@@ -144,9 +144,9 @@ final public class NSAliasFactory extends FactoryBase
    * It has no real functionality of its own; it is only needed to simplify the
    * parsing process of the transformation sheet.
    */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    protected Instance (final String qName, final NodeBase parent, final ParseContext context)
+    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {
       super (qName, parent, context, false);
     }

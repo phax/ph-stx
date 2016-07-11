@@ -49,7 +49,7 @@ import net.sf.joost.trace.DebugProcessor;
  *
  * @author Zubow
  */
-public class TemplatesImpl implements Templates, TrAXConstants
+public class TemplatesImpl implements Templates
 {
 
   // Define a static logger variable so that it references the
@@ -146,7 +146,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
     try
     {
       // check if transformerfactory is in debug mode
-      final boolean debugmode = ((Boolean) this.factory.getAttribute (DEBUG_FEATURE)).booleanValue ();
+      final boolean debugmode = ((Boolean) this.factory.getAttribute (CTrAX.DEBUG_FEATURE)).booleanValue ();
 
       if (debugmode)
       {
@@ -196,7 +196,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
        * {@link TransformerFactoryImpl#getErrorListener()} if available.
        */
       // check if transformerfactory is in debug mode
-      final boolean debugmode = ((Boolean) this.factory.getAttribute (DEBUG_FEATURE)).booleanValue ();
+      final boolean debugmode = ((Boolean) this.factory.getAttribute (CTrAX.DEBUG_FEATURE)).booleanValue ();
 
       final ParseContext pContext = new ParseContext ();
       pContext.allowExternalFunctions = factory.allowExternalFunctions;

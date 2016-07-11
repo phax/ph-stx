@@ -18,14 +18,14 @@ public class Lexer implements sym, java_cup.runtime.Scanner
 {
 
   /** This character denotes the end of file */
-  final public static int YYEOF = -1;
+  public final static int YYEOF = -1;
 
   /** initial size of the lookahead buffer */
   final private static int YY_BUFFERSIZE = 16384;
 
   /** lexical states */
-  final public static int CODESEG = 1;
-  final public static int YYINITIAL = 0;
+  public final static int CODESEG = 1;
+  public final static int YYINITIAL = 0;
 
   /**
    * Translates characters to character classes
@@ -759,7 +759,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
   /**
    * Closes the input stream.
    */
-  final public void yyclose () throws java.io.IOException
+  public final void yyclose () throws java.io.IOException
   {
     yy_atEOF = true; /* indicate end of file */
     yy_endRead = yy_startRead; /* invalidate buffer */
@@ -777,7 +777,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
    * @param reader
    *        the new input stream
    */
-  final public void yyreset (final java.io.Reader reader) throws java.io.IOException
+  public final void yyreset (final java.io.Reader reader) throws java.io.IOException
   {
     yyclose ();
     yy_reader = reader;
@@ -792,7 +792,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
   /**
    * Returns the current lexical state.
    */
-  final public int yystate ()
+  public final int yystate ()
   {
     return yy_lexical_state;
   }
@@ -803,7 +803,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
    * @param newState
    *        the new lexical state
    */
-  final public void yybegin (final int newState)
+  public final void yybegin (final int newState)
   {
     yy_lexical_state = newState;
   }
@@ -811,7 +811,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
   /**
    * Returns the text matched by the current regular expression.
    */
-  final public String yytext ()
+  public final String yytext ()
   {
     return new String (yy_buffer, yy_startRead, yy_markedPos - yy_startRead);
   }
@@ -825,7 +825,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
    *        yylength()-1.
    * @return the character at position pos
    */
-  final public char yycharat (final int pos)
+  public final char yycharat (final int pos)
   {
     return yy_buffer[yy_startRead + pos];
   }
@@ -833,7 +833,7 @@ public class Lexer implements sym, java_cup.runtime.Scanner
   /**
    * Returns the length of the matched text region.
    */
-  final public int yylength ()
+  public final int yylength ()
   {
     return yy_markedPos - yy_startRead;
   }

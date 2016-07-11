@@ -41,7 +41,7 @@ import org.xml.sax.SAXParseException;
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.IStxEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.trax.TrAXHelper;
@@ -54,7 +54,7 @@ import net.sf.joost.trax.TrAXHelper;
  * @author Oliver Becker
  */
 
-final public class ResultDocumentFactory extends FactoryBase
+public final class ResultDocumentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -77,12 +77,12 @@ final public class ResultDocumentFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree href = parseRequiredAVT (qName, attrs, "href", context);
+    final AbstractTree href = parseRequiredAVT (qName, attrs, "href", context);
 
     final String encodingAtt = attrs.getValue ("output-encoding");
 
@@ -108,17 +108,17 @@ final public class ResultDocumentFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>result-document</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree href;
+    private AbstractTree href;
     private String encoding;
     private final String method;
     private final boolean append;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree href,
+                        final AbstractTree href,
                         final String encoding,
                         final String method,
                         final boolean append)

@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -45,7 +46,7 @@ import net.sf.joost.stx.Processor;
  * @author Oliver Becker
  */
 
-public class TransformFactory extends FactoryBase
+public class TransformFactory extends AbstractFactoryBase
 {
   /** allowed values for the <code>pass-through</code> attribute */
   private static final String [] PASS_THROUGH_VALUES = { "none", "text", "all" };
@@ -77,10 +78,10 @@ public class TransformFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (parent != null && parent.systemId.equals (context.locator.getSystemId ()))
       throw new SAXParseException ("'" + qName + "' is allowed only as root element", context.locator);
@@ -197,10 +198,10 @@ public class TransformFactory extends FactoryBase
   /* --------------------------------------------------------------------- */
 
   /** Represents an instance of the <code>transform</code> element. */
-  final public class Instance extends GroupBase
+  public final class Instance extends AbstractGroupBase
   {
     /** mapping table for <code>stx:namespace-alias</code> instructions */
-    public Hashtable namespaceAliases;
+    public Hashtable <String, String> namespaceAliases;
 
     // stx:transform attributes (options)
     public String outputEncoding;
@@ -210,10 +211,10 @@ public class TransformFactory extends FactoryBase
 
     // used to transfer the list of compilable nodes from an included
     // STX sheet to the calling Parser object
-    public Vector compilableNodes;
+    public List <AbstractNodeBase> compilableNodes;
 
     // Constructor
-    public Instance (NodeBase parent,
+    public Instance (AbstractNodeBase parent,
                      final String qName,
                      final ParseContext context,
                      final String outputEncoding,
@@ -259,7 +260,7 @@ public class TransformFactory extends FactoryBase
     }
 
     @Override
-    public void insert (final NodeBase node) throws SAXParseException
+    public void insert (final AbstractNodeBase node) throws SAXParseException
     {
       if (compilableNodes != null)
         // will only happen after this transform
@@ -273,9 +274,9 @@ public class TransformFactory extends FactoryBase
                                      node.lineNo,
                                      node.colNo);
 
-      if (node instanceof TemplateBase || // template, procedure
-          node instanceof GroupBase || // group, transform (= include)
-          node instanceof VariableBase) // param, variable, buffer
+      if (node instanceof AbstractTemplateBase || // template, procedure
+          node instanceof AbstractGroupBase || // group, transform (= include)
+          node instanceof AbstractVariableBase) // param, variable, buffer
         super.insert (node);
       else
         if (node instanceof NSAliasFactory.Instance || node instanceof ScriptFactory.Instance)

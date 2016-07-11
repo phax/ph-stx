@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -44,7 +44,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class WhileFactory extends FactoryBase
+public final class WhileFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -64,25 +64,25 @@ final public class WhileFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree testExpr = parseRequiredExpr (qName, attrs, "test", context);
+    final AbstractTree testExpr = parseRequiredExpr (qName, attrs, "test", context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, testExpr);
   }
 
   /** Represents an instance of the <code>while</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree test;
+    private AbstractTree test;
     private AbstractInstruction contents, successor;
 
     // Constructor
-    protected Instance (final String qName, final NodeBase parent, final ParseContext context, final Tree test)
+    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree test)
     {
       super (qName, parent, context, true);
       this.test = test;

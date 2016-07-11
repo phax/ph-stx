@@ -34,21 +34,19 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Common base class for {@link TemplateFactory.Instance} and
  * {@link ProcedureFactory.Instance}.
- * 
+ *
  * @version $Revision: 2.9 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
 
-public abstract class TemplateBase extends NodeBase
+public abstract class AbstractTemplateBase extends AbstractNodeBase
 {
   /** Visibility values */
   public static final int LOCAL_VISIBLE = 0, GROUP_VISIBLE = 1, GLOBAL_VISIBLE = 2;
 
   /** Attribute value strings for the above visibility values */
-  protected static final String [] VISIBILITY_VALUES = { "local", "group", "global" }; // note:
-                                                                                       // same
-                                                                                       // order
-                                                                                       // required!
+  // note: same order required!
+  protected static final String [] VISIBILITY_VALUES = { "local", "group", "global" };
 
   /** The visibility of this template */
   public int visibility;
@@ -60,21 +58,21 @@ public abstract class TemplateBase extends NodeBase
   private final boolean newScope;
 
   /** The parent of this template */
-  public GroupBase parentGroup;
+  public AbstractGroupBase parentGroup;
 
   //
   // Constructor
   //
 
-  protected TemplateBase (final String qName,
-                          final NodeBase parent,
-                          final ParseContext context,
-                          final int visibility,
-                          final boolean isPublic,
-                          final boolean newScope)
+  protected AbstractTemplateBase (final String qName,
+                                  final AbstractNodeBase parent,
+                                  final ParseContext context,
+                                  final int visibility,
+                                  final boolean isPublic,
+                                  final boolean newScope)
   {
     super (qName, parent, context, true);
-    parentGroup = (GroupBase) parent;
+    parentGroup = (AbstractGroupBase) parent;
     this.visibility = visibility;
     this.isPublic = isPublic;
     this.newScope = newScope;
@@ -104,9 +102,9 @@ public abstract class TemplateBase extends NodeBase
   protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
   {
     super.onDeepCopy (copy, copies);
-    final TemplateBase theCopy = (TemplateBase) copy;
+    final AbstractTemplateBase theCopy = (AbstractTemplateBase) copy;
     if (parentGroup != null)
-      theCopy.parentGroup = (GroupBase) parentGroup.deepCopy (copies);
+      theCopy.parentGroup = (AbstractGroupBase) parentGroup.deepCopy (copies);
   }
 
 }

@@ -44,7 +44,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class CdataFactory extends FactoryBase
+public final class CdataFactory extends AbstractFactoryBase
 {
   /** @return <code>"cdata"</code> */
   @Override
@@ -54,22 +54,22 @@ final public class CdataFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     checkAttributes (qName, attrs, null, context);
     return new Instance (qName, parent, context);
   }
 
   /** The inner Instance class */
-  public class Instance extends NodeBase
+  public class Instance extends AbstractNodeBase
   {
     private StringEmitter strEmitter;
     private StringBuffer buffer;
 
-    public Instance (final String qName, final NodeBase parent, final ParseContext context)
+    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {
       super (qName, parent, context, true);
       init ();
@@ -119,6 +119,5 @@ final public class CdataFactory extends FactoryBase
       final Instance theCopy = (Instance) copy;
       theCopy.init ();
     }
-
   }
 }

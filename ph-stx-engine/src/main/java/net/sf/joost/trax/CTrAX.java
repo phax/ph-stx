@@ -34,10 +34,8 @@ import net.sf.joost.CSTX;
  * @version $Revision: 1.15 $ $Date: 2008/10/06 13:31:41 $
  * @author Anatolij Zubow, Oliver Becker
  */
-// TODO make final class
-public interface TrAXConstants
+public final class CTrAX
 {
-
   /**
    * Internally used for the identity transformation.
    */
@@ -105,4 +103,7 @@ public interface TrAXConstants
   public final static String OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING = "{" +
                                                                           CSTX.JOOST_EXT_NS +
                                                                           "}support-disable-output-escaping";
+
+  private CTrAX ()
+  {}
 }

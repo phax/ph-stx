@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -47,7 +47,7 @@ import net.sf.joost.stx.Value;
  * @author Oliver Becker
  */
 
-final public class VariableFactory extends FactoryBase
+public final class VariableFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -69,7 +69,7 @@ final public class VariableFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -77,10 +77,10 @@ final public class VariableFactory extends FactoryBase
     final String nameAtt = getRequiredAttribute (qName, attrs, "name", context);
     final String varName = getExpandedName (nameAtt, context);
 
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
     final int keepValueIndex = getEnumAttValue ("keep-value", attrs, YESNO_VALUES, context);
-    if (keepValueIndex != -1 && !(parent instanceof GroupBase))
+    if (keepValueIndex != -1 && !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("Attribute 'keep-value' is not allowed for local variables", context.locator);
 
     // default is "no" (false)
@@ -91,10 +91,10 @@ final public class VariableFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>variable</code> element. */
-  public class Instance extends VariableBase
+  public class Instance extends AbstractVariableBase
   {
     private final String varName;
-    private Tree select;
+    private AbstractTree select;
     private final String errorMessage;
     private final boolean isGroupVar;
 
@@ -102,9 +102,9 @@ final public class VariableFactory extends FactoryBase
                         final ParseContext context,
                         final String varName,
                         final String expName,
-                        final Tree select,
+                        final AbstractTree select,
                         final boolean keepValue,
-                        final NodeBase parent)
+                        final AbstractNodeBase parent)
     {
       super (qName,
              parent,
@@ -117,7 +117,7 @@ final public class VariableFactory extends FactoryBase
       this.select = select;
       this.keepValue = keepValue;
       this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
-      this.isGroupVar = parent instanceof GroupBase;
+      this.isGroupVar = parent instanceof AbstractGroupBase;
     }
 
     @Override

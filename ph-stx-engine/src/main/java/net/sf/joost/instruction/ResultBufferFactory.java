@@ -46,7 +46,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class ResultBufferFactory extends FactoryBase
+public final class ResultBufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -67,7 +67,7 @@ final public class ResultBufferFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -84,13 +84,13 @@ final public class ResultBufferFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>result-buffer</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     private final String bufName, expName;
     private final boolean clear;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String bufName,
                         final String expName,
@@ -113,7 +113,7 @@ final public class ResultBufferFactory extends FactoryBase
       Object emitter = context.localVars.get (expName);
       if (emitter == null)
       {
-        GroupBase group = context.currentGroup;
+        AbstractGroupBase group = context.currentGroup;
         while (emitter == null && group != null)
         {
           emitter = ((Hashtable) ((Stack) context.groupVars.get (group)).peek ()).get (expName);

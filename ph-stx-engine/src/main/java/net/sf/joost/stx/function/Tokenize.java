@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -49,7 +49,7 @@ import net.sf.joost.util.regex.IRegularExpression;
  * @version $Revision: 1.3 $ $Date: 2008/06/14 15:01:30 $
  * @author Oliver Becker
  */
-final public class Tokenize implements Instance
+public final class Tokenize implements Instance
 {
   /** @return 2 **/
   public int getMinParCount ()
@@ -75,10 +75,10 @@ final public class Tokenize implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     String input, pattern, flags;
-    if (args.left.type == Tree.LIST)
+    if (args.left.type == AbstractTree.LIST)
     { // three parameters
       input = args.left.left.evaluate (context, top).getStringValue ();
       pattern = args.left.right.evaluate (context, top).getStringValue ();

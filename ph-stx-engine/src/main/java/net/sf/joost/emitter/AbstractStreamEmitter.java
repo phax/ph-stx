@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.CTrAX;
 
 /**
  * Base class for emitter classes that produce a character stream.
@@ -122,7 +122,7 @@ public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
           }
       if (emitter != null)
       {
-        final String val = outputProperties.getProperty (TrAXConstants.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING);
+        final String val = outputProperties.getProperty (CTrAX.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING);
         if (val != null)
           emitter.setSupportDisableOutputEscaping (val.equals ("yes"));
       }

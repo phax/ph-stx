@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -47,7 +47,7 @@ import net.sf.joost.stx.Value;
  * @author Oliver Becker
  */
 
-final public class ParamFactory extends FactoryBase
+public final class ParamFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -69,13 +69,13 @@ final public class ParamFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    if (parent == null || !(parent instanceof GroupBase || // transform, group
-                            parent instanceof TemplateBase)) // template,
+    if (parent == null || !(parent instanceof AbstractGroupBase || // transform, group
+                            parent instanceof AbstractTemplateBase)) // template,
                                                              // procedure
       throw new SAXParseException ("'" +
                                    qName +
@@ -89,7 +89,7 @@ final public class ParamFactory extends FactoryBase
     // default is false
     final boolean required = getEnumAttValue ("required", attrs, YESNO_VALUES, context) == YES_VALUE;
 
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
     if (required && selectExpr != null)
       throw new SAXParseException ("'" +
                                    qName +
@@ -102,20 +102,20 @@ final public class ParamFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>param</code> element. */
-  public class Instance extends VariableBase
+  public class Instance extends AbstractVariableBase
   {
     private final String varName;
-    private Tree select;
+    private AbstractTree select;
     private final boolean required;
     private AbstractInstruction contents, successor;
     // private Hashtable globalParams;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String varName,
                         final String expName,
-                        final Tree select,
+                        final AbstractTree select,
                         final boolean required)
     {
       super (qName,
@@ -146,7 +146,7 @@ final public class ParamFactory extends FactoryBase
     public short process (final Context context) throws SAXException
     {
       Value v;
-      if (parent instanceof GroupBase)
+      if (parent instanceof AbstractGroupBase)
       {
         // passed value from the outside
         v = context.globalParameters.get (expName);
@@ -206,7 +206,7 @@ final public class ParamFactory extends FactoryBase
     {
       // determine scope
       Hashtable <String, Value> varTable;
-      if (parent instanceof GroupBase) // global parameter
+      if (parent instanceof AbstractGroupBase) // global parameter
         varTable = context.groupVars.get (parent).peek ();
       else
         varTable = context.localVars;

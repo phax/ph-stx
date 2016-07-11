@@ -27,7 +27,7 @@ package net.sf.joost.grammar.tree;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.SAXEvent;
@@ -39,7 +39,7 @@ import net.sf.joost.stx.SAXEvent;
  * @version $Revision: 1.3 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
-final public class LocalWildcardTree extends Tree
+public final class LocalWildcardTree extends AbstractTree
 {
   /**
    * Constructs a LocalWildcardTree object with a given namespace prefix.

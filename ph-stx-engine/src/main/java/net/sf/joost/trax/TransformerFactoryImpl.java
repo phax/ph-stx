@@ -67,7 +67,7 @@ import net.sf.joost.trace.ParserListenerMgr;
  *
  * @author Zubow
  */
-public class TransformerFactoryImpl extends SAXTransformerFactory implements TrAXConstants
+public class TransformerFactoryImpl extends SAXTransformerFactory
 {
 
   // Define a static logger variable so that it references the
@@ -164,40 +164,21 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   public Object getAttribute (final String name) throws IllegalArgumentException
   {
 
-    if (KEY_TH_RESOLVER.equals (name))
-    {
+    if (CTrAX.KEY_TH_RESOLVER.equals (name))
       return thResolver;
-    }
-    else
-      if (KEY_OUTPUT_URI_RESOLVER.equals (name))
-      {
-        return outputUriResolver;
-      }
-      else
-        if (MESSAGE_EMITTER_CLASS.equals (name))
-        {
-          return msgEmitter;
-        }
-        else
-          if (KEY_XSLT_FACTORY.equals (name))
-          {
-            return System.getProperty (KEY_XSLT_FACTORY);
-          }
-          else
-            if (ALLOW_EXTERNAL_FUNCTIONS.equals (name))
-            {
-              return new Boolean (allowExternalFunctions);
-            }
-            else
-              if (DEBUG_FEATURE.equals (name))
-              {
-                return new Boolean (debugmode);
-              }
-              else
-              {
-                log.warn ("Feature not supported: " + name);
-                throw new IllegalArgumentException ("Feature not supported: " + name);
-              }
+    if (CTrAX.KEY_OUTPUT_URI_RESOLVER.equals (name))
+      return outputUriResolver;
+    if (CTrAX.MESSAGE_EMITTER_CLASS.equals (name))
+      return msgEmitter;
+    if (CTrAX.KEY_XSLT_FACTORY.equals (name))
+      return System.getProperty (CTrAX.KEY_XSLT_FACTORY);
+    if (CTrAX.ALLOW_EXTERNAL_FUNCTIONS.equals (name))
+      return Boolean.valueOf (allowExternalFunctions);
+    if (CTrAX.DEBUG_FEATURE.equals (name))
+      return Boolean.valueOf (debugmode);
+
+    log.warn ("Feature not supported: " + name);
+    throw new IllegalArgumentException ("Feature not supported: " + name);
   }
 
   /**
@@ -215,17 +196,17 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   public void setAttribute (final String name, final Object value) throws IllegalArgumentException
   {
 
-    if (KEY_TH_RESOLVER.equals (name))
+    if (CTrAX.KEY_TH_RESOLVER.equals (name))
     {
       thResolver = (TransformerHandlerResolver) value;
     }
     else
-      if (KEY_OUTPUT_URI_RESOLVER.equals (name))
+      if (CTrAX.KEY_OUTPUT_URI_RESOLVER.equals (name))
       {
         outputUriResolver = (OutputURIResolver) value;
       }
       else
-        if (MESSAGE_EMITTER_CLASS.equals (name))
+        if (CTrAX.MESSAGE_EMITTER_CLASS.equals (name))
         {
           // object is of type string, so use reflection
           if (value instanceof String)
@@ -252,17 +233,17 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
             }
         }
         else
-          if (KEY_XSLT_FACTORY.equals (name))
+          if (CTrAX.KEY_XSLT_FACTORY.equals (name))
           {
-            System.setProperty (KEY_XSLT_FACTORY, (String) value);
+            System.setProperty (CTrAX.KEY_XSLT_FACTORY, (String) value);
           }
           else
-            if (ALLOW_EXTERNAL_FUNCTIONS.equals (name))
+            if (CTrAX.ALLOW_EXTERNAL_FUNCTIONS.equals (name))
             {
               this.allowExternalFunctions = ((Boolean) value).booleanValue ();
             }
             else
-              if (DEBUG_FEATURE.equals (name))
+              if (CTrAX.DEBUG_FEATURE.equals (name))
               {
                 this.debugmode = ((Boolean) value).booleanValue ();
               }
@@ -451,7 +432,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      final StreamSource streamSrc = new StreamSource (new StringReader (IDENTITY_TRANSFORM));
+      final StreamSource streamSrc = new StreamSource (new StringReader (CTrAX.IDENTITY_TRANSFORM));
       return newTransformer (streamSrc);
     }
   }
@@ -523,7 +504,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
     {
       if (CSTX.DEBUG)
         log.debug ("get a TransformerHandler " + "(identity transformation or copy)");
-      final StreamSource streamSrc = new StreamSource (new StringReader (IDENTITY_TRANSFORM));
+      final StreamSource streamSrc = new StreamSource (new StringReader (CTrAX.IDENTITY_TRANSFORM));
       return newTransformerHandler (streamSrc);
     }
   }

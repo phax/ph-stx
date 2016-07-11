@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 import net.sf.joost.grammar.ExprParser;
 import net.sf.joost.grammar.PatternParser;
 import net.sf.joost.grammar.Sym;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.grammar.Yylex;
 import net.sf.joost.grammar.tree.AvtTree;
 import net.sf.joost.grammar.tree.StringTree;
@@ -42,14 +42,14 @@ import net.sf.joost.stx.ParseContext;
 
 /**
  * Abstract base class for all factory classes which produce nodes
- * ({@link NodeBase}) for the tree representation of an STX transformation
+ * ({@link AbstractNodeBase}) for the tree representation of an STX transformation
  * sheet.
  *
  * @version $Revision: 2.11 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
 
-public abstract class FactoryBase
+public abstract class AbstractFactoryBase
 {
   /** @return the local name of this STX element */
   public abstract String getName ();
@@ -69,7 +69,7 @@ public abstract class FactoryBase
    * @exception SAXParseException
    *            for missing or wrong attributes, etc.
    */
-  public abstract NodeBase createNode (NodeBase parent,
+  public abstract AbstractNodeBase createNode (AbstractNodeBase parent,
                                        String qName,
                                        Attributes attrs,
                                        ParseContext context) throws SAXException;
@@ -154,14 +154,13 @@ public abstract class FactoryBase
                                    value +
                                    "')",
                                    context.locator);
-    else
-    {
-      String msg = "Value of attribute '" + name + "' must be one of ";
-      for (int i = 0; i < enumValues.length - 1; i++)
-        msg += "'" + enumValues[i] + "', ";
-      msg += "or '" + enumValues[enumValues.length - 1] + "' (found '" + value + "')";
-      throw new SAXParseException (msg, context.locator);
-    }
+
+    final StringBuilder msg = new StringBuilder ();
+    msg.append ("Value of attribute '").append (name).append ("' must be one of ");
+    for (int i = 0; i < enumValues.length - 1; i++)
+      msg.append ("'").append (enumValues[i]).append ("', ");
+    msg.append ("or '").append (enumValues[enumValues.length - 1]).append ("' (found '").append ("')");
+    throw new SAXParseException (msg.toString (), context.locator);
   }
 
   /**
@@ -231,11 +230,11 @@ public abstract class FactoryBase
    *        the string to be parsed
    * @param context
    *        the parse context
-   * @return a {@link Tree} representation of the pattern
+   * @return a {@link AbstractTree} representation of the pattern
    * @exception SAXParseException
    *            if a parse error occured
    */
-  protected static Tree parsePattern (final String string, final ParseContext context) throws SAXParseException
+  protected static AbstractTree parsePattern (final String string, final ParseContext context) throws SAXParseException
   {
     if (string == null)
       return null;
@@ -244,10 +243,10 @@ public abstract class FactoryBase
     final Yylex lexer = new Yylex (sr);
     final PatternParser parser = new PatternParser (lexer, context);
 
-    Tree pattern;
+    AbstractTree pattern;
     try
     {
-      pattern = (Tree) parser.parse ().value;
+      pattern = (AbstractTree) parser.parse ().value;
       if (lexer.withinComment > 0)
         throw new SAXParseException ("Syntax error, encountered end of pattern within a comment.", context.locator);
     }
@@ -273,8 +272,7 @@ public abstract class FactoryBase
           else
             throw new SAXParseException (e.getMessage () + "Found empty pattern.", context.locator);
       }
-      else
-        throw new SAXParseException (e.getMessage () + "Found '" + lexer.last.value + "'.", context.locator);
+      throw new SAXParseException (e.getMessage () + "Found '" + lexer.last.value + "'.", context.locator);
     }
     return pattern;
   }
@@ -283,7 +281,7 @@ public abstract class FactoryBase
    * @see #getRequiredAttribute(String, Attributes, String, ParseContext)
    * @see #parsePattern(String, ParseContext)
    */
-  protected static Tree parseRequiredPattern (final String elName,
+  protected static AbstractTree parseRequiredPattern (final String elName,
                                               final Attributes attrs,
                                               final String attName,
                                               final ParseContext context) throws SAXParseException
@@ -298,12 +296,12 @@ public abstract class FactoryBase
    *        the string to be parsed
    * @param context
    *        the parse context
-   * @return a {@link Tree} representation of the expression or
+   * @return a {@link AbstractTree} representation of the expression or
    *         <code>null</code> if <code>string</code> was <code>null</code>
    * @exception SAXParseException
    *            if a parse error occured
    */
-  public static Tree parseExpr (final String string, final ParseContext context) throws SAXParseException
+  public static AbstractTree parseExpr (final String string, final ParseContext context) throws SAXParseException
   {
     if (string == null)
       return null;
@@ -311,10 +309,10 @@ public abstract class FactoryBase
     final StringReader sr = new StringReader (string);
     final Yylex lexer = new Yylex (sr);
     final ExprParser parser = new ExprParser (lexer, context);
-    Tree expr;
+    AbstractTree expr;
     try
     {
-      expr = (Tree) parser.parse ().value;
+      expr = (AbstractTree) parser.parse ().value;
       if (lexer.withinComment > 0)
         throw new SAXParseException ("Syntax error, " +
                                      "encountered end of expression within a comment.",
@@ -342,8 +340,7 @@ public abstract class FactoryBase
           else
             throw new SAXParseException (e.getMessage () + "Found empty expression.", context.locator);
       }
-      else
-        throw new SAXParseException (e.getMessage () + "Found '" + lexer.last.value + "'.", context.locator);
+      throw new SAXParseException (e.getMessage () + "Found '" + lexer.last.value + "'.", context.locator);
     }
     return expr;
   }
@@ -352,7 +349,7 @@ public abstract class FactoryBase
    * @see #getRequiredAttribute(String, Attributes, String, ParseContext)
    * @see #parseExpr(String, ParseContext)
    */
-  protected static Tree parseRequiredExpr (final String elName,
+  protected static AbstractTree parseRequiredExpr (final String elName,
                                            final Attributes attrs,
                                            final String attName,
                                            final ParseContext context) throws SAXParseException
@@ -374,19 +371,19 @@ public abstract class FactoryBase
    *        the string to be parsed
    * @param context
    *        the parse context
-   * @return a {@link Tree} representation of the AVT or <code>null</code> if
+   * @return a {@link AbstractTree} representation of the AVT or <code>null</code> if
    *         <code>string</code> was <code>null</code>
    * @exception SAXParseException
    *            if a parse error occured
    */
-  protected static Tree parseAVT (final String string, final ParseContext context) throws SAXParseException
+  protected static AbstractTree parseAVT (final String string, final ParseContext context) throws SAXParseException
   {
     if (string == null)
       return null;
 
     final int length = string.length ();
     final StringBuffer buf = new StringBuffer ();
-    Tree tree = null;
+    AbstractTree tree = null;
 
     // this is a finite state machine
     int state = ATT_STATE;
@@ -415,7 +412,6 @@ public abstract class FactoryBase
           {
             buf.append (c);
             state = ATT_STATE;
-            continue;
           }
           else
           {
@@ -426,8 +422,8 @@ public abstract class FactoryBase
             }
             state = EXPR_STATE;
             index--; // put back one character
-            continue;
           }
+          continue;
         case RBRACE_STATE:
           if (c == '}')
           {
@@ -435,11 +431,10 @@ public abstract class FactoryBase
             state = ATT_STATE;
             continue;
           }
-          else
-            throw new SAXParseException ("Invalid attribute value template: found unmatched '}' " +
-                                         "at position " +
-                                         index,
-                                         context.locator);
+          throw new SAXParseException ("Invalid attribute value template: found unmatched '}' " +
+                                       "at position " +
+                                       index,
+                                       context.locator);
         case EXPR_STATE:
           switch (c)
           {
@@ -487,7 +482,7 @@ public abstract class FactoryBase
    * @see #getRequiredAttribute(String, Attributes, String, ParseContext)
    * @see #parseAVT(String, ParseContext)
    */
-  protected static Tree parseRequiredAVT (final String elName,
+  protected static AbstractTree parseRequiredAVT (final String elName,
                                           final Attributes attrs,
                                           final String attName,
                                           final ParseContext context) throws SAXParseException

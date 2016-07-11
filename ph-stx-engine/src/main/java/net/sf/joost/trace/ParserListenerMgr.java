@@ -27,7 +27,7 @@ package net.sf.joost.trace;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.ParserListener;
 import net.sf.joost.trax.TransformerImpl;
 
@@ -96,7 +96,7 @@ public class ParserListenerMgr implements ParserListener
   // ----------------------------------------------------------------------
 
   /** see {@link ParserListener#nodeCreated} */
-  public void nodeCreated (final NodeBase node)
+  public void nodeCreated (final AbstractNodeBase node)
   {
     if (hasParseListeners ())
     {

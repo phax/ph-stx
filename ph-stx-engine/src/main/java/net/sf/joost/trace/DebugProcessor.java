@@ -37,7 +37,7 @@ import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Emitter;
 import net.sf.joost.stx.ParseContext;
@@ -181,7 +181,7 @@ public class DebugProcessor extends Processor
     }
 
     // found end element
-    if (inst instanceof NodeBase.End)
+    if (inst instanceof AbstractNodeBase.End)
     {
       // end node
       tmgr.fireLeaveInstructionNode (inst, event);

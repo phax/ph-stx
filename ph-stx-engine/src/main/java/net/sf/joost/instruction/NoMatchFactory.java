@@ -41,7 +41,7 @@ import net.sf.joost.stx.ParseContext;
  * @version $Revision: 1.3 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
-public class NoMatchFactory extends FactoryBase
+public class NoMatchFactory extends AbstractFactoryBase
 {
   /** @return <code>"no-match"</code> */
   @Override
@@ -51,7 +51,7 @@ public class NoMatchFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -64,12 +64,12 @@ public class NoMatchFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>no-match</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     /** The parent */
     AnalyzeTextFactory.Instance analyzeText;
 
-    public Instance (final String qName, final NodeBase parent, final ParseContext context)
+    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {
       super (qName, parent, context, true);
       analyzeText = (AnalyzeTextFactory.Instance) parent;

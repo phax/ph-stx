@@ -28,21 +28,21 @@ import net.sf.joost.stx.ParseContext;
 
 /**
  * Common base class for variables, parameters, and buffers.
- * 
+ *
  * @version $Revision: 2.2 $ $Date: 2003/06/03 14:30:27 $
  * @author Oliver Becker
  */
-public class VariableBase extends NodeBase
+public abstract class AbstractVariableBase extends AbstractNodeBase
 {
   protected String expName;
   protected boolean keepValue;
 
-  public VariableBase (final String qName,
-                       final NodeBase parent,
-                       final ParseContext context,
-                       final String expName,
-                       final boolean keepValue,
-                       final boolean mayHaveChildren)
+  public AbstractVariableBase (final String qName,
+                               final AbstractNodeBase parent,
+                               final ParseContext context,
+                               final String expName,
+                               final boolean keepValue,
+                               final boolean mayHaveChildren)
   {
     super (qName, parent, context, mayHaveChildren);
     this.expName = expName;

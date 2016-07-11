@@ -31,7 +31,7 @@ import java.io.OutputStreamWriter;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -46,7 +46,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class EscapeUri implements Instance
+public final class EscapeUri implements Instance
 {
   /** @return 2 **/
   public int getMinParCount ()
@@ -72,7 +72,7 @@ final public class EscapeUri implements Instance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     final Value v = args.left.evaluate (context, top);
     final String uri = v.getStringValue ();

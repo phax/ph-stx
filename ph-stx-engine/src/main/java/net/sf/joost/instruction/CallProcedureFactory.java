@@ -43,7 +43,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public class CallProcedureFactory extends FactoryBase
+public class CallProcedureFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -66,7 +66,7 @@ public class CallProcedureFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -81,14 +81,14 @@ public class CallProcedureFactory extends FactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends ProcessBase
+  public class Instance extends AbstractProcessBase
   {
     String procQName, procExpName;
     ProcedureFactory.Instance procedure = null;
 
     // Constructor
     public Instance (final String qName,
-                     final NodeBase parent,
+                     final AbstractNodeBase parent,
                      final ParseContext context,
                      final String procQName,
                      final String procExpName,

@@ -51,7 +51,7 @@ import net.sf.joost.trax.TrAXHelper;
  * @author Oliver Becker
  */
 
-final public class IncludeFactory extends FactoryBase
+public final class IncludeFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -72,7 +72,7 @@ final public class IncludeFactory extends FactoryBase
 
   /** Returns an instance of {@link TransformFactory.Instance} */
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext pContext) throws SAXException
@@ -80,7 +80,7 @@ final public class IncludeFactory extends FactoryBase
     // check parent
     if (parent == null)
       throw new SAXParseException ("'" + qName + "' not allowed as root element", pContext.locator);
-    if (!(parent instanceof GroupBase))
+    if (!(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", pContext.locator);
 
     final String hrefAtt = getRequiredAttribute (qName, attrs, "href", pContext);
@@ -88,7 +88,7 @@ final public class IncludeFactory extends FactoryBase
     checkAttributes (qName, attrs, attrNames, pContext);
 
     final Parser stxParser = new Parser (new ParseContext (pContext));
-    stxParser.includingGroup = (GroupBase) parent;
+    stxParser.includingGroup = (AbstractGroupBase) parent;
 
     XMLReader reader = null;
     InputSource iSource;

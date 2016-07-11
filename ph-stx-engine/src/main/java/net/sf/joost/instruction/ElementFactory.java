@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -46,7 +46,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class ElementFactory extends FactoryBase
+public final class ElementFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -67,33 +67,33 @@ final public class ElementFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
-    final Tree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
+    final AbstractTree nameAVT = parseRequiredAVT (qName, attrs, "name", context);
 
-    final Tree namespaceAVT = parseAVT (attrs.getValue ("namespace"), context);
+    final AbstractTree namespaceAVT = parseAVT (attrs.getValue ("namespace"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, nameAVT, namespaceAVT);
   }
 
   /** Represents an instance of the <code>element</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree name, namespace;
-    private final Hashtable nsSet;
+    private AbstractTree name, namespace;
+    private final Hashtable <String, String> nsSet;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree name,
-                        final Tree namespace)
+                        final AbstractTree name,
+                        final AbstractTree namespace)
     {
       super (qName, parent, context, true);
-      this.nsSet = (Hashtable) context.nsSet.clone ();
+      this.nsSet = new Hashtable<> (context.nsSet);
       this.name = name;
       this.namespace = namespace;
     }
@@ -132,7 +132,7 @@ final public class ElementFactory extends FactoryBase
         {
           // look into the set of in-scope namespaces
           // (of the transformation sheet)
-          elUri = (String) nsSet.get (prefix);
+          elUri = nsSet.get (prefix);
           if (elUri == null)
           {
             context.errorHandler.fatalError ("Attempt to create element '" +
@@ -156,7 +156,7 @@ final public class ElementFactory extends FactoryBase
         else
         {
           // no namespace attribute, see above
-          elUri = (String) nsSet.get ("");
+          elUri = nsSet.get ("");
           if (elUri == null)
             elUri = "";
         }

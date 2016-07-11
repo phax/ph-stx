@@ -24,8 +24,8 @@
 
 package net.sf.joost.stx;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
@@ -38,6 +38,9 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.NamespaceSupport;
 
 import net.sf.joost.CSTX;
+import net.sf.joost.instruction.AbstractFactoryBase;
+import net.sf.joost.instruction.AbstractGroupBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.instruction.AnalyzeTextFactory;
 import net.sf.joost.instruction.AssignFactory;
 import net.sf.joost.instruction.AttributeFactory;
@@ -52,9 +55,7 @@ import net.sf.joost.instruction.ElementEndFactory;
 import net.sf.joost.instruction.ElementFactory;
 import net.sf.joost.instruction.ElementStartFactory;
 import net.sf.joost.instruction.ElseFactory;
-import net.sf.joost.instruction.FactoryBase;
 import net.sf.joost.instruction.ForEachFactory;
-import net.sf.joost.instruction.GroupBase;
 import net.sf.joost.instruction.GroupFactory;
 import net.sf.joost.instruction.IfFactory;
 import net.sf.joost.instruction.IncludeFactory;
@@ -63,7 +64,6 @@ import net.sf.joost.instruction.MatchFactory;
 import net.sf.joost.instruction.MessageFactory;
 import net.sf.joost.instruction.NSAliasFactory;
 import net.sf.joost.instruction.NoMatchFactory;
-import net.sf.joost.instruction.NodeBase;
 import net.sf.joost.instruction.OtherwiseFactory;
 import net.sf.joost.instruction.PAttributesFactory;
 import net.sf.joost.instruction.PBufferFactory;
@@ -98,25 +98,25 @@ import net.sf.joost.instruction.WithParamFactory;
 public class Parser implements ContentHandler // , ErrorHandler
 {
   /** The context object for parsing */
-  private final ParseContext pContext;
+  private final ParseContext m_aPContext;
 
   /** Stack for opened elements, contains Node instances. */
-  private final Stack <NodeBase> openedElements;
+  private final Stack <AbstractNodeBase> openedElements;
 
   /** The current (last created) Node. */
-  private NodeBase currentNode;
+  private AbstractNodeBase currentNode;
 
   /** Hashtable for STX factory objects, one for each type. */
-  private final Hashtable <String, FactoryBase> stxFactories;
+  private final Map <String, AbstractFactoryBase> stxFactories;
 
   /** Hashtable for Joost extension factory objects, one for each type. */
-  private final Hashtable <String, FactoryBase> joostFactories;
+  private final Map <String, AbstractFactoryBase> joostFactories;
 
   /** The factory for literal result elements. */
   private final LitElementFactory litFac;
 
   /** Hashtable: keys = prefixes, values = URI stacks */
-  private final Hashtable <String, Stack <String>> inScopeNamespaces;
+  private final Map <String, Stack <String>> inScopeNamespaces;
 
   /**
    * Hashtable for newly declared namespaces between literal elements; keys =
@@ -124,17 +124,19 @@ public class Parser implements ContentHandler // , ErrorHandler
    */
   private Hashtable <String, String> newNamespaces;
 
-  /** List of nodes that need another call to {@link NodeBase#compile} */
-  public Vector <NodeBase> compilableNodes = new Vector<> ();
+  /**
+   * List of nodes that need another call to {@link AbstractNodeBase#compile}
+   */
+  public List <AbstractNodeBase> compilableNodes = new Vector<> ();
 
   /**
    * Group which had an <code>stx:include</code>, which in turn created this
    * Parser object
    */
-  public GroupBase includingGroup;
+  public AbstractGroupBase includingGroup;
 
   /** An optional ParserListener */
-  private final ParserListener parserListener;
+  private final ParserListener m_aParserListener;
 
   //
   // Constructor
@@ -143,56 +145,56 @@ public class Parser implements ContentHandler // , ErrorHandler
   /** Constructs a new Parser instance. */
   public Parser (final ParseContext pContext)
   {
-    this.pContext = pContext;
-    this.parserListener = pContext.parserListener;
+    this.m_aPContext = pContext;
+    this.m_aParserListener = pContext.parserListener;
 
     // factories for elements from the STX namespace
-    final FactoryBase [] stxFacs = { new TransformFactory (),
-                                     new GroupFactory (),
-                                     new IncludeFactory (),
-                                     new NSAliasFactory (),
-                                     new TemplateFactory (),
-                                     new ProcedureFactory (),
-                                     new CallProcedureFactory (),
-                                     new ParamFactory (),
-                                     new VariableFactory (),
-                                     new AssignFactory (),
-                                     new WithParamFactory (),
-                                     new ValueOfFactory (),
-                                     new PChildrenFactory (),
-                                     new PSelfFactory (),
-                                     new PSiblingsFactory (),
-                                     new PAttributesFactory (),
-                                     new AnalyzeTextFactory (),
-                                     new MatchFactory (),
-                                     new NoMatchFactory (),
-                                     new PDocumentFactory (),
-                                     new ResultDocumentFactory (),
-                                     new BufferFactory (),
-                                     new ResultBufferFactory (),
-                                     new PBufferFactory (),
-                                     new CopyFactory (),
-                                     new TextFactory (),
-                                     new CdataFactory (),
-                                     new AttributeFactory (),
-                                     new ElementFactory (),
-                                     new ElementStartFactory (),
-                                     new ElementEndFactory (),
-                                     new CommentFactory (),
-                                     new PIFactory (),
-                                     new ForEachFactory (),
-                                     new WhileFactory (),
-                                     new IfFactory (),
-                                     new ElseFactory (),
-                                     new ChooseFactory (),
-                                     new WhenFactory (),
-                                     new OtherwiseFactory (),
-                                     new MessageFactory (),
-                                     new DoctypeFactory () };
+    final AbstractFactoryBase [] stxFacs = { new TransformFactory (),
+                                             new GroupFactory (),
+                                             new IncludeFactory (),
+                                             new NSAliasFactory (),
+                                             new TemplateFactory (),
+                                             new ProcedureFactory (),
+                                             new CallProcedureFactory (),
+                                             new ParamFactory (),
+                                             new VariableFactory (),
+                                             new AssignFactory (),
+                                             new WithParamFactory (),
+                                             new ValueOfFactory (),
+                                             new PChildrenFactory (),
+                                             new PSelfFactory (),
+                                             new PSiblingsFactory (),
+                                             new PAttributesFactory (),
+                                             new AnalyzeTextFactory (),
+                                             new MatchFactory (),
+                                             new NoMatchFactory (),
+                                             new PDocumentFactory (),
+                                             new ResultDocumentFactory (),
+                                             new BufferFactory (),
+                                             new ResultBufferFactory (),
+                                             new PBufferFactory (),
+                                             new CopyFactory (),
+                                             new TextFactory (),
+                                             new CdataFactory (),
+                                             new AttributeFactory (),
+                                             new ElementFactory (),
+                                             new ElementStartFactory (),
+                                             new ElementEndFactory (),
+                                             new CommentFactory (),
+                                             new PIFactory (),
+                                             new ForEachFactory (),
+                                             new WhileFactory (),
+                                             new IfFactory (),
+                                             new ElseFactory (),
+                                             new ChooseFactory (),
+                                             new WhenFactory (),
+                                             new OtherwiseFactory (),
+                                             new MessageFactory (),
+                                             new DoctypeFactory () };
     stxFactories = createFactoryMap (stxFacs);
 
     // factories for elements from the Joost namespace
-    final FactoryBase [] joostFacs = { new ScriptFactory () };
+    final AbstractFactoryBase [] joostFacs = { new ScriptFactory () };
     joostFactories = createFactoryMap (joostFacs);
 
     litFac = new LitElementFactory ();
@@ -208,10 +210,10 @@ public class Parser implements ContentHandler // , ErrorHandler
    *        to be filled in the map
    * @return the created hashtable
    */
-  private Hashtable <String, FactoryBase> createFactoryMap (final FactoryBase [] data)
+  private Hashtable <String, AbstractFactoryBase> createFactoryMap (final AbstractFactoryBase [] data)
   {
-    final Hashtable <String, FactoryBase> map = new Hashtable<> (data.length);
-    for (final FactoryBase element : data)
+    final Hashtable <String, AbstractFactoryBase> map = new Hashtable<> (data.length);
+    for (final AbstractFactoryBase element : data)
       map.put (element.getName (), element);
     return map;
   }
@@ -219,7 +221,7 @@ public class Parser implements ContentHandler // , ErrorHandler
   /**
    * @return the STX node factories, indexed by local name
    */
-  public Map <String, FactoryBase> getFactories ()
+  public Map <String, AbstractFactoryBase> getFactories ()
   {
     return stxFactories;
   }
@@ -229,7 +231,7 @@ public class Parser implements ContentHandler // , ErrorHandler
    */
   public TransformFactory.Instance getTransformNode ()
   {
-    return pContext.transformNode;
+    return m_aPContext.transformNode;
   }
 
   /** Buffer for collecting consecutive character data */
@@ -241,18 +243,17 @@ public class Parser implements ContentHandler // , ErrorHandler
     final String s = collectedCharacters.toString ();
     if (currentNode.preserveSpace || s.trim ().length () != 0)
     {
-      if (currentNode instanceof GroupBase)
+      if (currentNode instanceof AbstractGroupBase)
       {
         if (s.trim ().length () != 0)
-          throw new SAXParseException ("Text must not occur on group level", pContext.locator);
-
+          throw new SAXParseException ("Text must not occur on group level", m_aPContext.locator);
       }
       else
       {
-        final NodeBase textNode = new TextNode (s, currentNode, pContext);
+        final AbstractNodeBase textNode = new TextNode (s, currentNode, m_aPContext);
         currentNode.insert (textNode);
-        if (parserListener != null)
-          parserListener.nodeCreated (textNode);
+        if (m_aParserListener != null)
+          m_aParserListener.nodeCreated (textNode);
       }
     }
     collectedCharacters.setLength (0);
@@ -264,7 +265,7 @@ public class Parser implements ContentHandler // , ErrorHandler
 
   public void setDocumentLocator (final Locator locator)
   {
-    pContext.locator = locator;
+    m_aPContext.locator = locator;
   }
 
   public void startDocument () throws SAXException
@@ -286,24 +287,24 @@ public class Parser implements ContentHandler // , ErrorHandler
       while ((size = compilableNodes.size ()) != 0)
       {
         pass++;
-        final NodeBase nodes[] = new NodeBase [size];
+        final AbstractNodeBase nodes[] = new AbstractNodeBase [size];
         compilableNodes.toArray (nodes);
         compilableNodes.clear (); // for the next pass
         for (int i = 0; i < size; i++)
-          if (nodes[i].compile (pass, pContext))
+          if (nodes[i].compile (pass, m_aPContext))
           {
             // still need another invocation
-            compilableNodes.addElement (nodes[i]);
+            compilableNodes.add (nodes[i]);
           }
       }
       compilableNodes = null; // for garbage collection
 
-      if (parserListener != null)
-        parserListener.parseFinished ();
+      if (m_aParserListener != null)
+        m_aParserListener.parseFinished ();
     }
     catch (final SAXParseException ex)
     {
-      pContext.getErrorHandler ().error (ex);
+      m_aPContext.getErrorHandler ().error (ex);
     }
   }
 
@@ -317,18 +318,18 @@ public class Parser implements ContentHandler // , ErrorHandler
       if (collectedCharacters.length () != 0)
         processCharacters ();
 
-      NodeBase newNode;
-      pContext.nsSet = getInScopeNamespaces ();
+      AbstractNodeBase newNode;
+      m_aPContext.nsSet = getInScopeNamespaces ();
       if (CSTX.STX_NS.equals (uri))
       {
-        final FactoryBase fac = stxFactories.get (lName);
+        final AbstractFactoryBase fac = stxFactories.get (lName);
         if (fac == null)
-          throw new SAXParseException ("Unknown statement '" + qName + "'", pContext.locator);
-        newNode = fac.createNode (currentNode != null ? currentNode : includingGroup, qName, attrs, pContext);
-        if (pContext.transformNode == null)
+          throw new SAXParseException ("Unknown statement '" + qName + "'", m_aPContext.locator);
+        newNode = fac.createNode (currentNode != null ? currentNode : includingGroup, qName, attrs, m_aPContext);
+        if (m_aPContext.transformNode == null)
           try
           {
-            pContext.transformNode = (TransformFactory.Instance) newNode;
+            m_aPContext.transformNode = (TransformFactory.Instance) newNode;
           }
           catch (final ClassCastException cce)
           {
@@ -336,7 +337,7 @@ public class Parser implements ContentHandler // , ErrorHandler
                                          qName +
                                          "' as root element, " +
                                          "file is not an STX transformation sheet",
-                                         pContext.locator);
+                                         m_aPContext.locator);
           }
         // if this is an instruction that may create a new namespace,
         // use the full set of namespaces in the next literal element
@@ -346,14 +347,14 @@ public class Parser implements ContentHandler // , ErrorHandler
       else
         if (CSTX.JOOST_EXT_NS.equals (uri))
         {
-          final FactoryBase fac = joostFactories.get (lName);
+          final AbstractFactoryBase fac = joostFactories.get (lName);
           if (fac == null)
-            throw new SAXParseException ("Unknown statement '" + qName + "'", pContext.locator);
-          newNode = fac.createNode (currentNode != null ? currentNode : includingGroup, qName, attrs, pContext);
+            throw new SAXParseException ("Unknown statement '" + qName + "'", m_aPContext.locator);
+          newNode = fac.createNode (currentNode != null ? currentNode : includingGroup, qName, attrs, m_aPContext);
         }
         else
         {
-          newNode = litFac.createNode (currentNode, uri, lName, qName, attrs, pContext, newNamespaces);
+          newNode = litFac.createNode (currentNode, uri, lName, qName, attrs, m_aPContext, newNamespaces);
           // reset these newly declared namespaces
           // newNode "consumes" the old value (without copy)
           newNamespaces = new Hashtable<> ();
@@ -373,7 +374,7 @@ public class Parser implements ContentHandler // , ErrorHandler
                                          "' must be either 'preserve' or 'default' (found '" +
                                          spaceAtt +
                                          "')",
-                                         pContext.locator);
+                                         m_aPContext.locator);
         // "default" means false -> nothing to do
       }
       else
@@ -392,12 +393,12 @@ public class Parser implements ContentHandler // , ErrorHandler
       openedElements.push (currentNode);
       currentNode = newNode;
 
-      if (parserListener != null)
-        parserListener.nodeCreated (newNode);
+      if (m_aParserListener != null)
+        m_aParserListener.nodeCreated (newNode);
     }
     catch (final SAXParseException ex)
     {
-      pContext.getErrorHandler ().error (ex);
+      m_aPContext.getErrorHandler ().error (ex);
     }
   }
 
@@ -408,31 +409,29 @@ public class Parser implements ContentHandler // , ErrorHandler
       if (collectedCharacters.length () != 0)
         processCharacters ();
 
-      currentNode.setEndLocation (pContext);
+      currentNode.setEndLocation (m_aPContext);
 
       if (currentNode instanceof LitElementFactory.Instance)
-        // restore the newly
-        // declared
-        // namespaces from
-        // this element
-        // (this is a deep
-        // copy)
+      {
+        // restore the newly declared namespaces from this element
+        // (this is a deep copy)
         newNamespaces = ((LitElementFactory.Instance) currentNode).getNamespaces ();
+      }
 
       // Don't call compile for an included stx:transform, because
       // the including Parser will call it
-      if (!(currentNode == pContext.transformNode && includingGroup != null))
-        if (currentNode.compile (0, pContext))
+      if (!(currentNode == m_aPContext.transformNode && includingGroup != null))
+        if (currentNode.compile (0, m_aPContext))
           // need another invocation
-          compilableNodes.addElement (currentNode);
+          compilableNodes.add (currentNode);
       // add the compilable nodes from an included stx:transform
-      if (currentNode instanceof TransformFactory.Instance && currentNode != pContext.transformNode)
+      if (currentNode instanceof TransformFactory.Instance && currentNode != m_aPContext.transformNode)
         compilableNodes.addAll (((TransformFactory.Instance) currentNode).compilableNodes);
       currentNode = openedElements.pop ();
     }
     catch (final SAXParseException ex)
     {
-      pContext.getErrorHandler ().error (ex);
+      m_aPContext.getErrorHandler ().error (ex);
     }
   }
 
@@ -455,25 +454,20 @@ public class Parser implements ContentHandler // , ErrorHandler
     }
     catch (final SAXParseException ex)
     {
-      pContext.getErrorHandler ().error (ex);
+      m_aPContext.getErrorHandler ().error (ex);
     }
   }
 
   public void startPrefixMapping (final String prefix, final String uri)
   {
-    Stack <String> nsStack = inScopeNamespaces.get (prefix);
-    if (nsStack == null)
-    {
-      nsStack = new Stack<> ();
-      inScopeNamespaces.put (prefix, nsStack);
-    }
+    final Stack <String> nsStack = inScopeNamespaces.computeIfAbsent (prefix, k -> new Stack<> ());
     nsStack.push (uri);
     newNamespaces.put (prefix, uri);
   }
 
   public void endPrefixMapping (final String prefix)
   {
-    final Stack nsStack = inScopeNamespaces.get (prefix);
+    final Stack <String> nsStack = inScopeNamespaces.get (prefix);
     nsStack.pop ();
     newNamespaces.remove (prefix);
   }
@@ -513,13 +507,9 @@ public class Parser implements ContentHandler // , ErrorHandler
   public Hashtable <String, String> getInScopeNamespaces ()
   {
     final Hashtable <String, String> ret = new Hashtable<> ();
-    for (final Enumeration <String> e = inScopeNamespaces.keys (); e.hasMoreElements ();)
-    {
-      final String prefix = e.nextElement ();
-      final Stack <String> s = inScopeNamespaces.get (prefix);
-      if (!s.isEmpty ())
-        ret.put (prefix, s.peek ());
-    }
+    for (final Map.Entry <String, Stack <String>> e : inScopeNamespaces.entrySet ())
+      if (!e.getValue ().isEmpty ())
+        ret.put (e.getKey (), e.getValue ().peek ());
     return ret;
   }
 }

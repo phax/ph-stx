@@ -42,7 +42,7 @@ import net.sf.joost.stx.Processor;
  * @author Oliver Becker
  */
 
-final public class GroupFactory extends FactoryBase
+public final class GroupFactory extends AbstractFactoryBase
 {
   /** allowed values for the <code>pass-through</code> attribute */
   private static final String [] PASS_THROUGH_VALUES = { "none", "text", "all", "inherit" };
@@ -74,13 +74,13 @@ final public class GroupFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
     // check parent
-    if (parent != null && !(parent instanceof GroupBase))
+    if (parent != null && !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", context.locator);
 
     String groupName = null;
@@ -89,7 +89,7 @@ final public class GroupFactory extends FactoryBase
     {
       groupName = getExpandedName (nameAtt, context);
 
-      final Hashtable <String, Object> namedGroups = ((GroupBase) parent).namedGroups;
+      final Hashtable <String, Object> namedGroups = ((AbstractGroupBase) parent).namedGroups;
       if (namedGroups.get (groupName) != null)
         throw new SAXParseException ("Group name '" + nameAtt + "' already used", context.locator);
       else
@@ -98,7 +98,7 @@ final public class GroupFactory extends FactoryBase
       // it will be replaced in GroupBase.compile()
     }
 
-    final GroupBase pg = (GroupBase) parent; // parent group
+    final AbstractGroupBase pg = (AbstractGroupBase) parent; // parent group
 
     // default is "inherit" for the following three attributes
     byte passThrough = 0;
@@ -165,11 +165,11 @@ final public class GroupFactory extends FactoryBase
   /* -------------------------------------------------------------------- */
 
   /** Represents an instance of the <code>group</code> element. */
-  final public class Instance extends GroupBase
+  public final class Instance extends AbstractGroupBase
   {
     // Constructor
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String groupName,
                         final byte passThrough,
@@ -187,11 +187,11 @@ final public class GroupFactory extends FactoryBase
      *        the child to adopt
      */
     @Override
-    public void insert (final NodeBase node) throws SAXParseException
+    public void insert (final AbstractNodeBase node) throws SAXParseException
     {
-      if (node instanceof TemplateBase || // template, procedure
-          node instanceof GroupBase || // group, transform (= include)
-          node instanceof VariableBase) // variable, param, buffer
+      if (node instanceof AbstractTemplateBase || // template, procedure
+          node instanceof AbstractGroupBase || // group, transform (= include)
+          node instanceof AbstractVariableBase) // variable, param, buffer
         super.insert (node);
       else
         throw new SAXParseException ("'" +

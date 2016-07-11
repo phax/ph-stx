@@ -407,7 +407,7 @@ class CUP$PatternParser$actions {
               Object RESULT =null;
 		int start_valleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).left;
 		int start_valright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).right;
-		Tree start_val = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
+		AbstractTree start_val = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
 		RESULT = start_val;
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("$START",0, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -418,13 +418,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 1: // Expr ::= Expr OR AndExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new OrTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Expr",7, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -433,10 +433,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 2: // Expr ::= AndExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Expr",7, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -445,13 +445,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 3: // AndExpr ::= AndExpr AND GeneralComp 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new AndTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AndExpr",8, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -460,10 +460,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 4: // AndExpr ::= GeneralComp 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AndExpr",8, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -472,13 +472,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 5: // GeneralComp ::= GeneralComp EQ AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new EqTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -487,13 +487,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 6: // GeneralComp ::= GeneralComp NE AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new NeTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -502,13 +502,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 7: // GeneralComp ::= GeneralComp LT AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new LtTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -517,13 +517,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 8: // GeneralComp ::= GeneralComp LE AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new LeTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -532,13 +532,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 9: // GeneralComp ::= GeneralComp GT AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new GtTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -547,13 +547,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 10: // GeneralComp ::= GeneralComp GE AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new GeTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -562,10 +562,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 11: // GeneralComp ::= AdditiveExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("GeneralComp",9, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -574,13 +574,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 12: // AdditiveExpr ::= AdditiveExpr PLUS MultiplicativeExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new AddTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AdditiveExpr",10, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -589,13 +589,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 13: // AdditiveExpr ::= AdditiveExpr MINUS MultiplicativeExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new SubTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AdditiveExpr",10, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -604,10 +604,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 14: // AdditiveExpr ::= MultiplicativeExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AdditiveExpr",10, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -616,13 +616,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 15: // MultiplicativeExpr ::= MultiplicativeExpr STAR UnaryExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new MultTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("MultiplicativeExpr",11, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -631,13 +631,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 16: // MultiplicativeExpr ::= MultiplicativeExpr DIV UnaryExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new DivTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("MultiplicativeExpr",11, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -646,13 +646,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 17: // MultiplicativeExpr ::= MultiplicativeExpr MOD UnaryExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int e1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int e1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree e1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree e1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int e2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int e2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree e2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree e2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new ModTree(e1, e2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("MultiplicativeExpr",11, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -661,10 +661,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 18: // MultiplicativeExpr ::= UnaryExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("MultiplicativeExpr",11, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -673,10 +673,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 19: // UnaryExpr ::= PLUS BasicExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new AddTree(null, t); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("UnaryExpr",12, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -685,10 +685,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 20: // UnaryExpr ::= MINUS BasicExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new SubTree(null, t); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("UnaryExpr",12, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -697,10 +697,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 21: // UnaryExpr ::= BasicExpr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("UnaryExpr",12, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -709,10 +709,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 22: // BasicExpr ::= Accessor 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("BasicExpr",13, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -721,7 +721,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 23: // BasicExpr ::= STRING 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -733,7 +733,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 24: // BasicExpr ::= NUMBER 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		Double n = (Double)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -745,10 +745,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 25: // BasicExpr ::= LPAR ExprSeq RPAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
 		 RESULT = (t == null ? new ListTree() : t); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("BasicExpr",13, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -757,7 +757,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 26: // BasicExpr ::= DOT 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new DotTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("BasicExpr",13, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -766,13 +766,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 27: // Accessor ::= NodeAccessor SLASH AttributeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 a.left = n; 
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
@@ -782,10 +782,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 28: // Accessor ::= NodeAccessor 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = n; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -794,13 +794,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 29: // Accessor ::= RelativeAccessor SLASH AttributeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 a.left = n.reverseAssociativity(); 
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
@@ -810,10 +810,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 30: // Accessor ::= RelativeAccessor 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = n.reverseAssociativity(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -822,13 +822,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 31: // Accessor ::= SLASH RelativeAccessor SLASH AttributeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 a.left = new RootTree(n.reverseAssociativity()); 
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
@@ -838,10 +838,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 32: // Accessor ::= SLASH RelativeAccessor 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new RootTree(n.reverseAssociativity()); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -850,13 +850,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 33: // Accessor ::= DSLASH RelativeAccessor SLASH AttributeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 a.left = new RootTree(new DescTree(null, n.reverseAssociativity()));
          RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
@@ -866,10 +866,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 34: // Accessor ::= DSLASH RelativeAccessor 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new RootTree(new DescTree(null, 
                                             n.reverseAssociativity())); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
@@ -879,10 +879,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 35: // Accessor ::= AttributeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = a; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Accessor",14, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -891,7 +891,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 36: // NodeAccessor ::= DOLLAR Name 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -903,10 +903,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 37: // NodeAccessor ::= FunctionCall 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("NodeAccessor",15, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -915,14 +915,14 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 38: // RelativeAccessor ::= RelativeAccessor SLASH AccessorStep 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int rleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int rright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree r = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree r = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 if (a.type == Tree.DDOT) {
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		 if (a.type == AbstractTree.DDOT) {
             a.left = r;
             RESULT = a;
          }
@@ -936,15 +936,15 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 39: // RelativeAccessor ::= RelativeAccessor DSLASH AccessorStep 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int rleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int rright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree r = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree r = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 Tree d = new DescTree(r, null);
-         if (a.type == Tree.DDOT) {
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		 AbstractTree d = new DescTree(r, null);
+         if (a.type == AbstractTree.DDOT) {
             a.left = d;
             RESULT = a;
          }
@@ -958,11 +958,11 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 40: // RelativeAccessor ::= AccessorStep 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree a = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 if (a.type == Tree.DDOT)
+		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		 if (a.type == AbstractTree.DDOT)
             RESULT = a;
          else
             RESULT = new ChildTree(null, a);
@@ -974,10 +974,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 41: // AccessorStep ::= NodeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = n; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AccessorStep",17, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -986,10 +986,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 42: // AccessorStep ::= KindTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int kleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int kright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree k = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree k = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = k; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AccessorStep",17, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -998,7 +998,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 43: // AccessorStep ::= DDOT 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new DdotTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AccessorStep",17, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1007,7 +1007,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 44: // NodeNameTest ::= Name 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -1019,7 +1019,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 45: // NodeNameTest ::= STAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new WildcardTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("NodeNameTest",18, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1028,7 +1028,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 46: // NodeNameTest ::= STAR COLON NCNAME 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -1040,7 +1040,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 47: // NodeNameTest ::= NCNAME COLON STAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
@@ -1052,7 +1052,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 48: // KindTest ::= COMMENT 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new CommentTestTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("KindTest",19, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1061,7 +1061,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 49: // KindTest ::= NODE 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new NodeTestTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("KindTest",19, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1070,7 +1070,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 50: // KindTest ::= PI_START RPAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new PiTestTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("KindTest",19, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1079,7 +1079,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 51: // KindTest ::= PI_START STRING RPAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int sleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).left;
 		int sright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).right;
 		String s = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
@@ -1091,7 +1091,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 52: // KindTest ::= TEXT 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new TextTestTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("KindTest",19, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1100,7 +1100,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 53: // KindTest ::= CDATA 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new CDataTestTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("KindTest",19, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1109,7 +1109,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 54: // AttributeNameTest ::= AT Name 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -1121,7 +1121,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 55: // AttributeNameTest ::= AT STAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new AttrWildcardTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("AttributeNameTest",20, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1130,7 +1130,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 56: // AttributeNameTest ::= AT STAR COLON NCNAME 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
@@ -1142,7 +1142,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 57: // AttributeNameTest ::= AT NCNAME COLON STAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
@@ -1154,13 +1154,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 58: // FunctionCall ::= Name LPAR ParaSeq RPAR 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)).right;
 		String n = (String)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)).value;
 		int eleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).left;
 		int eright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).right;
-		Tree e = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
+		AbstractTree e = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
 		 RESULT = new FunctionTree(n, e, parser.j_context); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("FunctionCall",21, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-3)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1169,7 +1169,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 59: // ExprSeq ::= 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new SeqTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("ExprSeq",22, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1178,10 +1178,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 60: // ExprSeq ::= Expr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("ExprSeq",22, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1190,13 +1190,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 61: // ExprSeq ::= Expr COMMA ExprSeq 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int t1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int t1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree t1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree t1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int t2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int t2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new SeqTree(t1, t2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("ExprSeq",22, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1205,7 +1205,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 62: // ParaSeq ::= 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("ParaSeq",23, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1214,10 +1214,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 63: // ParaSeq ::= Expr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("ParaSeq",23, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1226,13 +1226,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 64: // ParaSeq ::= ParaSeq COMMA Expr 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int t1left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int t1right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree t1 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree t1 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int t2left = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int t2right = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t2 = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t2 = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new ListTree(t1, t2); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("ParaSeq",23, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1313,10 +1313,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 71: // Pattern ::= MatchPath 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Pattern",0, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1325,13 +1325,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 72: // Pattern ::= Pattern BAR MatchPath 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int pleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int pright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree p = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree p = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new UnionTree(t, p); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Pattern",0, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1340,7 +1340,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 73: // MatchPath ::= SLASH 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		 RESULT = new RootTree(); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("MatchPath",1, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1349,14 +1349,14 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 74: // MatchPath ::= SLASH RelativePath 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 // need to add an additional leaf for root
-         Tree tmp = t, last = null;
+         AbstractTree tmp = t, last = null;
          // go down the tree to the left
-         while (tmp.type == Tree.CHILD || tmp.type == Tree.DESC) {
+         while (tmp.type == AbstractTree.CHILD || tmp.type == AbstractTree.DESC) {
             last = tmp;
             tmp = tmp.left;
          }
@@ -1376,10 +1376,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 75: // MatchPath ::= RelativePath 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("MatchPath",1, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1388,10 +1388,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 76: // RelativePath ::= Step 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("RelativePath",2, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1400,13 +1400,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 77: // RelativePath ::= RelativePath SLASH Step 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int pleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int pright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree p = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree p = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int sleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int sright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree s = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree s = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new ChildTree(p, s); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("RelativePath",2, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1415,13 +1415,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 78: // RelativePath ::= RelativePath DSLASH Step 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int pleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).left;
 		int pright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).right;
-		Tree p = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
+		AbstractTree p = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)).value;
 		int sleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int sright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree s = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree s = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = new DescTree(p, s); 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("RelativePath",2, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1430,13 +1430,13 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 79: // Step ::= NodeTest Predicate 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int nleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).left;
 		int nright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).right;
-		Tree n = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
+		AbstractTree n = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
 		int pleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int pright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree p = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree p = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = (p != null) ? new PredicateTree(n, p)
                               : n; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Step",3, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
@@ -1446,7 +1446,7 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 80: // Predicate ::= 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Predicate",6, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1455,10 +1455,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 81: // Predicate ::= LBRACK Expr RBRACK 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-1)).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("Predicate",6, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.elementAt(CUP$PatternParser$top-2)), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1467,10 +1467,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 82: // NodeTest ::= NameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("NodeTest",4, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1479,10 +1479,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 83: // NodeTest ::= KindTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("NodeTest",4, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1491,10 +1491,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 84: // NameTest ::= NodeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("NameTest",5, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }
@@ -1503,10 +1503,10 @@ class CUP$PatternParser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 85: // NameTest ::= AttributeNameTest 
             {
-              Tree RESULT =null;
+              AbstractTree RESULT =null;
 		int tleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int tright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
-		Tree t = (Tree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
+		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 RESULT = t; 
               CUP$PatternParser$result = parser.getSymbolFactory().newSymbol("NameTest",5, ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()), RESULT);
             }

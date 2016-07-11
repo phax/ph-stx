@@ -29,7 +29,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.5 $ $Date: 2008/02/20 10:04:25 $
  * @author Oliver Becker
  */
-final public class RegexGroup implements Instance
+public final class RegexGroup implements Instance
 {
   /** @return 1 */
   public int getMinParCount ()
@@ -69,7 +69,7 @@ final public class RegexGroup implements Instance
     return false;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     final Value v = args.evaluate (context, top);
     final double d = v.getNumberValue ();

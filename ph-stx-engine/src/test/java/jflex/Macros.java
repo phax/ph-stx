@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class Macros
+public final class Macros
 {
 
   /** Maps names of macros to their definition */

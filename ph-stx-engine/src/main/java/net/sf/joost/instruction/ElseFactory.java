@@ -38,7 +38,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public class ElseFactory extends FactoryBase
+public class ElseFactory extends AbstractFactoryBase
 {
   /** @return <code>"else"</code> */
   @Override
@@ -48,7 +48,7 @@ public class ElseFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -64,9 +64,9 @@ public class ElseFactory extends FactoryBase
   /**
    * Represents an instance of the <code>else</code> element.
    */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    public Instance (final String qName, final NodeBase parent, final ParseContext context)
+    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {
       super (qName, parent, context, true);
     }

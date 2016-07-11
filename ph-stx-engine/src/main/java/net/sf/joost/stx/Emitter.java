@@ -43,7 +43,7 @@ import net.sf.joost.CSTX;
 import net.sf.joost.emitter.BufferEmitter;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.helpers.MutableAttributes;
 import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
@@ -79,7 +79,7 @@ public class Emitter
   // properties of the last element
   private String lastUri, lastLName, lastQName;
   private MutableAttributes lastAttrs;
-  private NodeBase lastInstruction;
+  private AbstractNodeBase lastInstruction;
 
   private boolean insideCDATA = false;
   private boolean dtdAllowed = true;
@@ -167,7 +167,7 @@ public class Emitter
                             final String qName,
                             final String lName,
                             final String value,
-                            final NodeBase instruction) throws SAXException
+                            final AbstractNodeBase instruction) throws SAXException
   {
     if (lastAttrs == null)
     {
@@ -252,7 +252,7 @@ public class Emitter
                             final String qName,
                             final Attributes attrs,
                             final Map <String, String> namespaces,
-                            final NodeBase instruction) throws SAXException
+                            final AbstractNodeBase instruction) throws SAXException
   {
     if (contH != null)
     {
@@ -417,7 +417,7 @@ public class Emitter
   public void characters (final char [] ch,
                           final int start,
                           final int length,
-                          final NodeBase instruction) throws SAXException
+                          final AbstractNodeBase instruction) throws SAXException
   {
     if (length == 0)
       return;
@@ -466,7 +466,7 @@ public class Emitter
    */
   public void processingInstruction (final String target,
                                      final String data,
-                                     final NodeBase instruction) throws SAXException
+                                     final AbstractNodeBase instruction) throws SAXException
   {
     if (contH != null)
     {
@@ -497,7 +497,7 @@ public class Emitter
   public void comment (final char [] ch,
                        final int start,
                        final int length,
-                       final NodeBase instruction) throws SAXException
+                       final AbstractNodeBase instruction) throws SAXException
   {
     if (contH != null && lastAttrs != null)
       processLastElement ();
@@ -525,7 +525,7 @@ public class Emitter
    * @param instruction
    *        the instruction that causes this method invocation
    */
-  public void startCDATA (final NodeBase instruction) throws SAXException
+  public void startCDATA (final AbstractNodeBase instruction) throws SAXException
   {
     if (contH != null && lastAttrs != null)
       processLastElement ();
@@ -557,7 +557,7 @@ public class Emitter
     }
   }
 
-  public void createDTD (final NodeBase instruction,
+  public void createDTD (final AbstractNodeBase instruction,
                          final String name,
                          final String publicId,
                          final String systemId) throws SAXException

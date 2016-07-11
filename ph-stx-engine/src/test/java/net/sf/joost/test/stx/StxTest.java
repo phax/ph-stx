@@ -41,7 +41,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Test;
 
-import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.CTrAX;
 
 /**
  * @version $Revision: 1.3 $ $Date: 2008/10/06 13:31:42 $
@@ -97,7 +97,7 @@ public class StxTest
             else
               if ("-doe".equals (parSpec))
               {
-                t.setOutputProperty (TrAXConstants.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING, "yes");
+                t.setOutputProperty (CTrAX.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING, "yes");
               }
           }
         }

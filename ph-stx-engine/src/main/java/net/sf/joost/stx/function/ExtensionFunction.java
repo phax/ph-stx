@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -49,7 +49,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.6 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
-final public class ExtensionFunction implements Instance
+public final class ExtensionFunction implements Instance
 {
   /** the target class, identified by the namespace */
   private Class <?> targetClass;
@@ -82,7 +82,7 @@ final public class ExtensionFunction implements Instance
    */
   ExtensionFunction (final String className,
                      final String lName,
-                     final Tree args,
+                     final AbstractTree args,
                      final Locator locator) throws SAXParseException
   {
     // identify the requested class
@@ -97,11 +97,11 @@ final public class ExtensionFunction implements Instance
 
     // Count parameters in args
     // Future: use static type information to preselect candidate methods
-    Tree aArgs = args;
+    AbstractTree aArgs = args;
     if (aArgs != null)
     {
       paramCount = 1;
-      while (aArgs.type == Tree.LIST)
+      while (aArgs.type == AbstractTree.LIST)
       {
         aArgs = aArgs.left;
         paramCount++;
@@ -207,11 +207,11 @@ final public class ExtensionFunction implements Instance
   }
 
   /** find and call the correct Java method */
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     // evaluate current parameters
     Value [] values = null;
-    Tree aArgs = args;
+    AbstractTree aArgs = args;
     if (paramCount > 0)
     {
       values = new Value [paramCount];

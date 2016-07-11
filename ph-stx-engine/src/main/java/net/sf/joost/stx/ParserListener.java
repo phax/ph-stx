@@ -24,7 +24,7 @@
 
 package net.sf.joost.stx;
 
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 
 /**
  * Callback interface that can be used to receive information about the STX
@@ -42,7 +42,7 @@ public interface ParserListener
    * @param node
    *        the instruction
    */
-  public void nodeCreated (NodeBase node);
+  public void nodeCreated (AbstractNodeBase node);
 
   /**
    * Send a notification that the parser has finished its parsing. All nodes

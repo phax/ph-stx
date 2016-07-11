@@ -26,28 +26,28 @@ package net.sf.joost.grammar.tree;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 
 /**
  * Objects of PredicateTree represent predicate nodes in the syntax tree of a
  * pattern or an STXPath expression.
- * 
+ *
  * @version $Revision: 1.2 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class PredicateTree extends Tree
+public final class PredicateTree extends AbstractTree
 {
   /**
    * Constructs a PredicateTree.
-   * 
+   *
    * @param left
    *        the path before the predicate
    * @param right
    *        the contents of the predicate
    */
-  public PredicateTree (final Tree left, final Tree right)
+  public PredicateTree (final AbstractTree left, final AbstractTree right)
   {
     super (PREDICATE, left, right);
   }
@@ -69,8 +69,10 @@ final public class PredicateTree extends Tree
         retValue = v.getBooleanValue ();
     }
     if (!setPosition)
-                     // restore old position
-                     context.position = pos;
+    {
+      // restore old position
+      context.position = pos;
+    }
     return retValue;
   }
 

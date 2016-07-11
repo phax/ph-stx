@@ -27,7 +27,7 @@ package net.sf.joost.util;
 import java.util.Hashtable;
 import java.util.Stack;
 
-import net.sf.joost.instruction.GroupBase;
+import net.sf.joost.instruction.AbstractGroupBase;
 import net.sf.joost.stx.Context;
 
 /**
@@ -50,15 +50,15 @@ public final class VariableUtils
    * @throws VariableNotFoundException
    *         if the variable couldn't be found
    */
-  public static GroupBase findVariableScope (final Context context,
+  public static AbstractGroupBase findVariableScope (final Context context,
                                              final String expName) throws VariableNotFoundException
   {
-    GroupBase groupScope = null;
+    AbstractGroupBase groupScope = null;
 
     Object obj = context.localVars.get (expName);
     if (obj == null)
     {
-      GroupBase group = context.currentGroup;
+      AbstractGroupBase group = context.currentGroup;
       while (obj == null && group != null)
       {
         obj = ((Hashtable) ((Stack) context.groupVars.get (group)).peek ()).get (expName);

@@ -46,7 +46,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Nikolay Fiykov, Oliver Becker
  */
 
-final public class ScriptFactory extends FactoryBase
+public final class ScriptFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -68,13 +68,13 @@ final public class ScriptFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
     // check parent
-    if (parent != null && !(parent instanceof GroupBase))
+    if (parent != null && !(parent instanceof AbstractGroupBase))
       throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.qName + "'", context.locator);
 
     // check that prefix points to a declared namespace
@@ -114,7 +114,7 @@ final public class ScriptFactory extends FactoryBase
   /* -------------------------------------------------------------------- */
 
   /** Represents an instance of the <code>script</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     /** namespace prefix from prefix attribute of the script element */
     private final String prefix;
@@ -133,7 +133,7 @@ final public class ScriptFactory extends FactoryBase
 
     // Constructor
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
                         final String prefix,
                         final String scriptUri,
@@ -158,7 +158,7 @@ final public class ScriptFactory extends FactoryBase
      * Take care that only a text node can be child of <code>script</code>.
      */
     @Override
-    public void insert (final NodeBase node) throws SAXParseException
+    public void insert (final AbstractNodeBase node) throws SAXParseException
     {
       if (!(node instanceof TextNode))
       {

@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Value;
@@ -45,7 +45,7 @@ import net.sf.joost.stx.Value;
  * @author Oliver Becker
  */
 
-final public class ValueOfFactory extends FactoryBase
+public final class ValueOfFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -66,29 +66,29 @@ final public class ValueOfFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
+    final AbstractTree selectExpr = parseRequiredExpr (qName, attrs, "select", context);
 
-    final Tree separatorAVT = parseAVT (attrs.getValue ("separator"), context);
+    final AbstractTree separatorAVT = parseAVT (attrs.getValue ("separator"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, selectExpr, separatorAVT);
   }
 
   /** Represents an instance of the <code>value-of</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
-    private Tree select, separator;
+    private AbstractTree select, separator;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree select,
-                        final Tree separator)
+                        final AbstractTree select,
+                        final AbstractTree separator)
     {
       super (qName, parent, context, false);
       this.select = select;

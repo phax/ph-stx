@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.SAXEvent;
@@ -45,7 +45,7 @@ import net.sf.joost.stx.SAXEvent;
  * @author Oliver Becker
  */
 
-public class PSiblingsFactory extends FactoryBase
+public class PSiblingsFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -67,16 +67,16 @@ public class PSiblingsFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
     final String groupAtt = attrs.getValue ("group");
 
-    final Tree whilePattern = parsePattern (attrs.getValue ("while"), context);
+    final AbstractTree whilePattern = parsePattern (attrs.getValue ("while"), context);
 
-    final Tree untilPattern = parsePattern (attrs.getValue ("until"), context);
+    final AbstractTree untilPattern = parsePattern (attrs.getValue ("until"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
 
@@ -84,17 +84,17 @@ public class PSiblingsFactory extends FactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends ProcessBase
+  public class Instance extends AbstractProcessBase
   {
-    private Tree whilePattern, untilPattern;
-    private GroupBase parentGroup;
+    private AbstractTree whilePattern, untilPattern;
+    private AbstractGroupBase parentGroup;
 
     public Instance (final String qName,
-                     NodeBase parent,
+                     AbstractNodeBase parent,
                      final ParseContext context,
                      final String groupQName,
-                     final Tree whilePattern,
-                     final Tree untilPattern) throws SAXParseException
+                     final AbstractTree whilePattern,
+                     final AbstractTree untilPattern) throws SAXParseException
     {
       super (qName, parent, context, groupQName, null, null);
       this.whilePattern = whilePattern;
@@ -103,8 +103,8 @@ public class PSiblingsFactory extends FactoryBase
       // determine parent group (needed for matches())
       do // parent itself is not a group
         parent = parent.parent;
-      while (!(parent instanceof GroupBase));
-      parentGroup = (GroupBase) parent;
+      while (!(parent instanceof AbstractGroupBase));
+      parentGroup = (AbstractGroupBase) parent;
     }
 
     /**
@@ -150,7 +150,7 @@ public class PSiblingsFactory extends FactoryBase
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
       if (parentGroup != null)
-        theCopy.parentGroup = (GroupBase) parentGroup.deepCopy (copies);
+        theCopy.parentGroup = (AbstractGroupBase) parentGroup.deepCopy (copies);
       if (untilPattern != null)
         theCopy.untilPattern = untilPattern.deepCopy (copies);
       if (whilePattern != null)

@@ -33,7 +33,7 @@ import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -45,7 +45,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public class CommentFactory extends FactoryBase
+public class CommentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -64,25 +64,25 @@ public class CommentFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
   {
-    final Tree selectExpr = parseExpr (attrs.getValue ("select"), context);
+    final AbstractTree selectExpr = parseExpr (attrs.getValue ("select"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, selectExpr);
   }
 
   /** Represents an instance of the <code>comment</code> element. */
-  public class Instance extends NodeBase
+  public class Instance extends AbstractNodeBase
   {
-    private Tree select;
+    private AbstractTree select;
     private StringEmitter strEmitter;
     private StringBuffer buffer;
 
-    public Instance (final String qName, final NodeBase parent, final ParseContext context, final Tree select)
+    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final AbstractTree select)
     {
       super (qName,
              parent,

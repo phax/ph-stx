@@ -30,14 +30,14 @@ package net.sf.joost.grammar;
  * @version $Revision: 2.1 $ $Date: 2004/09/29 05:59:50 $
  * @author Oliver Becker
  */
-abstract public class ReversableTree extends Tree
+public abstract  class AbstractReversableTree extends AbstractTree
 {
-  public ReversableTree (final int type)
+  public AbstractReversableTree (final int type)
   {
     super (type);
   }
 
-  public ReversableTree (final int type, final Tree left, final Tree right)
+  public AbstractReversableTree (final int type, final AbstractTree left, final AbstractTree right)
   {
     super (type, left, right);
   }
@@ -49,9 +49,9 @@ abstract public class ReversableTree extends Tree
    * @return the new root
    */
   @Override
-  public Tree reverseAssociativity ()
+  public AbstractTree reverseAssociativity ()
   {
-    Tree newRoot;
+    AbstractTree newRoot;
     if (left != null)
     {
       newRoot = left.reverseAssociativity ();

@@ -24,7 +24,7 @@
 
 package net.sf.joost.stx.function;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
@@ -37,7 +37,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-final public class HasChildNodes implements Instance
+public final class HasChildNodes implements Instance
 {
   /** @return 0 */
   public int getMinParCount ()
@@ -63,7 +63,7 @@ final public class HasChildNodes implements Instance
     return false;
   }
 
-  public Value evaluate (final Context context, final int top, final Tree args)
+  public Value evaluate (final Context context, final int top, final AbstractTree args)
   {
     return Value.getBoolean (context.ancestorStack.size () == 1 ||
                              ((SAXEvent) context.ancestorStack.peek ()).hasChildNodes);

@@ -16,7 +16,7 @@ package jflex;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class CharSetEnumerator
+public final class CharSetEnumerator
 {
 
   private int index;

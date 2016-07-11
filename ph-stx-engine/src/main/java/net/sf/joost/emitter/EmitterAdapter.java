@@ -35,7 +35,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.Emitter;
 import net.sf.joost.stx.helpers.MutableAttributes;
 import net.sf.joost.stx.helpers.MutableAttributesImpl;
@@ -54,9 +54,9 @@ public class EmitterAdapter implements ContentHandler, LexicalHandler
   private final Emitter emitter;
   private final Map <String, String> nsTable = new Hashtable <> ();
 
-  private final NodeBase instruction;
+  private final AbstractNodeBase instruction;
 
-  public EmitterAdapter (final Emitter emitter, final NodeBase instruction)
+  public EmitterAdapter (final Emitter emitter, final AbstractNodeBase instruction)
   {
     this.emitter = emitter;
     this.instruction = instruction;

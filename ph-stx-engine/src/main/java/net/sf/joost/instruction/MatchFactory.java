@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sf.joost.CSTX;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -44,7 +44,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class MatchFactory extends FactoryBase
+public final class MatchFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet <String> attrNames;
@@ -65,7 +65,7 @@ final public class MatchFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -73,37 +73,37 @@ final public class MatchFactory extends FactoryBase
     if (!(parent instanceof AnalyzeTextFactory.Instance))
       throw new SAXParseException ("'" + qName + "' must be child of stx:analyze-text", context.locator);
 
-    final Tree regexAVT = parseRequiredAVT (qName, attrs, "regex", context);
+    final AbstractTree regexAVT = parseRequiredAVT (qName, attrs, "regex", context);
 
-    final Tree flagsAVT = parseAVT (attrs.getValue ("flags"), context);
+    final AbstractTree flagsAVT = parseAVT (attrs.getValue ("flags"), context);
 
     checkAttributes (qName, attrs, attrNames, context);
     return new Instance (qName, parent, context, regexAVT, flagsAVT);
   }
 
   /** Represents an instance of the <code>match</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     /**
      * The AVT in the <code>regex</code> attribute; it will be evaluated in the
      * <code>stx:analyze-text</code> parent
      */
-    protected Tree regex;
+    protected AbstractTree regex;
 
     /**
      * The AVT in the <code>flags</code> attribute; it will be evaluated in the
      * <code>stx:analyze-text</code> parent
      */
-    protected Tree flags;
+    protected AbstractTree flags;
 
     /** The parent */
     private AnalyzeTextFactory.Instance analyzeText;
 
     protected Instance (final String qName,
-                        final NodeBase parent,
+                        final AbstractNodeBase parent,
                         final ParseContext context,
-                        final Tree regex,
-                        final Tree flags)
+                        final AbstractTree regex,
+                        final AbstractTree flags)
     {
       super (qName, parent, context, true);
       this.regex = regex;

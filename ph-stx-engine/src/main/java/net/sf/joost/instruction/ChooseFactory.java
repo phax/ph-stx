@@ -37,7 +37,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-final public class ChooseFactory extends FactoryBase
+public final class ChooseFactory extends AbstractFactoryBase
 {
   /** @return <code>"choose"</code> */
   @Override
@@ -47,7 +47,7 @@ final public class ChooseFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -57,11 +57,11 @@ final public class ChooseFactory extends FactoryBase
   }
 
   /** Represents an instance of the <code>choose</code> element. */
-  final public class Instance extends NodeBase
+  public final class Instance extends AbstractNodeBase
   {
     private boolean otherwisePresent;
 
-    protected Instance (final String qName, final NodeBase parent, final ParseContext context)
+    protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {
       super (qName, parent, context, true);
       otherwisePresent = false;
@@ -72,7 +72,7 @@ final public class ChooseFactory extends FactoryBase
      * children will be inserted.
      */
     @Override
-    public void insert (final NodeBase node) throws SAXParseException
+    public void insert (final AbstractNodeBase node) throws SAXParseException
     {
       if (node instanceof TextNode)
       {

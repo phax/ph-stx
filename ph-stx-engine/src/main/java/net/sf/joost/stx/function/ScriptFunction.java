@@ -30,7 +30,7 @@ import java.util.Vector;
 import org.xml.sax.SAXException;
 
 import net.sf.joost.grammar.EvalException;
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.Instance;
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.5 $ $Date: 2007/05/20 18:00:44 $
  * @author Nikolay Fiykov, Oliver Becker
  */
-final public class ScriptFunction implements Instance
+public final class ScriptFunction implements Instance
 {
   /** BSF script engine instance */
   // BSFEngine engine;
@@ -71,13 +71,13 @@ final public class ScriptFunction implements Instance
    * @param args
    * @return Object[]
    */
-  private Object [] convertInputArgs (final Context context, final int top, final Tree args) throws SAXException
+  private Object [] convertInputArgs (final Context context, final int top, final AbstractTree args) throws SAXException
   {
     // evaluate current parameters
     final Stack varr = new Stack ();
     if (args != null)
     {
-      Tree t = args;
+      AbstractTree t = args;
       do
       {
         if (t.right != null)
@@ -110,7 +110,7 @@ final public class ScriptFunction implements Instance
    * evaluate the script function with given input arguments and return the
    * result
    */
-  public Value evaluate (final Context context, final int top, final Tree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
   {
     // convert input params
     final Object [] scrArgs = convertInputArgs (context, top, args);

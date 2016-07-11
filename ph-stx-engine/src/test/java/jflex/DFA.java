@@ -22,7 +22,7 @@ import java.util.Map;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class DFA
+public final class DFA
 {
 
   /**

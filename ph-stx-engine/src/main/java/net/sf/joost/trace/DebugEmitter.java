@@ -37,7 +37,7 @@ import org.xml.sax.helpers.LocatorImpl;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
-import net.sf.joost.instruction.NodeBase;
+import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.Emitter;
 import net.sf.joost.stx.ErrorHandlerImpl;
 import net.sf.joost.stx.SAXEvent;
@@ -176,7 +176,7 @@ public class DebugEmitter extends Emitter
                             final String qName,
                             final Attributes attrs,
                             final Map <String, String> namespaces,
-                            final NodeBase instruction) throws SAXException
+                            final AbstractNodeBase instruction) throws SAXException
   {
     if (log.isDebugEnabled ())
       log.debug ("start element in resultdoc");
@@ -219,7 +219,7 @@ public class DebugEmitter extends Emitter
   public void characters (final char [] ch,
                           final int start,
                           final int length,
-                          final NodeBase instruction) throws SAXException
+                          final AbstractNodeBase instruction) throws SAXException
   {
     if (log.isDebugEnabled ())
       log.debug ("characters in resultdoc");
@@ -237,7 +237,7 @@ public class DebugEmitter extends Emitter
   @Override
   public void processingInstruction (final String target,
                                      final String data,
-                                     final NodeBase instruction) throws SAXException
+                                     final AbstractNodeBase instruction) throws SAXException
   {
     if (log.isDebugEnabled ())
       log.debug ("processingInstruction in resultdoc");
@@ -256,7 +256,7 @@ public class DebugEmitter extends Emitter
   public void comment (final char [] ch,
                        final int start,
                        final int length,
-                       final NodeBase instruction) throws SAXException
+                       final AbstractNodeBase instruction) throws SAXException
   {
     if (log.isDebugEnabled ())
       log.debug ("comment in resultdoc");
@@ -272,7 +272,7 @@ public class DebugEmitter extends Emitter
    * overloaded method for debug information
    */
   @Override
-  public void startCDATA (final NodeBase instruction) throws SAXException
+  public void startCDATA (final AbstractNodeBase instruction) throws SAXException
   {
     if (log.isDebugEnabled ())
       log.debug ("start CDATA in resultdoc");

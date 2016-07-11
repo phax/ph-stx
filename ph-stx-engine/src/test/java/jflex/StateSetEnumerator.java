@@ -14,7 +14,7 @@ package jflex;
  * @author Gerwin Klein
  * @version JFlex 1.6.1
  */
-final public class StateSetEnumerator
+public final class StateSetEnumerator
 {
 
   private final static boolean DEBUG = false;

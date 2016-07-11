@@ -27,7 +27,7 @@ package net.sf.joost.grammar.tree;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.grammar.Tree;
+import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.SAXEvent;
@@ -40,7 +40,7 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.3 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
-final public class AttrLocalWildcardTree extends Tree
+public final class AttrLocalWildcardTree extends AbstractTree
 {
   private final String prefix; // needed only in the error message
 

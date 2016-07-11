@@ -53,7 +53,7 @@ import net.sf.joost.plugins.attributes.Attribute;
 import net.sf.joost.plugins.attributes.BooleanAttribute;
 import net.sf.joost.plugins.attributes.StringAttribute;
 import net.sf.joost.stx.Value;
-import net.sf.joost.trax.TrAXConstants;
+import net.sf.joost.trax.CTrAX;
 import net.sf.joost.trax.TransformerFactoryImpl;
 
 /**
@@ -446,7 +446,7 @@ public class THResolver implements TransformerHandlerResolver
           final String propVal = System.getProperty (TFPROP);
           boolean propChanged = false;
 
-          final String xsltFac = System.getProperty (TrAXConstants.KEY_XSLT_FACTORY);
+          final String xsltFac = System.getProperty (CTrAX.KEY_XSLT_FACTORY);
           if (xsltFac != null || STXIMP.equals (propVal))
           {
             // change this property,

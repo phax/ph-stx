@@ -47,7 +47,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public class TextFactory extends FactoryBase
+public class TextFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
   private final HashSet attrNames;
@@ -70,7 +70,7 @@ public class TextFactory extends FactoryBase
   }
 
   @Override
-  public NodeBase createNode (final NodeBase parent,
+  public AbstractNodeBase createNode (final AbstractNodeBase parent,
                               final String qName,
                               final Attributes attrs,
                               final ParseContext context) throws SAXParseException
@@ -84,7 +84,7 @@ public class TextFactory extends FactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends NodeBase
+  public class Instance extends AbstractNodeBase
   {
     /** a StreamEmitter or a StringEmitter */
     private IStxEmitter stxEmitter;
@@ -97,7 +97,7 @@ public class TextFactory extends FactoryBase
 
     private final int markup;
 
-    public Instance (final String qName, final NodeBase parent, final ParseContext context, final int markup)
+    public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final int markup)
     {
       super (qName, parent, context, true);
       this.markup = markup;

@@ -50,7 +50,7 @@ import net.sf.joost.stx.Value;
  * @author Oliver Becker
  */
 
-abstract public class GroupBase extends NodeBase
+public abstract class AbstractGroupBase extends AbstractNodeBase
 {
   // attributes from stx:transform / stx:group
 
@@ -121,7 +121,7 @@ abstract public class GroupBase extends NodeBase
   public Hashtable <String, ProcedureFactory.Instance> visibleProcedures;
 
   /** Contained groups in this group */
-  protected GroupBase [] containedGroups;
+  protected AbstractGroupBase [] containedGroups;
 
   /**
    * Table of named groups: key = group name, value = group object. All groups
@@ -130,27 +130,27 @@ abstract public class GroupBase extends NodeBase
   public Hashtable <String, Object> namedGroups;
 
   /** parent group */
-  public GroupBase parentGroup;
+  public AbstractGroupBase parentGroup;
 
   /** Group variables */
-  private VariableBase [] groupVariables;
+  private AbstractVariableBase [] groupVariables;
 
   /** Expanded name of this group */
   public String groupName;
 
   /** Vector of the children */
-  protected Vector <NodeBase> children = new Vector<> ();
+  protected Vector <AbstractNodeBase> children = new Vector<> ();
 
   // Constructor
-  protected GroupBase (final String qName,
-                       final NodeBase parent,
-                       final ParseContext context,
-                       final byte passThrough,
-                       final boolean stripSpace,
-                       final boolean recognizeCdata)
+  protected AbstractGroupBase (final String qName,
+                               final AbstractNodeBase parent,
+                               final ParseContext context,
+                               final byte passThrough,
+                               final boolean stripSpace,
+                               final boolean recognizeCdata)
   {
     super (qName, parent, context, true);
-    this.parentGroup = (GroupBase) parent;
+    this.parentGroup = (AbstractGroupBase) parent;
     this.passThrough = passThrough;
     this.stripSpace = stripSpace;
     this.recognizeCdata = recognizeCdata;
@@ -168,7 +168,7 @@ abstract public class GroupBase extends NodeBase
   }
 
   @Override
-  public void insert (final NodeBase node) throws SAXParseException
+  public void insert (final AbstractNodeBase node) throws SAXParseException
   {
     // no call of super.insert(node)
     children.addElement (node);
@@ -201,9 +201,9 @@ abstract public class GroupBase extends NodeBase
     // template vector
     final Vector <Instance> tvec = new Vector<> ();
     // group vector
-    final Vector <GroupBase> gvec = new Vector<> ();
+    final Vector <AbstractGroupBase> gvec = new Vector<> ();
     // variable vector
-    final Vector <VariableBase> vvec = new Vector<> ();
+    final Vector <AbstractVariableBase> vvec = new Vector<> ();
 
     for (int i = 0; i < length; i++)
     {
@@ -217,11 +217,11 @@ abstract public class GroupBase extends NodeBase
           {
             containedPublicTemplates.addElement (t);
           }
-          if (t.visibility == TemplateBase.GROUP_VISIBLE)
+          if (t.visibility == AbstractTemplateBase.GROUP_VISIBLE)
           {
             containedGroupTemplates.addElement (t);
           }
-          if (t.visibility == TemplateBase.GLOBAL_VISIBLE)
+          if (t.visibility == AbstractTemplateBase.GLOBAL_VISIBLE)
           {
             containedGlobalTemplates.addElement (t);
           }
@@ -233,7 +233,7 @@ abstract public class GroupBase extends NodeBase
         if (objs[i] instanceof ProcedureFactory.Instance)
         {
           final ProcedureFactory.Instance p = (ProcedureFactory.Instance) objs[i];
-          NodeBase node = visibleProcedures.get (p.expName);
+          AbstractNodeBase node = visibleProcedures.get (p.expName);
           if (node != null)
           {
             throw new SAXParseException ("Procedure '" +
@@ -251,11 +251,11 @@ abstract public class GroupBase extends NodeBase
           visibleProcedures.put (p.expName, p);
           if (p.isPublic)
             containedPublicProcedures.put (p.expName, p);
-          if (p.visibility == TemplateBase.GROUP_VISIBLE)
+          if (p.visibility == AbstractTemplateBase.GROUP_VISIBLE)
           {
             groupProcedures.put (p.expName, p);
           }
-          if (p.visibility == TemplateBase.GLOBAL_VISIBLE)
+          if (p.visibility == AbstractTemplateBase.GLOBAL_VISIBLE)
           {
             node = globalProcedures.get (p.expName);
             if (node != null)
@@ -278,20 +278,20 @@ abstract public class GroupBase extends NodeBase
           }
         }
         else
-          if (objs[i] instanceof GroupBase)
-            gvec.addElement ((GroupBase) objs[i]);
+          if (objs[i] instanceof AbstractGroupBase)
+            gvec.addElement ((AbstractGroupBase) objs[i]);
           else
-            if (objs[i] instanceof VariableBase)
-              vvec.addElement ((VariableBase) objs[i]);
+            if (objs[i] instanceof AbstractVariableBase)
+              vvec.addElement ((AbstractVariableBase) objs[i]);
     }
 
     // create group array
-    containedGroups = new GroupBase [gvec.size ()];
+    containedGroups = new AbstractGroupBase [gvec.size ()];
     gvec.toArray (containedGroups);
 
     // visible templates/procedures: from this group
     // plus public templates/procedures from child groups
-    for (final GroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : containedGroups)
     {
       tvec.addAll (containedGroup.containedPublicTemplates);
       final Hashtable <String, net.sf.joost.instruction.ProcedureFactory.Instance> pubProc = containedGroup.containedPublicProcedures;
@@ -301,7 +301,7 @@ abstract public class GroupBase extends NodeBase
         if (visibleProcedures.containsKey (o = e.nextElement ()))
         {
           final ProcedureFactory.Instance p1 = pubProc.get (o);
-          final NodeBase p2 = visibleProcedures.get (o);
+          final AbstractNodeBase p2 = visibleProcedures.get (o);
           throw new SAXParseException ("Public procedure '" +
                                        p1.procName +
                                        "' conflicts with the procedure definition in line " +
@@ -331,7 +331,7 @@ abstract public class GroupBase extends NodeBase
 
     // add group and global templates/procedures to all sub-groups
     // (group scope)
-    for (final GroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : containedGroups)
     {
       containedGroup.addGroupTemplates (containedGroupTemplates);
       containedGroup.addGroupTemplates (containedGlobalTemplates);
@@ -343,13 +343,13 @@ abstract public class GroupBase extends NodeBase
 
     // add global templates from all sub-groups (global scope)
     // (this removes the global templates in these groups)
-    for (final GroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : containedGroups)
     {
       containedGlobalTemplates.addAll (containedGroup.getGlobalTemplates ());
     }
 
     // create array of group variables
-    groupVariables = new VariableBase [vvec.size ()];
+    groupVariables = new AbstractVariableBase [vvec.size ()];
     vvec.toArray (groupVariables);
 
     return true; // need an additional pass for creating groupTemplates
@@ -362,7 +362,7 @@ abstract public class GroupBase extends NodeBase
   public void initGroupVariables (final Context context) throws SAXException
   {
     enterRecursionLevel (context);
-    for (final GroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : containedGroups)
       containedGroup.initGroupVariables (context);
   }
 
@@ -383,7 +383,7 @@ abstract public class GroupBase extends NodeBase
     context.groupVars.get (this).push (varTable);
 
     context.currentGroup = this;
-    for (final VariableBase groupVariable : groupVariables)
+    for (final AbstractVariableBase groupVariable : groupVariables)
       if (groupVariable.keepValue && shadowed != null)
         varTable.put (groupVariable.expName, shadowed.get (groupVariable.expName));
       else
@@ -411,7 +411,7 @@ abstract public class GroupBase extends NodeBase
   protected void addGroupTemplates (final Vector <Instance> tVec)
   {
     containedGroupTemplates.addAll (tVec);
-    for (final GroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : containedGroups)
       containedGroup.addGroupTemplates (tVec);
   }
 
@@ -433,7 +433,7 @@ abstract public class GroupBase extends NodeBase
       if (groupProcedures.containsKey (key))
       {
         final ProcedureFactory.Instance p1 = pTable.get (key);
-        final NodeBase p2 = groupProcedures.get (key);
+        final AbstractNodeBase p2 = groupProcedures.get (key);
         throw new SAXParseException ("Group procedure '" +
                                      p1.procName +
                                      "' conflicts with the procedure definition in line " +
@@ -448,7 +448,7 @@ abstract public class GroupBase extends NodeBase
       }
     }
     groupProcedures.putAll (pTable);
-    for (final GroupBase containedGroup : containedGroups)
+    for (final AbstractGroupBase containedGroup : containedGroups)
       containedGroup.addGroupProcedures (pTable);
   }
 
@@ -489,28 +489,28 @@ abstract public class GroupBase extends NodeBase
   protected void onDeepCopy (final AbstractInstruction copy, final HashMap copies)
   {
     super.onDeepCopy (copy, copies);
-    final GroupBase theCopy = (GroupBase) copy;
+    final AbstractGroupBase theCopy = (AbstractGroupBase) copy;
     if (containedGroups != null)
     {
-      theCopy.containedGroups = (GroupBase []) copies.get (containedGroups);
+      theCopy.containedGroups = (AbstractGroupBase []) copies.get (containedGroups);
       if (theCopy.containedGroups == null)
       {
-        theCopy.containedGroups = new GroupBase [containedGroups.length];
+        theCopy.containedGroups = new AbstractGroupBase [containedGroups.length];
         for (int i = 0; i < containedGroups.length; i++)
         {
-          theCopy.containedGroups[i] = (GroupBase) containedGroups[i].deepCopy (copies);
+          theCopy.containedGroups[i] = (AbstractGroupBase) containedGroups[i].deepCopy (copies);
         }
       }
     }
     if (groupVariables != null)
     {
-      theCopy.groupVariables = (VariableBase []) copies.get (groupVariables);
+      theCopy.groupVariables = (AbstractVariableBase []) copies.get (groupVariables);
       if (theCopy.groupVariables == null)
       {
-        theCopy.groupVariables = new VariableBase [groupVariables.length];
+        theCopy.groupVariables = new AbstractVariableBase [groupVariables.length];
         for (int i = 0; i < groupVariables.length; i++)
         {
-          theCopy.groupVariables[i] = (VariableBase) groupVariables[i].deepCopy (copies);
+          theCopy.groupVariables[i] = (AbstractVariableBase) groupVariables[i].deepCopy (copies);
         }
       }
     }
@@ -524,7 +524,7 @@ abstract public class GroupBase extends NodeBase
     }
     if (parentGroup != null)
     {
-      theCopy.parentGroup = (GroupBase) parentGroup.deepCopy (copies);
+      theCopy.parentGroup = (AbstractGroupBase) parentGroup.deepCopy (copies);
     }
     if (namedGroups != null)
     {

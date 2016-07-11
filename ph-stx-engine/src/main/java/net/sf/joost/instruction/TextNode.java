@@ -38,11 +38,11 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public class TextNode extends NodeBase
+public class TextNode extends AbstractNodeBase
 {
   private final String string;
 
-  public TextNode (final String s, final NodeBase parent, final ParseContext context)
+  public TextNode (final String s, final AbstractNodeBase parent, final ParseContext context)
   {
     super ("", parent, context, false);
     string = s;
