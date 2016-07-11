@@ -75,7 +75,7 @@ public final class Subsequence implements IInstance
   {
     Value seq;
     long begin, end;
-    if (args.m_aLeft.m_nType == AbstractTree.LIST)
+    if (args.m_aLeft.getType () == AbstractTree.LIST)
     { // three parameters
       seq = args.m_aLeft.m_aLeft.evaluate (context, top);
       final double arg2 = args.m_aLeft.m_aRight.evaluate (context, top).getNumberValue ();

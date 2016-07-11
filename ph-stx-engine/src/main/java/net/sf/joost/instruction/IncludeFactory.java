@@ -137,7 +137,7 @@ public final class IncludeFactory extends AbstractFactoryBase
 
     final TransformFactory.Instance tfi = stxParser.getTransformNode ();
     // transfer compilable nodes to the calling Parser object
-    tfi.compilableNodes = stxParser.compilableNodes;
+    tfi.m_aCompilableNodes = stxParser.compilableNodes;
     tfi.m_sQName = qName; // replace name for error reporting
     return tfi;
   }

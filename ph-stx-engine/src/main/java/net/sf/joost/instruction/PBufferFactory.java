@@ -107,11 +107,12 @@ public class PBufferFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
-    private final String bufName, expName;
-    private boolean scopeDetermined = false;
-    private AbstractGroupBase groupScope = null;
+    private final String m_sBufName;
+    private final String m_sExpName;
+    private boolean m_bScopeDetermined = false;
+    private AbstractGroupBase m_aGroupScope;
 
     // Constructor
     public Instance (final String qName,
@@ -124,8 +125,8 @@ public class PBufferFactory extends AbstractFactoryBase
                      final String src) throws SAXParseException
     {
       super (qName, parent, context, groupQName, method, src);
-      this.bufName = bufName;
-      this.expName = expName;
+      this.m_sBufName = bufName;
+      this.m_sExpName = expName;
     }
 
     @Override
@@ -143,30 +144,30 @@ public class PBufferFactory extends AbstractFactoryBase
     {
       context.currentInstruction = this;
 
-      if (!scopeDetermined)
+      if (!m_bScopeDetermined)
       {
         try
         {
-          groupScope = VariableUtils.findVariableScope (context, expName);
+          m_aGroupScope = VariableUtils.findVariableScope (context, m_sExpName);
         }
         catch (final VariableNotFoundException e)
         {
           context.m_aErrorHandler.error ("Can't process an undeclared buffer '" +
-                                      bufName +
-                                      "'",
-                                      m_sPublicID,
-                                      m_sSystemID,
-                                      lineNo,
-                                      colNo);
+                                         m_sBufName +
+                                         "'",
+                                         m_sPublicID,
+                                         m_sSystemID,
+                                         lineNo,
+                                         colNo);
           // if the error handler returns
           return CSTX.PR_ERROR;
         }
-        scopeDetermined = true;
+        m_bScopeDetermined = true;
       }
 
-      final BufferReader br = new BufferReader (context, expName, groupScope, m_sPublicID, m_sSystemID);
+      final BufferReader br = new BufferReader (context, m_sExpName, m_aGroupScope, m_sPublicID, m_sSystemID);
 
-      if (m_aFilter != null)
+      if (hasFilter ())
       {
         // use external SAX filter (TransformerHandler)
         final TransformerHandler handler = getProcessHandler (context);
@@ -191,7 +192,13 @@ public class PBufferFactory extends AbstractFactoryBase
           // wrap exception
           final StringWriter sw = new StringWriter ();
           e.printStackTrace (new PrintWriter (sw));
-          context.m_aErrorHandler.fatalError ("External processing failed: " + sw, m_sPublicID, m_sSystemID, lineNo, colNo, e);
+          context.m_aErrorHandler.fatalError ("External processing failed: " +
+                                              sw,
+                                              m_sPublicID,
+                                              m_sSystemID,
+                                              lineNo,
+                                              colNo,
+                                              e);
           return CSTX.PR_ERROR;
         }
       }
@@ -227,8 +234,8 @@ public class PBufferFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (groupScope != null)
-        theCopy.groupScope = (AbstractGroupBase) groupScope.deepCopy (copies);
+      if (m_aGroupScope != null)
+        theCopy.m_aGroupScope = (AbstractGroupBase) m_aGroupScope.deepCopy (copies);
     }
 
   }

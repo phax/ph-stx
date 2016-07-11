@@ -888,7 +888,7 @@ class CUP$ExprParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$ExprParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$ExprParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$ExprParser$stack.peek()).value;
-		 if (a.m_nType == AbstractTree.DDOT) {
+		 if (a.getType () == AbstractTree.DDOT) {
             a.m_aLeft = r;
             RESULT = a;
          }
@@ -910,7 +910,7 @@ class CUP$ExprParser$actions {
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$ExprParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$ExprParser$stack.peek()).value;
 		 AbstractTree d = new DescTree(r, null);
-         if (a.m_nType == AbstractTree.DDOT) {
+         if (a.getType () == AbstractTree.DDOT) {
             a.m_aLeft = d;
             RESULT = a;
          }
@@ -928,7 +928,7 @@ class CUP$ExprParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$ExprParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$ExprParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$ExprParser$stack.peek()).value;
-		 if (a.m_nType == AbstractTree.DDOT)
+		 if (a.getType () == AbstractTree.DDOT)
             RESULT = a;
          else
             RESULT = new ChildTree(null, a);

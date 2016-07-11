@@ -55,7 +55,7 @@ public final class ScriptFactory extends AbstractFactoryBase
   // Constructor
   public ScriptFactory ()
   {
-    attrNames = new HashSet <String> ();
+    attrNames = new HashSet <> ();
     attrNames.add ("prefix");
     attrNames.add ("language");
     attrNames.add ("src");
@@ -76,7 +76,12 @@ public final class ScriptFactory extends AbstractFactoryBase
   {
     // check parent
     if (parent != null && !(parent instanceof AbstractGroupBase))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.m_sQName + "'", context.locator);
+      throw new SAXParseException ("'" +
+                                   qName +
+                                   "' not allowed as child of '" +
+                                   parent.m_sQName +
+                                   "'",
+                                   context.locator);
 
     // check that prefix points to a declared namespace
     final String prefixAtt = getRequiredAttribute (qName, attrs, "prefix", context);
@@ -115,7 +120,7 @@ public final class ScriptFactory extends AbstractFactoryBase
   /* -------------------------------------------------------------------- */
 
   /** Represents an instance of the <code>script</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     /** namespace prefix from prefix attribute of the script element */
     private final String prefix;
@@ -219,7 +224,13 @@ public final class ScriptFactory extends AbstractFactoryBase
         }
         catch (final IOException e)
         {
-          throw new SAXParseException ("Exception while reading from " + src, m_sPublicID, m_sSystemID, lineNo, colNo, e);
+          throw new SAXParseException ("Exception while reading from " +
+                                       src,
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo,
+                                       e);
         }
       }
 

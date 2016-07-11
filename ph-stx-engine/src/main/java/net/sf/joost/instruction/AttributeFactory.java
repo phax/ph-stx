@@ -85,7 +85,7 @@ public final class AttributeFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>attribute</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aName, m_aNamespace, m_aSelect;
     private final Hashtable <String, String> m_aNSSet;
@@ -124,7 +124,7 @@ public final class AttributeFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       // check for nesting of this stx:attribute
-      if (context.emitter.isEmitterActive (m_aStrEmitter))
+      if (context.m_aEmitter.isEmitterActive (m_aStrEmitter))
       {
         context.m_aErrorHandler.error ("Can't create nested attribute", m_sPublicID, m_sSystemID, lineNo, colNo);
         return 0; // if the errorHandler returns
@@ -205,7 +205,7 @@ public final class AttributeFactory extends AbstractFactoryBase
 
       if (m_aSelect != null)
       {
-        context.emitter.addAttribute (attUri,
+        context.m_aEmitter.addAttribute (attUri,
                                       attName,
                                       attLocal,
                                       m_aSelect.evaluate (context, this).getStringValue (),
@@ -232,7 +232,7 @@ public final class AttributeFactory extends AbstractFactoryBase
       final String attLocal = (String) m_aLocalFieldStack.pop ();
       final String attUri = (String) m_aLocalFieldStack.pop ();
       context.popEmitter ();
-      context.emitter.addAttribute (attUri, attName, attLocal, m_aStrEmitter.getBuffer ().toString (), this);
+      context.m_aEmitter.addAttribute (attUri, attName, attLocal, m_aStrEmitter.getBuffer ().toString (), this);
       return super.processEnd (context);
     }
 

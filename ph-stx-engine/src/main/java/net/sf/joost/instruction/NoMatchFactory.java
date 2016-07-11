@@ -64,10 +64,10 @@ public class NoMatchFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>no-match</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     /** The parent */
-    AnalyzeTextFactory.Instance analyzeText;
+    private AnalyzeTextFactory.Instance analyzeText;
 
     public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {

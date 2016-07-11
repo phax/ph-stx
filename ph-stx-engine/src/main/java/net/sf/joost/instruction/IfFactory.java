@@ -77,10 +77,10 @@ public final class IfFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>if</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     /** the parsed <code>select</code> expression */
-    private AbstractTree test;
+    private AbstractTree m_aTest;
 
     /** next instruction if the test evaluates to true */
     private AbstractInstruction trueNext;
@@ -94,7 +94,7 @@ public final class IfFactory extends AbstractFactoryBase
                         final AbstractTree test)
     {
       super (qName, parent, context, true);
-      this.test = test;
+      this.m_aTest = test;
     }
 
     /**
@@ -122,7 +122,7 @@ public final class IfFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (test.evaluate (context, this).getBooleanValue ())
+      if (m_aTest.evaluate (context, this).getBooleanValue ())
       {
         super.process (context);
         next = trueNext;
@@ -140,8 +140,8 @@ public final class IfFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (test != null)
-        theCopy.test = test.deepCopy (copies);
+      if (m_aTest != null)
+        theCopy.m_aTest = m_aTest.deepCopy (copies);
       if (trueNext != null)
         theCopy.trueNext = trueNext.deepCopy (copies);
       if (falseNext != null)
@@ -154,7 +154,7 @@ public final class IfFactory extends AbstractFactoryBase
     @Override
     public String toString ()
     {
-      return "stx:if test='" + test + "'";
+      return "stx:if test='" + m_aTest + "'";
     }
   }
 }

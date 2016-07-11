@@ -16,6 +16,7 @@
 package net.sf.joost.plugins.attributes;
 
 import java.util.Hashtable;
+import java.util.Locale;
 
 /**
  * created on Mar 9, 2005
@@ -26,7 +27,6 @@ import java.util.Hashtable;
  */
 public class BooleanAttribute extends AbstractAttribute
 {
-
   public BooleanAttribute (final String name, final String defVal, final Hashtable <String, AbstractAttribute> col)
   {
     super (name, new String [] { "true", "false" }, defVal, col);
@@ -35,12 +35,11 @@ public class BooleanAttribute extends AbstractAttribute
   @Override
   public Object newValue (final String value)
   {
-    return new Boolean (value.toLowerCase ());
+    return Boolean.valueOf (Boolean.parseBoolean (value.toLowerCase (Locale.US)));
   }
 
   public boolean booleanValue ()
   {
-    return ((Boolean) value).booleanValue ();
+    return ((Boolean) m_aValue).booleanValue ();
   }
-
 }

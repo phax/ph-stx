@@ -82,7 +82,7 @@ public final class BufferFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>buffer</code> element. */
-  public final class Instance extends AbstractVariableBase
+  public static final class Instance extends AbstractVariableBase
   {
     private final String m_sVarName;
 
@@ -93,7 +93,7 @@ public final class BufferFactory extends AbstractFactoryBase
                         final String expName)
     {
       super (qName, parent, context, expName, false, true);
-      this.m_sVarName = varName;
+      m_sVarName = varName;
     }
 
     /**
@@ -124,7 +124,7 @@ public final class BufferFactory extends AbstractFactoryBase
 
       final BufferEmitter buffer = new BufferEmitter ();
       context.pushEmitter (buffer);
-      varTable.put (m_sExpName, context.emitter);
+      varTable.put (m_sExpName, context.m_aEmitter);
 
       if (varTable == context.localVars)
         m_aParent.declareVariable (m_sExpName);

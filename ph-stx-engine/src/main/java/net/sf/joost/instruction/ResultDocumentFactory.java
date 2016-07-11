@@ -62,7 +62,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
   // Constructor
   public ResultDocumentFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("href");
     attrNames.add ("output-encoding");
     attrNames.add ("output-method");
@@ -108,7 +108,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>result-document</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree href;
     private String encoding;
@@ -177,7 +177,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
         if (emitter == null)
         {
           // either there's no outputUriResolver or it returned null
-          final Writer osw = context.emitter.getResultWriter (filename,
+          final Writer osw = context.m_aEmitter.getResultWriter (filename,
                                                               encoding,
                                                               m_sPublicID,
                                                               m_sSystemID,
@@ -210,7 +210,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
       }
 
       context.pushEmitter (emitter);
-      context.emitter.startDocument ();
+      context.m_aEmitter.startDocument ();
       return CSTX.PR_CONTINUE;
     }
 
@@ -218,7 +218,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      context.emitter.endDocument (m_aNodeEnd);
+      context.m_aEmitter.endDocument (m_aNodeEnd);
       context.popEmitter ();
       final Object object = m_aLocalFieldStack.pop ();
       try
@@ -235,7 +235,12 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
       }
       catch (final java.io.IOException ex)
       {
-        context.m_aErrorHandler.error (ex.toString (), m_sPublicID, m_sSystemID, m_aNodeEnd.lineNo, m_aNodeEnd.colNo, ex);
+        context.m_aErrorHandler.error (ex.toString (),
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       m_aNodeEnd.lineNo,
+                                       m_aNodeEnd.colNo,
+                                       ex);
       }
       catch (final TransformerException ex)
       {

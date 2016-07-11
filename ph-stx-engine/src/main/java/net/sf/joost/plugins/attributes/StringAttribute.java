@@ -45,5 +45,4 @@ public class StringAttribute extends AbstractAttribute
   {
     return value;
   }
-
 }

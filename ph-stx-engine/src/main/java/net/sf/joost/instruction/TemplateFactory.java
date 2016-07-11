@@ -133,13 +133,13 @@ public final class TemplateFactory extends AbstractFactoryBase
   // -----------------------------------------------------------------------
 
   /** The inner Instance class */
-  public final class Instance extends AbstractTemplateBase implements Comparable <Instance>
+  public static final class Instance extends AbstractTemplateBase implements Comparable <Instance>
   {
     /** The match pattern */
-    private AbstractTree match;
+    private AbstractTree m_aMatch;
 
     /** The priority of this template */
-    private double priority;
+    private double m_dPriority;
 
     //
     // Constructor
@@ -154,8 +154,8 @@ public final class TemplateFactory extends AbstractFactoryBase
                         final boolean newScope)
     {
       super (qName, parent, context, visibility, isPublic, newScope);
-      this.match = match;
-      this.priority = priority;
+      this.m_aMatch = match;
+      this.m_dPriority = priority;
     }
 
     /**
@@ -164,7 +164,7 @@ public final class TemplateFactory extends AbstractFactoryBase
      * @param setPosition
      *        <code>true</code> if the context position
      *        ({@link Context#position}) should be set in case the event stack
-     *        matches the pattern in {@link #match}.
+     *        matches the pattern in {@link #m_aMatch}.
      * @return true if the current event stack matches the pattern of this
      *         template
      * @exception SAXParseException
@@ -174,7 +174,7 @@ public final class TemplateFactory extends AbstractFactoryBase
     {
       context.currentInstruction = this;
       context.currentGroup = m_aParentGroup;
-      return match.matches (context, context.ancestorStack.size (), setPosition);
+      return m_aMatch.matches (context, context.ancestorStack.size (), setPosition);
     }
 
     /**
@@ -186,7 +186,7 @@ public final class TemplateFactory extends AbstractFactoryBase
      */
     public Instance split () throws SAXException
     {
-      if (match.m_nType != AbstractTree.UNION)
+      if (m_aMatch.getType () != AbstractTree.UNION)
         return null;
 
       Instance copy = null;
@@ -198,12 +198,12 @@ public final class TemplateFactory extends AbstractFactoryBase
       {
         throw new SAXException ("Can't split " + this, e);
       }
-      copy.match = match.m_aRight; // non-union
-      if (Double.isNaN (copy.priority)) // no priority specified
-        copy.priority = copy.match.getPriority ();
-      match = match.m_aLeft; // may contain another union
-      if (Double.isNaN (priority)) // no priority specified
-        priority = match.getPriority ();
+      copy.m_aMatch = m_aMatch.m_aRight; // non-union
+      if (Double.isNaN (copy.m_dPriority)) // no priority specified
+        copy.m_dPriority = copy.m_aMatch.getPriority ();
+      m_aMatch = m_aMatch.m_aLeft; // may contain another union
+      if (Double.isNaN (m_dPriority)) // no priority specified
+        m_dPriority = m_aMatch.getPriority ();
       return copy;
     }
 
@@ -212,7 +212,7 @@ public final class TemplateFactory extends AbstractFactoryBase
      */
     public double getPriority ()
     {
-      return priority;
+      return m_dPriority;
     }
 
     /**
@@ -220,7 +220,7 @@ public final class TemplateFactory extends AbstractFactoryBase
      */
     public AbstractTree getMatchPattern ()
     {
-      return match;
+      return m_aMatch;
     }
 
     /**
@@ -229,8 +229,8 @@ public final class TemplateFactory extends AbstractFactoryBase
      */
     public int compareTo (final Instance o)
     {
-      final double p = o.priority;
-      return (p < priority) ? -1 : ((p > priority) ? 1 : 0);
+      final double p = o.m_dPriority;
+      return (p < m_dPriority) ? -1 : ((p > m_dPriority) ? 1 : 0);
     }
 
     @Override
@@ -238,15 +238,15 @@ public final class TemplateFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (match != null)
-        theCopy.match = match.deepCopy (copies);
+      if (m_aMatch != null)
+        theCopy.m_aMatch = m_aMatch.deepCopy (copies);
     }
 
     // for debugging
     @Override
     public String toString ()
     {
-      return "template:" + lineNo + " " + match + " " + priority;
+      return "template:" + lineNo + " " + m_aMatch + " " + m_dPriority;
     }
   }
 }

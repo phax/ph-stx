@@ -31,8 +31,8 @@ import org.xml.sax.Attributes;
 public interface IMutableAttributes extends Attributes
 {
   /** Set the value of an attribute at the specified index */
-  public void setValue (int index, String value);
+  void setValue (int index, String value);
 
   /** Add an attribute to the set of attributes */
-  public void addAttribute (String uri, String lName, String qName, String type, String value);
+  void addAttribute (String uri, String lName, String qName, String type, String value);
 }

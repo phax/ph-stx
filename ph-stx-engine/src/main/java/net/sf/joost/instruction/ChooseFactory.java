@@ -57,7 +57,7 @@ public final class ChooseFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>choose</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private boolean otherwisePresent;
 

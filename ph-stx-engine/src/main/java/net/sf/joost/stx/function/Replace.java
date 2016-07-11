@@ -26,13 +26,13 @@ package net.sf.joost.stx.function;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
-import net.sf.joost.util.regex.JRegularExpression;
 import net.sf.joost.util.regex.IRegularExpression;
+import net.sf.joost.util.regex.JRegularExpression;
 
 /**
  * The <code>replace</code> function.<br>
@@ -73,18 +73,21 @@ public final class Replace implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     String input, pattern, replacement, flags;
-    if (args.m_aLeft.m_aLeft.m_nType == AbstractTree.LIST)
-    { // four parameters
+    if (args.m_aLeft.m_aLeft.getType () == AbstractTree.LIST)
+    {
+      // four parameters
       input = args.m_aLeft.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
       pattern = args.m_aLeft.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
       replacement = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
       flags = args.m_aRight.evaluate (context, top).getStringValue ();
     }
     else
-    { // three parameters
+    {
+      // three parameters
       input = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
       pattern = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
       replacement = args.m_aRight.evaluate (context, top).getStringValue ();

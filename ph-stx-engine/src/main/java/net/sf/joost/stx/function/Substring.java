@@ -77,8 +77,9 @@ public final class Substring implements IInstance
     // the correct handling of NaN and +/- infinity.
     try
     {
-      if (args.m_aLeft.m_nType == AbstractTree.LIST)
-      { // three parameters
+      if (args.m_aLeft.getType () == AbstractTree.LIST)
+      {
+        // three parameters
         final String str = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
         final double arg2 = args.m_aLeft.m_aRight.evaluate (context, top).getNumberValue ();
         final double arg3 = args.m_aRight.evaluate (context, top).getNumberValue ();

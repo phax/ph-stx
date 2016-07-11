@@ -83,7 +83,7 @@ public final class LitElementFactory
 
   /** Represents a literal result element. */
 
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private String uri;
     private final String lName;
@@ -116,7 +116,7 @@ public final class LitElementFactory
         {
           final String key = keys.nextElement ();
           // remove the namespaces from exclude-result-prefixes
-          if (context.transformNode.excludedNamespaces.contains (namespaces.get (key)))
+          if (context.transformNode.m_aExcludedNamespaces.contains (namespaces.get (key)))
             namespaces.remove (key);
           // remove the namespace that belongs to this qName
           if (qName.startsWith (key) &&
@@ -130,7 +130,7 @@ public final class LitElementFactory
       }
       // else: namespaces = null
 
-      this.namespaceAliases = context.transformNode.namespaceAliases;
+      this.namespaceAliases = context.transformNode.m_aNamespaceAliases;
     }
 
     /**
@@ -248,7 +248,7 @@ public final class LitElementFactory
         for (int i = 0; i < avtList.length; i++)
           if (avtList[i] != null)
             attrs.setValue (i, avtList[i].evaluate (context, this).getString ());
-        context.emitter.startElement (uri, lName, m_sQName, attrs, namespaces, this);
+        context.m_aEmitter.startElement (uri, lName, m_sQName, attrs, namespaces, this);
       }
       return CSTX.PR_CONTINUE;
     }
@@ -259,7 +259,7 @@ public final class LitElementFactory
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      context.emitter.endElement (uri, lName, m_sQName, m_aNodeEnd);
+      context.m_aEmitter.endElement (uri, lName, m_sQName, m_aNodeEnd);
       return super.processEnd (context);
     }
 

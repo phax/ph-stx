@@ -24,6 +24,8 @@ package net.sf.joost.plugins.attributes;
 
 import java.util.Hashtable;
 
+import com.helger.commons.hashcode.HashCodeGenerator;
+
 /**
  * This class encapsulates base Attribute interface created on Mar 9, 2005
  *
@@ -33,15 +35,14 @@ import java.util.Hashtable;
  */
 public abstract class AbstractAttribute
 {
-
   /** attribute name */
-  String name;
+  final String m_sName;
 
   /** attribute value */
-  Object value;
+  Object m_aValue;
 
   /** list of valid values if any */
-  String [] validValues;
+  final String [] m_aValidValues;
 
   /**
    * Default constructor
@@ -54,8 +55,8 @@ public abstract class AbstractAttribute
                             final String defVal,
                             final Hashtable <String, AbstractAttribute> col)
   {
-    this.name = name;
-    this.validValues = validValues;
+    this.m_sName = name;
+    this.m_aValidValues = validValues;
     col.put (name.toLowerCase (), this);
     setValue (defVal);
   }
@@ -69,7 +70,7 @@ public abstract class AbstractAttribute
   {
     final String v = value.toLowerCase ();
     boolean flg = true;
-    for (final String validValue : validValues)
+    for (final String validValue : m_aValidValues)
     {
       flg = false;
       if (validValue.equals (v))
@@ -79,7 +80,7 @@ public abstract class AbstractAttribute
       }
     }
     if (flg)
-      this.value = newValue (value);
+      this.m_aValue = newValue (value);
     else
       throw new IllegalArgumentException ("setValue(" + value + "): not valid value!");
   }
@@ -93,34 +94,39 @@ public abstract class AbstractAttribute
   public abstract Object newValue (String value);
 
   /**
-   * Get the value as string
-   *
-   * @return
+   * @return the value as string
    */
   public String getValueStr ()
   {
-    return value.toString ();
+    return m_aValue.toString ();
   }
 
   /**
-   * Get the value as string
-   *
-   * @return
+   * @return the value
    */
   public Object getValue ()
   {
-    return value;
+    return m_aValue;
   }
 
   /**
    * Perform generic compare based on name
    */
   @Override
-  public boolean equals (final Object obj)
+  public boolean equals (final Object o)
   {
-    if (obj instanceof AbstractAttribute)
-      return name.equals (((AbstractAttribute) obj).name);
-    return super.equals (obj);
+    if (o == this)
+      return true;
+    if (o == null || !getClass ().equals (o.getClass ()))
+      return false;
+    final AbstractAttribute rhs = (AbstractAttribute) o;
+    return m_sName.equals (rhs.m_sName);
+  }
+
+  @Override
+  public int hashCode ()
+  {
+    return new HashCodeGenerator (this).append (m_sName).getHashCode ();
   }
 
   /**
@@ -129,6 +135,6 @@ public abstract class AbstractAttribute
   @Override
   public String toString ()
   {
-    return name.toString ();
+    return m_sName;
   }
 }

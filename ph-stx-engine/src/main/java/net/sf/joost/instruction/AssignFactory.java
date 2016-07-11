@@ -86,7 +86,7 @@ public final class AssignFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>assign</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     public String m_sVarName, m_sExpName;
     private AbstractTree m_aSelect;

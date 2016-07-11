@@ -36,8 +36,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
@@ -101,7 +101,7 @@ public final class ExtensionFunction implements IInstance
     if (aArgs != null)
     {
       paramCount = 1;
-      while (aArgs.m_nType == AbstractTree.LIST)
+      while (aArgs.getType () == AbstractTree.LIST)
       {
         aArgs = aArgs.m_aLeft;
         paramCount++;
@@ -207,7 +207,8 @@ public final class ExtensionFunction implements IInstance
   }
 
   /** find and call the correct Java method */
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     // evaluate current parameters
     Value [] values = null;

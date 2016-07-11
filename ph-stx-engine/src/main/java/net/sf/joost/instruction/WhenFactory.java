@@ -82,7 +82,7 @@ public final class WhenFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>when</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aTest;
     private AbstractInstruction m_aTrueNext, m_aFalseNext;

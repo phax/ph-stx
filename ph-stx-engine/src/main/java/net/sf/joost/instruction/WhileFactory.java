@@ -76,7 +76,7 @@ public final class WhileFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>while</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aTest;
     private AbstractInstruction contents, successor;

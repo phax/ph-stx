@@ -86,59 +86,60 @@ public class TextFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     /** a StreamEmitter or a StringEmitter */
-    private IStxEmitter stxEmitter;
+    private IStxEmitter m_aSTXxEmitter;
 
     /** the buffer of the StringWriter or the StringEmitter resp. */
-    private StringBuffer buffer;
+    private StringBuffer m_aBuffer;
 
     /** levels of recursive calls */
-    private int recursionLevel;
+    private int m_nRecursionLevel;
 
-    private final int markup;
+    private final int m_nMarkup;
 
     public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context, final int markup)
     {
       super (qName, parent, context, true);
-      this.markup = markup;
+      this.m_nMarkup = markup;
       init ();
     }
 
     private void init ()
     {
-      if (markup == SERIALIZE_MARKUP)
+      if (m_nMarkup == SERIALIZE_MARKUP)
       {
         // use our StreamEmitter with a StringWriter
         final StringWriter w = new StringWriter ();
-        buffer = w.getBuffer ();
-        stxEmitter = AbstractStreamEmitter.newXMLEmitter (w);
+        m_aBuffer = w.getBuffer ();
+        m_aSTXxEmitter = AbstractStreamEmitter.newXMLEmitter (w);
       }
       else
       {
         // use our StringEmitter
-        buffer = new StringBuffer ();
-        stxEmitter = new StringEmitter (buffer, markup == NO_MARKUP ? "('" +
-                                                                      m_sQName +
-                                                                      "' with the 'markup' attribute set to '" +
-                                                                      MARKUP_VALUES[NO_MARKUP] +
-                                                                      "' started in line " +
-                                                                      lineNo +
-                                                                      ")"
-                                                                    : null);
+        m_aBuffer = new StringBuffer ();
+        m_aSTXxEmitter = new StringEmitter (m_aBuffer,
+                                        m_nMarkup == NO_MARKUP ? "('" +
+                                                              m_sQName +
+                                                              "' with the 'markup' attribute set to '" +
+                                                              MARKUP_VALUES[NO_MARKUP] +
+                                                              "' started in line " +
+                                                              lineNo +
+                                                              ")"
+                                                            : null);
       }
-      recursionLevel = 0;
+      m_nRecursionLevel = 0;
     }
 
     @Override
     public short process (final Context context) throws SAXException
     {
       super.process (context);
-      if (recursionLevel++ == 0)
+      if (m_nRecursionLevel++ == 0)
       { // outermost invocation
-        buffer.setLength (0);
-        context.pushEmitter (stxEmitter);
+        m_aBuffer.setLength (0);
+        context.pushEmitter (m_aSTXxEmitter);
       }
       return CSTX.PR_CONTINUE;
     }
@@ -146,10 +147,10 @@ public class TextFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      if (--recursionLevel == 0)
+      if (--m_nRecursionLevel == 0)
       { // outermost invocation
         context.popEmitter ();
-        context.emitter.characters (buffer.toString ().toCharArray (), 0, buffer.length (), this);
+        context.m_aEmitter.characters (m_aBuffer.toString ().toCharArray (), 0, m_aBuffer.length (), this);
       }
       return super.processEnd (context);
     }

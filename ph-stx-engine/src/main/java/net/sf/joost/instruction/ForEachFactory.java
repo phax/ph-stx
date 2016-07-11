@@ -84,7 +84,7 @@ public final class ForEachFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>for-each-item</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private final String m_sVarName, m_sExpName;
     private AbstractTree m_aSelect;
@@ -158,12 +158,12 @@ public final class ForEachFactory extends AbstractFactoryBase
         if (context.localVars.get (m_sExpName) != null)
         {
           context.m_aErrorHandler.fatalError ("Variable '" +
-                                           m_sVarName +
-                                           "' already declared",
-                                           m_sPublicID,
-                                           m_sSystemID,
-                                           lineNo,
-                                           colNo);
+                                              m_sVarName +
+                                              "' already declared",
+                                              m_sPublicID,
+                                              m_sSystemID,
+                                              lineNo,
+                                              colNo);
           return CSTX.PR_ERROR;// if the errorHandler returns
         }
 

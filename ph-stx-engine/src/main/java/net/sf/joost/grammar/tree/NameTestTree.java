@@ -60,7 +60,7 @@ public final class NameTestTree extends AbstractTree
     {
       // no qualified name: uri depends on the value of
       // <stx:transform stxpath-default-namespace="..." />
-      m_sURI = context.transformNode.stxpathDefaultNamespace;
+      m_sURI = context.transformNode.m_sStxpathDefaultNamespace;
       m_sLocalName = value;
     }
   }

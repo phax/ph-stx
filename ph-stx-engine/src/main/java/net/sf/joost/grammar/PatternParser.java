@@ -922,7 +922,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 if (a.m_nType == AbstractTree.DDOT) {
+		 if (a.getType () == AbstractTree.DDOT) {
             a.m_aLeft = r;
             RESULT = a;
          }
@@ -944,7 +944,7 @@ class CUP$PatternParser$actions {
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 AbstractTree d = new DescTree(r, null);
-         if (a.m_nType == AbstractTree.DDOT) {
+         if (a.getType () == AbstractTree.DDOT) {
             a.m_aLeft = d;
             RESULT = a;
          }
@@ -962,7 +962,7 @@ class CUP$PatternParser$actions {
 		int aleft = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).left;
 		int aright = ((net.sf.joost.grammar.cup.Symbol)CUP$PatternParser$stack.peek()).right;
 		AbstractTree a = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
-		 if (a.m_nType == AbstractTree.DDOT)
+		 if (a.getType () == AbstractTree.DDOT)
             RESULT = a;
          else
             RESULT = new ChildTree(null, a);
@@ -1355,8 +1355,8 @@ class CUP$PatternParser$actions {
 		AbstractTree t = (AbstractTree)((net.sf.joost.grammar.cup.Symbol) CUP$PatternParser$stack.peek()).value;
 		 // need to add an additional leaf for root
          AbstractTree tmp = t, last = null;
-         // go down the tree to the left
-         while (tmp.m_nType == AbstractTree.CHILD || tmp.m_nType == AbstractTree.DESC) {
+         // go down the tree to the m_aLeft
+         while (tmp.getType () == AbstractTree.CHILD || tmp.getType () == AbstractTree.DESC) {
             last = tmp;
             tmp = tmp.m_aLeft;
          }

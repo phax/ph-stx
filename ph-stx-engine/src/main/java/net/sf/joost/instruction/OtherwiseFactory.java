@@ -33,7 +33,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>otherwise</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.4 $ $Date: 2008/01/09 11:16:06 $
  * @author Oliver Becker
  */
@@ -48,9 +48,9 @@ public class OtherwiseFactory extends AbstractFactoryBase
 
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext context) throws SAXParseException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext context) throws SAXParseException
   {
     if (!(parent instanceof ChooseFactory.Instance))
       throw new SAXParseException ("'" + qName + "' must be child of stx:choose", context.locator);
@@ -60,7 +60,7 @@ public class OtherwiseFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>otherwise</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     public Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {

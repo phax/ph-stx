@@ -85,26 +85,29 @@ public class PSiblingsFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
-    private AbstractTree whilePattern, untilPattern;
+    private AbstractTree m_aWhilePattern, m_aUntilPattern;
     private AbstractGroupBase parentGroup;
 
     public Instance (final String qName,
-                     AbstractNodeBase parent,
+                     final AbstractNodeBase aParent,
                      final ParseContext context,
                      final String groupQName,
                      final AbstractTree whilePattern,
                      final AbstractTree untilPattern) throws SAXParseException
     {
-      super (qName, parent, context, groupQName, null, null);
-      this.whilePattern = whilePattern;
-      this.untilPattern = untilPattern;
+      super (qName, aParent, context, groupQName, null, null);
+      this.m_aWhilePattern = whilePattern;
+      this.m_aUntilPattern = untilPattern;
 
       // determine parent group (needed for matches())
-      do // parent itself is not a group
+      AbstractNodeBase parent = aParent;
+      do
+      {
+        // parent itself is not a group
         parent = parent.m_aParent;
-      while (!(parent instanceof AbstractGroupBase));
+      } while (!(parent instanceof AbstractGroupBase));
       parentGroup = (AbstractGroupBase) parent;
     }
 
@@ -141,8 +144,8 @@ public class PSiblingsFactory extends AbstractFactoryBase
     {
       context.currentInstruction = this;
       context.currentGroup = parentGroup;
-      return (whilePattern == null || whilePattern.matches (context, context.ancestorStack.size (), false)) &&
-             (untilPattern == null || !untilPattern.matches (context, context.ancestorStack.size (), false));
+      return (m_aWhilePattern == null || m_aWhilePattern.matches (context, context.ancestorStack.size (), false)) &&
+             (m_aUntilPattern == null || !m_aUntilPattern.matches (context, context.ancestorStack.size (), false));
     }
 
     @Override
@@ -152,10 +155,10 @@ public class PSiblingsFactory extends AbstractFactoryBase
       final Instance theCopy = (Instance) copy;
       if (parentGroup != null)
         theCopy.parentGroup = (AbstractGroupBase) parentGroup.deepCopy (copies);
-      if (untilPattern != null)
-        theCopy.untilPattern = untilPattern.deepCopy (copies);
-      if (whilePattern != null)
-        theCopy.whilePattern = whilePattern.deepCopy (copies);
+      if (m_aUntilPattern != null)
+        theCopy.m_aUntilPattern = m_aUntilPattern.deepCopy (copies);
+      if (m_aWhilePattern != null)
+        theCopy.m_aWhilePattern = m_aWhilePattern.deepCopy (copies);
     }
   }
 }

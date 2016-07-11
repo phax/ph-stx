@@ -64,7 +64,7 @@ public final class CdataFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private StringEmitter strEmitter;
     private StringBuffer buffer;
@@ -87,9 +87,13 @@ public final class CdataFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (context.emitter.isEmitterActive (strEmitter))
+      if (context.m_aEmitter.isEmitterActive (strEmitter))
       {
-        context.m_aErrorHandler.error ("Can't create nested CDATA section here", m_sPublicID, m_sSystemID, lineNo, colNo);
+        context.m_aErrorHandler.error ("Can't create nested CDATA section here",
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo);
         return CSTX.PR_CONTINUE; // if the errorHandler returns
       }
       super.process (context);
@@ -105,7 +109,7 @@ public final class CdataFactory extends AbstractFactoryBase
     public short processEnd (final Context context) throws SAXException
     {
       context.popEmitter ();
-      final Emitter emitter = context.emitter;
+      final Emitter emitter = context.m_aEmitter;
       emitter.startCDATA (this);
       emitter.characters (buffer.toString ().toCharArray (), 0, buffer.length (), this);
       emitter.endCDATA ();

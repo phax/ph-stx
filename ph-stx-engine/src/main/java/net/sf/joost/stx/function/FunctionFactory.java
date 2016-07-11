@@ -214,7 +214,7 @@ public final class FunctionFactory
     if (aArgs != null)
     {
       argc = 1;
-      while (aArgs.m_nType == AbstractTree.LIST)
+      while (aArgs.getType () == AbstractTree.LIST)
       {
         aArgs = aArgs.m_aLeft;
         argc++;

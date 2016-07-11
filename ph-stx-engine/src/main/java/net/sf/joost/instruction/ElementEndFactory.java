@@ -81,7 +81,7 @@ public final class ElementEndFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>end-element</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aName, m_aNamespace;
     private final Hashtable <String, String> nsSet;
@@ -117,12 +117,12 @@ public final class ElementEndFactory extends AbstractFactoryBase
           if (elUri.equals (""))
           {
             context.m_aErrorHandler.fatalError ("Can't close element '" +
-                                             elName +
-                                             "' in the null namespace",
-                                             m_sPublicID,
-                                             m_sSystemID,
-                                             lineNo,
-                                             colNo);
+                                                elName +
+                                                "' in the null namespace",
+                                                m_sPublicID,
+                                                m_sSystemID,
+                                                lineNo,
+                                                colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
@@ -134,14 +134,14 @@ public final class ElementEndFactory extends AbstractFactoryBase
           if (elUri == null)
           {
             context.m_aErrorHandler.fatalError ("Attempt to close element '" +
-                                             elName +
-                                             "' with undeclared prefix '" +
-                                             prefix +
-                                             "'",
-                                             m_sPublicID,
-                                             m_sSystemID,
-                                             lineNo,
-                                             colNo);
+                                                elName +
+                                                "' with undeclared prefix '" +
+                                                prefix +
+                                                "'",
+                                                m_sPublicID,
+                                                m_sSystemID,
+                                                lineNo,
+                                                colNo);
             return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
@@ -160,7 +160,7 @@ public final class ElementEndFactory extends AbstractFactoryBase
         }
       }
 
-      context.emitter.endElement (elUri, elLocal, elName, this);
+      context.m_aEmitter.endElement (elUri, elLocal, elName, this);
 
       return CSTX.PR_CONTINUE;
     }

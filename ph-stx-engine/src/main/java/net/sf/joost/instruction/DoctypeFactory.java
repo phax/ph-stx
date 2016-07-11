@@ -81,7 +81,7 @@ public class DoctypeFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>doctype</code> element. */
-  public class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aNameAVT, m_aPublicAVT, m_aSystemAVT;
 
@@ -108,7 +108,7 @@ public class DoctypeFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      context.emitter.createDTD (this,
+      context.m_aEmitter.createDTD (this,
                                  m_aNameAVT.evaluate (context, this).getStringValue (),
                                  m_aPublicAVT != null ? m_aPublicAVT.evaluate (context, this).getStringValue () : null,
                                  m_aSystemAVT != null ? m_aSystemAVT.evaluate (context, this).getStringValue () : null);

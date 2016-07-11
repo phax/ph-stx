@@ -83,10 +83,10 @@ public final class ResultBufferFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>result-buffer</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
-    private final String bufName, expName;
-    private final boolean clear;
+    private final String m_sBufName, m_sExpName;
+    private final boolean m_bClear;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -96,9 +96,9 @@ public final class ResultBufferFactory extends AbstractFactoryBase
                         final boolean clear)
     {
       super (qName, parent, context, true);
-      this.bufName = bufName;
-      this.expName = expName;
-      this.clear = clear;
+      this.m_sBufName = bufName;
+      this.m_sExpName = expName;
+      this.m_bClear = clear;
     }
 
     /**
@@ -109,42 +109,42 @@ public final class ResultBufferFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       super.process (context);
-      Object emitter = context.localVars.get (expName);
+      Object emitter = context.localVars.get (m_sExpName);
       if (emitter == null)
       {
         AbstractGroupBase group = context.currentGroup;
         while (emitter == null && group != null)
         {
-          emitter = context.groupVars.get (group).peek ().get (expName);
+          emitter = context.groupVars.get (group).peek ().get (m_sExpName);
           group = group.m_aParentGroup;
         }
       }
       if (emitter == null)
       {
         context.m_aErrorHandler.error ("Can't fill an undeclared buffer '" +
-                                    bufName +
-                                    "'",
-                                    m_sPublicID,
-                                    m_sSystemID,
-                                    lineNo,
-                                    colNo);
+                                       m_sBufName +
+                                       "'",
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo);
         return CSTX.PR_CONTINUE;
       }
 
       final BufferEmitter buffer = (BufferEmitter) ((Emitter) emitter).m_aContH;
-      if (context.emitter.isEmitterActive (buffer))
+      if (context.m_aEmitter.isEmitterActive (buffer))
       {
         context.m_aErrorHandler.error ("Buffer '" +
-                                    bufName +
-                                    "' acts already as result buffer",
-                                    m_sPublicID,
-                                    m_sSystemID,
-                                    lineNo,
-                                    colNo);
+                                       m_sBufName +
+                                       "' acts already as result buffer",
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo);
         return CSTX.PR_CONTINUE;
       }
 
-      if (clear)
+      if (m_bClear)
         buffer.clear ();
 
       context.pushEmitter ((Emitter) emitter);

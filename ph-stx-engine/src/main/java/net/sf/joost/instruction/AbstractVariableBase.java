@@ -45,7 +45,7 @@ public abstract class AbstractVariableBase extends AbstractNodeBase
                                final boolean mayHaveChildren)
   {
     super (qName, parent, context, mayHaveChildren);
-    this.m_sExpName = expName;
-    this.m_bKeepValue = keepValue;
+    m_sExpName = expName;
+    m_bKeepValue = keepValue;
   }
 }

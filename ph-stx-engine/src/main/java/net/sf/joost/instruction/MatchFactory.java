@@ -52,7 +52,7 @@ public final class MatchFactory extends AbstractFactoryBase
   // Constructor
   public MatchFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("regex");
     attrNames.add ("flags");
   }
@@ -82,7 +82,7 @@ public final class MatchFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>match</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     /**
      * The AVT in the <code>regex</code> attribute; it will be evaluated in the

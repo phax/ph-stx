@@ -86,7 +86,7 @@ public abstract class AbstractTree implements Cloneable
   public static final int VALUE = 40; // internal: a constructed value leaf
 
   /** The type of the node in the Tree. */
-  public int m_nType;
+  private final int m_nType;
 
   /** The left subtree. */
   public AbstractTree m_aLeft;
@@ -134,6 +134,11 @@ public abstract class AbstractTree implements Cloneable
     this (type, null, null, null);
   }
 
+  public int getType ()
+  {
+    return m_nType;
+  }
+
   /**
    * Determines if the event stack matches the pattern represented by this Tree
    * object.
@@ -152,11 +157,11 @@ public abstract class AbstractTree implements Cloneable
   public boolean matches (final Context context, final int top, final boolean setPosition) throws SAXException
   {
     context.m_aErrorHandler.fatalError ("Fatal: unprocessed type in matching: " +
-                                     this,
-                                     context.currentInstruction.m_sPublicID,
-                                     context.currentInstruction.m_sSystemID,
-                                     context.currentInstruction.lineNo,
-                                     context.currentInstruction.colNo);
+                                        this,
+                                        context.currentInstruction.m_sPublicID,
+                                        context.currentInstruction.m_sSystemID,
+                                        context.currentInstruction.lineNo,
+                                        context.currentInstruction.colNo);
     return false;
   }
 
@@ -189,11 +194,11 @@ public abstract class AbstractTree implements Cloneable
   public Value evaluate (final Context context, final int top) throws SAXException
   {
     context.m_aErrorHandler.fatalError ("Fatal: unprocessed type in evaluating: " +
-                                     this,
-                                     context.currentInstruction.m_sPublicID,
-                                     context.currentInstruction.m_sSystemID,
-                                     context.currentInstruction.lineNo,
-                                     context.currentInstruction.colNo);
+                                        this,
+                                        context.currentInstruction.m_sPublicID,
+                                        context.currentInstruction.m_sSystemID,
+                                        context.currentInstruction.lineNo,
+                                        context.currentInstruction.colNo);
     return null;
   }
 

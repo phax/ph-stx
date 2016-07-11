@@ -104,7 +104,7 @@ public final class ParamFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>param</code> element. */
-  public class Instance extends AbstractVariableBase
+  public static final class Instance extends AbstractVariableBase
   {
     private final String varName;
     private AbstractTree select;
@@ -164,12 +164,12 @@ public final class ParamFactory extends AbstractFactoryBase
         if (required)
         {
           context.m_aErrorHandler.error ("Missing value for required parameter '" +
-                                      varName +
-                                      "'",
-                                      m_sPublicID,
-                                      m_sSystemID,
-                                      lineNo,
-                                      colNo);
+                                         varName +
+                                         "'",
+                                         m_sPublicID,
+                                         m_sSystemID,
+                                         lineNo,
+                                         colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
         if (select != null)
@@ -215,7 +215,13 @@ public final class ParamFactory extends AbstractFactoryBase
 
       if (varTable.get (m_sExpName) != null)
       {
-        context.m_aErrorHandler.error ("Param '" + varName + "' already declared", m_sPublicID, m_sSystemID, lineNo, colNo);
+        context.m_aErrorHandler.error ("Param '" +
+                                       varName +
+                                       "' already declared",
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo);
         return; // if the errorHandler returns
       }
 

@@ -109,7 +109,7 @@ public final class ProcedureFactory extends AbstractFactoryBase
   // -----------------------------------------------------------------------
 
   /** The inner Instance class */
-  public final class Instance extends AbstractTemplateBase
+  public static final class Instance extends AbstractTemplateBase
   {
     /** The expanded name of this procedure */
     final String m_sExpName;

@@ -104,7 +104,7 @@ public final class MessageFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>message</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree select, terminate;
     private Logger log;
@@ -225,11 +225,11 @@ public final class MessageFactory extends AbstractFactoryBase
       {
         // include locator info for logging
         final StringBuffer sb = new StringBuffer (m_sSystemID).append (':')
-                                                           .append (lineNo)
-                                                           .append (':')
-                                                           .append (colNo)
-                                                           .append (": ")
-                                                           .append (buffer);
+                                                              .append (lineNo)
+                                                              .append (':')
+                                                              .append (colNo)
+                                                              .append (": ")
+                                                              .append (buffer);
         switch (level)
         {
           case TRACE_LEVEL:
@@ -260,18 +260,21 @@ public final class MessageFactory extends AbstractFactoryBase
       final String terminateValue = terminate.evaluate (context, this).getString ();
       if (terminateValue.equals ("yes"))
         throw new SAXException (new TransformerException ("Transformation terminated",
-                                                          new SourceLocatorImpl (m_sPublicID, m_sSystemID, lineNo, colNo)));
+                                                          new SourceLocatorImpl (m_sPublicID,
+                                                                                 m_sSystemID,
+                                                                                 lineNo,
+                                                                                 colNo)));
 
       if (!terminateValue.equals ("no"))
         context.m_aErrorHandler.fatalError ("Attribute 'terminate' of '" +
-                                         m_sQName +
-                                         "' must be 'yes' or 'no', found '" +
-                                         terminateValue +
-                                         "'",
-                                         m_sPublicID,
-                                         m_sSystemID,
-                                         lineNo,
-                                         colNo);
+                                            m_sQName +
+                                            "' must be 'yes' or 'no', found '" +
+                                            terminateValue +
+                                            "'",
+                                            m_sPublicID,
+                                            m_sSystemID,
+                                            lineNo,
+                                            colNo);
     }
 
     @Override

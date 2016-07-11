@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.xml.transform.ErrorListener;
@@ -601,7 +602,7 @@ public class THTrAXResolver implements ITransformerHandlerResolver
       if (key.startsWith (tmp_FILTER_ATTR_NS))
       {
         // it is, extract the name of the attribute and set its value
-        final String name = key.substring (tmp_FILTER_ATTR_NS.length ()).toLowerCase ();
+        final String name = key.substring (tmp_FILTER_ATTR_NS.length ()).toLowerCase (Locale.US);
         final AbstractAttribute a = attrs.get (name);
         if (a == null)
           throw new IllegalArgumentException ("setFilterAttributes() : " + name + " not supported");

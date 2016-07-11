@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.annotation.Nonnull;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.URIResolver;
@@ -540,7 +541,7 @@ public class Processor extends XMLFilterImpl
   {
     m_aContext = new Context ();
 
-    m_aContext.emitter = initializeEmitter (m_aContext);
+    m_aContext.m_aEmitter = initializeEmitter (m_aContext);
 
     m_aEventStack = m_aContext.ancestorStack;
 
@@ -583,7 +584,8 @@ public class Processor extends XMLFilterImpl
    *        The current context
    * @return an emitter-instance
    */
-  protected Emitter initializeEmitter (final Context ctx)
+  @Nonnull
+  protected Emitter initializeEmitter (@Nonnull final Context ctx)
   {
     return new Emitter (ctx.m_aErrorHandler);
   }
@@ -595,9 +597,9 @@ public class Processor extends XMLFilterImpl
   public void initOutputProperties ()
   {
     m_aOutputProperties = new Properties ();
-    m_aOutputProperties.setProperty (OutputKeys.ENCODING, m_aTransformNode.outputEncoding);
+    m_aOutputProperties.setProperty (OutputKeys.ENCODING, m_aTransformNode.m_sOutputEncoding);
     m_aOutputProperties.setProperty (OutputKeys.MEDIA_TYPE, "text/xml");
-    m_aOutputProperties.setProperty (OutputKeys.METHOD, m_aTransformNode.outputMethod);
+    m_aOutputProperties.setProperty (OutputKeys.METHOD, m_aTransformNode.m_sOutputMethod);
     m_aOutputProperties.setProperty (OutputKeys.OMIT_XML_DECLARATION, "no");
     m_aOutputProperties.setProperty (OutputKeys.STANDALONE, "no");
     m_aOutputProperties.setProperty (OutputKeys.VERSION, "1.0");
@@ -629,7 +631,7 @@ public class Processor extends XMLFilterImpl
   @Override
   public void setContentHandler (final ContentHandler handler)
   {
-    m_aContext.emitter.setContentHandler (handler);
+    m_aContext.m_aEmitter.setContentHandler (handler);
   }
 
   /**
@@ -637,7 +639,7 @@ public class Processor extends XMLFilterImpl
    */
   public void setLexicalHandler (final LexicalHandler handler)
   {
-    m_aContext.emitter.setLexicalHandler (handler);
+    m_aContext.m_aEmitter.setLexicalHandler (handler);
   }
 
   /**
@@ -679,7 +681,7 @@ public class Processor extends XMLFilterImpl
    */
   public String getOutputEncoding ()
   {
-    return m_aTransformNode.outputEncoding;
+    return m_aTransformNode.m_sOutputEncoding;
   }
 
   /**
@@ -881,13 +883,13 @@ public class Processor extends XMLFilterImpl
         {
           if (category[tempIndex].matches (m_aContext, false))
             m_aContext.m_aErrorHandler.error ("Ambigous template rule with priority " +
-                                           priority +
-                                           ", found matching template rule already in line " +
-                                           found.lineNo,
-                                           category[tempIndex].m_sPublicID,
-                                           category[tempIndex].m_sSystemID,
-                                           category[tempIndex].lineNo,
-                                           category[tempIndex].colNo);
+                                              priority +
+                                              ", found matching template rule already in line " +
+                                              found.lineNo,
+                                              category[tempIndex].m_sPublicID,
+                                              category[tempIndex].m_sSystemID,
+                                              category[tempIndex].lineNo,
+                                              category[tempIndex].colNo);
         }
       }
     }
@@ -1049,7 +1051,10 @@ public class Processor extends XMLFilterImpl
             {
               case SAXEvent.ELEMENT:
                 startExternDocument ();
-                m_aContext.targetHandler.startElement (event.m_sURI, event.m_sLocalName, event.m_sQName, event.m_aAttrs);
+                m_aContext.targetHandler.startElement (event.m_sURI,
+                                                       event.m_sLocalName,
+                                                       event.m_sQName,
+                                                       event.m_aAttrs);
                 m_nSkipDepth = 1;
                 break;
 
@@ -1115,12 +1120,12 @@ public class Processor extends XMLFilterImpl
               case CSTX.PR_SELF:
                 final AbstractNodeBase start = inst.getNode ();
                 m_aContext.m_aErrorHandler.error ("Encountered '" +
-                                               start.m_sQName +
-                                               "' after stx:process-self",
-                                               start.m_sPublicID,
-                                               start.m_sSystemID,
-                                               start.lineNo,
-                                               start.colNo);
+                                                  start.m_sQName +
+                                                  "' after stx:process-self",
+                                                  start.m_sPublicID,
+                                                  start.m_sSystemID,
+                                                  start.lineNo,
+                                                  start.colNo);
                 // falls through, if the error handler returns
 
               case CSTX.PR_ERROR:
@@ -1163,7 +1168,7 @@ public class Processor extends XMLFilterImpl
     {
       // no template found, default action
       final AbstractGroupBase tg = m_aContext.targetGroup;
-      final Emitter emitter = m_aContext.emitter;
+      final Emitter emitter = m_aContext.m_aEmitter;
       switch (event.m_nType)
       {
         case SAXEvent.ROOT:
@@ -1172,7 +1177,12 @@ public class Processor extends XMLFilterImpl
 
         case SAXEvent.ELEMENT:
           if ((tg.m_nPassThrough & PASS_THROUGH_ELEMENT) != 0)
-            emitter.startElement (event.m_sURI, event.m_sLocalName, event.m_sQName, event.m_aAttrs, event.m_aNamespaces, tg);
+            emitter.startElement (event.m_sURI,
+                                  event.m_sLocalName,
+                                  event.m_sQName,
+                                  event.m_aAttrs,
+                                  event.m_aNamespaces,
+                                  tg);
           dataStack.push (new Data (dataStack.peek ()));
           break;
 
@@ -1431,12 +1441,12 @@ public class Processor extends XMLFilterImpl
           case CSTX.PR_SELF:
             final AbstractNodeBase start = inst.getNode ();
             m_aContext.m_aErrorHandler.error ("Encountered '" +
-                                           start.m_sQName +
-                                           "' after stx:process-siblings",
-                                           start.m_sPublicID,
-                                           start.m_sSystemID,
-                                           start.lineNo,
-                                           start.colNo);
+                                              start.m_sQName +
+                                              "' after stx:process-siblings",
+                                              start.m_sPublicID,
+                                              start.m_sSystemID,
+                                              start.lineNo,
+                                              start.colNo);
             // falls through, if the error handler returns
           case CSTX.PR_ERROR:
             throw new SAXException ("Non-recoverable error");
@@ -1525,12 +1535,12 @@ public class Processor extends XMLFilterImpl
       e.printStackTrace (new java.io.PrintWriter (sw));
       final AbstractNodeBase nb = m_aContext.currentInstruction;
       m_aContext.m_aErrorHandler.fatalError ("External processing failed: " +
-                                          sw,
-                                          nb.m_sPublicID,
-                                          nb.m_sSystemID,
-                                          nb.lineNo,
-                                          nb.colNo,
-                                          e);
+                                             sw,
+                                             nb.m_sPublicID,
+                                             nb.m_sSystemID,
+                                             nb.lineNo,
+                                             nb.colNo,
+                                             e);
     }
   }
 
@@ -1572,12 +1582,12 @@ public class Processor extends XMLFilterImpl
       e.printStackTrace (new java.io.PrintWriter (sw));
       final AbstractNodeBase nb = m_aContext.currentInstruction;
       m_aContext.m_aErrorHandler.fatalError ("External processing failed: " +
-                                          sw,
-                                          nb.m_sPublicID,
-                                          nb.m_sSystemID,
-                                          nb.lineNo,
-                                          nb.colNo,
-                                          e);
+                                             sw,
+                                             nb.m_sPublicID,
+                                             nb.m_sSystemID,
+                                             nb.lineNo,
+                                             nb.colNo,
+                                             e);
     }
   }
 
@@ -1596,7 +1606,7 @@ public class Processor extends XMLFilterImpl
     {
       // initialize all group stx:variables
       m_aTransformNode.initGroupVariables (m_aContext);
-      m_aContext.emitter.startDocument ();
+      m_aContext.m_aEmitter.startDocument ();
     }
     else
     { // stx:process-document
@@ -1648,16 +1658,16 @@ public class Processor extends XMLFilterImpl
             case CSTX.PR_SELF:
               final AbstractNodeBase start = inst.getNode ();
               m_aContext.m_aErrorHandler.error ("Encountered '" +
-                                             start.m_sQName +
-                                             "' after stx:process-" +
-                                             // prStatus must be either
-                                             // PR_CHILDREN
-                                             // or PR_SELF, see above
-                                             (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
-                                             start.m_sPublicID,
-                                             start.m_sSystemID,
-                                             start.lineNo,
-                                             start.colNo);
+                                                start.m_sQName +
+                                                "' after stx:process-" +
+                                                // prStatus must be either
+                                                // PR_CHILDREN
+                                                // or PR_SELF, see above
+                                                (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
+                                                start.m_sPublicID,
+                                                start.m_sSystemID,
+                                                start.lineNo,
+                                                start.colNo);
               // falls through if the error handler returns
             case CSTX.PR_ERROR:
               throw new SAXException ("Non-recoverable error");
@@ -1691,7 +1701,7 @@ public class Processor extends XMLFilterImpl
         if (m_aInnerProcStack.empty ())
         {
           m_aTransformNode.exitRecursionLevel (m_aContext);
-          m_aContext.emitter.endDocument (m_aTransformNode);
+          m_aContext.m_aEmitter.endDocument (m_aTransformNode);
         }
         else
           m_aEventStack = m_aContext.ancestorStack = (Stack <SAXEvent>) m_aInnerProcStack.pop ();
@@ -1779,7 +1789,7 @@ public class Processor extends XMLFilterImpl
       {
         // perform default action?
         if ((data.targetGroup.m_nPassThrough & PASS_THROUGH_ELEMENT) != 0)
-          m_aContext.emitter.endElement (uri, lName, qName, data.targetGroup);
+          m_aContext.m_aEmitter.endElement (uri, lName, qName, data.targetGroup);
       }
       else
         if (prStatus == CSTX.PR_CHILDREN || prStatus == CSTX.PR_SELF)
@@ -1800,16 +1810,16 @@ public class Processor extends XMLFilterImpl
             {
               final AbstractNodeBase start = inst.getNode ();
               m_aContext.m_aErrorHandler.error ("Encountered '" +
-                                             start.m_sQName +
-                                             "' after stx:process-" +
-                                             // prStatus must be either
-                                             // PR_CHILDREN
-                                             // or PR_SELF, see above
-                                             (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
-                                             start.m_sPublicID,
-                                             start.m_sSystemID,
-                                             start.lineNo,
-                                             start.colNo);
+                                                start.m_sQName +
+                                                "' after stx:process-" +
+                                                // prStatus must be either
+                                                // PR_CHILDREN
+                                                // or PR_SELF, see above
+                                                (prStatus == CSTX.PR_CHILDREN ? "children" : "self"),
+                                                start.m_sPublicID,
+                                                start.m_sSystemID,
+                                                start.lineNo,
+                                                start.colNo);
               throw new SAXException ("Non-recoverable error");
             }
 
@@ -2095,7 +2105,7 @@ public class Processor extends XMLFilterImpl
    */
   public Emitter getEmitter ()
   {
-    return m_aContext.emitter;
+    return m_aContext.m_aEmitter;
   }
 
   /**

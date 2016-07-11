@@ -92,7 +92,7 @@ terminal String QNAME, NCNAME, STRING;
 terminal Double NUMBER;
 
 /* Non-Terminals */
-non terminal Tree Pattern, MatchPath, RelativePath,
+non terminal AbstractTree Pattern, MatchPath, RelativePath,
                   Step, NodeTest, NameTest, Predicate;
 
 
@@ -103,7 +103,7 @@ non terminal Tree Pattern, MatchPath, RelativePath,
 
 
 /* Non-terminals */
-non terminal Tree   Expr, AndExpr, GeneralComp,
+non terminal AbstractTree   Expr, AndExpr, GeneralComp,
                     AdditiveExpr, MultiplicativeExpr, UnaryExpr, BasicExpr, 
                     Accessor, NodeAccessor, RelativeAccessor, AccessorStep,
                     NodeNameTest, KindTest, AttributeNameTest, 
@@ -191,22 +191,22 @@ BasicExpr ::=
 
 Accessor ::= 
    NodeAccessor:n SLASH AttributeNameTest:a
-      {: a.left = n; 
+      {: a.m_aLeft = n; 
          RESULT = a; :} 
  | NodeAccessor:n
       {: RESULT = n; :}
  | RelativeAccessor:n SLASH AttributeNameTest:a
-      {: a.left = n.reverseAssociativity(); 
+      {: a.m_aLeft = n.reverseAssociativity(); 
          RESULT = a; :} 
  | RelativeAccessor:n
       {: RESULT = n.reverseAssociativity(); :}
  | SLASH RelativeAccessor:n SLASH AttributeNameTest:a
-      {: a.left = new RootTree(n.reverseAssociativity()); 
+      {: a.m_aLeft = new RootTree(n.reverseAssociativity()); 
          RESULT = a; :} 
  | SLASH RelativeAccessor:n
       {: RESULT = new RootTree(n.reverseAssociativity()); :}
  | DSLASH RelativeAccessor:n SLASH AttributeNameTest:a
-      {: a.left = new RootTree(new DescTree(null, n.reverseAssociativity()));
+      {: a.m_aLeft = new RootTree(new DescTree(null, n.reverseAssociativity()));
          RESULT = a; :} 
  | DSLASH RelativeAccessor:n
       {: RESULT = new RootTree(new DescTree(null, 
@@ -248,24 +248,24 @@ NodeAccessor ::=
 
 RelativeAccessor ::=
    RelativeAccessor:r SLASH AccessorStep:a
-      {: if (a.type == Tree.DDOT) {
-            a.left = r;
+      {: if (a.getType () == AbstractTree.DDOT) {
+            a.m_aLeft = r;
             RESULT = a;
          }
          else
             RESULT = new ChildTree(r, a);
       :}
  | RelativeAccessor:r DSLASH AccessorStep:a
-      {: Tree d = new DescTree(r, null);
-         if (a.type == Tree.DDOT) {
-            a.left = d;
+      {: AbstractTree d = new DescTree(r, null);
+         if (a.getType () == AbstractTree.DDOT) {
+            a.m_aLeft = d;
             RESULT = a;
          }
          else 
             RESULT = new ChildTree(d, a);
       :}
  | AccessorStep:a
-      {: if (a.type == Tree.DDOT)
+      {: if (a.getType () == AbstractTree.DDOT)
             RESULT = a;
          else
             RESULT = new ChildTree(null, a);
@@ -370,18 +370,18 @@ MatchPath ::=
       {: RESULT = new RootTree(); :}
  | SLASH RelativePath:t
       {: // need to add an additional leaf for root
-         Tree tmp = t, last = null;
-         // go down the tree to the left
-         while (tmp.type == Tree.CHILD || tmp.type == Tree.DESC) {
+         AbstractTree tmp = t, last = null;
+         // go down the tree to the m_aLeft
+         while (tmp.getType () == AbstractTree.CHILD || tmp.getType () == AbstractTree.DESC) {
             last = tmp;
-            tmp = tmp.left;
+            tmp = tmp.m_aLeft;
          }
          // create a new CHILD node
          tmp = new ChildTree(new RootTree(), tmp);
          if (last == null)
             RESULT = tmp;     // return new node
          else {
-            last.left = tmp;  // insert new node
+            last.m_aLeft = tmp;  // insert new node
             RESULT = t;       // return original
          }
       :}

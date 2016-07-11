@@ -103,7 +103,7 @@ public final class WithParamFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>with-param</code> element. */
-  public class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private final String m_sExpName;
     private AbstractTree m_aSelect;
@@ -145,7 +145,7 @@ public final class WithParamFactory extends AbstractFactoryBase
     public short processEnd (final Context context) throws SAXException
     {
       context.m_aPassedParameters.put (m_sExpName,
-                                    new Value (((StringEmitter) context.popEmitter ()).getBuffer ().toString ()));
+                                       new Value (((StringEmitter) context.popEmitter ()).getBuffer ().toString ()));
 
       return super.processEnd (context);
     }

@@ -52,7 +52,7 @@ public class PAttributesFactory extends AbstractFactoryBase
   // Constructor
   public PAttributesFactory ()
   {
-    attrNames = new HashSet <String> ();
+    attrNames = new HashSet <> ();
     attrNames.add ("group");
   }
 
@@ -77,7 +77,7 @@ public class PAttributesFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
     // Constructor
     public Instance (final String qName,

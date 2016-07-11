@@ -51,7 +51,7 @@ public final class Context implements Cloneable
   public Locator locator;
 
   /** The emitter object for the transformation */
-  public Emitter emitter;
+  public Emitter m_aEmitter;
 
   /** The current ancestor stack */
   public Stack <SAXEvent> ancestorStack = new Stack<> ();
@@ -121,21 +121,21 @@ public final class Context implements Cloneable
   /** Instantiate a new emitter object for a new result event stream */
   public void pushEmitter (final IStxEmitter stxEmitter)
   {
-    emitter = emitter.pushEmitter (stxEmitter);
+    m_aEmitter = m_aEmitter.pushEmitter (stxEmitter);
   }
 
   /** re-use a previous emitter for the event stream */
   public void pushEmitter (final Emitter anEmitter)
   {
-    anEmitter.m_aPrev = emitter;
-    emitter = anEmitter;
+    anEmitter.m_aPrev = m_aEmitter;
+    m_aEmitter = anEmitter;
   }
 
   /** Restore previous emitter after finishing a result event stream */
   public IStxEmitter popEmitter ()
   {
-    final IStxEmitter stxEmitter = (IStxEmitter) emitter.m_aContH;
-    emitter = emitter.m_aPrev;
+    final IStxEmitter stxEmitter = (IStxEmitter) m_aEmitter.m_aContH;
+    m_aEmitter = m_aEmitter.m_aPrev;
     return stxEmitter;
   }
 }

@@ -86,7 +86,7 @@ public final class CopyFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>copy</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     /**
      * the pattern in the <code>attributes</code> attribute, <code>null</code>
@@ -95,7 +95,8 @@ public final class CopyFactory extends AbstractFactoryBase
     private AbstractTree m_aAttPattern;
 
     /**
-     * <code>true</code> if {@link #m_aAttPattern} is a wildcard (<code>@*</code>)
+     * <code>true</code> if {@link #m_aAttPattern} is a wildcard
+     * (<code>@*</code>)
      */
     private boolean attrWildcard = false;
 
@@ -113,7 +114,7 @@ public final class CopyFactory extends AbstractFactoryBase
     {
       super (qName, parent, context, true);
       this.m_aAttPattern = attPattern;
-      if (attPattern != null && attPattern.m_nType == AbstractTree.ATTR_WILDCARD)
+      if (attPattern != null && attPattern.getType () == AbstractTree.ATTR_WILDCARD)
         attrWildcard = true;
     }
 
@@ -146,7 +147,7 @@ public final class CopyFactory extends AbstractFactoryBase
         {
           super.process (context);
           final Attributes attList = attrWildcard ? event.m_aAttrs : emptyAttList;
-          context.emitter.startElement (event.m_sURI,
+          context.m_aEmitter.startElement (event.m_sURI,
                                         event.m_sLocalName,
                                         event.m_sQName,
                                         attList,
@@ -163,7 +164,7 @@ public final class CopyFactory extends AbstractFactoryBase
               if (m_aAttPattern.matches (context, context.ancestorStack.size (), false))
               {
                 final SAXEvent attrEvent = context.ancestorStack.peek ();
-                context.emitter.addAttribute (attrEvent.m_sURI,
+                context.m_aEmitter.addAttribute (attrEvent.m_sURI,
                                               attrEvent.m_sQName,
                                               attrEvent.m_sLocalName,
                                               attrEvent.m_sValue,
@@ -177,25 +178,25 @@ public final class CopyFactory extends AbstractFactoryBase
           break;
         }
         case SAXEvent.TEXT:
-          context.emitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
+          context.m_aEmitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
           next = successor;
           break;
         case SAXEvent.CDATA:
-          context.emitter.startCDATA (this);
-          context.emitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
-          context.emitter.endCDATA ();
+          context.m_aEmitter.startCDATA (this);
+          context.m_aEmitter.characters (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
+          context.m_aEmitter.endCDATA ();
           next = successor;
           break;
         case SAXEvent.PI:
-          context.emitter.processingInstruction (event.m_sQName, event.m_sValue, this);
+          context.m_aEmitter.processingInstruction (event.m_sQName, event.m_sValue, this);
           next = successor;
           break;
         case SAXEvent.COMMENT:
-          context.emitter.comment (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
+          context.m_aEmitter.comment (event.m_sValue.toCharArray (), 0, event.m_sValue.length (), this);
           next = successor;
           break;
         case SAXEvent.ATTRIBUTE:
-          context.emitter.addAttribute (event.m_sURI, event.m_sQName, event.m_sLocalName, event.m_sValue, this);
+          context.m_aEmitter.addAttribute (event.m_sURI, event.m_sQName, event.m_sLocalName, event.m_sValue, this);
           next = successor;
           break;
         default:
@@ -213,7 +214,7 @@ public final class CopyFactory extends AbstractFactoryBase
     {
       final SAXEvent event = context.ancestorStack.peek ();
       if (event.m_nType == SAXEvent.ELEMENT)
-        context.emitter.endElement (event.m_sURI, event.m_sLocalName, event.m_sQName, this);
+        context.m_aEmitter.endElement (event.m_sURI, event.m_sLocalName, event.m_sQName, this);
       return super.processEnd (context);
     }
 

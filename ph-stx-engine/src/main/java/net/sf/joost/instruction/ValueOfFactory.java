@@ -80,7 +80,7 @@ public final class ValueOfFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>value-of</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree select, separator;
 
@@ -127,7 +127,7 @@ public final class ValueOfFactory extends AbstractFactoryBase
         }
         s = sb.toString ();
       }
-      context.emitter.characters (s.toCharArray (), 0, s.length (), this);
+      context.m_aEmitter.characters (s.toCharArray (), 0, s.length (), this);
       return CSTX.PR_CONTINUE;
     }
 

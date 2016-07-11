@@ -28,13 +28,13 @@ import java.util.regex.Matcher;
 
 import org.xml.sax.SAXException;
 
-import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
+import net.sf.joost.grammar.EvalException;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
 import net.sf.joost.stx.function.FunctionFactory.IInstance;
-import net.sf.joost.util.regex.JRegularExpression;
 import net.sf.joost.util.regex.IRegularExpression;
+import net.sf.joost.util.regex.JRegularExpression;
 
 /**
  * The <code>tokenize</code> function.<br>
@@ -75,17 +75,20 @@ public final class Tokenize implements IInstance
     return true;
   }
 
-  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException, EvalException
+  public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
+                                                                                        EvalException
   {
     String input, pattern, flags;
-    if (args.m_aLeft.m_nType == AbstractTree.LIST)
-    { // three parameters
+    if (args.m_aLeft.getType () == AbstractTree.LIST)
+    {
+      // three parameters
       input = args.m_aLeft.m_aLeft.evaluate (context, top).getStringValue ();
       pattern = args.m_aLeft.m_aRight.evaluate (context, top).getStringValue ();
       flags = args.m_aRight.evaluate (context, top).getStringValue ();
     }
     else
-    { // two parameters
+    {
+      // two parameters
       input = args.m_aLeft.evaluate (context, top).getStringValue ();
       pattern = args.m_aRight.evaluate (context, top).getStringValue ();
       flags = "";

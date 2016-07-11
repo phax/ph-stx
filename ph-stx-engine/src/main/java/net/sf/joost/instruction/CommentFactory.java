@@ -76,7 +76,7 @@ public class CommentFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>comment</code> element. */
-  public class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aSelect;
     private StringEmitter m_aStrEmitter;
@@ -113,7 +113,7 @@ public class CommentFactory extends AbstractFactoryBase
         // we have contents to be processed
         super.process (context);
         // check for nesting of this stx:comment instructions
-        if (context.emitter.isEmitterActive (m_aStrEmitter))
+        if (context.m_aEmitter.isEmitterActive (m_aStrEmitter))
         {
           context.m_aErrorHandler.error ("Can't create nested comment here", m_sPublicID, m_sSystemID, lineNo, colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
@@ -134,7 +134,7 @@ public class CommentFactory extends AbstractFactoryBase
         else
         {
           // produce the comment immediately
-          context.emitter.comment (comment.toCharArray (), 0, comment.length (), this);
+          context.m_aEmitter.comment (comment.toCharArray (), 0, comment.length (), this);
         }
       }
 
@@ -192,7 +192,7 @@ public class CommentFactory extends AbstractFactoryBase
           comment.append (' ');
       }
 
-      context.emitter.comment (comment.toString ().toCharArray (), 0, comment.length (), this);
+      context.m_aEmitter.comment (comment.toString ().toCharArray (), 0, comment.length (), this);
     }
 
     @Override

@@ -59,7 +59,7 @@ parser code {:
 #include "terminals.inc"
 
 /* Non-Terminals */
-non terminal Tree Pattern, MatchPath, RelativePath,
+non terminal AbstractTree Pattern, MatchPath, RelativePath,
                   Step, NodeTest, NameTest, Predicate;
 
 
@@ -81,18 +81,18 @@ MatchPath ::=
       {: RESULT = new RootTree(); :}
  | SLASH RelativePath:t
       {: // need to add an additional leaf for root
-         Tree tmp = t, last = null;
-         // go down the tree to the left
-         while (tmp.type == Tree.CHILD || tmp.type == Tree.DESC) {
+         AbstractTree tmp = t, last = null;
+         // go down the tree to the m_aLeft
+         while (tmp.getType () == AbstractTree.CHILD || tmp.getType () == AbstractTree.DESC) {
             last = tmp;
-            tmp = tmp.left;
+            tmp = tmp.m_aLeft;
          }
          // create a new CHILD node
          tmp = new ChildTree(new RootTree(), tmp);
          if (last == null)
             RESULT = tmp;     // return new node
          else {
-            last.left = tmp;  // insert new node
+            last.m_aLeft = tmp;  // insert new node
             RESULT = t;       // return original
          }
       :}

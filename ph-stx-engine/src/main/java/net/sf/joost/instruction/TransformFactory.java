@@ -198,20 +198,20 @@ public class TransformFactory extends AbstractFactoryBase
   /* --------------------------------------------------------------------- */
 
   /** Represents an instance of the <code>transform</code> element. */
-  public final class Instance extends AbstractGroupBase
+  public static final class Instance extends AbstractGroupBase
   {
     /** mapping table for <code>stx:namespace-alias</code> instructions */
-    public Hashtable <String, String> namespaceAliases;
+    public Hashtable <String, String> m_aNamespaceAliases;
 
     // stx:transform attributes (options)
-    public String outputEncoding;
-    public String outputMethod;
-    public String stxpathDefaultNamespace;
-    public Set <String> excludedNamespaces;
+    public String m_sOutputEncoding;
+    public String m_sOutputMethod;
+    public String m_sStxpathDefaultNamespace;
+    public Set <String> m_aExcludedNamespaces;
 
     // used to transfer the list of compilable nodes from an included
     // STX sheet to the calling Parser object
-    public List <AbstractNodeBase> compilableNodes;
+    public List <AbstractNodeBase> m_aCompilableNodes;
 
     // Constructor
     public Instance (AbstractNodeBase parent,
@@ -230,7 +230,7 @@ public class TransformFactory extends AbstractFactoryBase
       {
         m_aNamedGroups = new Hashtable<> (); // shared with all sub-groups
         m_aGlobalProcedures = new Hashtable<> (); // also shared
-        namespaceAliases = new Hashtable<> (); // also shared
+        m_aNamespaceAliases = new Hashtable<> (); // also shared
       }
       else
       {
@@ -240,17 +240,17 @@ public class TransformFactory extends AbstractFactoryBase
         // -> should be improved/fixed)
         while (!(parent instanceof TransformFactory.Instance))
           parent = parent.m_aParent;
-        namespaceAliases = ((TransformFactory.Instance) parent).namespaceAliases;
+        m_aNamespaceAliases = ((TransformFactory.Instance) parent).m_aNamespaceAliases;
       }
 
-      this.outputEncoding = (outputEncoding != null) ? outputEncoding : CSTX.DEFAULT_ENCODING; // in
+      this.m_sOutputEncoding = (outputEncoding != null) ? outputEncoding : CSTX.DEFAULT_ENCODING; // in
       // Constants
 
-      this.outputMethod = (outputMethod != null) ? outputMethod : "xml";
+      this.m_sOutputMethod = (outputMethod != null) ? outputMethod : "xml";
 
-      this.stxpathDefaultNamespace = (stxpathDefaultNamespace != null) ? stxpathDefaultNamespace : "";
+      this.m_sStxpathDefaultNamespace = (stxpathDefaultNamespace != null) ? stxpathDefaultNamespace : "";
 
-      this.excludedNamespaces = excludedNamespaces;
+      this.m_aExcludedNamespaces = excludedNamespaces;
     }
 
     /** @return all top level elements of the transformation sheet */
@@ -262,7 +262,7 @@ public class TransformFactory extends AbstractFactoryBase
     @Override
     public void insert (final AbstractNodeBase node) throws SAXParseException
     {
-      if (compilableNodes != null)
+      if (m_aCompilableNodes != null)
                                   // will only happen after this transform
                                   // element was inserted by
                                   // an stx:include instruction

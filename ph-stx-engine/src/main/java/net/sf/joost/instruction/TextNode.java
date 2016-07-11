@@ -54,7 +54,7 @@ public class TextNode extends AbstractNodeBase
   @Override
   public short process (final Context context) throws SAXException
   {
-    context.emitter.characters (string.toCharArray (), 0, string.length (), this);
+    context.m_aEmitter.characters (string.toCharArray (), 0, string.length (), this);
     return CSTX.PR_CONTINUE;
   }
 

@@ -81,7 +81,7 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>analyze-text</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aSelect;
 

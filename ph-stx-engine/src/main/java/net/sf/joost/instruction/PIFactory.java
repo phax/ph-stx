@@ -83,7 +83,7 @@ public final class PIFactory extends AbstractFactoryBase
   /**
    * Represents an instance of the <code>processing-instruction</code> element.
    */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree name, select;
     private StringEmitter strEmitter;
@@ -125,13 +125,13 @@ public final class PIFactory extends AbstractFactoryBase
       {
         super.process (context);
         // check for nesting of this stx:processing-instruction
-        if (context.emitter.isEmitterActive (strEmitter))
+        if (context.m_aEmitter.isEmitterActive (strEmitter))
         {
           context.m_aErrorHandler.error ("Can't create nested processing instruction here",
-                                      m_sPublicID,
-                                      m_sSystemID,
-                                      lineNo,
-                                      colNo);
+                                         m_sPublicID,
+                                         m_sSystemID,
+                                         lineNo,
+                                         colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
         buffer.setLength (0);
@@ -149,7 +149,7 @@ public final class PIFactory extends AbstractFactoryBase
           while ((index = pi.lastIndexOf ("?>", --index)) != -1);
           pi = piBuf.toString ();
         }
-        context.emitter.processingInstruction (piName, pi, this);
+        context.m_aEmitter.processingInstruction (piName, pi, this);
       }
       return CSTX.PR_CONTINUE;
     }
@@ -169,7 +169,7 @@ public final class PIFactory extends AbstractFactoryBase
         while ((index = str.lastIndexOf ("?>", --index)) != -1)
           buffer.insert (index + 1, ' ');
       }
-      context.emitter.processingInstruction (piName, buffer.toString (), this);
+      context.m_aEmitter.processingInstruction (piName, buffer.toString (), this);
       return super.processEnd (context);
     }
 

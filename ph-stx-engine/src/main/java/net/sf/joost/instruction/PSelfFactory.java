@@ -51,7 +51,7 @@ public class PSelfFactory extends AbstractFactoryBase
   // Constructor
   public PSelfFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("group");
     attrNames.add ("filter-method");
     attrNames.add ("filter-src");
@@ -92,7 +92,7 @@ public class PSelfFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
     // Constructor
     public Instance (final String qName,
@@ -105,15 +105,12 @@ public class PSelfFactory extends AbstractFactoryBase
       super (qName, parent, context, groupQName, method, src);
     }
 
-    /**
-     * @return {@link #PR_SELF}
-     */
     @Override
     public short processEnd (final Context context) throws SAXException
     {
       // no need to call super.processEnd(), there are no local
       // variable declarations
-      if (m_aFilter != null)
+      if (hasFilter ())
       {
         // use external SAX filter (TransformerHandler)
         context.targetHandler = getProcessHandler (context);

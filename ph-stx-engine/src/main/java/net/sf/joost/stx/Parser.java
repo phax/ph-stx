@@ -426,7 +426,7 @@ public class Parser implements ContentHandler // , ErrorHandler
           compilableNodes.add (currentNode);
       // add the compilable nodes from an included stx:transform
       if (currentNode instanceof TransformFactory.Instance && currentNode != m_aPContext.transformNode)
-        compilableNodes.addAll (((TransformFactory.Instance) currentNode).compilableNodes);
+        compilableNodes.addAll (((TransformFactory.Instance) currentNode).m_aCompilableNodes);
       currentNode = openedElements.pop ();
     }
     catch (final SAXParseException ex)

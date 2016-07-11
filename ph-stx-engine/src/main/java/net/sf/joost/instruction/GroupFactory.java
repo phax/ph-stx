@@ -169,7 +169,7 @@ public final class GroupFactory extends AbstractFactoryBase
   /* -------------------------------------------------------------------- */
 
   /** Represents an instance of the <code>group</code> element. */
-  public final class Instance extends AbstractGroupBase
+  public static final class Instance extends AbstractGroupBase
   {
     // Constructor
     protected Instance (final String qName,

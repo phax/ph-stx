@@ -70,7 +70,12 @@ public final class NSAliasFactory extends AbstractFactoryBase
   {
     // check parent
     if (parent != null && !(parent instanceof TransformFactory.Instance))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.m_sQName + "'", context.locator);
+      throw new SAXParseException ("'" +
+                                   qName +
+                                   "' not allowed as child of '" +
+                                   parent.m_sQName +
+                                   "'",
+                                   context.locator);
 
     String fromPrefix = getRequiredAttribute (qName, attrs, "sheet-prefix", context);
     // check value syntax
@@ -119,7 +124,7 @@ public final class NSAliasFactory extends AbstractFactoryBase
     }
 
     // alias already defined?
-    final Hashtable <String, String> namespaceAliases = ((TransformFactory.Instance) parent).namespaceAliases;
+    final Hashtable <String, String> namespaceAliases = ((TransformFactory.Instance) parent).m_aNamespaceAliases;
     final String alias = namespaceAliases.get (fromURI);
     if (alias != null && !alias.equals (toURI))
     {
@@ -144,7 +149,7 @@ public final class NSAliasFactory extends AbstractFactoryBase
    * It has no real functionality of its own; it is only needed to simplify the
    * parsing process of the transformation sheet.
    */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     protected Instance (final String qName, final AbstractNodeBase parent, final ParseContext context)
     {

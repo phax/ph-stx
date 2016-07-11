@@ -97,8 +97,9 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
   protected AbstractGroupBase m_aTargetGroup;
 
   // filter and src values
-  protected String m_sUseBufQName, m_sUseBufExpName;
-  protected AbstractTree m_aFilter;
+  private String m_sUseBufQName;
+  private String m_sUseBufExpName;
+  private AbstractTree m_aFilter;
   private AbstractTree m_aHrefTree;
   private boolean m_bBufScopeDetermined = false;
   private AbstractGroupBase m_aBufGroupScope;
@@ -341,7 +342,7 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
       return null;
     }
 
-    final EmitterAdapter adapter = new EmitterAdapter (context.emitter, this);
+    final EmitterAdapter adapter = new EmitterAdapter (context.m_aEmitter, this);
     handler.setResult (new SAXResult (adapter));
     return handler;
   }
@@ -365,4 +366,8 @@ public abstract class AbstractProcessBase extends AbstractNodeBase
       theCopy.m_aHrefTree = m_aHrefTree.deepCopy (copies);
   }
 
+  protected boolean hasFilter ()
+  {
+    return m_aFilter != null;
+  }
 }

@@ -34,6 +34,8 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.annotation.Nonnull;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -78,12 +80,12 @@ public class Emitter
   public Emitter m_aPrev;
 
   // properties of the last element
-  private String lastUri, lastLName, lastQName;
-  private IMutableAttributes lastAttrs;
-  private AbstractNodeBase lastInstruction;
+  private String m_sLastUri, m_sLastLName, m_sLastQName;
+  private IMutableAttributes m_aLastAttrs;
+  private AbstractNodeBase m_aLastInstruction;
 
-  private boolean insideCDATA = false;
-  private boolean dtdAllowed = true;
+  private boolean m_bInsideCDATA = false;
+  private boolean m_bDTDAllowed = true;
 
   public Emitter (final ErrorHandlerImpl errorHandler)
   {
@@ -92,17 +94,17 @@ public class Emitter
     m_aNSStack = new Stack<> ();
 
     m_aOpenedElements = new Stack<> ();
-    this.m_aErrorHandler = errorHandler;
+    m_aErrorHandler = errorHandler;
   }
 
   /** Called from {@link #pushEmitter(IStxEmitter)} */
-  protected Emitter (final Emitter prev, final IStxEmitter handler)
+  protected Emitter (@Nonnull final Emitter aPrev, final IStxEmitter handler)
   {
-    this (prev.m_aErrorHandler);
+    this (aPrev.m_aErrorHandler);
 
-    this.m_aPrev = prev;
-    this.m_aContH = handler;
-    this.m_aLexH = handler;
+    m_aPrev = aPrev;
+    m_aContH = handler;
+    m_aLexH = handler;
   }
 
   /**
@@ -113,6 +115,7 @@ public class Emitter
    *        the STX handler for the new emitter
    * @return a new emitter object
    */
+  @Nonnull
   public Emitter pushEmitter (final IStxEmitter handler)
   {
     if (handler.getSystemId () == null && m_aContH instanceof IStxEmitter)
@@ -139,23 +142,23 @@ public class Emitter
   {
     try
     {
-      m_aContH.startElement (lastUri, lastLName, lastQName, lastAttrs);
-      dtdAllowed = false;
+      m_aContH.startElement (m_sLastUri, m_sLastLName, m_sLastQName, m_aLastAttrs);
+      m_bDTDAllowed = false;
     }
     catch (final SAXException se)
     {
       m_aErrorHandler.error (se.getMessage (),
-                             lastInstruction.m_sPublicID,
-                             lastInstruction.m_sSystemID,
-                             lastInstruction.lineNo,
-                             lastInstruction.colNo,
+                             m_aLastInstruction.m_sPublicID,
+                             m_aLastInstruction.m_sSystemID,
+                             m_aLastInstruction.lineNo,
+                             m_aLastInstruction.colNo,
                              se);
     }
 
-    m_aOpenedElements.push (lastUri);
-    m_aOpenedElements.push (lastQName);
+    m_aOpenedElements.push (m_sLastUri);
+    m_aOpenedElements.push (m_sLastQName);
 
-    lastAttrs = null; // flag: there's no startElement pending
+    m_aLastAttrs = null; // flag: there's no startElement pending
   }
 
   /**
@@ -170,7 +173,7 @@ public class Emitter
                             final String value,
                             final AbstractNodeBase instruction) throws SAXException
   {
-    if (lastAttrs == null)
+    if (m_aLastAttrs == null)
     {
       m_aErrorHandler.error ("Can't create an attribute if there's " +
                              "no opened element",
@@ -184,14 +187,15 @@ public class Emitter
     if (m_aContH != null)
     {
 
-      final int index = lastAttrs.getIndex (uri, lName);
+      final int index = m_aLastAttrs.getIndex (uri, lName);
       if (index != -1)
-      { // already there
-        lastAttrs.setValue (index, value);
+      {
+        // already there
+        m_aLastAttrs.setValue (index, value);
       }
       else
       {
-        lastAttrs.addAttribute (uri, lName, qName, "CDATA", value);
+        m_aLastAttrs.addAttribute (uri, lName, qName, "CDATA", value);
       }
 
       // is this attribute in an undeclared namespace?
@@ -225,7 +229,7 @@ public class Emitter
   {
     if (m_aContH != null)
     {
-      if (lastAttrs != null)
+      if (m_aLastAttrs != null)
         processLastElement ();
       if (!m_aOpenedElements.isEmpty ())
       {
@@ -257,7 +261,7 @@ public class Emitter
   {
     if (m_aContH != null)
     {
-      if (lastAttrs != null)
+      if (m_aLastAttrs != null)
         processLastElement ();
 
       m_aNSSupport.pushContext ();
@@ -292,10 +296,10 @@ public class Emitter
       // We store the properties of this element, because following
       // addAttribute() calls may create additional attributes. This
       // element will be reported to the next emitter in processLastElement
-      lastUri = uri;
-      lastLName = lName;
-      lastQName = qName;
-      lastAttrs = new MutableAttributesImpl (attrs);
+      m_sLastUri = uri;
+      m_sLastLName = lName;
+      m_sLastQName = qName;
+      m_aLastAttrs = new MutableAttributesImpl (attrs);
 
       if (namespaces != null)
       {
@@ -326,7 +330,7 @@ public class Emitter
       // else: happens for dynamically created elements
       // e.g. <stx:start-element name="foo" />
 
-      lastInstruction = instruction;
+      m_aLastInstruction = instruction;
     }
   }
 
@@ -343,7 +347,7 @@ public class Emitter
   {
     if (m_aContH != null)
     {
-      if (lastAttrs != null)
+      if (m_aLastAttrs != null)
         processLastElement ();
 
       if (m_aOpenedElements.isEmpty ())
@@ -424,11 +428,11 @@ public class Emitter
       return;
     if (m_aContH != null)
     {
-      if (lastAttrs != null)
+      if (m_aLastAttrs != null)
         processLastElement ();
       try
       {
-        if (insideCDATA)
+        if (m_bInsideCDATA)
         { // prevent output of "]]>" in this CDATA section
           String str = new String (ch, start, length);
           int index = str.indexOf ("]]>");
@@ -471,7 +475,7 @@ public class Emitter
   {
     if (m_aContH != null)
     {
-      if (lastAttrs != null)
+      if (m_aLastAttrs != null)
         processLastElement ();
       try
       {
@@ -500,7 +504,7 @@ public class Emitter
                        final int length,
                        final AbstractNodeBase instruction) throws SAXException
   {
-    if (m_aContH != null && lastAttrs != null)
+    if (m_aContH != null && m_aLastAttrs != null)
       processLastElement ();
     if (m_aLexH != null)
     {
@@ -528,7 +532,7 @@ public class Emitter
    */
   public void startCDATA (final AbstractNodeBase instruction) throws SAXException
   {
-    if (m_aContH != null && lastAttrs != null)
+    if (m_aContH != null && m_aLastAttrs != null)
       processLastElement ();
     if (m_aLexH != null)
     {
@@ -545,7 +549,7 @@ public class Emitter
                                instruction.colNo,
                                se);
       }
-      insideCDATA = true;
+      m_bInsideCDATA = true;
     }
   }
 
@@ -554,7 +558,7 @@ public class Emitter
     if (m_aLexH != null)
     {
       m_aLexH.endCDATA ();
-      insideCDATA = false;
+      m_bInsideCDATA = false;
     }
   }
 
@@ -563,9 +567,9 @@ public class Emitter
                          final String publicId,
                          final String systemId) throws SAXException
   {
-    if (m_aContH != null && lastAttrs != null)
+    if (m_aContH != null && m_aLastAttrs != null)
       processLastElement ();
-    if (!dtdAllowed)
+    if (!m_bDTDAllowed)
     {
       m_aErrorHandler.error ("Cannot create a document type declaration for '" +
                              name +
@@ -583,7 +587,7 @@ public class Emitter
       {
         m_aLexH.startDTD (name, publicId, systemId);
         m_aLexH.endDTD ();
-        dtdAllowed = false;
+        m_bDTDAllowed = false;
       }
       catch (final SAXException se)
       {

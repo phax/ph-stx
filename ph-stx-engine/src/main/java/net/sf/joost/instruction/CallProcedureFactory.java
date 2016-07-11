@@ -82,7 +82,7 @@ public class CallProcedureFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
     final String m_sProcQName, m_sProcExpName;
     ProcedureFactory.Instance m_aProcedure;

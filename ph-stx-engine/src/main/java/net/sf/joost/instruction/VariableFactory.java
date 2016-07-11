@@ -91,7 +91,7 @@ public final class VariableFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>variable</code> element. */
-  public class Instance extends AbstractVariableBase
+  public static final class Instance extends AbstractVariableBase
   {
     private final String varName;
     private AbstractTree select;
@@ -166,12 +166,12 @@ public final class VariableFactory extends AbstractFactoryBase
       if (varTable.get (m_sExpName) != null)
       {
         context.m_aErrorHandler.error ("Variable '" +
-                                    varName +
-                                    "' already declared",
-                                    m_sPublicID,
-                                    m_sSystemID,
-                                    lineNo,
-                                    colNo);
+                                       varName +
+                                       "' already declared",
+                                       m_sPublicID,
+                                       m_sSystemID,
+                                       lineNo,
+                                       colNo);
         return; // if the errorHandler returns
       }
       varTable.put (m_sExpName, v);

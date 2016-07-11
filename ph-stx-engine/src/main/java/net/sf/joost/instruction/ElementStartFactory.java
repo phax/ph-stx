@@ -83,7 +83,7 @@ public final class ElementStartFactory extends AbstractFactoryBase
   }
 
   /** Represents an instance of the <code>start-element</code> element. */
-  public final class Instance extends AbstractNodeBase
+  public static final class Instance extends AbstractNodeBase
   {
     private AbstractTree m_aName, m_aNamespace;
     private final Map <String, String> m_aNSSet;
@@ -162,7 +162,7 @@ public final class ElementStartFactory extends AbstractFactoryBase
         }
       }
 
-      context.emitter.startElement (elUri, elLocal, elName, new AttributesImpl (), null, this);
+      context.m_aEmitter.startElement (elUri, elLocal, elName, new AttributesImpl (), null, this);
 
       return CSTX.PR_CONTINUE;
     }

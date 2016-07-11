@@ -71,7 +71,7 @@ public final class Concat implements IInstance
   public Value evaluate (final Context context, final int top, final AbstractTree args) throws SAXException,
                                                                                         EvalException
   {
-    if (args.m_nType == AbstractTree.LIST)
+    if (args.getType () == AbstractTree.LIST)
     {
       final Value v1 = evaluate (context, top, args.m_aLeft);
       final Value v2 = args.m_aRight.evaluate (context, top);

@@ -120,9 +120,9 @@ public class PDocumentFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
-    private AbstractTree href, baseUri;
+    private AbstractTree m_aHref, m_aBaseUri;
 
     // Constructor
     public Instance (final String qName,
@@ -132,13 +132,11 @@ public class PDocumentFactory extends AbstractFactoryBase
                      final AbstractTree baseUri,
                      final String groupQName,
                      final String method,
-                     final String src)
-
-                                       throws SAXParseException
+                     final String src) throws SAXParseException
     {
       super (qName, parent, context, groupQName, method, src);
-      this.baseUri = baseUri;
-      this.href = href;
+      this.m_aBaseUri = baseUri;
+      this.m_aHref = href;
     }
 
     /**
@@ -147,14 +145,14 @@ public class PDocumentFactory extends AbstractFactoryBase
     @Override
     public short processEnd (final Context context) throws SAXException
     {
-      Value v = href.evaluate (context, this);
+      Value v = m_aHref.evaluate (context, this);
       if (v.type == Value.EMPTY)
         return CSTX.PR_CONTINUE; // nothing to do
 
       final Processor proc = context.currentProcessor;
       ContentHandler contH = proc;
       LexicalHandler lexH = proc;
-      if (m_aFilter != null)
+      if (hasFilter ())
       {
         // use external SAX filter (TransformerHandler)
         final TransformerHandler handler = getProcessHandler (context);
@@ -165,19 +163,23 @@ public class PDocumentFactory extends AbstractFactoryBase
       }
 
       String base;
-      if (baseUri == null)
-      { // determine default base URI
-        if (v.type == Value.NODE) // use #input
+      if (m_aBaseUri == null)
+      {
+        // determine default base URI
+        if (v.type == Value.NODE)
+        {
+          // use #input
           base = context.locator.getSystemId ();
-        // TODO: take the node's base. The result differs if the
-        // node in v comes from a different document
-        // (for example, it was stored in a variable)
+          // TODO: take the node's base. The result differs if the
+          // node in v comes from a different document
+          // (for example, it was stored in a variable)
+        }
         else // use #sheet
           base = m_sSystemID;
       }
       else
       { // use specified base URI
-        base = baseUri.evaluate (context, this).getString ();
+        base = m_aBaseUri.evaluate (context, this).getString ();
         if ("#input".equals (base) && context.locator != null)
           base = context.locator.getSystemId ();
         else
@@ -217,7 +219,15 @@ public class PDocumentFactory extends AbstractFactoryBase
               catch (final SAXException ex)
               {
                 log.warn ("Accessing " + reader + ": " + ex);
-                context.m_aErrorHandler.warning ("Accessing " + reader + ": " + ex, m_sPublicID, m_sSystemID, lineNo, colNo, ex);
+                context.m_aErrorHandler.warning ("Accessing " +
+                                                 reader +
+                                                 ": " +
+                                                 ex,
+                                                 m_sPublicID,
+                                                 m_sSystemID,
+                                                 lineNo,
+                                                 colNo,
+                                                 ex);
               }
             }
             else
@@ -246,7 +256,15 @@ public class PDocumentFactory extends AbstractFactoryBase
             catch (final SAXException ex)
             {
               log.warn ("Accessing " + reader + ": " + ex);
-              context.m_aErrorHandler.warning ("Accessing " + reader + ": " + ex, m_sPublicID, m_sSystemID, lineNo, colNo, ex);
+              context.m_aErrorHandler.warning ("Accessing " +
+                                               reader +
+                                               ": " +
+                                               ex,
+                                               m_sPublicID,
+                                               m_sSystemID,
+                                               lineNo,
+                                               colNo,
+                                               ex);
             }
           }
 
@@ -273,10 +291,10 @@ public class PDocumentFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (baseUri != null)
-        theCopy.baseUri = baseUri.deepCopy (copies);
-      if (href != null)
-        theCopy.href = href.deepCopy (copies);
+      if (m_aBaseUri != null)
+        theCopy.m_aBaseUri = m_aBaseUri.deepCopy (copies);
+      if (m_aHref != null)
+        theCopy.m_aHref = m_aHref.deepCopy (copies);
     }
   }
 }

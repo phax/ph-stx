@@ -52,7 +52,7 @@ public class PChildrenFactory extends AbstractFactoryBase
   // Constructor
   public PChildrenFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("group");
     attrNames.add ("filter-method");
     attrNames.add ("filter-src");
@@ -93,7 +93,7 @@ public class PChildrenFactory extends AbstractFactoryBase
   }
 
   /** The inner Instance class */
-  public class Instance extends AbstractProcessBase
+  public static final class Instance extends AbstractProcessBase
   {
     // Constructor
     public Instance (final String qName,
@@ -118,7 +118,7 @@ public class PChildrenFactory extends AbstractFactoryBase
       final SAXEvent event = context.ancestorStack.peek ();
       if (event.m_nType == SAXEvent.ELEMENT || event.m_nType == SAXEvent.ROOT)
       {
-        if (m_aFilter != null)
+        if (hasFilter ())
         {
           // use external SAX filter (TransformerHandler)
           context.targetHandler = getProcessHandler (context);
