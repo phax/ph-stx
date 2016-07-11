@@ -36,7 +36,7 @@ import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.ITransformerHandlerResolver;
 
 /**
  * Implementation of SAX as Trax filter. Filter URI: http://xml.org/sax Example:
@@ -47,7 +47,7 @@ import net.sf.joost.TransformerHandlerResolver;
  * @author Oliver Becker, Nikolay Fiykov
  */
 
-public final class THResolver implements TransformerHandlerResolver
+public final class THResolver implements ITransformerHandlerResolver
 {
   /** The URI identifying an STX transformation */
   public static final String SAX_METHOD = "http://xml.org/sax";

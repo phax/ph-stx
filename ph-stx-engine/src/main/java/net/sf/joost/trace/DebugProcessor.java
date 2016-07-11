@@ -42,7 +42,7 @@ import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Emitter;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Parser;
-import net.sf.joost.stx.ParserListener;
+import net.sf.joost.stx.IParserListener;
 import net.sf.joost.stx.Processor;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.trax.TransformerImpl;
@@ -61,7 +61,7 @@ public class DebugProcessor extends Processor
   /** the TrAX-Transformer */
   private TransformerImpl transformer;
   /** the ParserListener for static tracing */
-  private ParserListener parserListener;
+  private IParserListener parserListener;
 
   private Locator locator;
 
@@ -213,7 +213,7 @@ public class DebugProcessor extends Processor
   /**
    * getter for property {@link #parserListener}
    */
-  public ParserListener getParserListener ()
+  public IParserListener getParserListener ()
   {
     return parserListener;
   }

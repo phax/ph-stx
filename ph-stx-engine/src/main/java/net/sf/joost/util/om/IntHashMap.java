@@ -279,7 +279,7 @@ public class IntHashMap implements Serializable
    * Get an iterator over the keys
    */
 
-  public IntIterator keyIterator ()
+  public IIntIterator keyIterator ()
   {
     return new IntHashMapKeyIterator ();
   }
@@ -300,7 +300,7 @@ public class IntHashMap implements Serializable
   public IntHashMap copy ()
   {
     final IntHashMap n = new IntHashMap (size ());
-    final IntIterator it = keyIterator ();
+    final IIntIterator it = keyIterator ();
     while (it.hasNext ())
     {
       final int k = it.next ();
@@ -315,7 +315,7 @@ public class IntHashMap implements Serializable
 
   public void display ()
   {
-    final IntIterator iter = new IntHashMapKeyIterator ();
+    final IIntIterator iter = new IntHashMapKeyIterator ();
     while (iter.hasNext ())
     {
       final int key = iter.next ();
@@ -327,7 +327,7 @@ public class IntHashMap implements Serializable
   /**
    * Iterator over keys
    */
-  private class IntHashMapKeyIterator implements IntIterator, Serializable
+  private class IntHashMapKeyIterator implements IIntIterator, Serializable
   {
 
     private int i = 0;

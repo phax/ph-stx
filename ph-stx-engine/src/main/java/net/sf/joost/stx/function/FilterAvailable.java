@@ -30,7 +30,7 @@ import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
 /**
  * The <code>filter-available</code> function.<br>
@@ -39,7 +39,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-public final class FilterAvailable implements Instance
+public final class FilterAvailable implements IInstance
 {
   /** @return 1 */
   public int getMinParCount ()

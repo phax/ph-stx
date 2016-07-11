@@ -57,7 +57,7 @@ public final class ParseContext
   public URIResolver uriResolver;
 
   /** An optional ParserListener for <code>stx:include</code> instructions */
-  public ParserListener parserListener;
+  public IParserListener parserListener;
 
   /** The root element of the transform sheet */
   public TransformFactory.Instance transformNode;

@@ -74,7 +74,7 @@ import net.sf.joost.stx.Value;
  * @author Oliver Becker
  */
 
-public interface TransformerHandlerResolver
+public interface ITransformerHandlerResolver
 {
   /**
    * Resolves a {@link TransformerHandler} object for an external

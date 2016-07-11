@@ -37,7 +37,7 @@ import javax.xml.transform.TransformerException;
  * @author Oliver Becker
  */
 
-public interface OutputURIResolver
+public interface IOutputURIResolver
 {
 
   /**

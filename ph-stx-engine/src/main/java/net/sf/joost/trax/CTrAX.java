@@ -46,14 +46,14 @@ public final class CTrAX
                                                   " version='1.0' pass-through='all' />";
 
   /**
-   * Key for the Joost property {@link net.sf.joost.TransformerHandlerResolver}
+   * Key for the Joost property {@link net.sf.joost.ITransformerHandlerResolver}
    *
    * @see javax.xml.transform.TransformerFactory#setAttribute
    */
   public static String KEY_TH_RESOLVER = "http://joost.sf.net/attributes/transformer-handler-resolver";
 
   /**
-   * Key for the Joost property {@link net.sf.joost.OutputURIResolver}
+   * Key for the Joost property {@link net.sf.joost.IOutputURIResolver}
    *
    * @see javax.xml.transform.TransformerFactory#setAttribute
    */

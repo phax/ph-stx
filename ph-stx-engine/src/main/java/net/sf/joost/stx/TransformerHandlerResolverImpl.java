@@ -39,11 +39,11 @@ import com.helger.commons.lang.ServiceLoaderHelper;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.ITransformerHandlerResolver;
 
 /**
- * The default implementation of an {@link TransformerHandlerResolver}. It
- * supports pluggable {@link TransformerHandlerResolver} implementations. Plugin
+ * The default implementation of an {@link ITransformerHandlerResolver}. It
+ * supports pluggable {@link ITransformerHandlerResolver} implementations. Plugin
  * mechanism is based on Jakarta's Discovery library. During instantiation it
  * will scan for available handlers and cache them if this was behavior was
  * configured. Upon calling
@@ -56,7 +56,7 @@ import net.sf.joost.TransformerHandlerResolver;
  * @author fikin
  */
 
-public final class TransformerHandlerResolverImpl implements TransformerHandlerResolver
+public final class TransformerHandlerResolverImpl implements ITransformerHandlerResolver
 {
   /** logging object */
   private static Logger log = OptionalLog.getLog (TransformerHandlerResolverImpl.class);
@@ -88,7 +88,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
   /**
    * Custom handler provided via {link @Processor} interface
    */
-  public TransformerHandlerResolver customResolver = null;
+  public ITransformerHandlerResolver customResolver = null;
 
   /**
    * Initialize the object It scans plugins directories and create a hashtable
@@ -136,7 +136,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
 
     // plugin classes
     // loop over founded classes
-    for (final TransformerHandlerResolver plg : ServiceLoaderHelper.getAllSPIImplementations (TransformerHandlerResolver.class))
+    for (final ITransformerHandlerResolver plg : ServiceLoaderHelper.getAllSPIImplementations (ITransformerHandlerResolver.class))
     {
       if (CSTX.DEBUG)
         log.debug ("scanning implemented stx-filter-methods of class" + plg.getClass ());
@@ -150,7 +150,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
           log.debug ("stx-filter-method found : " + mt);
 
         // see if method is already defined by some other plugin ?
-        final TransformerHandlerResolver firstPlg = (TransformerHandlerResolver) plugins.get (mt);
+        final ITransformerHandlerResolver firstPlg = (ITransformerHandlerResolver) plugins.get (mt);
 
         if (null != firstPlg)
         {
@@ -239,7 +239,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
     if (notInitializedYet)
       init ();
 
-    final TransformerHandlerResolver impl = (TransformerHandlerResolver) plugins.get (method);
+    final ITransformerHandlerResolver impl = (ITransformerHandlerResolver) plugins.get (method);
     if (impl == null)
       throw new SAXException ("Undefined filter implementation for method '" + method + "'");
     return impl.resolve (method, href, base, uriResolver, errorListener, externalParams);
@@ -271,7 +271,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
     if (notInitializedYet)
       init ();
 
-    final TransformerHandlerResolver impl = (TransformerHandlerResolver) plugins.get (method);
+    final ITransformerHandlerResolver impl = (ITransformerHandlerResolver) plugins.get (method);
     if (impl == null)
       throw new SAXException ("Undefined filter implementation for method '" + method + "'");
     return impl.resolve (method, reader, uriResolver, errorListener, externalParams);

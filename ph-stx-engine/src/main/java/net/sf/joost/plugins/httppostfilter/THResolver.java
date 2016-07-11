@@ -36,7 +36,7 @@ import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.ITransformerHandlerResolver;
 
 /**
  * Implementation of HTTP-Post filter. Filter URI:
@@ -49,7 +49,7 @@ import net.sf.joost.TransformerHandlerResolver;
  * @author Oliver Becker
  */
 
-public final class THResolver implements TransformerHandlerResolver
+public final class THResolver implements ITransformerHandlerResolver
 {
   /** The URI identifying an STX transformation */
   public static final String HTTP_POST_METHOD = "http://www.ietf.org/rfc/rfc2616.txt#POST";

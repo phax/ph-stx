@@ -28,7 +28,7 @@ import org.xml.sax.Attributes;
 /**
  * Defines mutable SAX attributes.
  */
-public interface MutableAttributes extends Attributes
+public interface IMutableAttributes extends Attributes
 {
   /** Set the value of an attribute at the specified index */
   public void setValue (int index, String value);

@@ -45,7 +45,7 @@ import net.sf.joost.stx.function.FunctionFactory;
 public final class FunctionTree extends AbstractTree
 {
   /*** the function instance */
-  private final FunctionFactory.Instance func;
+  private final FunctionFactory.IInstance func;
 
   /**
    * Constructs a FunctionTree object.

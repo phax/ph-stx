@@ -48,7 +48,7 @@ public final class FunctionFactory
   /**
    * Type for all functions
    */
-  public static interface Instance
+  public static interface IInstance
   {
     /** Minimum number of parameters. */
     public int getMinParCount ();
@@ -91,10 +91,10 @@ public final class FunctionFactory
   public static final String JENSP = "{" + CSTX.JOOST_EXT_NS + "}";
 
   /** Contains one instance for each function. */
-  private static Hashtable <String, Instance> functionHash;
+  private static Hashtable <String, IInstance> functionHash;
   static
   {
-    final Instance [] functions = { new StringConv (),
+    final IInstance [] functions = { new StringConv (),
                                     new NumberConv (),
                                     new BooleanConv (),
                                     new Position (),
@@ -143,7 +143,7 @@ public final class FunctionFactory
                                     new FilterAvailable (),
                                     new ExtSequence () };
     functionHash = new Hashtable<> (functions.length);
-    for (final Instance function : functions)
+    for (final IInstance function : functions)
       functionHash.put (function.getName (), function);
   }
 
@@ -181,7 +181,7 @@ public final class FunctionFactory
    *            if the function wasn't found or the number of parameters is
    *            wrong
    */
-  public Instance getFunction (final String uri,
+  public IInstance getFunction (final String uri,
                                final String lName,
                                final String qName,
                                final AbstractTree args) throws SAXParseException
@@ -205,7 +205,7 @@ public final class FunctionFactory
     // throw new SAXParseException ("No permission to call script function '" +
     // qName + "'", pContext.locator);
 
-    final Instance function = functionHash.get ("{" + uri + "}" + lName);
+    final IInstance function = functionHash.get ("{" + uri + "}" + lName);
     if (function == null)
       throw new SAXParseException ("Unknown function '" + qName + "'", m_aContext.locator);
 

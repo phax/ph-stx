@@ -55,8 +55,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.OutputURIResolver;
-import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.IOutputURIResolver;
+import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.instruction.AbstractInstruction;
@@ -728,12 +728,12 @@ public class Processor extends XMLFilterImpl
   }
 
   /**
-   * Registers a custom {@link TransformerHandlerResolver} object.
+   * Registers a custom {@link ITransformerHandlerResolver} object.
    *
    * @param resolver
    *        the resolver to be registered
    */
-  public void setTransformerHandlerResolver (final TransformerHandlerResolver resolver)
+  public void setTransformerHandlerResolver (final ITransformerHandlerResolver resolver)
   {
     context.defaultTransformerHandlerResolver.customResolver = resolver;
   }
@@ -750,12 +750,12 @@ public class Processor extends XMLFilterImpl
   }
 
   /**
-   * Registers an {@link OutputURIResolver} for <code>stx:result-document</code>
+   * Registers an {@link IOutputURIResolver} for <code>stx:result-document</code>
    *
    * @param resolver
    *        the resolver to be registered
    */
-  public void setOutputURIResolver (final OutputURIResolver resolver)
+  public void setOutputURIResolver (final IOutputURIResolver resolver)
   {
     context.outputUriResolver = resolver;
   }

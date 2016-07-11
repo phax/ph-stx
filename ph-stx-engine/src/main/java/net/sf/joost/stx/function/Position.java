@@ -27,7 +27,7 @@ package net.sf.joost.stx.function;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
 /**
  * The <code>position</code> function.<br>
@@ -36,7 +36,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.3 $ $Date: 2007/05/20 18:00:44 $
  * @author Oliver Becker
  */
-public final class Position implements Instance
+public final class Position implements IInstance
 {
   /** @return 0 */
   public int getMinParCount ()

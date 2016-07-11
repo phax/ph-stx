@@ -32,7 +32,7 @@ import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 import net.sf.joost.util.regex.JRegularExpression;
 import net.sf.joost.util.regex.IRegularExpression;
 
@@ -49,7 +49,7 @@ import net.sf.joost.util.regex.IRegularExpression;
  * @version $Revision: 1.3 $ $Date: 2008/06/14 15:01:30 $
  * @author Oliver Becker
  */
-public final class Tokenize implements Instance
+public final class Tokenize implements IInstance
 {
   /** @return 2 **/
   public int getMinParCount ()

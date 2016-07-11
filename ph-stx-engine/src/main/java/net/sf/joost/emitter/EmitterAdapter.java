@@ -37,7 +37,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 import net.sf.joost.instruction.AbstractNodeBase;
 import net.sf.joost.stx.Emitter;
-import net.sf.joost.stx.helpers.MutableAttributes;
+import net.sf.joost.stx.helpers.IMutableAttributes;
 import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
 /**
@@ -89,7 +89,7 @@ public class EmitterAdapter implements ContentHandler, LexicalHandler
                             final Attributes atts) throws SAXException
   {
     // remove namespace declarations that might appear in the attributes
-    final MutableAttributes filteredAtts = new MutableAttributesImpl (null, 0);
+    final IMutableAttributes filteredAtts = new MutableAttributesImpl (null, 0);
     for (int i = 0; i < atts.getLength (); i++)
     {
       if (!XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals (atts.getURI (i)))

@@ -38,7 +38,7 @@ import net.sf.joost.stx.SAXEvent;
  * @version $Revision: 1.5 $ $Date: 2004/09/19 13:36:42 $
  * @author Zubow
  */
-public interface TraceListener
+public interface ITraceListener
 {
 
   // ----------------------------------------------

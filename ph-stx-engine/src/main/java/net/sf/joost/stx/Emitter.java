@@ -44,7 +44,7 @@ import net.sf.joost.emitter.BufferEmitter;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.AbstractNodeBase;
-import net.sf.joost.stx.helpers.MutableAttributes;
+import net.sf.joost.stx.helpers.IMutableAttributes;
 import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
 /**
@@ -78,7 +78,7 @@ public class Emitter
 
   // properties of the last element
   private String lastUri, lastLName, lastQName;
-  private MutableAttributes lastAttrs;
+  private IMutableAttributes lastAttrs;
   private AbstractNodeBase lastInstruction;
 
   private boolean insideCDATA = false;

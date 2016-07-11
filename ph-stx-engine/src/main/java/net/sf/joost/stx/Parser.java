@@ -136,7 +136,7 @@ public class Parser implements ContentHandler // , ErrorHandler
   public AbstractGroupBase includingGroup;
 
   /** An optional ParserListener */
-  private final ParserListener m_aParserListener;
+  private final IParserListener m_aParserListener;
 
   //
   // Constructor

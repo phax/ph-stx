@@ -24,18 +24,18 @@ import java.util.Hashtable;
  * @version $Revision: 1.1 $
  * @since
  */
-public class StringAttribute extends Attribute
+public class StringAttribute extends AbstractAttribute
 {
 
   public StringAttribute (final String name,
                           final String [] validValues,
                           final String defVal,
-                          final Hashtable <String, Attribute> col)
+                          final Hashtable <String, AbstractAttribute> col)
   {
     super (name, validValues, defVal, col);
   }
 
-  public StringAttribute (final String name, final String defVal, final Hashtable <String, Attribute> col)
+  public StringAttribute (final String name, final String defVal, final Hashtable <String, AbstractAttribute> col)
   {
     this (name, new String [] {}, defVal, col);
   }

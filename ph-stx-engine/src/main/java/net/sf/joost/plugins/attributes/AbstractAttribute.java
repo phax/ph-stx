@@ -31,7 +31,7 @@ import java.util.Hashtable;
  * @version $Revision: 1.1 $
  * @since
  */
-public abstract class Attribute
+public abstract class AbstractAttribute
 {
 
   /** attribute name */
@@ -49,10 +49,10 @@ public abstract class Attribute
    * @param name
    * @param validValues
    */
-  public Attribute (final String name,
-                    final String [] validValues,
-                    final String defVal,
-                    final Hashtable <String, Attribute> col)
+  public AbstractAttribute (final String name,
+                            final String [] validValues,
+                            final String defVal,
+                            final Hashtable <String, AbstractAttribute> col)
   {
     this.name = name;
     this.validValues = validValues;
@@ -118,8 +118,8 @@ public abstract class Attribute
   @Override
   public boolean equals (final Object obj)
   {
-    if (obj instanceof Attribute)
-      return name.equals (((Attribute) obj).name);
+    if (obj instanceof AbstractAttribute)
+      return name.equals (((AbstractAttribute) obj).name);
     return super.equals (obj);
   }
 

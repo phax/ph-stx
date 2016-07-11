@@ -191,7 +191,7 @@ public class IntToIntHashMap implements Serializable
    *         order)
    */
 
-  public IntIterator keyIterator ()
+  public IIntIterator keyIterator ()
   {
     return new IntToIntHashMapKeyIterator ();
   }
@@ -294,7 +294,7 @@ public class IntToIntHashMap implements Serializable
   /**
    * Iterator over keys
    */
-  private class IntToIntHashMapKeyIterator implements IntIterator, Serializable
+  private class IntToIntHashMapKeyIterator implements IIntIterator, Serializable
   {
 
     private int i = 0;

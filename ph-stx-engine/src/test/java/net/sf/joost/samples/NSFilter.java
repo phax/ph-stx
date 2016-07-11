@@ -44,7 +44,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.XMLFilterImpl;
 
-import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.trax.CTrAX;
 
 /**
@@ -63,7 +63,7 @@ import net.sf.joost.trax.CTrAX;
  * @author Oliver Becker
  */
 
-public class NSFilter extends XMLFilterImpl implements TransformerHandler, TransformerHandlerResolver
+public class NSFilter extends XMLFilterImpl implements TransformerHandler, ITransformerHandlerResolver
 {
   public static void main (final String [] args)
   {

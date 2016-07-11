@@ -33,7 +33,7 @@ import net.sf.joost.instruction.AbstractNodeBase;
  * @version $Revision: 2.3 $ $Date: 2004/01/23 16:16:46 $
  * @author Oliver Becker
  */
-public interface ParserListener
+public interface IParserListener
 {
   /**
    * Send a notification that the parser has created an internal representation

@@ -31,7 +31,7 @@ import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.SAXEvent;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
 /**
  * The <code>local-name</code> function.<br>
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.4 $ $Date: 2007/11/25 14:18:00 $
  * @author Oliver Becker
  */
-public final class LocalName implements Instance
+public final class LocalName implements IInstance
 {
   /** @return 0 */
   public int getMinParCount ()

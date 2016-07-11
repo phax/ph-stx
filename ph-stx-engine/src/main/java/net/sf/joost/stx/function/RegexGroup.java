@@ -32,7 +32,7 @@ import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
 /**
  * The <code>regex-group</code> function.<br>
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.5 $ $Date: 2008/02/20 10:04:25 $
  * @author Oliver Becker
  */
-public final class RegexGroup implements Instance
+public final class RegexGroup implements IInstance
 {
   /** @return 1 */
   public int getMinParCount ()

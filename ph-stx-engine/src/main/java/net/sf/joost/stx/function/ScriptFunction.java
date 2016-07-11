@@ -33,7 +33,7 @@ import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
 /**
  * An instance of this class represents a Javascript extension function defined
@@ -43,7 +43,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.5 $ $Date: 2007/05/20 18:00:44 $
  * @author Nikolay Fiykov, Oliver Becker
  */
-public final class ScriptFunction implements Instance
+public final class ScriptFunction implements IInstance
 {
   /** BSF script engine instance */
   // BSFEngine engine;

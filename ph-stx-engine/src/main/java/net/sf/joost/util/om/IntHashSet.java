@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @author Dominique Devienne
  * @author Michael Kay: retrofitted to JDK 1.4, added iterator()
  */
-public class IntHashSet implements IntSet, Serializable
+public class IntHashSet implements IIntSet, Serializable
 {
 
   private static final int NBIT = 30; // MAX_SIZE = 2^NBIT
@@ -264,7 +264,7 @@ public class IntHashSet implements IntSet, Serializable
    * Get an iterator over the values
    */
 
-  public IntIterator iterator ()
+  public IIntIterator iterator ()
   {
     return new IntHashSetIterator ();
   }
@@ -276,7 +276,7 @@ public class IntHashSet implements IntSet, Serializable
   public IntHashSet union (final IntHashSet other)
   {
     final IntHashSet n = new IntHashSet (size () + other.size ());
-    IntIterator it = iterator ();
+    IIntIterator it = iterator ();
     while (it.hasNext ())
     {
       n.add (it.next ());
@@ -296,7 +296,7 @@ public class IntHashSet implements IntSet, Serializable
   public IntHashSet intersect (final IntHashSet other)
   {
     final IntHashSet n = new IntHashSet (size ());
-    final IntIterator it = iterator ();
+    final IIntIterator it = iterator ();
     while (it.hasNext ())
     {
       final int v = it.next ();
@@ -315,7 +315,7 @@ public class IntHashSet implements IntSet, Serializable
   public IntHashSet except (final IntHashSet other)
   {
     final IntHashSet n = new IntHashSet (size ());
-    final IntIterator it = iterator ();
+    final IIntIterator it = iterator ();
     while (it.hasNext ())
     {
       final int v = it.next ();
@@ -331,9 +331,9 @@ public class IntHashSet implements IntSet, Serializable
    * Test if this set is a superset of another set
    */
 
-  public boolean containsAll (final IntSet other)
+  public boolean containsAll (final IIntSet other)
   {
-    final IntIterator it = other.iterator ();
+    final IIntIterator it = other.iterator ();
     while (it.hasNext ())
     {
       if (!contains (it.next ()))
@@ -350,7 +350,7 @@ public class IntHashSet implements IntSet, Serializable
 
   public boolean containsSome (final IntHashSet other)
   {
-    final IntIterator it = other.iterator ();
+    final IIntIterator it = other.iterator ();
     while (it.hasNext ())
     {
       if (contains (it.next ()))
@@ -368,7 +368,7 @@ public class IntHashSet implements IntSet, Serializable
   @Override
   public boolean equals (final Object other)
   {
-    if (other instanceof IntSet)
+    if (other instanceof IIntSet)
     {
       final IntHashSet s = (IntHashSet) other;
       return (size () == s.size () && containsAll (s));
@@ -388,7 +388,7 @@ public class IntHashSet implements IntSet, Serializable
   {
     // Note, hashcodes are the same as those used by IntArraySet
     int h = 936247625;
-    final IntIterator it = iterator ();
+    final IIntIterator it = iterator ();
     while (it.hasNext ())
     {
       h += it.next ();
@@ -400,7 +400,7 @@ public class IntHashSet implements IntSet, Serializable
    * Iterator class
    */
 
-  private class IntHashSetIterator implements IntIterator, Serializable
+  private class IntHashSetIterator implements IIntIterator, Serializable
   {
 
     private int i = 0;

@@ -40,7 +40,7 @@ import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.AbstractTree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Value;
-import net.sf.joost.stx.function.FunctionFactory.Instance;
+import net.sf.joost.stx.function.FunctionFactory.IInstance;
 
 /**
  * An instance of this class represents a Java extension function. Parts of this
@@ -49,7 +49,7 @@ import net.sf.joost.stx.function.FunctionFactory.Instance;
  * @version $Revision: 1.6 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
-public final class ExtensionFunction implements Instance
+public final class ExtensionFunction implements IInstance
 {
   /** the target class, identified by the namespace */
   private Class <?> targetClass;

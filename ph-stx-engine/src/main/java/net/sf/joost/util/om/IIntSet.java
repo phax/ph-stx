@@ -10,7 +10,7 @@ package net.sf.joost.util.om;
 /**
  * A set of integers represented as int values
  */
-public interface IntSet
+public interface IIntSet
 {
 
   /**
@@ -69,13 +69,13 @@ public interface IntSet
    * Get an iterator over the values
    */
 
-  IntIterator iterator ();
+  IIntIterator iterator ();
 
   /**
    * Test if this set is a superset of another set
    */
 
-  public boolean containsAll (IntSet other);
+  public boolean containsAll (IIntSet other);
 }
 
 //

@@ -72,7 +72,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import junit.framework.Assert;
-import net.sf.joost.OutputURIResolver;
+import net.sf.joost.IOutputURIResolver;
 import net.sf.joost.trax.CTrAX;
 
 /**
@@ -2348,7 +2348,7 @@ public class TestCases
 
     final ByteArrayOutputStream baoStream = new ByteArrayOutputStream ();
     final Map resultMap = new HashMap ();
-    final OutputURIResolver resolver = new OutputURIResolver ()
+    final IOutputURIResolver resolver = new IOutputURIResolver ()
     {
 
       public Result resolve (final String href,

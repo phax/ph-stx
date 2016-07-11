@@ -48,8 +48,8 @@ import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.TransformerHandlerResolver;
-import net.sf.joost.plugins.attributes.Attribute;
+import net.sf.joost.ITransformerHandlerResolver;
+import net.sf.joost.plugins.attributes.AbstractAttribute;
 import net.sf.joost.plugins.attributes.BooleanAttribute;
 import net.sf.joost.plugins.attributes.StringAttribute;
 import net.sf.joost.stx.Value;
@@ -106,7 +106,7 @@ import net.sf.joost.trax.TransformerFactoryImpl;
  * @version $Revision: 1.11 $ $Date: 2009/09/22 21:13:44 $
  * @author fikin
  */
-public class THResolver implements TransformerHandlerResolver
+public class THResolver implements ITransformerHandlerResolver
 {
 
   /** supported methods */
@@ -125,7 +125,7 @@ public class THResolver implements TransformerHandlerResolver
   private static final String tmp_TRAX_ATTR_NS = "{" + TRAX_ATTR_NS + "}";
 
   /** supported filter attributes */
-  private static Hashtable <String, Attribute> attrs = new Hashtable<> ();
+  private static Hashtable <String, AbstractAttribute> attrs = new Hashtable<> ();
 
   /** indicate if to cache TrAX TH and reuse them across calls */
   public static final BooleanAttribute REUSE_TH_URL = new BooleanAttribute ("REUSE-TH-URL",
@@ -191,7 +191,7 @@ public class THResolver implements TransformerHandlerResolver
   }
 
   /**
-   * @see net.sf.joost.TransformerHandlerResolver#resolve(java.lang.String,
+   * @see net.sf.joost.ITransformerHandlerResolver#resolve(java.lang.String,
    *      java.lang.String, java.lang.String, javax.xml.transform.URIResolver,
    *      javax.xml.transform.ErrorListener, java.util.Hashtable)
    */
@@ -269,7 +269,7 @@ public class THResolver implements TransformerHandlerResolver
   }
 
   /**
-   * @see net.sf.joost.TransformerHandlerResolver#resolve(java.lang.String,
+   * @see net.sf.joost.ITransformerHandlerResolver#resolve(java.lang.String,
    *      org.xml.sax.XMLReader, javax.xml.transform.URIResolver,
    *      javax.xml.transform.ErrorListener, java.util.Hashtable)
    */
@@ -314,7 +314,7 @@ public class THResolver implements TransformerHandlerResolver
   }
 
   /**
-   * @see net.sf.joost.TransformerHandlerResolver#available(java.lang.String)
+   * @see net.sf.joost.ITransformerHandlerResolver#available(java.lang.String)
    */
   public boolean available (final String method)
   {
@@ -605,7 +605,7 @@ public class THResolver implements TransformerHandlerResolver
 
         // it is, extract the name of the attribute and set its value
         final String name = key.substring (tmp_FILTER_ATTR_NS.length ()).toLowerCase ();
-        final Attribute a = (attrs.get (name));
+        final AbstractAttribute a = (attrs.get (name));
         if (a == null)
           throw new IllegalArgumentException ("setFilterAttributes() : " + name + " not supported");
 

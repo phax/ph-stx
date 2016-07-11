@@ -28,7 +28,7 @@ import org.xml.sax.Attributes;
 /**
  * Mutable attributes implementation.
  */
-public final class MutableAttributesImpl implements MutableAttributes
+public final class MutableAttributesImpl implements IMutableAttributes
 {
   private int _length;
   private int _max;

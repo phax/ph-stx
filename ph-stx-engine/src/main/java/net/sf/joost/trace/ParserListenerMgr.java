@@ -28,20 +28,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.joost.instruction.AbstractNodeBase;
-import net.sf.joost.stx.ParserListener;
+import net.sf.joost.stx.IParserListener;
 import net.sf.joost.trax.TransformerImpl;
 
 /**
- * This class implements the {@link ParserListener}-Interface for static debug
+ * This class implements the {@link IParserListener}-Interface for static debug
  * purpose (e.g. validation of breakpoints).
  *
  * @author Zubow
  */
-public class ParserListenerMgr implements ParserListener
+public class ParserListenerMgr implements IParserListener
 {
 
-  /** list of all registered {@link ParserListener} */
-  private List <ParserListener> parserListeners = null;
+  /** list of all registered {@link IParserListener} */
+  private List <IParserListener> parserListeners = null;
 
   /** default constructor */
   public ParserListenerMgr ()
@@ -63,7 +63,7 @@ public class ParserListenerMgr implements ParserListener
    * @param newParserListener
    *        A parserlistener to be added.
    */
-  public void addParseListener (final ParserListener newParserListener)
+  public void addParseListener (final IParserListener newParserListener)
   {
     // set Joost-Transformer in debug-mode
     // todo think about this ???
@@ -82,7 +82,7 @@ public class ParserListenerMgr implements ParserListener
    * @param oldParserListener
    *        A parserlistener to be removed.
    */
-  public void removeParseListener (final ParserListener oldParserListener)
+  public void removeParseListener (final IParserListener oldParserListener)
   {
     if (parserListeners != null)
     {
@@ -95,27 +95,27 @@ public class ParserListenerMgr implements ParserListener
   // Callback methods
   // ----------------------------------------------------------------------
 
-  /** see {@link ParserListener#nodeCreated} */
+  /** see {@link IParserListener#nodeCreated} */
   public void nodeCreated (final AbstractNodeBase node)
   {
     if (hasParseListeners ())
     {
       for (int i = 0; i < parserListeners.size (); i++)
       {
-        final ParserListener pl = parserListeners.get (i);
+        final IParserListener pl = parserListeners.get (i);
         pl.nodeCreated (node);
       }
     }
   }
 
-  /** see {@link ParserListener#parseFinished} */
+  /** see {@link IParserListener#parseFinished} */
   public void parseFinished ()
   {
     if (hasParseListeners ())
     {
       for (int i = 0; i < parserListeners.size (); i++)
       {
-        final ParserListener pl = parserListeners.get (i);
+        final IParserListener pl = parserListeners.get (i);
         pl.parseFinished ();
       }
     }

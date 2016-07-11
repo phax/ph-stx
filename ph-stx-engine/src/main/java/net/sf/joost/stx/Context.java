@@ -32,7 +32,7 @@ import javax.xml.transform.sax.TransformerHandler;
 
 import org.xml.sax.Locator;
 
-import net.sf.joost.OutputURIResolver;
+import net.sf.joost.IOutputURIResolver;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractGroupBase;
 import net.sf.joost.instruction.AbstractNodeBase;
@@ -108,7 +108,7 @@ public final class Context implements Cloneable
   public URIResolver uriResolver;
 
   /** The OutputURIResolver for <code>stx:result-document</code> */
-  public OutputURIResolver outputUriResolver;
+  public IOutputURIResolver outputUriResolver;
 
   /**
    * The message emitter for <code>stx:message</code>, either explicitely set by

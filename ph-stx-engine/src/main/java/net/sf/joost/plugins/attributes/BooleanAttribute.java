@@ -24,10 +24,10 @@ import java.util.Hashtable;
  * @version $Revision: 1.1 $
  * @since
  */
-public class BooleanAttribute extends Attribute
+public class BooleanAttribute extends AbstractAttribute
 {
 
-  public BooleanAttribute (final String name, final String defVal, final Hashtable <String, Attribute> col)
+  public BooleanAttribute (final String name, final String defVal, final Hashtable <String, AbstractAttribute> col)
   {
     super (name, new String [] { "true", "false" }, defVal, col);
   }

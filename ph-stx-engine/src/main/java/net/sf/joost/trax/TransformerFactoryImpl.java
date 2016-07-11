@@ -52,8 +52,8 @@ import org.xml.sax.XMLReader;
 
 import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.OutputURIResolver;
-import net.sf.joost.TransformerHandlerResolver;
+import net.sf.joost.IOutputURIResolver;
+import net.sf.joost.ITransformerHandlerResolver;
 import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.Processor;
@@ -77,8 +77,8 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
   // Member
   private URIResolver uriResolver = null;
   private ErrorListener errorListener = null;
-  protected TransformerHandlerResolver thResolver = null;
-  protected OutputURIResolver outputUriResolver = null;
+  protected ITransformerHandlerResolver thResolver = null;
+  protected IOutputURIResolver outputUriResolver = null;
   protected boolean allowExternalFunctions = true;
 
   // init default errorlistener
@@ -198,12 +198,12 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
 
     if (CTrAX.KEY_TH_RESOLVER.equals (name))
     {
-      thResolver = (TransformerHandlerResolver) value;
+      thResolver = (ITransformerHandlerResolver) value;
     }
     else
       if (CTrAX.KEY_OUTPUT_URI_RESOLVER.equals (name))
       {
-        outputUriResolver = (OutputURIResolver) value;
+        outputUriResolver = (IOutputURIResolver) value;
       }
       else
         if (CTrAX.MESSAGE_EMITTER_CLASS.equals (name))

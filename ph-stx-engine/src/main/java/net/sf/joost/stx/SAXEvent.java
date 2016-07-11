@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.xml.sax.Attributes;
 
-import net.sf.joost.stx.helpers.MutableAttributes;
+import net.sf.joost.stx.helpers.IMutableAttributes;
 import net.sf.joost.stx.helpers.MutableAttributesImpl;
 
 /**
@@ -57,7 +57,7 @@ public final class SAXEvent
   public String uri;
   public String lName;
   public String qName; // PI->target, MAPPING->prefix
-  public MutableAttributes attrs;
+  public IMutableAttributes attrs;
   public Map <String, String> namespaces;
   public String value = "";
   // PI->data, MAPPING->uri, TEXT, ATTRIBUTES as usual
@@ -184,14 +184,14 @@ public final class SAXEvent
   /**
    * Enables the counting of child nodes.
    *
-   * @param hasChildNodes
+   * @param bHasChildNodes
    *        <code>true</code>, if there are really child nodes;
    *        <code>false</code>, if only the counting has to be supported (e.g.
    *        in <code>stx:process-buffer</code>)
    */
-  public void enableChildNodes (final boolean hasChildNodes)
+  public void enableChildNodes (final boolean bHasChildNodes)
   {
-    if (hasChildNodes)
+    if (bHasChildNodes)
     {
       posHash = new HashMap<> ();
       this.hasChildNodes = true;
@@ -210,11 +210,11 @@ public final class SAXEvent
    */
   private final class Counter
   {
-    public long value;
+    public long m_nValue;
 
     public Counter ()
     {
-      value = 1;
+      m_nValue = 1;
     }
   }
 
@@ -245,7 +245,9 @@ public final class SAXEvent
     @Override
     public boolean equals (final Object o)
     {
-      if (!(o instanceof DoubleString))
+      if (o == this)
+        return true;
+      if (o == null || !getClass ().equals (o.getClass ()))
         return false;
       final DoubleString ds = (DoubleString) o;
       return s1.equals (ds.s1) && s2.equals (ds.s2);
@@ -319,7 +321,7 @@ public final class SAXEvent
       if (c == null)
         posHash.put (key, new Counter ());
       else
-        c.value++;
+        c.m_nValue++;
       // posHash.put(keys[i], new Long(l.longValue()+1));
     }
   }
@@ -332,7 +334,7 @@ public final class SAXEvent
       // Shouldn't happen
       throw new NullPointerException ();
     }
-    return c.value;
+    return c.m_nValue;
   }
 
   public long getPositionOfNode ()
@@ -343,7 +345,7 @@ public final class SAXEvent
       // Shouldn't happen
       throw new NullPointerException ();
     }
-    return c.value;
+    return c.m_nValue;
   }
 
   public long getPositionOfText ()
@@ -354,7 +356,7 @@ public final class SAXEvent
       // Shouldn't happen
       throw new NullPointerException ();
     }
-    return c.value;
+    return c.m_nValue;
   }
 
   public long getPositionOfCDATA ()
@@ -365,7 +367,7 @@ public final class SAXEvent
       // Shouldn't happen
       throw new NullPointerException ();
     }
-    return c.value;
+    return c.m_nValue;
   }
 
   public long getPositionOfComment ()
@@ -376,7 +378,7 @@ public final class SAXEvent
       // Shouldn't happen
       throw new NullPointerException ();
     }
-    return c.value;
+    return c.m_nValue;
   }
 
   public long getPositionOfPI (final String target)
@@ -387,7 +389,7 @@ public final class SAXEvent
       // Shouldn't happen
       throw new NullPointerException ();
     }
-    return c.value;
+    return c.m_nValue;
   }
 
   @Override
