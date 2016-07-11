@@ -1,0 +1,824 @@
+1 / 23
+
+
+    Extended SAX Filter Processing with STX
+
+
+
+      Oliver Becker
+
+*Humboldt University Berlin*
+
+Extreme Markup Languages
+2003–08–06
+
+------------------------------------------------------------------------
+2 / 23
+
+
+    Roadmap:
+
+  * SAX for the Ignorant
+
+  * SAX Filter Chains
+
+  * The STX Vision
+
+  * Combining SAX, XSLT, and STX
+
+  * A Proof of Concept: Schematron
+
+  * Pluggable Filters for Joost
+
+------------------------------------------------------------------------
+3 / 23
+
+
+    SAX for the Ignorant
+
+  * Simple API for XML
+  * Event-based parser API
+  * Push model
+
+    The Simple API for XML (SAX) enables the processing of XML data as a
+    stream. A SAX producer generates events that correspond to XML
+    markup, a SAX consumer processes such events. In most of the cases
+    the SAX producer is an XML Parser (an |XMLReader| object) and the
+    SAX consumer is an application that wants to read and process XML
+    encoded data. 
+
+<http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/sax-basics.svg>
+
+    (This graphic is linked to an animated SVG.) 
+
+------------------------------------------------------------------------
+4 / 23
+
+
+      SAX Filters
+
+  * Event producer doesn't have to be an XML parser;
+    it could be
+      o any application that produces XML data
+      o any specialized parser that provides an XML view to non-XML data
+  * Event consumer might in turn emit SAX events
+    (it acts as a SAX filter)
+
+    There are many more potential applications on the producer side. Any
+    software that wants to provide an XML view on its data might decide
+    to produce SAX events instead of generating a well-formed XML file
+    as a byte stream (which in turn would have to be parsed on the
+    consumer side). In addition, transformation tools that read a
+    proprietary data format and turn it into SAX events enable all kinds
+    of XML processing for non-XML data. 
+
+    A special type of a SAX processing participant is a SAX filter
+    component. A filter acts as consumer and producer simultaneously.
+    The consumed events could be modified, removed, or used for creating
+    a completely new set of events. Using this technology, a filter
+    chain could easily be established, in which the first producer is
+    often an XML parser and the last consumer is often an XML serializer
+    that creates an XML document from the event stream. The Cocoon
+    framework for example uses this technology to create processing
+    pipelines. 
+
+*Filter chain:*
+
+<http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/flow1.svg>
+
+    (This graphic is linked to an animated SVG. The animation starts by
+    clicking into this SVG.) 
+
+No semantic difference between "Filter" and "Transformer"
+
+------------------------------------------------------------------------
+5 / 23
+
+
+      SAX-Based Transformations?
+
+  * requires low-level programming
+  * programmer needs to maintain state, namespaces, etc
+  * laborious to create XML
+
+    There are several ways to implement the single components of this
+    pipeline (the individual filter objects). Using the SAX interfaces
+    directly on the Java level requires low-level SAX programming. This
+    could be a small barrier to non-experienced programmers. While
+    simple tasks may be relatively easy to solve, it gets more
+    complicated for a filter mechanism that needs to keep track of the
+    current context in the event stream. Last but not least, creating
+    SAX output events in a filter scenario requires a great deal of
+    attention to detail. 
+
+
+*A deterrent example:*
+add an |id| attribute that belongs to a special namespace
+
+// /"declare" the additional namespace before a startElement()/
+handler.startPrefixMapping("ex", "http://www.example.com");
+
+// /within the implementation of startElement(uri, lName, qName, atts)/
+AttributesImpl newAtts = new AttributesImpl(atts);
+newAtts.addAttribute("http://www.example.com", "id", "ex:id",
+                     "CDATA", String.valueOf(count++));
+handler.startElement(uri, lName, qName, newAtts);
+
+// /"undeclare" the additional namespace after the proper endElement()/
+handler.endPrefixMapping("ex");
+
+------------------------------------------------------------------------
+6 / 23
+
+*Luckily ...*
+
+  * the W3C invented the XML transformation language XSLT
+  * JAXP 1.1 (Java API for XML Processing) provides a SAX interface to
+    XSLT transformations:
+
+    The solution for more complex filter algorithms would be the use of
+    special transformation components, for example an XSLT engine (in
+    fact there is no difference between a filter and an XML transformer
+    from the user's perspective). The Java interfaces for XSLT in the
+    JAXP 1.1 (Java API for XML Processing) specification include a
+    special SAX package (|javax.xml.transform.sax|) that enables the
+    chain-linking of several transformer objects into a SAX filter
+    pipeline. 
+
+TransformerFactory tFactory = TransformerFactory.newInstance();
+SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tFactory;
+// */create two XSLT transformer objects/
+TransformerHandler tHandler1 = 
+    saxTFactory.newTransformerHandler(new StreamSource("step1.xsl"));
+TransformerHandler tHandler2 = 
+    saxTFactory.newTransformerHandler(new StreamSource("step2.xsl"));*
+XMLReader myReader = XMLReaderFactory.createXMLReader();
+ContentHandler mySerializer = ...
+
+// */create a transformation chain/
+myReader.setContentHandler(tHandler1);*
+myReader.setProperty("http://xml.org/sax/properties/lexical-handler", 
+                     tHandler1);*
+tHandler1.setResult(new SAXResult(tHandler2));
+tHandler2.setResult(new SAXResult(mySerializer));*
+
+// /run the transformation/
+myReader.parse("input.xml");
+
+    A |SAXTransformerFactory| creates two handler objects. One uses the
+    XSLT instructions in the file step1.xsl, the other one uses the file
+    step2.xsl. A |TransformerHandler| is a sub-interface of
+    |ContentHandler|, so it can be registered at an |XMLReader| object.
+    In this scenario |tHandler1| acts as the consumer for the |myReader|
+    object. Then |tHandler2| is registered as a consumer (result object)
+    for |tHandler1|, and finally |mySerializer| consumes the output from
+    |tHandler2|. 
+
+------------------------------------------------------------------------
+7 / 23
+
+*But ...*
+
+the use of XSLT prevents real stream processing
+
+  * XSLT/XPath needs an in-memory representation of the whole document.
+  * The transformation won't start before the last event has been consumed.
+  * This is inappropriate for large XML documents.
+
+    The drawback of XSLT is that it does not process its input as a
+    stream. Rather, it consumes the incoming SAX events completely,
+    creates an in-memory tree representation of the data, performs the
+    transformation into a result tree, and then afterwards produces SAX
+    events for this result. XSLT is tree-oriented by design, it is build
+    on top of XPath. This characteristic will be problematic for
+    memory-intensive cases, that means for SAX streams that represent
+    large XML documents. If only one component of a pipeline needs a
+    tree-oriented XML representation (like XSLT), the whole data flow
+    within the pipeline would be accumulated in this component before
+    the next one starts its processing. 
+
+<http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/flow2.svg>
+
+    (This graphic is linked to an animated SVG. The animation starts by
+    clicking into this SVG.) 
+
+/XSLT is like an (event) dam in the SAX event stream./
+
+------------------------------------------------------------------------
+8 / 23
+
+
+      SAX or XSLT? – STX!
+
+STX = Streaming Transformations for XML
+http://stx.sourceforge.net/
+
+    STX (Streaming Transformations for XML) [1] offers a solution for
+    this memory problem. STX is built directly on SAX; it processes its
+    input without building an internal tree representation. STX enables
+    a streaming processing that resembles XSLT on the syntactic level. 
+
+    STX was introduced in an article on xml.com [2] and at the XML
+    Europe 2003 conference in London [3]. 
+
+  * processes a stream of SAX events
+
+  * doesn't build an internal tree representation of the document
+
+  * resembles XSLT on the syntactic level:
+      o XML document that contains templates
+      o templates will be matched using patterns
+      o mix of instructions and literal result elements
+      o STXPath very similar to XPath, but no explicit axes
+
+  * uses a strict forward processing model
+
+------------------------------------------------------------------------
+9 / 23
+
+
+      A Simple STX Example
+
+/Modify the input by adding a consecutive ID attribute to certain
+elements (footnotes that appear within chapters)./
+
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:ex="http://www.example.com/"
+               version="1.0" pass-through="all">
+      
+  <stx:variable name="count" select="1" />
+      
+  <stx:template match="chapter//footnote">
+    <stx:copy attributes="@*">
+      <stx:attribute name="ex:id" select="$count" />
+      <stx:assign name="count" select="$count + 1" />
+      <stx:process-children />
+    </stx:copy>
+  </stx:template>
+      
+</stx:transform>
+
+
+*STX combines SAX processing with the XSLT syntax.*
+
+    Using STX removes the burden of keeping track of the current context
+    (the ancestors, the position among siblings, and the namespaces in
+    scope) from the programmer and makes it very easy to create XML
+    output. Nevertheless, complex transformations that need more than
+    the actual ancestor list are still difficult to develop in a pure
+    streaming scenario. 
+
+------------------------------------------------------------------------
+10 / 23
+
+
+      Java and STX?
+
+    The good thing from the Java programmer's point of view is that the
+    API side is already familiar. The Java-based STX implementation
+    Joost [4] enables an STX transformation via the JAXP 1.1 interfaces
+    discussed above. That means using Joost as STX engine within a Java
+    application requires only a tiny bit of configuration. Switching
+    from XSLT to STX is trivial. Moreover, using STX in existing
+    applications as for example Cocoon is just as simple. 
+
+STX /is/ a transformation language, that means STX can be used via JAXP
+just as XSLT.
+
+Using the Java-based implementation Joost:
+
+// /use Joost as transformation engine/*
+System.setProperty("javax.xml.transform.TransformerFactory",
+                   "net.sf.joost.trax.TransformerFactoryImpl");*
+
+// /the remaining code is known area/
+TransformerFactory tFactory = TransformerFactory.newInstance();
+SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tFactory;
+
+// /of course the transformation source must be different/
+TransformerHandler tHandler1 = 
+    saxTFactory.newTransformerHandler(new StreamSource("*trans.stx*"));
+...
+myReader.setContentHandler(tHandler1);
+myReader.setProperty("http://xml.org/sax/properties/lexical-handler", 
+                     tHandler1);
+tHandler1.setResult(new SAXResult(tHandler2));
+...
+
+    From the Java point of view, the |TransformerHandler| object is
+    simply a "black box" that does the XML transformation somehow and
+    that has a standardized interface. Switching to STX simply means:
+    use a different black box. 
+
+    [Note: This example shows that a future JAXP version should provide
+    an intermediate level for specifying the kind of transformation.
+    Currently without the property for a TransformerFactory the Java
+    runtime system instantiates a default factory (which should be able
+    to create XSLT transformers). Using STX requires the class name of
+    an STX transformer factory. However, it is not possible to request a
+    "default" STX transformer without knowing a concrete implementation.] 
+
+------------------------------------------------------------------------
+11 / 23
+
+
+      XSLT and STX: Two Extremes (!)
+
+    In the current situation one has to choose between the streaming
+    approach (SAX, STX) and the full tree approach (DOM, XSLT). Both
+    extremes seem to be inadequate for non-trivial transformations of
+    large documents. 
+
+XSLT 	STX
+Full in-memory representation of the document 	Ancestor stack
+Random access to all data in the document 	Only current node and its
+ancestors accessible
+
+/a book/ 	/a reading/
+
+*Is there a compromise?*
+Use a hybrid transformation approach.
+
+Split the document into fragments. Transform each fragment with XSLT (or
+any other tree-oriented transformation).
+
+/a chapter-wise tape-record of a long reading/
+
+    A possible solution is to use a hybrid approach that reads a SAX
+    stream, identifies smaller pieces (XML fragments), and passes these
+    fragments to a tree-oriented application. By this means the new
+    scenario describes not a linear pipeline, but rather a flow with
+    laterally connected transformation components. Technically, each
+    component is just a common SAX filter that may build an in-memory
+    tree representation of the fragment. The component itself doesn't
+    take notice of its special usage. 
+
+------------------------------------------------------------------------
+12 / 23
+
+*Using a splitter component*
+
+The splitter passes the fragments to independent transformers.
+
+<http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/flow3.svg>
+
+    (This graphic is linked to an animated SVG. The animation starts by
+    clicking into this SVG.) 
+
+  * non-linear transformation
+  * completely SAX-based, uses standard SAX interfaces
+  * /Filter 2/ doesn't take notice of its special usage
+
+    STX provides a simple interface to these external SAX filters. As
+    you will see in a moment, this interface is completely independent
+    from the implementation of such an external filter. 
+
+    [Technical detail: the SAX event stream for the fragment should be
+    enclosed in a |startDocument| / |endDocument| event pair, as well as
+    |startPrefixMapping| / |endPrefixMapping| events for all namespaces
+    that are in scope at the start of the fragment.] 
+
+------------------------------------------------------------------------
+13 / 23
+
+*STX can be used to split a document*
+
+    Before I explain the details, I will say a few words about STX's
+    general processing model. STX processes SAX events, i.e. it
+    processes an XML document in document order. In XSLT, the
+    instruction to process other parts of the input (other nodes) is
+    |xsl:apply-templates|. While |xsl:apply-templates| is able to
+    process arbitrary nodes of the input tree, an analogous STX
+    instruction can only process nodes that follow the current node. To
+    this end STX provides several individual instructions. 
+
+*Idea:* extend the |stx:process-|... instructions
+(STX's replacement for |xsl:apply-templates|)
+
+  * |stx:process-children|
+  * |stx:process-attributes|
+  * |stx:process-self|
+  * |stx:process-siblings|
+  * (|stx:process-buffer|)
+  * (|stx:process-document|)
+
+	
+
+    STX has buffers: FIFO (first in first out) stores for SAX events. A
+    temporary result of an STX transformation can be stored in a buffer
+    and then processed again using the |stx:process-buffer| instruction.
+
+    With the exception of |stx:process-attributes| each of these
+    instructions addresses an XML fragment that is subject of the
+    following processing steps. While normally the templates of the STX
+    transformation sheet do this processing, it is easy to extend the
+    instructions above to direct the selected fragment to an external
+    SAX filter. 
+
+Every instruction addresses an XML fragment that can be passed to an
+external SAX filter component
+(except for |stx:process-attributes|)
+
+------------------------------------------------------------------------
+14 / 23
+
+
+      How to Identify the External Filter?
+
+    To address the the external SAX filter, one needs an identification
+    of the filter and possibly a source for special filter instructions.
+    In the case of XSLT we need to express that an XSLT transformer is
+    required and which stylesheet has to be used. 
+
+We need
+
+  * a unique name for the filter (implementation-independent)
+  * possibly a source for the filter instructions
+
+The web-typical solution for a unique name: a *URI*
+
+
+*See*: extension functions in XSLT
+
+Bad solution (depends on a Java implementation)
+
+<xsl:value-of select="date:new()"
+              xmlns:date="*java:java.util.Date*" />
+
+Good solution (EXSLT)
+
+<xsl:value-of select="date:date-time()"
+              xmlns:date="*http://exslt.org/dates-and-times*" />
+
+    In this examples the first invocation of |xsl:value-of| presumably
+    works only in a Java-based implementation of the XSLT processor,
+    because it directly addresses a method in a Java class. The second
+    example uses an extension function whose specification is defined
+    independent of an underlying programming language. Thus every XSLT
+    processor should be able to provide an implementation of this function.
+
+    The same approach is used to identify an external filter: it doesn't
+    address the implementation, but uses a URI that every STX engine can
+    map to its specific implementation of the filter. (/It's all about
+    indirection in XML!/)
+
+------------------------------------------------------------------------
+15 / 23
+
+
+      Filter URIs
+
+Do we have to invent new URIs for all kinds of SAX filters?
+
+*No, some do have already canonical names:*
+
+  * XSLT:
+    *|http://www.w3.org/1999/XSL/Transform|*
+
+  * STX:
+    *|http://stx.sourceforge.net/2002/ns|*
+
+  * XML Signature:
+    *|http://www.w3.org/2000/09/xmldsig#|*
+
+  * SAX:
+    *|http://xml.org/sax|*
+
+    If some transformation approach belongs to a specified namespace,
+    this namespace should be used to identify the filter. Of course it
+    is possible to extend this URI list for all kinds of specialized
+    filters.
+
+    The SAX filter listed above is meant as a transformer that consumes
+    text as a (series of) |characters| events and emits SAX events from
+    parsing this text. This is useful for unparsed XML content, for
+    example from within a CDATA section.
+
+    In the end it is up to the STX engine to recognize a filter URI and
+    to identify and resolve a proper implementation for that filter. The
+    STX function |filter-available()| can be used to check whether a
+    requested filter is available or not. On the STX level, there's no
+    implementation-specific knowledge necessary (for example a Java
+    class name); this extended filter interface is portable and
+    implementation-independent.
+
+------------------------------------------------------------------------
+16 / 23
+
+
+      Filter Sources
+
+Some filters need additional filter instructions
+(for example an XSLT stylesheet)
+
+*Two ways for specifying a source:*
+
+  * reference to an external resource
+    |*url(/link/)*|
+    necessary if the source is non-XML data
+
+  * source is the contents of an STX buffer
+    |*buffer(/buffer-name/)*|
+    requires that the filter accepts SAX events for its initialization
+
+    The specification of a filter source is possible by reference, using
+    the "|url(...)|" syntax already known from several W3C documents
+    (namely CSS and XSLFO), and inline with the help of an STX buffer,
+    using the "|buffer(...)|" notation. This second variant enables
+    self-containing transformation sheets, provided the source is XML
+    that can be passed to the filter as a SAX event stream. 
+
+------------------------------------------------------------------------
+17 / 23
+
+*Two attributes for |stx:process-|...*
+
+  * *|filter-method|*
+    specifies the URI that identifies the transformation
+  * *|filter-src|*
+    specifies the source for the transformation instructions
+
+Parameters are passed using the familiar syntax:
+
+
+<stx:process-children
+        *filter-method="http://www.w3.org/1999/XSL/Transform"
+        filter-src="url('sorter.xsl')"*>
+   <stx:with-param name="attrname" select="'size'" />
+</stx:process-children>
+
+
+means:   	/Transform the children of the current node with the XSLT
+stylesheet 'sorter.xsl' and pass the string '|size|' as value for the
+stylesheet parameter |attrname|./
+
+------------------------------------------------------------------------
+18 / 23
+
+
+      Inline XSLT Stylesheets in STX
+
+With the help of buffers it is possible to describe an STX
+transformation that uses an XSLT process within one source file:
+
+*<stx:buffer name="xslt-code">*
+  <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                  version="1.0">
+    <xsl:param name="par" />
+    <xsl:template match="/">
+       ...
+    </xsl:template>
+    ...
+  </xsl:stylesheet>
+</stx:buffer>
+
+<stx:template match="foo">
+  <stx:process-self
+          filter-method="http://www.w3.org/1999/XSL/Transform"*
+          filter-src="buffer(xslt-code)"*>
+    <stx:with-param name="par" select="123" />
+  </stx:process-self>
+</stx:template>
+
+------------------------------------------------------------------------
+19 / 23
+
+
+      Inline Code for External Transformations
+
+    From the STX point of view, the contents of a buffer is simply XML
+    data. That means the buffer contents can be created or modified by
+    STX template rules or again with the help of an external SAX filter.
+
+This technique allows transformations that modify their source
+dynamically prior to its usage!
+
+The meta-information for the transformation could be located
+
+  * in another document
+  * at the start of the document
+
+<magic>
+  <head>
+    <important path="*charm[2]/@spell*" />
+    <important path="*charm[4]/@spell*" />
+  </head>
+  <body>
+    <charm spell="Abracadabra">???</charm>
+    <charm spell="Obliviate">
+             Modifies or erases portions of a person's memory.</charm>
+    <charm spell="Peskipiksi Pesternomi">Freezing Charm?</charm>
+    <charm spell="Wingardium Leviosa">
+             Causes a feather to levitate.</charm>
+  </body>
+</magic>
+
+    In this example the transformation has to extract the information
+    that is specified in the |path| attribute of the |head/important|
+    elements. Using pure XSLT this is impossible, or at least very
+    difficult (unless of course one uses for example such magic
+    functions like Saxon's |evaluate|).
+
+    Using the |stx:process-buffer| approach, STX can transform the
+    |head| element into transformation instructions, store these in a
+    buffer, and apply the contents of this buffer afterwards to the
+    |body| part of the document, see magic.xml
+    <http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/magic.xml> and
+    magic.stx
+    <http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/magic.stx>.
+
+------------------------------------------------------------------------
+20 / 23
+
+
+      A Proof of Concept: Schematron via STX
+
+    A more real life example is the XSLT-based implementation of
+    Schematron [5]. Using this pure XSLT approach one has to transform
+    the Schematron schema into a validating stylesheet. After this step
+    this stylesheet can be applied to an XML document, which should
+    conform to the Schematron schema. It is not possible in this
+    implementation to apply the schema directly to the document. This
+    might appear strange to less experienced users.
+
+    Since the validating stylesheet is a temporary file that results
+    directly from the Schematron schema, it can be computed dynamically
+    and stored in a buffer. The following graphic demonstrates this
+    approach.
+
+<http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/schematron-stx.svg>
+
+
+    (This graphic is linked to an animated SVG. Click on this SVG to
+    proceed to the next step; altogether four times. 
+
+------------------------------------------------------------------------
+21 / 23
+
+
+      Schematron via STX: the Code
+
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               version="1.0">
+
+  <stx:param name="schema" required="yes" />
+
+  <stx:buffer name="schematron">
+    <stx:process-document
+            filter-src="url('schematron-basic.xsl')"
+            filter-method="http://www.w3.org/1999/XSL/Transform"
+            href="$schema" />
+  </stx:buffer>
+  
+  <stx:template match="/">
+    <stx:process-self
+            filter-src="buffer(schematron)"
+            filter-method="http://www.w3.org/1999/XSL/Transform" />
+  </stx:template>
+
+</stx:transform>
+
+    The contents of the buffer "schematron" is the result of applying an
+    XSLT transformation on the Schematron schema. This transformation
+    produces a validating XSLT stylesheet which will be applied to the
+    input stream of the STX process afterwards. Using only XSLT and the
+    metastylesheet reference implementation "schematron-basic.xsl"
+    requires the manual execution of these two steps. 
+
+Invocation:
+
+joost document.xml schematron.stx
+<http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/schematron.stx> schema=val.sch <http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/val.sch>
+
+    In this example the file |val.sch| is a simple schema that checks if
+    the root element of the input document is |stx:transform|. Running
+    the example requires the two additional files schematron-basic.xsl
+    <http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/schematron-basic.xsl>
+    and skeleton1-5.xsl
+    <http://www2.informatik.hu-berlin.de/~obecker/Docs/EML2003/skeleton1-5.xsl>
+    to be in the working directory.
+
+------------------------------------------------------------------------
+22 / 23
+
+
+      Pluggable Filters in Joost
+
+How to provide a custom filter implementation for a URI?
+
+    I've started this presentation with a motivation for SAX filter
+    processing. After telling you that special transformation components
+    (XSLT and STX-based) might be easier to develop and maintain, and
+    that STX moreover allows the splitting of large documents into
+    smaller fragments, one last question remains: how can I use existing
+    custom filter implementations from an STX engine? 
+
+    Using Joost it is very simple to plug in custom SAX filter
+    implementations. The only prerequisites are
+
+      * the filter implementation must support the
+        |javax.xml.transform.sax.TransformerHandler| interface
+      * the filter implementation must accept a
+        |javax.xml.transform.sax.SAXResult| object for sending the
+        result SAX event stream to.
+
+    (In the first JAXP example you've seen already both
+    |TransformerHandler| and |SAXResult| as participants in a SAX filter
+    chain.)
+
+    Actually Joost doesn't need a full implementation for this
+    interface. In particular, the |getTransformer()| method won't be
+    invoked by Joost, thus it's sufficient to provide an empty method.
+
+    Registering such an implementation works in the same way as the
+    familiar approach, when a custom |javax.xml.transform.Source| object
+    for an URI appearing in the transformation may be provided via a
+    |javax.xml.transform.URIResolver|.
+
+    Joost provides a special |TransformerHandlerResolver| interface for
+    resolving |TransformerHandler| objects. Its method |resolve()| will
+    be called when an |stx:process-|*** instruction bearing a
+    |filter-method| attribute is encountered, passing the filter URI,
+    the source specification and the parameters as arguments. It then
+    returns either a |TransformerHandler| object, or |null| if such an
+    object cannot be created.
+
+ 1. The filter has to implement the interface
+    *|javax.xml.transform.sax.TransformerHandler|*
+ 2. The new resolver interface *|TransformerHandlerResolver|* returns a
+    filter object (similar to |URIResolver|)
+
+public interface TransformerHandlerResolver
+{
+   // /invoked for a url(...) source/
+   TransformerHandler resolve(String method, String href, String base,
+                              Hashtable params)
+      throws SAXException;
+
+   // /invoked for a buffer(...) source/
+   TransformerHandler resolve(String method, XMLReader reader, 
+                              Hashtable params)
+      throws SAXException;
+
+   // /implements the STX function filter-available()/
+   boolean available(String filter);
+}
+
+    Such a resolver can be registered using the |setAttribute| method of
+    Joost's |TransformerFactory|, which is again specified already by
+    JAXP 1.1.
+
+------------------------------------------------------------------------
+23 / 23
+
+    This paper has demonstrated that the streaming transformation
+    language STX may be used to split a SAX event stream into fragments
+    and pass these fragments to other SAX filter components. This
+    enables the transformation of very large XML documents that are on
+    the one hand too big for XSLT, but on the other hand too complicated
+    to transform solely an a stream basis with STX. Splitting the stream
+    into fragments allows hybrid techniques, so that each of the
+    fragments can be transformed independently, e.g. by an XSLT engine. 
+
+    Furthermore, using the Java-based STX implementation Joost, it is
+    very easy to create custom SAX filters that can be invoked from an
+    STX transformation. The interface on the STX level is
+    language-independent, the interfaces for using Joost are
+    standardized in the JAXP 1.1 package. 
+
+    [Closing note: the specification for using external filter
+    components described here is currently under revision. Instead of
+    sending the result of an external component directly to the current
+    result stream, it might be redirected to the input stream. Thus,
+    such a filter would act as a preprocessing step for the current
+    |stx:process-|*** instruction.] 
+
+
+    Thank you for your attention!
+
+
+    Questions?
+
+    ------------------------------------------------------------------------
+
+    *Bibliography*
+
+    [1]  	Petr Cimprich, Oliver Becker et. al: "/Streaming
+    Transformations for XML (STX)/", http://stx.sourceforge.net/documents/
+    [2] 	Oliver Becker, Paul Brown, Petr Cimprich: "/An Introduction to
+    Streaming Transformations for XML/", xml.com,
+    http://www.xml.com/pub/a/2003/02/26/stx.html
+    [3] 	Oliver Becker: "/Transforming XML on the Fly/", XML Europe
+    2003, Proceedings,
+    http://www.idealliance.org/papers/dx_xmle03/papers/04-02-02/04-02-02.html
+
+    [4] 	/Joost, A Java-based STX processor/, http://joost.sourceforge.net/
+    [5] 	Rick Jelliffe: "/The Schematron – An XML Structure Validation
+    Language using Patterns in Trees/",
+    http://xml.ascc.net/xml/resource/schematron/schematron.html
+
+------------------------------------------------------------------------
+
+/Extended SAX Filter Processing with STX/,    Extreme Markup Languages
+2003–08–06,    © Oliver Becker
+

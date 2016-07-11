@@ -1,0 +1,3338 @@
+STX <http://stx.sourceforge.net/>
+
+
+  Streaming Transformations for XML (STX)
+  Version 1.0
+
+
+    Working Draft 27 April 2007
+
+This version:
+    http://stx.sourceforge.net/documents/spec-stx-20070427.html
+    <http://stx.sourceforge.net/documents/spec-stx-20040701.html> 
+Latest version:
+    http://stx.sourceforge.net/documents/ 
+Authors and Contributors:
+    Petr Cimprich <petr at NO-SPAM.gingerall.cz> <mailto:n/a>
+    Oliver Becker <obecker at NO-SPAM.informatik.hu-berlin.de> <mailto:n/a>
+    Christian Nentwich <c.nentwich at NO-SPAM.cs.ucl.ac.uk> <mailto:n/a>
+    Honza Jiroušek <honza.jirousek at NO-SPAM.ecn.cz> <mailto:n/a>
+    Manos Batsis <mbatsis at NO-SPAM.humanmarkup.org> <mailto:n/a>
+    Paul Brown <prb at NO-SPAM.fivesight.com> <mailto:n/a>
+    Michael Kay <michael.h.kay at NO-SPAM.ntlworld.com> <mailto:n/a>
+
+Copyright © 2002-2005 authors and contributors. All rights reserved.
+
+------------------------------------------------------------------------
+
+
+    Abstract
+
+STX is an XML-based language for transforming XML documents into other
+XML documents without building a tree in memory. An STX processor
+transforms one or more source streams of XML events according to rules
+given in an XML document called STX transformation sheet and generates
+one or more result XML streams. Each incoming event invokes one or more
+rules, that can e.g. emit events to a result stream or access a working
+storage.
+
+
+    Status of this Document
+
+This document is a working draft of the STX transformation language
+specification.
+
+
+    Table of Contents
+
+1 Introduction <#introduction>
+2 Concepts <#concepts>
+    2.1 Initiating a Transformation <#initiating-a-transformation>
+    2.2 Context <#context>
+    2.3 Precedence Categories <#precedence-categories>
+    2.4 Expressions <#expressions>
+    2.5 Match Patterns <#match-patterns>
+    2.6 Attribute Value Templates <#avt>
+    2.7 Errors <#stx-errors>
+3 Data Model <#data-model>
+    3.1 XML Schemas and Types <#xml-schemas-and-types>
+    3.2 Accessors <#accessors>
+    3.3 Nodes <#nodes>
+    3.4 Atomic Values <#atomic-values>
+    3.5 Whitespace Stripping <#whitespace-stripping>
+4 STX Transformation Sheet Structure <#sheet-structure>
+    4.1 STX Namespace <#stx-namespace>
+    4.2 Transform Element <#transform-element>
+    4.3 Grouping of Templates <#grouping-of-templates>
+    4.4 STX Transformation Sheet Inclusion <#sheet-inclusion>
+5 Generating Output <#generating-output>
+    5.1 Namespace Aliasing <#namespace-aliasing>
+    5.2 Templates <#templates>
+    5.3 Procedures <#procedures>
+    5.4 Parameters <#Parameters>
+    5.5 Copying the Current Node <#copying-the-current-node>
+    5.6 Processing Nested Events <#processing-nested-events>
+    5.7 Processing Attributes <#processing-attributes>
+    5.8 Processing Siblings <#processing-siblings>
+    5.9 Running Overridden Templates <#running-overridden-templates>
+    5.10 Outputting Strings <#outputting-strings>
+    5.11 Outputting Elements and Attributes
+<#outputting-elements-and-attributes>
+    5.12 Outputting Other Nodes <#outputting-other-nodes>
+    5.13 Conditions <#conditions>
+    5.14 Loops <#loops>
+    5.15 Multiple Input Documents <#multiple-input-documents>
+    5.16 Multiple Output Documents <#multiple-output-documents>
+    5.17 Buffers <#buffers>
+    5.18 Using external filters <#external-filters>
+    5.19 Messages <#messages>
+6 STXPath <#stxpath-lang>
+    6.1 Literals <#literals>
+    6.2 Variables <#variables>
+    6.3 Parenthesized Expressions <#parenthesized-expressions>
+    6.4 Context Item Expression <#context-item-expression>
+    6.5 Functions <#functions>
+        6.5.1 Sequence Functions <#sequence-functions>
+        6.5.2 Node Functions <#node-functions>
+        6.5.3 Boolean Functions <#boolean-functions>
+        6.5.4 String Functions <#string-functions>
+        6.5.5 Numerical Functions <#numerical-functions>
+        6.5.6 Aggregate Functions <#aggregate-functions>
+        6.5.7 Conversion Functions <#conversion-functions>
+        6.5.8 Other Functions <#other-functions>
+    6.6 Path Expressions <#path-expressions>
+    6.7 Predicate <#predicate>
+    6.8 Sequence Expressions <#sequence-expressions>
+    6.9 Arithmetic Expressions <#arithmetic-expressions>
+    6.10 Comparison Expressions <#comparison-expressions>
+    6.11 Logical Expressions <#logical-expressions>
+    6.12 For Expressions <#for-expressions>
+    6.13 Conditional Expressions <#conditional-expressions>
+    6.14 Quantified Expressions <#quantified-expressions>
+
+
+      Appendices
+
+A References <#references>
+    A.1 Normative References <#normative-references>
+    A.2 Other References <#other-references>
+B List of STX Instructions and Declarations <#element-syntax-summary>
+C STXPath Grammar <#stxpath>
+D Recommended filter URIs <#filter-uris> (Non-Normative)
+E Acknowledgments <#acknowledgments> (Non-Normative)
+F Draft Change History since WD 1 July 2004 <#changehistory> (Non-Normative)
+
+------------------------------------------------------------------------
+
+
+    1 Introduction
+
+This document defines the syntax and semantics of the STX transformation
+language. Transformation rules in STX are expressed as well-formed XML
+documents. These documents, called STX transformation sheets
+(abbreviated as stx-sheets), may include both elements that are defined
+by STX (STX declarations and instructions) and other elements
+(literals). STX-defined elements are identified by a specific XML
+namespace, which is referred to in this specification as the STX
+namespace. This document uses the 'stx' prefix as a shortcut for
+referring to elements from the STX namespace.
+
+An STX transformation describes rules for transforming one or more
+source XML documents into one or more result XML documents. The STX
+language is designed in a way which allows transformations to have a
+streaming character. This means that it does not need to build a tree
+representing the source documents in memory. Result events are generated
+as soon as source events appear and are processed. Because of the
+streaming character of STX transformations, source XML documents are
+supposed to be provided as streams of XML events. This is why the source
+documents are also referred to as source streams of XML events. The same
+is true for result XML documents that may be referred to as result
+streams of XML events.
+
+*Note:*
+
+The term 'XML events' used within this specification refers to any
+sequence of events describing a structure of XML document. The STX
+language does not require any particular set of such events (like SAX2,
+StAX or Expat events). Implementations are free to support any APIs to
+communicate with source stream providers and result stream handlers.
+
+The transformation is achieved by associating events with templates. A
+template pattern <#NT-pattern> is matched against events and their
+context. The best matching template is then instantiated to create a
+part of the result stream. A template is always instantiated with
+respect to the current context, a set of additional information
+maintained during the transformation. In constructing the result stream,
+events from the source stream can be filtered and arbitrary events can
+be added. Events can also be reordered using a working storage.
+
+On the surface, the syntax of STX is similar to the syntax of [XSLT 2.0]
+<#XSLT2>. STX also employs a compact expression language embedded in
+certain attributes. This expression language, called STXPath, is
+syntactically similar to [XPath 2.0] <#XPath2>. This should allow XSLT
+users to easily adapt to the STX syntax.
+
+
+    2 Concepts
+
+The software responsible for running an STX transformation is referred
+to as an *STX processor*. An STX processor transforms one or more source
+XML documents according to rules given in an STX transformation sheet
+and generates one or more result XML documents.
+
+The source documents are supplied in the form of streams of XML events.
+These streams are referred to as the *source streams*. The stream whose
+events are currently processed is referred to as the *current source
+stream*. The current source stream at the time when the transformation
+is initiated is referred to as the *principal source stream*.
+
+A possibly empty set of external values for stx-sheet parameters is
+supplied. These values are available for use within expressions in the
+stx-sheet.
+
+No tree representation of the source document is constructed. However,
+when processing each event, a limited amount of contextual information
+is available from the system.
+
+Data arriving with source events form nodes of a data model for source
+documents (see *3 Data Model* <#data-model>). The data model is a tree
+of nodes. However, a processor does not build the complete tree; just a
+limited set of nodes is available at each time of processing.
+
+The stx-sheet is a well-formed XML document that may be precompiled to
+some kind of executable representation that can be reused to perform
+multiple transformations. The stx-sheet can consist of several stx-sheet
+modules contained in different files. One of these modules is the
+*principal stx-sheet module*. The complete stx-sheet is assembled by
+finding the stx-sheet modules referenced directly or indirectly from the
+principal stx-sheet module using the |stx:include| declaration.
+
+The output of a transformation consists of one or more sequences of XML
+events. These sequences of events are referred to as *result streams*.
+The stream where events are currently emitted to is referred to as the
+*current result stream*. The current result stream at the time when the
+transformation is initiated is referred to as the *principal result stream*.
+
+Each incoming event can cause an invocation of one or more rules within
+the stx-sheet by means of a match pattern <#NT-pattern>. The actions
+such a rule may perform include emitting XML events to result streams,
+saving working data to a working storage, accessing data written to the
+working storage by previously executed rules, and invoking other rules.
+
+*Note:*
+
+Source and result streams are abstract constructs that function as input
+or output channels for STX transformations. Each source or result stream
+is identified with a URI. This URI must not be confused with a URI of
+physical document that may be parsed to generate the source stream or a
+URI of document the result stream may be serialized to. Stream URIs are
+passed to a resolver that maps abstract streams to physical resources.
+
+
+      2.1 Initiating a Transformation
+
+This document does not specify interfaces for initiating an STX
+transformation. Instead, these interfaces are implementation defined.
+This section describes the minimum amount of information that must be
+supplied to execute a transformation:
+
+  *
+
+    An identification of the stx-sheet module that is to act as the
+    principal stx-sheet module for the transformation.
+
+  *
+
+    A possibly empty set of values for stx-sheet parameters (name-value
+    pairs). External parameter values are matched against global
+    stx-sheet parameters.
+
+  *
+
+    An identification of the stream that is to act as the principal
+    source stream.
+
+  *
+
+    An identification of the stream that is to act as the principal
+    result stream.
+
+
+      2.2 Context
+
+There is a contextual information available at each point during
+processing. It includes the data arriving with the current event and
+other data related to the state of processing. The contextual
+information at any particular instant during the processing is called
+the *current context*. The context information consists of the following
+parts:
+
+  *
+
+    /current node data/ - The node which is the subject of the current
+    event is called the *current node*. The information available for
+    the current node depends on the node kind; see *3 Data Model*
+    <#data-model> for details.
+
+  *
+
+    /ancestor stack/ - All ancestor nodes of the current node with all
+    their properties are stored in the ancestor stack.
+
+  *
+
+    /position within siblings/ - Information about the position relative
+    to other siblings is kept. The position is available for the current
+    node and all its ancestors.
+
+    A position number is available for all node kind tests such as
+    |node()|, |text()|, |cdata()|, |processing-instruction()|,
+    |comment()|, and |doctype()|. For elements, the position is
+    available for all qualified names or names containing * shortcut:
+    |pre:lname|, |lname|, |pre:*|, |*:lname|, |*|. For processing
+    instructions, the position is also available for each target. The
+    position of attribute nodes is undefined.
+
+
+      2.3 Precedence Categories
+
+Each incoming event can invoke a template within the stx-sheet by means
+of precedence categories and a match pattern (see *2.5 Match Patterns*
+<#match-patterns>). The template that is used to process the current
+node is called the *current template*. Templates can be separated into
+groups (see *4.3 Grouping of Templates* <#grouping-of-templates>).
+Top-level templates are considered to be members of the default group.
+The group containing the current template is referred to as the *current
+group*.
+
+Templates are classed into the precedence categories according to their
+visibility from a *base group*. The base group can be either the current
+group or the group explicitly specified in the |group| attribute of
+current process statement. The visibility is defined using the
+|visibility| and |public| attributes for each template (see *5.2
+Templates* <#templates>).
+
+There are three precedence categories (listed with decreasing precedence):
+
+ 1.
+
+    templates from the base group and public templates (|public="yes"|)
+    from groups that are children of the base group
+
+ 2.
+
+    group templates (|visibility="group"|) and global templates
+    (|visibility="global"|) from all groups that are ancestors of the
+    base group
+
+ 3.
+
+    all global templates (|visibility="global")|
+
+The first precedence category is searched for the best matching template
+by means of a match pattern (see *2.5 Match Patterns*
+<#match-patterns>). If there is no matching template in the first
+precedence category, the second category is searched. If neither the
+first nor the second category contain a matching template, the third
+category is searched.
+
+
+      2.4 Expressions
+
+STX uses an expression language called *STXPath* that is defined later
+in this specification (see *6 STXPath* <#stxpath-lang>).
+
+Expressions are used in match patterns, to specify conditions for
+different ways of processing of the current node, to generate text to be
+inserted to an output stream, or to access data from the ancestor stack.
+
+An STXPath expression may occur as the value of certain attributes on
+STX elements, and also within curly braces in attribute value templates
+(see *2.6 Attribute Value Templates* <#avt>). The context within an
+stx-sheet where an STXPath expression appears may specify a required
+data type; the type of value that the expression is expected to return.
+
+STXPath expressions can include built-in functions whose expanded names
+are identified by a specific namespace which is referred to as the STX
+function namespace. This document uses the 'sf' prefix as a shortcut for
+referring to the built-in STXPath functions
+
+It is a static error if the value of an expression attribute does not
+match the STXPath production expression <#NT-expression>. It is a
+dynamic error if any STXPath expression is evaluated and raises an
+error, or when it raises an error when converting to the required data type.
+
+The attribute |stxpath-default-namespace| of the |stx:transform| element
+(see *4.2 Transform Element* <#transform-element>) may be used to define
+the namespace that will be used for an unprefixed name used as a name
+test <#prod-NameTest> within a step of an STXPath expression
+<#NT-expression> or pattern <#NT-pattern>. The value of the attribute is
+the namespace URI to be used.
+
+This default namespace URI applies only to elements; it does not apply
+to attributes. In the absence of this attribute, an unqualified name
+test <#prod-NameTest> matches an element whose namespace URI is null:
+the default namespace of XML document (as defined by an
+|xmlns="some-uri"| declaration) is not used.
+
+
+      2.5 Match Patterns
+
+A match pattern <#NT-pattern> specifies a set of conditions on the
+current context. If the current context satisfies the conditions the
+current node matches the pattern; if the current context does not
+satisfy the conditions the current node does not match the pattern. The
+syntax for STX patterns <#NT-pattern> is a subset of the syntax for
+STXPath expressions <#NT-expression>. In particular, patterns are in
+form of location paths that meet certain restrictions.
+
+Here are some examples of patterns:
+
+  *
+
+    |item| - matches any 'item' element from the namespace used for
+    unprefixed STXPath path patterns (defined with
+    'stxpath-default-namespace' attribute, no namespace by default)
+
+  *
+
+    |list/item| - matches any 'item' element with a 'list' parent, where
+    both elements are from the namespace used for unprefixed STXPath
+    path patterns
+
+  *
+
+    |chapter//list/item| - matches any 'item' element with a 'list'
+    parent and a 'chapter' ancestor, where all three elements are from
+    the namespace used for unprefixed STXPath path patterns
+
+  *
+
+    |/root/list/*| - matches any element with a 'list' parent and a
+    'root' grand parent which is the document element, where both 'root'
+    and 'list' elements are from the namespace used for unprefixed
+    STXPath path patterns
+
+  *
+
+    |pre:list[@id=5]/pre:item| - matches any 'item' element with a
+    'list' parent having an 'id' attribute with a value of 5, where both
+    elements are from the namespace which is bound to the 'pre' prefix
+    in the stx-sheet for this rule
+
+  *
+
+    |*[sf:position()=1]| - matches any element that is the first element
+    child of its parent
+
+  *
+
+    |node()| - matches any child node
+
+  *
+
+    |text()| - matches any text node (including CDATA text node)
+
+  *
+
+    |cdata()| - matches any CDATA text node
+
+  *
+
+    |processing-instruction()| - matches any processing instruction
+
+A match pattern <#NT-pattern> is a set of location path patterns
+separated with |||. A location path pattern is a location path whose
+steps are separated either by the |/| (child axis) operator or by the
+|//| operator (descendant axis). Up to one predicate is allowed in each
+step. Predicate expressions are STXPath expressions <#NT-expression>
+(see *2.4 Expressions* <#expressions>).
+
+Predicate expressions are evaluated using the current context. If the
+result is a number, the result will be converted to true if the number
+is equal to the context position and will be converted to false
+otherwise. Thus a location path |p[3]| is equivalent to
+|p[sf:position()=3]|. Otherwise the result will be converted to a
+boolean using the type conversion rules described in *6 STXPath*
+<#stxpath-lang>. If the result of evaluating and converting the
+predicate expression is false, the pattern does not match the current node.
+
+If there is no matching template available a *default rule* is applied.
+One of three default rules, specified in the |pass-through| attribute of
+|stx:transform| or |stx:group| element can be used: "none" (to skip the
+current node), "all" (to pass through the current node), and "text" (to
+pass through the current node only if it is a text node). All these
+three default rules process all children of the current node, thus the
+processing does not stop when a default rule is applied. The default
+rule can be set for the stx-sheet (see *4.2 Transform Element*
+<#transform-element>) or for a group (see *4.3 Grouping of Templates*
+<#grouping-of-templates>). This feature enables copying of documents
+with only a few changes, and to straightforwardly select just a few
+items from a document. The default behavior is to ignore all not
+matching events (value "none") on the stx-sheet level. Groups inherit
+the pass-through behavior from their parent group when not specified
+explicitly.
+
+It is possible that the current context matches more than one rule
+within a precedence category. Each rule has a computed priority value.
+The computed priority can be overridden with a 'priority' attribute
+value (see *5.2 Templates* <#templates>).
+
+ 1.
+
+    If the pattern <#NT-pattern> contains multiple alternatives
+    separated with |||, then it is treated equivalently to a set of
+    template rules, one for each alternative.
+
+ 2.
+
+    If the pattern has the form of a /qualified name/ or has the form
+    either of /processing-instruction(target)/ or /cdata()/, then the
+    priority is /0/.
+
+ 3.
+
+    If the pattern has the form /pre:*/ or /*:lname/, then the priority
+    is /-0.25/.
+
+ 4.
+
+    If the pattern consists of just a /node test/ other than cdata(),
+    then the priority is /-0.5/.
+
+ 5.
+
+    Otherwise, the priority is /0.5/.
+
+The rule with the highest priority is used. If there is more than one
+matching template rule with the highest priority, an STX processor must
+select the rule that occurs the last in the stx-sheet.
+
+*Note:*
+
+The rules to determine an STX template to be instantiated are, with the
+exception of cdata(), the same as in XSLT 1.0 (see [XSLT 1.0] <#XSLT>, 5.5).
+
+
+      2.6 Attribute Value Templates
+
+In an attribute that is designated as an attribute value template an
+STXPath expression can be used by surrounding the expression with curly
+braces ({}).
+
+An attribute value template consists of an alternating sequence of fixed
+parts and variable parts. A variable part consists of an STXPath
+expression enclosed in curly braces ({}). A fixed part may contain any
+characters, except that a left curly brace must be written as {{ and a
+right curly brace must be written as }}.
+
+The result of evaluating an attribute value template is obtained by
+concatenating the expansions of the fixed and variable parts. The
+expansion of a fixed part is obtained by replacing any double curly
+braces ({{ or }}) by the corresponding single curly brace. The expansion
+of a variable part is obtained by evaluating the enclosed STXPath
+expression and converting the resulting value to a string.
+
+If a left curly brace appears in an attribute value template without a
+matching right curly brace, or if a right curly brace occurs in an
+attribute value template outside an expression without being followed by
+a second right curly brace, a processor must signal a static error.
+
+
+      2.7 Errors
+
+All errors that can occur during an STX transformation belong to one of
+the following categories:
+
+  *
+
+    /warnings/ - The processor may issue a warning; the transformation
+    must not be stopped.
+
+  *
+
+    /errors/ - The processor must exit the transformation and issue an
+    error message.
+
+This specification does not define how to issue a warning or an error.
+Implementations are free to use either the standard output or standard
+error output, or any convenient error handler.
+
+
+    3 Data Model
+
+STX operates on a transformation sheet document and one or more source
+and result documents. The stx-sheet document uses the [XQuery 1.0 and
+XPath 2.0 Data Model] <#XQXPDM>. The source and result documents use a
+specific STX Data Model which is derived from the XQuery 1.0 and XPath
+2.0 Data Model. This section describes additions, restrictions and
+modifications to the XQuery 1.0 and XPath 2.0 Data Model to derive the
+STX Data Model. Additions describe information that is required for STX
+processing but that is not contained in the XQuery 1.0 and XPath 2.0
+Data Model. Restrictions describe features of the XQuery 1.0 and XPath
+2.0 Data Model that are never used in STX. Modifications describe rules
+about the way in which trees in the STX Data Model are constructed that
+are different from the rules of the XQuery 1.0 and XPath 2.0 Data Model.
+Each item is marked as either addition, restriction or modification in
+this section.
+
+
+      3.1 XML Schemas and Types
+
+*[Restriction]*
+
+The aspects of the [XQuery 1.0 and XPath 2.0 Data Model] <#XQXPDM> that
+are dependent on W3C XML Schema are not used in STX.
+
+  * /Validity assessments:/ STX does not expect parsers to validate
+    source documents; it does not work with any PSVI information.
+  * /Type assessment:/ All elements and attributes are treated as
+    untyped in STX.
+
+
+      3.2 Accessors
+
+A set of accessors is defined on all nodes in [XQuery 1.0 and XPath 2.0
+Data Model] <#XQXPDM>. These accessors are shown with the prefix 'dm'.
+Additional, STX specific, accessors are shown with the prefix 'stxdm'.
+The prefixes are not bound to namespaces as both kinds of accessor are
+abstract, not directly accessible functions.
+
+*[Restriction]*
+
+The following accessors are never used during STX transformations on any
+node:
+
+  * dm:typed-value
+  * dm:type
+  * dm:children
+  * dm:nilled
+
+*[Modification]*
+
+The dm:string-value accessor defined in [XQuery 1.0 and XPath 2.0 Data
+Model] <#XQXPDM> is replaced with an STX specific accessor
+stxdm:string-value. The way in which the string value accessor of
+different kinds of nodes is computed is the following:
+
+  * documents - the empty string.
+  * elements - if the very first child of an element happens to be a
+    text node, the string-value of the element is the string-value of
+    this text node. Otherwise, the string-value of the element is the
+    empty string.
+  * attributes - the same as dm:string-value.
+  * text nodes - the same as dm:string-value.
+  * processing instructions - the same as dm:string-value.
+  * comments - the same as dm:string-value.
+
+
+      3.3 Nodes
+
+*[Addition]*
+
+In addition to the kinds of nodes defined in [XQuery 1.0 and XPath 2.0
+Data Model] <#XQXPDM> STX recognizes two more kinds: document type nodes
+and cdata nodes.
+
+/Document type (doctype) nodes/ represent an information contained in
+document type declarations. Doctype has the following properties:
+
+  * base-uri, possibly empty
+  * node-name
+  * parent
+  * system-id, possibly empty
+  * public-id, possibly empty
+
+Doctype nodes must satisfy these constrains:
+
+ 1. Every doctype node must have a unique identity, distinct from all
+    other nodes.
+ 2. Parent property must contain the document element.
+
+The properties of doctype nodes are exposed by the following accessors
+defined in [XQuery 1.0 and XPath 2.0 Data Model] <#XQXPDM>.
+
+  * dm:base-uri - the value of base-uri property
+  * dm:node-kind - "doctype"
+  * dm:node-name - the name of doctype
+  * dm:parent - the document node
+  * dm:attributes - the empty sequence
+  * dm:namespaces - the empty sequence
+
+Moreover, two extra STX accessors are defined for doctype nodes:
+
+  * stxdm:system-id - doctype system identifier
+  * stxdm:public-id - doctype public identifier
+
+/Cdata nodes/ encapsulate XML character content enclosed within CDATA
+boundaries. Cdata nodes have the same properties and accessors as text
+nodes defined in [XQuery 1.0 and XPath 2.0 Data Model] <#XQXPDM> with
+the only exception of the dm:node-kind accessor which returns "cdata"
+for cdata nodes.
+
+*Note:*
+
+The recognition of CDATA boundaries is optional in STX. When these
+boundaries are ignored the data model of source documents contains no
+cdata nodes.
+
+*[Restriction]*
+
+Namespace nodes are not directly accessible in STX; they are not exposed
+as nodes. The information held in namespace nodes is instead made
+available using two functions: sf:get-in-scope-namespaces
+<#F-sf:get-in-scope-namespaces> and sf:get-namespace-uri-for-prefix
+<#F-sf:get-namespace-uri-for-prefix>. Properties of namespace nodes that
+are not exposed by these two functions can not be accessed by STX
+processors.
+
+*Note:*
+
+The same restriction is applied in XPath 2.0.
+
+
+      3.4 Atomic Values
+
+*[Modification]*
+
+In [XQuery 1.0 and XPath 2.0 Data Model] <#XQXPDM>, atomic values belong
+to the value space of W3C XML Schema atomic types; this is, primitive
+simple types or types derived by restriction from a primitive simple
+type. The STX data model recognizes only three atomic types:
+
+  *
+
+    string
+
+  *
+
+    number
+
+  *
+
+    boolean
+
+
+      3.5 Whitespace Stripping
+
+*[Restriction]*
+
+Source documents and an stx-sheet may contain whitespace nodes (text
+nodes consisting solely of whitespace characters: #x20, #x9, #xD or
+#xA). Such whitespace nodes may be removed according to the following
+rules. This process is referred to as whitespace stripping.
+
+Whitespace nodes are stripped from source documents if the |strip-space|
+attribute of |stx:transform| (see *4.2 Transform Element*
+<#transform-element>) or |stx:group| (see *4.3 Grouping of Templates*
+<#grouping-of-templates>) is set to "yes". Otherwise they are preserved
+and treated as any other text nodes.
+
+For stx-sheets, whitespace text nodes are preserved only if an ancestor
+element of this text node has the |xml:space| attribute set to
+"preserve", and no closer ancestor element has |xml:space| set to
+"default". All other whitespace nodes are removed from the stx-sheet.
+
+The STX elements |stx:text| and |stx:cdata| have the default |xml:space|
+attribute set to "preserve" which may be overridden in the stx-sheet.
+|xml:space| attributes on literal result elements will not be stripped
+from these elements.
+
+
+    4 STX Transformation Sheet Structure
+
+
+      4.1 STX Namespace
+
+The STX namespace has the URI |http://stx.sourceforge.net/2002/ns|.
+
+The STX functions namespace has the URI
+|http://stx.sourceforge.net/2003/functions|.
+
+These two namespaces are recognized as reserved namespaces in STX
+transformation sheets, and may be used only for purposes specified in
+this document.
+
+
+      4.2 Transform Element
+
+*stx:transform*
+
+<!-- Category: root -->
+<stx:transform
+  version = number
+  pass-through = "none"|"all"|"text"
+  recognize-cdata = "yes"|"no"
+  stxpath-default-namespace = uri-reference
+  strip-space = "yes"|"no"
+  output-method = "xml"|"text"|qname-but-not-ncname
+  output-encoding = string
+  exclude-result-prefixes = tokens
+  <!-- Content: top-level-elements -->
+</stx:transform>
+
+STX transformation sheets are required to use the root element
+|stx:transform|.
+
+The |version| attribute contains a version number to distinguish
+language versions; this attribute is mandatory and its value must be
+"1.0" for this version of STX.
+
+The other attributes make it possible to set global properties of the
+transformation. Some of these properties (pass-through, recognize-cdata,
+strip-space) can also be set on the group level.
+
+  *
+
+    |pass-through| - This optional attribute specifies a default rule
+    how to treat events no matching template is found for. These events
+    are either ignored ("none", default) or passed to the output without
+    modification ("all"). For the "text" value, only text nodes are
+    passed through to the output.
+
+  *
+
+    |recognize-cdata| - This optional attribute specifies whether CDATA
+    boundaries are recognized during the transformation. If so
+    (|recognize-cdata="yes"|), every CDATA section forms a single cdata
+    node (see *3.3 Nodes* <#nodes>). Otherwise (|recognize-cdata="no"|),
+    CDATA boundaries are ignored and all consequent character data form
+    a single text node. The default value is "yes".
+
+  *
+
+    |stxpath-default-namespace| - This optional attribute specifies a
+    namespace used for unprefixed name tests in STXPath expressions and
+    patterns. See *2.4 Expressions* <#expressions> for details. No
+    namespace is used by default.
+
+  *
+
+    |strip-space| - This optional attribute specifies whether whitespace
+    text nodes are stripped from source streams. See *3.5 Whitespace
+    Stripping* <#whitespace-stripping> for details. The default value is
+    "no".
+
+  *
+
+    |output-method| - This optional attribute specifies the preferred
+    serialization method into a byte stream. The value "xml" (which is
+    the default value) indicates to serialize the result as a
+    well-formed XML fragment. The value "text" indicates to serialize
+    only text and cdata nodes without any escaping and without any
+    markup, especially without an XML declaration. An implementation may
+    provide additionally serialization methods that have to be indicated
+    by a valid QName in a non-empty namespace.
+
+  *
+
+    |output-encoding| - This optional attribute specifies the preferred
+    output encoding of the resulting byte stream. The value of this
+    attribute should be treated case-insensitively; the value must
+    contain only printable ASCII characters (#x21 - #x7E); the value
+    must be a charset registered with the Internet Assigned Numbers
+    Authority (see [IANA Character Sets] <#IANA-CS>).
+
+    If the attribute is not present, the output encoding is UTF-8. A
+    compliant STX processor is not required to support any particular
+    encoding other than UTF-8.
+
+  *
+
+    |exclude-result-prefixes| - This optional attribute contains a
+    whitespace-separated list of tokens, each of which is either a
+    namespace prefix or the value "#default". The namespace bound to
+    each of the prefixes is designated as an excluded namespace,
+    "#default" indicates the default namespace. It is a static error if
+    there is no namespace declared for a specified prefix (or the
+    default namespace for "#default").
+
+    The special value "#all" indicates that all namespaces declared for
+    this |stx:transform| element are designated as excluded namespaces.
+    It is a static error if "#all" is used together with other tokens.
+
+    A result stream element that was copied from the stx-sheet as a
+    literal result element must be preceded by all necessary namespace
+    declarations that are in scope for this element in the stx-sheet,
+    unless the namespace is designated as an excluded namespace. By
+    default the STX namespace (|http://stx.sourceforge.net/2002/ns|) is
+    designated as an excluded namespace.
+
+    However, a namespace that is in use for a result element name or an
+    attribute name must be declared in any case, regardless of its
+    designation as an excluded namespace.
+
+An |stx:transform| element can contain the following children from the
+STX namespace. These elements are called top-level elements:
+
+  *
+
+    stx:include
+
+  *
+
+    stx:variable
+
+  *
+
+    stx:param
+
+  *
+
+    stx:buffer
+
+  *
+
+    stx:namespace-alias
+
+  *
+
+    stx:group
+
+  *
+
+    stx:template
+
+  *
+
+    stx:procedure
+
+All top-level elements may occur multiple times. |stx:namespace-alias|
+element is allowed as top-level element only.
+
+
+      4.3 Grouping of Templates
+
+Templates can be organized into groups using the |stx:group| element.
+Groups of templates play a role in template matching (precedence
+categories are defined for groups) and determine the scoping of variables.
+
+Each stx-sheet has a virtual *default group* (represented by
+|stx:transform|) that is considered to be the parent of top-level
+groups. Explicit groups represented by |stx:group| are not mandatory;
+many transformations can be done without grouping templates. On the
+other hand, templates separated to groups make it possible to define
+more precise transformation rules and to run safer complex
+transformations, especially on a well-known, regular input data.
+
+*stx:group*
+
+<!-- Category: top-level or group -->
+<stx:group
+  name = qname
+  pass-through = "none"|"all"|"text"|"inherit"
+  recognize-cdata = "yes"|"no"|"inherit"
+  strip-space = "yes"|"no"|"inherit">
+  <!-- Content: group-elements -->
+</stx:group>
+
+This element must be a child of either the |stx:transform| or the
+|stx:group| element. The optional |name| attribute contains a qualified
+name that must be unique in the stx-sheet. The name can be referenced by
+the |group| attribute of any of |stx:process-children|,
+|stx:process-attributes|, |stx:process-self|, |stx:process-siblings|,
+|stx:process-document| or |stx:process-buffer| instructions. In this
+event, the referenced group is used instead of the current group for
+matching. It is not possible to reference the default group.
+
+It is a static error if an stx-sheet contains more than one group of the
+same name.
+
+The attributes |pass-through|, |recognize-cdata|, and |strip-space| are
+optional, and they set transformation properties specific for this
+group. Their meaning is exactly the same as the meaning of global
+properties of the same name specified on the |stx:transform| element
+(see *4.2 Transform Element* <#transform-element>). The only difference
+is that the group attributes have the additional value "inherit". This
+is the default value; it specifies that the value of the same property
+of the nearest ancestor group should be used. In other words, the value
+of the property stems from the nearest ancestor group that has the
+corresponding attribute set to a value distinct from "inherit", or from
+the default value of the |stx:transform| element, if no such attribute
+was specified. At each point of the processing, properties of the
+current base group apply.
+
+*Note:*
+
+The last sentence means, that for a visible template from a different
+group, the properties of this different group do not take effect untill
+this template is instantiated. Thus, the different properties do not
+apply during the matching process.
+
+
+      4.4 STX Transformation Sheet Inclusion
+
+An stx-sheet may include another stx-sheet using the |stx:include| element.
+
+*stx:include*
+
+<!-- Category: top-level or group -->
+<stx:include
+  href = uri-reference/>
+
+This declaration is used to insert additional stx-sheet modules into the
+principal stx-sheet module. A circular inclusion is prohibited.
+
+This element must be top-level or a child of the |stx:group| element.
+|stx:include| is replaced with the |stx:transform| element of the
+included stx-sheet whereupon the included |stx:transform| then becomes
+an |stx:group| element. There is one exception: an |stx:namespace-alias|
+instruction from the included stx-sheet is always inserted as a
+top-level element. The resulting stx-sheet must meet the criteria for
+being a valid STX transformation sheet (for example concerning unique
+group and procedure names).
+
+The rules for attributes of the imported |stx:transform| element are as
+follows:
+
+  *
+
+    The |version|, |output-method|, and |output-encoding| attributes
+    will not affect the including stx-sheet. However, the included
+    stx-sheet must be valid, that means its |version| attribute must be
+    "1.0".
+
+  *
+
+    The |stxpath-default-namespace| and |exclude-result-prefixes|
+    attributes will be used for the included stx-sheet. The
+    |stxpath-default-namespace| and |exclude-result-prefixes| attributes
+    of the |stx:transform| element of the principal stx-sheet module
+    never affects included stx-sheet modules.
+
+  *
+
+    The |pass-through|, |recognize-cdata|, and |strip-space| attributes
+    become attributes of the new |stx:group| element. If one of these
+    attributes is missing the |stx:group| element has an attribute of
+    the same name with the default value defined for the |stx:transform|
+    element. It never can have the value "inherit".
+
+There is no difference between templates from the principal stx-sheet
+module and included templates in terms of matching precedence.
+
+
+    5 Generating Output
+
+STX templates are called sequentially for each incoming node rather than
+from other templates. Pair events for the document and elements match
+only one template, which is broken into two parts; the first part is
+executed when the start event appears and the second one at the end
+event. The two parts can be separated by the |stx:process-children| element.
+
+
+      5.1 Namespace Aliasing
+
+*stx:namespace-alias*
+
+<!-- Category: top-level -->
+<stx:namespace-alias
+  sheet-prefix = ncname|"#default"
+  result-prefix = ncname|"#default"/>
+
+Namespaces of literal elements and attributes in stx-sheets can be
+mapped to different namespaces in result streams using the
+|stx:namespace-alias| element. Both attributes are mandatory and can
+contain either a prefix bound to a namespace or the "#default" keyword
+for the default namespace.
+
+
+      5.2 Templates
+
+*stx:template*
+
+<!-- Category: top-level or group -->
+<stx:template
+  match = pattern <#NT-pattern>
+  priority = number
+  visibility = "local"|"group"|"global"
+  public = "yes"|"no"
+  new-scope = "yes"|"no">
+  <!-- Content: template -->
+</stx:template>
+
+Rules to process input events are written in templates. The
+|stx:template| element must be a child of either the |stx:transform| or
+the |stx:group| element. Templates match to the events by means of
+precedence categories and a pattern <#NT-pattern> in the mandatory
+|match| attribute. The optional |priority| attribute can contain an
+explicit priority value used for matching (see *2.5 Match Patterns*
+<#match-patterns>).
+
+Two optional attributes; |visibility| and |public|; control whether the
+template is visible from other groups (and thus can match to the next
+event) or not. See *2.3 Precedence Categories* <#precedence-categories>
+for meaning of the two attributes. The default value of the |visibility|
+attribute is "local". The default value of the |public| attribute for
+top-level templates is "yes", for group templates it is "no". Whether a
+top-level template is public or not is important only when the stx-sheet
+is included into another stx-sheet, because every top-level template
+then becomes a group template, see *4.4 STX Transformation Sheet
+Inclusion* <#sheet-inclusion>.
+
+The optional |new-scope| attribute specifies whether the template
+creates new instances of group variables. The default value is "no". A
+new set of group variables is created for each instantiated template
+with |new-scope="yes"|. These variables shadow their former values and
+exist as long as the template is being processed.
+
+The content of templates may include both STX instructions and
+declarations, and literal elements. Literal elements are simply copied
+to the output.
+
+A *text template* is defined as the content of some elements
+(|stx:attribute|, |stx:variable|, |stx:param|, |stx:assign|,
+|stx:with-param|, |stx:cdata|, |stx:processing-instruction|,
+|stx:comment|, |stx:message|). This is a part of template that is
+supposed to generate nothing but character events to the current output
+stream. If an event of another type is emitted, an STX processor is
+required either (1) to issue a run-time error or (2) to serialize the
+event or (3) to ignore the event according to the value of |markup|
+attribute. See *5.10 Outputting Strings* <#outputting-strings> for details.
+
+
+      5.3 Procedures
+
+*stx:procedure*
+
+<!-- Category: top-level or group -->
+<stx:procedure
+  visibility = "local"|"group"|"global"
+  public = "yes"|"no"
+  new-scope = "yes"|"no"
+  name = qname>
+  <!-- Content: template -->
+</stx:procedure>
+
+Procedures are sub-templates that can be called by names (with the
+|stx:call-procedure| instruction). The optional |visibility|, |public|,
+and |new-scope| attributes have the same meaning and default values as
+for templates. Only visible procedures can be called by name, the
+|new-scope| must be set to "yes" to create new copies of group
+variables. It is a static error if an stx-sheet contains more than one
+visible procedure with the same name within the same precedence category.
+
+The content of procedures may be the same as the content of templates.
+
+*stx:call-procedure*
+
+<!-- Category: template -->
+<stx:call-procedure
+  name = qname
+  group = qname>
+  <!-- Content: stx:with-param* -->
+<stx:call-procedure>
+
+The |stx:call-procedure| element makes it possible to invoke a procedure
+by its name. The |name| attribute is mandatory. The optional |group|
+attribute allows to use the specified group instead of the current group
+as a base group for calling the procedure.
+
+The target procedure will be determined according to the precedence
+categories described in *2.3 Precedence Categories*
+<#precedence-categories>. If the first category does not contain a
+procedure with the requested name, then the second category will be
+searched. If neither the first nor the second category contain such
+procedure, the third category is searched. It is a static error if none
+of the three precedence categories contain the requested procedure.
+
+
+      5.4 Parameters
+
+Values can be passed to stx-sheets or to their templates and procedures
+as parameters. Parameters are variables (see *6.2 Variables*
+<#variables>) with the additional property that their value can be set
+by the caller of the stx-sheet, the template, or the procedure.
+Stx-sheet parameters behave in the same way as group variables, they may
+be shadowed by variables or parameters of the same name in descendant
+groups. Note that a parameter that is only visible in a certain group
+will be initialized with the value passed to the stx-sheet anyway,
+regardless whether there is a shadowed parameter of the same name or
+not. Template/procedure parameters behave in the same way as local
+variables; thus they are only visible within the template or procedure
+they are passed to. There are two elements available to work with
+parameters:
+
+*stx:with-param*
+
+<!-- Category: process-xxx, call-procedure -->
+<stx:with-param
+  name = qname
+  select = expression <#NT-expression>
+  <!-- Content: text template -->
+</stx:with-param>
+
+Parameters are passed to templates or procedures using the
+|stx:with-param| element. The required |name| attribute specifies the
+name of the parameter. The value of the parameter is either the result
+returned by the expression <#NT-expression> located in the optional
+|select| attribute or the content of this element if the |select|
+attribute is missing. If neither the |select| attribute nor the content
+is present the parameter value is the empty string.
+
+The |stx:with-param| instruction is allowed as a child of the elements
+|stx:process-children|, |stx:process-attributes|, |stx:process-self|,
+|stx:process-siblings|, |stx:process-document|, |stx:process-buffer|, or
+|stx:call-procedure|, and must not have any of these elements in its
+content.
+
+*stx:param*
+
+<!-- Category: top-level or group or template -->
+<stx:param
+  name = qname
+  select = expression <#NT-expression>
+  required = "yes" | "no">
+  <!-- Content: text template -->
+</stx:param>
+
+The |stx:param| element is allowed as a top-level or group element
+(indicating an stx-sheet parameter) and in templates or procedures (as a
+child of |stx:template| or |stx:procedure|). The required |name|
+attribute specifies the name of the parameter. The optional |select|
+attribute or the content of this element specifies a default value,
+which is both evaluated and used only when there is no value specified
+using the |select| attribute or the content of the appropriate
+|stx:with-param| element. Should both the |select| attribute and the
+content be missing, the parameter defaults to the empty string.
+
+Stx-sheet parameters are statically initialized while parsing the
+stx-sheet; only the /static context/ information is available during the
+initialization. Template/procedure parameters are initialized at
+run-time. Since there is no current source stream available during the
+static initialization, it is an error if an stx-sheet parameter has an
+|stx:process-children|, |stx:process-attributes|, |stx:process-self|, or
+|stx:process-siblings| instruction in its content.
+
+The optional |required| attribute may be used to indicate that a
+parameter is mandatory. The default value is "no", indicating that the
+parameter is optional. If the value of the |required| attribute is
+"yes", the |stx:param| element must be empty, and must have no |select|
+attribute. It is a dynamic error if the caller does not supply a value
+with |stx:with-param| for a required parameter.
+
+
+      5.5 Copying the Current Node
+
+*stx:copy*
+
+<!-- Category: template -->
+<stx:copy
+  attributes = pattern <#NT-pattern>>
+  <!-- Content: template -->
+</stx:copy>
+
+The |stx:copy| element is used to copy the current node to the output.
+The optional |attributes| attribute contains a pattern <#NT-pattern>.
+These attributes of the current node that match the pattern are copied
+to the output. If the |attributes| attribute is not present no
+attributes are copied with the current node.
+
+Thus, |attributes="@*"| copies all attributes, |attributes="@foo|@bar"|
+copies the |foo| and |bar| attributes only,
+|attributes="@*[not(name()='foo')]"| copies all but the |foo| attribute,
+and |attributes="@*[false()]"| does not copy any attributes as if the
+|attributes| attribute is missing at all.
+
+If the |stx:copy| instruction applies to a node other than element the
+|attributes| attribute is ignored.
+
+
+      5.6 Processing Nested Events
+
+*stx:process-children*
+
+<!-- Category: template -->
+<stx:process-children
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification>
+  <!-- Content: stx:with-param* -->
+</stx:process-children>
+
+The instruction |stx:process-children| suspends the processing of the
+current template by processing the children of the current node.
+
+xxx
+
+*Note:*
+
+STX processors are not required to use any particular API. Any
+event-base API providing information about all events needed for an STX
+processor, such as [SAX2] <#SAX2> or [StAX] <#StAX>, can be used.
+However, sometimes it makes sense to illustrate the functionality of an
+STX processor in terms of a specific well-known API.
+
+Using SAX2 terms: the |stx:process-children| instruction splits a
+template into two parts such that a SAX2 |startElement| event causes the
+execution of the first part and the corresponding SAX2 |endElement|
+event causes the execution of the second part.
+
+There must be always at most one |stx:process-children| instruction
+executed during the processing of a template. Moreover, it is an error
+if |stx:process-children| is encountered after an |stx:process-self|
+instruction or an |stx:process-siblings| instruction.
+
+*Note:*
+
+If a template does not contain any |stx:process-children| instruction,
+the children of this element will be skipped. The default rule applies
+only to nodes that are processed and no matching template is found.
+
+*Note:*
+
+If the current node is neither an element node nor the document root
+then the |stx:process-children| instruction simply does nothing.
+
+The optional |group| attribute makes it possible to use the specified
+group instead of the current group as the base for matching (see *2.3
+Precedence Categories* <#precedence-categories>). It is a static error
+if the group of the specified name is not available.
+
+The optional |filter-method| and |filter-src| attributes can be used to
+direct the processing of children to an external filter, see *5.18 Using
+external filters* <#external-filters>.
+
+
+      5.7 Processing Attributes
+
+*stx:process-attributes*
+
+<!-- Category: template -->
+<stx:process-attributes
+  group = qname>
+  <!-- Content: stx:with-param* -->
+</stx:process-attributes>
+
+This instruction is used to apply templates to attributes of an element
+node.
+
+The optional |group| attribute makes it possible to use the specified
+group instead of the current group as the base for matching (see *2.3
+Precedence Categories* <#precedence-categories>). It is a static error
+if the group of the specified name is not available.
+
+
+      5.8 Processing Siblings
+
+*stx:process-siblings*
+
+<!-- Category: template -->
+<stx:process-siblings
+  while = pattern <#NT-pattern>
+  until = pattern <#NT-pattern>
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification>
+  <!-- Content: stx:with-param* -->
+</stx:process-siblings>
+
+The |stx:process-siblings| instruction suspends the processing of the
+current template and processes the following siblings of the current
+node. The processing can be terminated by one of |while| or |until|
+conditions, or because of the end of the parent element or the current
+buffer (see |stx:process-buffer|).
+
+*Note:*
+
+If the current node is an attribute node or the document root node the
+|stx:process-siblings| instruction does nothing.
+
+The optional |while| attribute contains a pattern <#NT-pattern>. The
+next siblings are processed as long as they match the specified pattern.
+The first non-matching node stops the processing; this node is not
+processed by this |stx:process-siblings| instruction.. The |while|
+attribute defaults to |node()|.
+
+The optional |until| attribute contains a pattern <#NT-pattern>. The
+next siblings are processed until a node matching the pattern is
+encountered; this node is not processed by this |stx:process-siblings|
+instruction. The |until| attribute defaults to |node()[false()]|.
+
+If both |while| and |until| attributes have been specified then both
+conditions have to be met. For example |<stx:process-siblings
+while="foo" until="foo"/>| does not process any siblings. Variable
+bindings used within the patterns will be interpreted with regard to the
+current context. That means changed group variables affect the
+evaluation, whereas new instances of group variables or local variables
+are not visible.
+
+*Note:*
+
+Whitespace text nodes not stripped from the document must be considered
+in the patterns, particularly when using the |while| attribute. A
+typical attribute specification would be |while="foo | text()"| which
+processes all following |foo| elements and potential text nodes between
+these |foo| elements.
+
+The optional |group| attribute makes it possible to use the specified
+group instead of the current group as the base for matching (see *2.3
+Precedence Categories* <#precedence-categories>). It is a static error
+if the group of the specified name is not available.
+
+The optional |filter-method| and |filter-src| attributes can be used to
+direct the processing of siblings to an external filter, see *5.18 Using
+external filters* <#external-filters>.
+
+An |stx:process-siblings| instruction encountered during the processing
+of siblings does not affect the |while| and |until| conditions of the
+previous |stx:process-siblings|. In other words: nested
+|stx:process-siblings| instructions process at most the siblings chosen
+in the preceding |stx:process-siblings|. That means
+|stx:process-siblings| also returns if there are no more siblings in the
+input available or a preceding |stx:process-siblings| terminates.
+
+Though multiple |stx:process-siblings| instructions may appear within
+the same template it is an error if an |stx:process-children| or
+|stx:process-self| instruction will be encountered after
+|stx:process-siblings|.
+
+
+      5.9 Running Overridden Templates
+
+*stx:process-self*
+
+<!-- Category: template -->
+<stx:process-self
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification>
+  <!-- Content: stx:with-param* -->
+</stx:process-self>
+
+This instruction is used to process the current node using the template
+that would have been chosen if the current template was not present in
+the stx-sheet. The current template will not be instantiated again for
+this node, even in a chain of calls to |stx:process-self|. There must be
+always at most one |stx:process-self| instruction executed during the
+processing of a template. Moreover it is an error if an
+|stx:process-self| instruction is encountered after an
+|stx:process-children| or an |stx:process-siblings| instruction in a
+template.
+
+The optional |group| attribute makes it possible to use the specified
+group instead of the current group as the base for matching (see *2.3
+Precedence Categories* <#precedence-categories>). It is a static error
+if the group of the specified name is not available.
+
+*Note:*
+
+If no |group| attribute has been specified then the current group will
+be used for choosing the next best matching template. This is also true
+if the current group has been automatically entered via a public template.
+
+The optional |filter-method| and |filter-src| attributes can be used to
+direct the processing of the context node to an external filter, see
+*5.18 Using external filters* <#external-filters>.
+
+
+      5.10 Outputting Strings
+
+*stx:value-of*
+
+<!-- Category: template -->
+<stx:value-of
+  select = expression <#NT-expression>
+  separator = { string } />
+
+This instructions emits characters to the result stream. The mandatory
+|select| attribute contains an STXPath expression <#NT-expression> whose
+value may be any sequence of items. The optional |separator| attribute
+defaults to a single space character. This element is always empty.
+
+The result of this instruction is the concatenation of the string values
+of the items in the sequence from the |select| attribute, with each of
+these string values except the last being followed by the string that is
+the effective value of the |separator| attribute. If the effective value
+of the |separator| attribute is a zero-length string, then all items in
+the sequence are processed and the results are concatenated with no
+separator.
+
+*stx:text*
+
+<!-- Category: template -->
+<stx:text
+  markup = "error"|"ignore"|"serialize">
+  <!-- Content: template -->
+</stx:text>
+
+This instruction emits literal character data to the result stream.
+
+The optional |markup| attribute determines how non-text nodes in the
+content of |stx:text| should be handled: "error" causes the processor to
+raise a run-time error for such nodes, "ignore" ignores any markup by
+emitting only the string value of the contents to the result stream,
+"serialize" emits any markup serialized as text. The default value is
+"error".
+
+*Note:*
+
+The string created by |markup="serialize"| may vary in different STX
+implementations, because some of the lexical representation is not
+relevant for the information coded in XML. For example every STX
+implementation may choose its own order for serializing attributes.
+
+The |stx:text| element has an implicit |xml:space| attribute with the
+default value "preserve". Thus the content is normally neither
+normalized nor stripped should it contain whitespace characters only.
+
+*stx:cdata*
+
+<!-- Category: template -->
+<stx:cdata>
+  <!-- Content: text template -->
+</stx:cdata>
+
+This instructions emits literal data as a CDATA section to the result
+stream.
+
+The |stx:cdata| element has an implicit |xml:space| attribute with the
+default value "preserve". Thus the content is normally neither
+normalized nor stripped should it contain whitespace characters only.
+
+
+      5.11 Outputting Elements and Attributes
+
+*stx:element*
+
+<!-- Category: template -->
+<stx:element
+  name = {qname}
+  namespace = {uri-reference}>
+  <!-- Content: template -->
+</stx:element>
+
+This instruction is used to generate an element. It has the same meaning
+as in [XSLT 1.0] <#XSLT>.
+
+*stx:start-element*
+
+<!-- Category: template -->
+<stx:start-element
+  name = {qname}
+  namespace = {uri-reference}/>
+
+*stx:end-element*
+
+<!-- Category: template -->
+<stx:end-element
+  name = {qname}
+  namespace = {uri-reference}/>
+
+There are separate instructions available to output an element start tag
+and end tag. The |name| attribute is required for both instructions. The
+both elements must be empty.
+
+A compliant STX processor is required to produce a well-formed XML
+output. An attempt to create an end-tag without a matching start-tag
+must be reported as an error by the STX processor.
+
+*stx:attribute*
+
+<!-- Category: template -->
+<stx:attribute
+  name = {qname}
+  namespace = {uri-reference}
+  select = expression <#NT-expression>>
+  <!-- Content: text template -->
+</stx:attribute>
+
+This instruction is used to generate an attribute. It has the same
+meaning as in [XSLT 1.0] <#XSLT>. Alternatively, the value of the
+generated attribute may be specified in the optional |select| attribute.
+It is a static error if this instruction has a |select| attribute and is
+not empty.
+
+|stx:attribute| must follow an element-starting instruction
+(|stx:element|, |stx:start-element|, |stx:copy|, or a literal element)
+and no other output-generating instructions are allowed between the
+element-starting instruction and |stx:attribute|. Otherwise, an STX
+processor is required to issues an error.
+
+
+      5.12 Outputting Other Nodes
+
+*stx:processing-instruction*
+
+<!-- Category: template -->
+<stx:processing-instruction
+  name = {ncname}
+  select = expression <#NT-expression>>
+  <!-- Content: text template -->
+</stx:processing-instruction>
+
+This instruction is used to generate a processing instruction. It has
+the same meaning as in [XSLT 1.0] <#XSLT>. Alternatively, the value of
+the generated processing instruction may be specified in the optional
+|select| attribute. It is a static error if this instruction has a
+|select| attribute and is not empty.
+
+*stx:comment*
+
+<!-- Category: template -->
+<stx:comment
+  select = expression <#NT-expression>>
+  <!-- Content: text template -->
+</stx:comment>
+
+This instruction is used to generate a comment. It has the same meaning
+as in [XSLT 1.0] <#XSLT>. Alternatively, the value of the generated
+comment may be specified in the optional |select| attribute. It is a
+static error if this instruction has a |select| attribute and is not empty.
+
+*stx:doctype*
+
+<!-- Category: template -->
+<stx:doctype
+  system-id = {system-literal}
+  public-id = {pubid-literal}>
+  <!-- Content: text template -->
+</stx:doctype>
+
+This instruction is used to generate a document type declaration that
+contains or points to markup declarations. The |system-id| attribute
+contains a system identifier. The |public-id| attribute contains a
+public identifier. Both attributes are optional. This element must be
+either empty or it must contain a valid internal subset of markup
+declarations (see [XML 1.0;] <#XML1>).
+
+
+      5.13 Conditions
+
+*stx:if*
+
+<!-- Category: template -->
+<stx:if
+  test = expression <#NT-expression>>
+  <!-- Content: template -->
+</stx:if>
+
+The mandatory |test| attribute contains an STXPath expression
+<#NT-expression> evaluating to boolean. The content template is
+instantiated if and only if the |test| attribute has evaluated to true.
+
+*stx:else*
+
+<!-- Category: template -->
+<stx:else>
+  <!-- Content: template -->
+</stx:else>
+
+This instruction must follow immediately after |stx:if|; a static error
+must be reported otherwise. The content template is instantiated if and
+only if the |test| attribute of the preceding |stx:if| instruction has
+evaluated to false.
+
+*stx:choose*
+
+<!-- Category: template -->
+<stx:choose>
+  <stx:when
+    test = expression <#NT-expression>>
+    <!-- Content: template -->
+  </stx:when>+
+  <stx:otherwise>
+    <!-- Content: template -->
+  </stx:otherwise>?
+</stx:choose>
+
+The same meaning as in [XSLT 1.0] <#XSLT>.
+
+
+      5.14 Loops
+
+*stx:for-each-item*
+
+<!-- Category: template -->
+<stx:for-each-item
+  name = qname
+  select = expression <#NT-expression>>
+  <!-- Content: template -->
+</stx:for-each-item>
+
+The |stx:for-each-item| instruction contains a template that is
+instantiated for each item of the sequence specified by the mandatory
+|select| attribute.
+
+The mandatory |name| attribute specifies a name of local variable that
+is declared automatically for each item, and that contains the current item.
+
+Neither the current node (accessed with |.|) nor sf:position() change
+inside |stx:for-each-item|.
+
+*stx:while*
+
+<!-- Category: template -->
+<stx:while
+  test = expression <#NT-expression>>
+  <!-- Content: template -->
+</stx:while>
+
+The mandatory |test| attribute contains an STXPath expression
+<#NT-expression> evaluating to boolean. The contents of the |stx:while|
+element is instantiated repeatedly as long as the |test| attribute
+evaluates to true.
+
+
+      5.15 Multiple Input Documents
+
+*stx:process-document*
+
+<!-- Category: template -->
+<stx:process-document
+  href = expression <#NT-expression>
+  base = {uri-reference}|"#input"|"#sheet"
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification>
+  <!-- Content: stx:with-param* -->
+</stx:process-document>
+
+An stx-sheet can process further source streams in addition to this
+supplied when the transformation is invoked (the principal source
+stream). The current source stream can be changed with the
+|stx:process-document| instruction. When this instruction is
+instantiated the expression <#NT-expression> in the mandatory |href|
+attribute will be evaluated, each item in the resulting sequence will be
+converted sequentially to a string (a URI), and its value will be used
+to identify and to process a new source stream. When new source streams
+for all items are processed, the execution of the template containing
+the |stx:process-document| instruction continues with the original
+source stream.
+
+If a URI is a relative URI then the base URI will be derived from the
+type of item in the sequence that represents this URI. In case this item
+is a node then its base URI will be used, otherwise the base URI of the
+stx-sheet will be used. Alternatively, the optional |base| attribute can
+be used to specify explicitly which base URI should be used. Its value
+must be either an absolute URI, the string "#input" in which case the
+base URI of the current input stream will be used, or the string
+"#stylesheet" in which case the base URI of the principal stx-sheet will
+be used.
+
+The optional |group| attribute makes it possible to use the specified
+group instead of the current group as the base for matching (see *2.3
+Precedence Categories* <#precedence-categories>). It is a static error
+if the group of the specified name is not available.
+
+*Note:*
+
+When processing a new document, the ancestor stack of the original
+document is not available for matching and navigation. Each new document
+has an ancestor stack of its own.
+
+The optional |filter-method| and |filter-src| attributes can be used to
+direct the processing of document to an external filter, see *5.18 Using
+external filters* <#external-filters>.
+
+
+      5.16 Multiple Output Documents
+
+*stx:result-document*
+
+<!-- Category: template -->
+<stx:result-document
+  href = {uri-reference}
+  output-method = "xml"|"text"|qname-but-not-ncname
+  output-encoding = string>
+  <!-- Content: template -->
+</stx:result-document>
+
+An stx-sheet can produce further result streams in addition to the
+principal result stream. The current result stream can be changed with
+the |stx:result-document| instruction. Events generated as the result of
+executing instructions contained within the |stx:result-document|
+element are emitted to a new current result stream identified with the
+URI which is specified by an attribute value template in the required
+|href| attribute. Then, the execution of instructions behind the end of
+the |stx:result-document| element continues to emit events into the
+original result stream.
+
+If the |href| attribute contains a relative URI, the *base output URI*
+is used to resolve the URI. The base output URI is implementation
+defined; it can be provided through an interface or otherwise specified
+by an STX processor.
+
+The optional attributes |output-method| and |output-encoding| can be
+used to specify a preferred output method and an output encoding for the
+new result stream. Their semantics is the same as for |stx:transform|,
+see *4.2 Transform Element* <#transform-element>. If one of these
+attributes is not present then the values will be used that are in
+effect for the principal result stream.
+
+
+      5.17 Buffers
+
+A sequence of events can be stored into an object called a buffer. The
+stored events can be emitted and processed later, in the same way as
+events emitted from a source stream. The events are emitted from a
+buffer in the same order as they were stored in. In other words, the
+buffers are temporary storages of the 'first in first out' type. The
+events stored in a buffer must represent a well-formed external general
+parsed entity (the restriction on a single root node is relaxed).
+
+There are two types of buffers:
+
+  *
+
+    /group buffers/ - |stx:buffer| is child of either |stx:transform| or
+    |stx:group|. Top-level buffers are considered members of the
+    top-most default group that exists for each stx-sheet.
+
+  *
+
+    /local buffers/ - Declared within templates.
+
+A buffer must be declared before it can be used. The same rules as for
+variables (see *6.2 Variables* <#variables>) apply for the the
+visibility of buffers, their shadowing, and the creating of new
+instances for new-scope templates (see *5.2 Templates* <#templates>).
+
+*stx:buffer*
+
+<!-- Category: top-level, group or template-->
+<stx:buffer
+  name = qname>
+  <!-- Content: template -->
+</stx:buffer>
+
+The |stx:buffer| element declares a buffer. The mandatory |name|
+attribute contains a qualified name identifying the declared buffer. The
+buffer is initialized with events generated as a result of evaluation of
+the content of the |stx:buffer| declaration. If the content is empty
+(|stx:buffer| element has no children) the buffer is empty.
+
+For group buffers, the content of |stx:buffer| element is evaluated
+statically. It is a static error if the element |stx:buffer| declaring a
+/group buffer/ contains an |stx:process-children|, |stx:process-self|,
+|stx:process-siblings|, |stx:process-attributes|,
+|stx:process-document|, |stx:process-buffer|, or |call-procedure|
+instruction in its content.
+
+*stx:result-buffer*
+
+<!-- Category: template -->
+<stx:result-buffer
+  name = qname
+  clear = "yes"|"no">
+  <!-- Content: template -->
+</stx:result-buffer>
+
+The |stx:result-buffer| instruction directs events emitted by its
+content into the buffer specified with the mandatory |name| attribute
+rather than to the current result stream. The buffer must be declared
+with |stx:buffer| before it can be employed in |stx:result-buffer|.
+
+If the buffer specified with the |name| attribute already contains a
+sequence of events, the new sequence of events is appended behind the
+last event in the previously stored sequence normally. If the
+|stx:result-buffer| element has the optional |clear| attribute with the
+value of "yes", the previously stored events are removed from the buffer
+before the new sequence of events is stored in. The |clear| attribute
+defaults to "no".
+
+*Note:*
+
+To clear a buffer without storing a new sequence of events, use the
+|stx:result-buffer| instruction with no content:|<stx:result-buffer
+name="my-buffer" clear="yes"/>|
+
+The events stored in a buffer will not be available for a following
+|stx:process-buffer| before the |stx:result-buffer| instruction has
+terminated. Until then the previous contents is accessible. Thus for
+processing a buffer and storing the result in the same buffer again use
+|<stx:result-buffer name="b" clear="yes"> <stx:process-buffer name="b"/>
+</stx:result-buffer>|
+
+It is an error if this instruction is executed for a buffer that acts
+already as (current or suspended) result buffer.
+
+*stx:process-buffer*
+
+<!-- Category: template -->
+<stx:process-buffer
+  name = qname
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification>
+  <!-- Content: stx:with-param* -->
+</stx:process-buffer>
+
+The |stx:process-buffer| instruction emits the events currently stored
+in the buffer specified by the mandatory |name| attribute to the STX
+processor. The events are processed in the same way as events supplied
+by source streams. When the very last event from the buffer is
+processed, the processing in the current template continues with an
+instruction, declaration or literal next to the |stx:process-buffer|
+instruction.
+
+*Note:*
+
+Changes to the contents of a buffer that is currently processed will not
+affect this processing. The |stx:process-buffer| instruction creates an
+internal copy of the contained events and emits them afterwards.
+
+The optional |group| attribute makes it possible to use the specified
+group instead of the current group as the base for matching (see *2.3
+Precedence Categories* <#precedence-categories>). It is a static error
+if the group of the specified name is not available.
+
+The optional |filter-method| and |filter-src| attributes can be used to
+direct the processing of buffer's contents to an external filter, see
+*5.18 Using external filters* <#external-filters>.
+
+The processing of events from a buffer does not mean the emptying of
+this buffer. Once a sequence of events is stored in the buffer, it can
+be processed repeatedly.
+
+*Note:*
+
+A buffer is not treated as a new document, but rather as if events
+emitted from the buffer originate from the current source stream. The
+ancestor stack of the current source stream remains available for
+matching and navigation when processing nodes from the buffer.
+
+
+      5.18 Using external filters
+
+The main task of an STX processor is to transform a stream of source XML
+events into a stream of result XML events (see *2 Concepts*
+<#concepts>). Using this paradigm, an STX processor can be seen as a
+typical representative of a filter of XML events.
+
+Moreover, STX can as well direct any XML event stream to an external
+filter process and incorporate the result of this processing into the
+current result stream. Thus an STX process may split a large XML
+document into smaller fragments, pass each of these fragments to an
+external filter (for example an XSLT processor), and combine the results
+into a large XML result document.
+
+*Note:*
+
+The term /external/ refers to a processing outside of the STX scope. An
+actual filter might be as well a built-in part of an STX processor
+implementation.
+
+Each event stream directed to an external filter represents a
+well-formed XML fragment.
+
+*Note:*
+
+In terms of SAX2, that means the stream starts with a |startDocument|
+event, followed by a sequence of |startPrefixMapping| events, one for
+each namespace in scope, followed by the SAX2 representation of the
+piece of XML to be processed. The stream will be completed by the
+matching |endPrefixMapping| and |endDocument| events. Before
+incorporating the SAX2 stream resulting from the filter into the current
+result stream, its enclosing |startDocument| and |endDocument| events
+will be discarded.
+
+STX provides two attributes for identifying the external filter:
+|filter-method| and |filter-src|. Both attributes can be used on
+|stx:process-children| (*5.6 Processing Nested Events*
+<#processing-nested-events>), |stx:process-siblings| (*5.8 Processing
+Siblings* <#processing-siblings>), |stx:process-self| (*5.9 Running
+Overridden Templates* <#running-overridden-templates>),
+|stx:process-document| (*5.15 Multiple Input Documents*
+<#multiple-input-documents>), and |stx:process-buffer| (*5.17 Buffers*
+<#buffers>).
+
+The optional |filter-method| attribute contains a URI that identifies a
+filter method to be used. This specification cannot provide a complete
+list of filters and their URIs. However, if a filter method is described
+using an XML vocabulary in a well-known namespace, its namespace URI is
+the recommended value for the |filter-method| attribute, see *D
+Recommended filter URIs* <#filter-uris> for a list of currently
+recommended URIs. A conformant STX processor does not have to support
+any external filters. The function sf:filter-available
+<#F-sf:filter-available> may be used to check, whether the current STX
+processor supports the requested filter.
+
+It is a static error to specify both |filter-method| and |group|
+attributes. It is a run-time error if the requested filter is not
+supported by the processor.
+
+The optional |filter-src| attribute provides additional information
+about the source to initialize the desired filter. There are two kinds
+of values allowed for this attribute:
+
+  *
+
+    A <uri-specification>, as defined in [XSL-FO] <#XSLFO>, repeated
+    here for convenience:
+
+    A sequence of characters that is "url(", followed by optional white
+    space, followed by an optional single quote (') or double quote (")
+    character, followed by a URI reference as defined in [RFC 2396]
+    <#RFC2396>, followed by an optional single quote (') or double quote
+    (") character, followed by optional white space, followed by ")".
+    The two quote characters must be the same and must both be present
+    or absent. If the URI reference contains a single quote, the two
+    quote characters must be present and be double quotes.
+
+    The document identified by that URI provides the source for the
+    external filter.
+
+  *
+
+    A <buffer-specification>: A sequence of characters that is "buffer("
+    followed by optional white space, followed by a QName as defined in
+    [XML Names] <#XMLNAMES>, followed by optional white space, followed
+    by ")".
+
+    The contents of the specified buffer provides the source for the
+    external filter. This implies, that this source can be supplied as
+    an XML event stream to the filter. It is an error, if there's no
+    such buffer declared at this scope.
+
+It is a static error, if the |filter-src| attribute is present without a
+|filter-method| attribute. However, the specification of a
+|filter-method| attribute does not require necessarily a |filter-src|
+attribute.
+
+*Note:*
+
+A typical use case would be an embedded XSLT transformation, that could
+be invoked like this:
+
+<stx:variable name="xslt" select="'http://www.w3.org/1999/XSL/Transform'" />
+<stx:if test="filter-available($xslt)">
+  <stx:process-self filter-method="{$xslt}" filter-src="buffer(xslt-code)" />
+</stx:if>
+<stx:else>
+  <stx:message>Cannot invoke an XSLT transformation</stx:message>
+</stx:else>
+
+This instruction passes the current node and all its children to an XSLT
+processor, using an XSLT stylesheet that is the contents of the buffer
+named |xslt-code|.
+
+
+      5.19 Messages
+
+*stx:message*
+
+<!-- Category: template -->
+<stx:message
+  select = expression <#NT-expression>>
+  <!-- Content: template -->
+</stx:message>
+
+The |stx:message| instruction generates a separate result stream whose
+handling is implementation dependent. It can be directed to a log, or to
+a special message resolver, etc. However, all instructions of the
+content of the |stx:message| element must processed even if the message
+stream is ignored. Alternatively, the value of the generated message may
+be specified in the optional |select| attribute. It is a static error if
+this instruction has a |select| attribute and is not empty.
+
+
+    6 STXPath
+
+STXPath is an expression language for STX; STXPath expressions are
+embeded in specific attributes of STX instructions and declarations.
+STXPath is similar to [XPath 2.0] <#XPath2> on the first sight.
+Syntactically, STXPath is a subset of [XPath 2.0] <#XPath2>. However, as
+STX has a different notion of context, the meaning of some expressions
+may be different in STXPath and in XPath 2.0. Consider the following
+example:
+
+In XPath 2.0, the expression |/node1/node2| returns a sequence
+containing all |node2| elements, whose parent |node1| is the document
+element. In STXPath, on contrary, the same expression returns a sequence
+containing a single node from this node-set; the one which is an
+ancestor of the current node.
+
+Each expression has its *static context* - the information that is
+available during static analysis of the expression, prior to its
+evaluation. The static context includes in-scope namespaces, default
+namespace for element names, default function namespace, and in-scope
+variables. The information that is available at the time when the
+expression is evaluated is the *current context* as defined in *2.2
+Context* <#context>.
+
+Each STXPath expressions evaluate always to a sequence (see XPath 2.0
+definition of a sequence
+<http://www.w3.org/TR/xpath20/#id-sequence-expressions>).
+
+Certain operators, functions, and syntactic constructs expect a value of
+a particular type to be supplied: this type is referred to as a
+/required type/. In such an event, a general sequence is converted to
+the required type according to the /conversion rules/.
+
+The empty sequence is converted to required types as defined in the
+following table:
+
+required type	result
+boolean	|false|
+string	empty string
+number	|NaN|
+node	ERROR
+
+A singleton sequence is converted to a required type according to the
+type of the only item in the sequence. An attempt to convert boolean,
+string, or number to node causes an error.
+
+item type	boolean required	string required	number required
+boolean		|false| is converted to 'false', |true| is converted to 'true'
+|false| is converted to 0, |true| is converted to 1
+string	the empty string is converted to |false|, other strings are
+converted to |true|		a string that consists of optional whitespace
+followed by an optional minus sign followed by a numeric literal (see
+*6.1 Literals* <#literals>) followed by whitespace is converted to the
+number that is nearest to the mathematical value represented by the
+string; any other string is converted to |NaN|.
+number	0, +0, -0, |NaN| are converted to |false|, other numbers are
+converted to |true|	|NaN| is converted to 'NaN', +0 and -0 are converted
+to '0', positive infinity is converted to 'Infinity', negative infinity
+is converted to '-Infinity'. Other numbers are represented in decimal
+form as numeric literal (see *6.1 Literals* <#literals>) with no leading
+zeros (apart possibly from the one required digit immediately before the
+decimal point), preceded by a minus sign (-) if the number is negative.	
+node	a node is converted to |true|	a node is converted to its string
+value (see *2.4 Expressions* <#expressions>)	a node is converted to its
+string value (see *2.4 Expressions* <#expressions>); then the rules to
+convert strings to numbers are applied to convert the string value to a
+number
+
+A sequence containing more than one item is converted according to its
+very first item; all other items are ignored. The same conversion rules
+as for singleton sequences are applied (see the table above).
+
+The following sections discuss basic kinds of expression. Each kind of
+expression has a name such as expression PathExpr <#prod-PathExpr>,
+which is introduced on the left side of the grammar production that
+defines the expression. Each kind of expression is defined in terms of
+other expressions whose operators have a higher precedence. In this way,
+the precedence of operators is represented explicitly in the grammar.
+For the complete grammar, see *C STXPath Grammar* <#stxpath>.
+
+
+      6.1 Literals
+
+A literal is a direct syntactic representation of an atomic value.
+STXPath supports two kinds of literals: /string literals/ and /numeric
+literals/.
+
+The value of a string literal is a singleton sequence containing an item
+whose atomic type is string and whose value is the string denoted by the
+characters between the delimiting quotation marks.
+
+  
+	|StringLiteral|	   ::=   	|('"' (('"' '"') | [^"])* '"') | ("'" (("'"
+"'") | [^'])* "'")|
+
+
+The value of a numeric literal is a singleton sequence containing an
+item whose type is number and whose value is obtained by parsing the
+numeric literal according to the rules for string to numbers conversion
+(see *6 STXPath* <#stxpath-lang>).
+
+  
+	|NumericLiteral|	   ::=   	|IntegerLiteral <#prod-IntegerLiteral> |
+DecimalLiteral <#prod-DecimalLiteral> | DoubleLiteral
+<#prod-DoubleLiteral> |
+	|IntegerLiteral|	   ::=   	|Digits <#prod-Digits> |
+	|DecimalLiteral|	   ::=   	|("." Digits <#prod-Digits>) | (Digits
+<#prod-Digits> "." [0-9]*)|
+	|DoubleLiteral|	   ::=   	|(("." Digits <#prod-Digits>) | (Digits
+<#prod-Digits> ("." [0-9]*)?)) ("e" | "E") ("+" | "-")? Digits
+<#prod-Digits> |
+
+
+      6.2 Variables
+
+STX has full-featured re-assignable variables. The STX elements
+|stx:variable| and |stx:assign| are used to declare and initialize
+variables, and to assign new values to them. Visible variables can be
+referenced in STXPath expressions.
+
+  
+	|VarRef|	   ::=   	|"$" VarName <#prod-VarName> |
+
+
+STX variables are scoped statically according to the literal structure
+of stx-sheets. The grouping of templates is used to make the sharing of
+other than global variables possible.
+
+There are two types of variables:
+
+  *
+
+    /group variables/ - |stx:variable| is child of either
+    |stx:transform| or |stx:group|. Top-level variables are considered
+    to be members of the top-most default group that exists for each
+    stx-sheet.
+
+  *
+
+    /local variables/ - Declared within templates.
+
+A group variable is visible for the group where the variable is
+declared, for all descendant groups and for all templates belonging to
+these groups. A local variable is visible for all following siblings of
+the variable declaration and their descendants. Group variables may be
+shadowed (another variable with the same name is visible) by descendant
+group variables and by local variables. It is a static error to
+redeclare a variable with the same name in the same group or template.
+
+Variables always contain a sequence. STX instructions |stx:variable| and
+|stx:assign| are used to evaluate an expression and store its value into
+a variable.
+
+Since variables are re-assignable, each variable must be declared using
+the |stx:variable| element before it is used (assigned, referenced).
+Group variables are statically initialized while parsing an stx-sheet.
+Only the /static context/ information is available during the
+initialization of group variables. Local variables are initialized at
+run-time. A variable declared with no value is initialized with a
+singleton sequence containing the empty string.
+
+*stx:variable*
+
+<!-- Category: top-level or group or template -->
+<stx:variable
+  name = qname
+  select = expression <#NT-expression>
+  keep-value = "yes"|"no">
+  <!-- Content: text template -->
+</stx:variable>
+
+This instruction is used to declare and initialize a variable. The
+mandatory |name| attribute contains the name of the variable. An
+expression <#NT-expression> in the |select| attribute is evaluated and
+the variable is initialized with its result. The |select| attribute is
+optional; a variable is initialized with the string resulting from the
+content of the |stx:variable| element if the |select| attribute is
+missing. If the content is empty (|stx:variable| element has no
+children) the variable is initialized with the empty string.
+
+*Note:*
+
+Thus, <stx:variable name="var"/> is equal to <stx:variable name="var"
+select="''"/>.
+
+It is a static error if the element |stx:variable| declaring a /group
+variable/ contains an |stx:process-children|, |stx:process-self|,
+|stx:process-siblings|, |stx:process-attributes|,
+|stx:process-document|, |stx:process-buffer|, or |call-procedure|
+instruction in its content.
+
+The optional |keep-value| attribute specifies whether a new instance of
+the variable created by instantiating a template having its |new-scope|
+attribute set to "yes" is initialized with the value of the shadowed
+variable (|yes|) or not (|no|). This attribute is allowed only for group
+variables. The default value is |no|. If there is no shadowed variable
+(a variable with the same name declared in an ancestor group) yet, the
+|keep-value| attribute is ignored.
+
+*stx:assign*
+
+<!-- Category: top-level or group or template -->
+<stx:assign
+  name = qname
+  select = expression <#NT-expression>>
+  <!-- Content: text template -->
+</stx:assign>
+
+This instruction is used to assign a new value to a previously declared
+variable. The mandatory |name| attribute contains the name of the
+variable. The expression <#NT-expression> in the optional |select|
+attribute is evaluated and its result is assigned to the variable. The
+string resulting from the content of the |stx:assign| element is
+assigned to the variable if the |select| attribute is missing. If the
+content is empty, the empty string is assigned to the variable.
+
+*Note:*
+
+Thus, <stx:assign name="var"/> is equal to <stx:assign name="var"
+select="''"/>.
+
+
+      6.3 Parenthesized Expressions
+
+Parentheses may be used to enforce a particular evaluation order in
+expressions that contain multiple operators.
+
+Parentheses are also used as delimiters in constructing a sequence, as
+described in *6.8 Sequence Expressions* <#sequence-expressions>.
+
+  
+	|ParenthesizedExpr|	   ::=   	|"(" Expr <#prod-Expr>? ")"|
+
+
+Parenthesized Expressions in STXPath are equivalent to Parenthesized
+Expressions <http://www.w3.org/TR/xpath20/#id-paren-expressions> in
+[XPath 2.0] <#XPath2>.
+
+
+      6.4 Context Item Expression
+
+The context item expression evaluates to the current node.
+
+  
+	|ContextItemExpr|	   ::=   	|"."|
+
+
+      6.5 Functions
+
+A function call <#prod-FunctionCall> consists of a function qualified
+name <http://www.w3.org/TR/REC-xml-names/#NT-QName> followed by a
+parenthesized list of zero or more expressions <#NT-expression>. The
+expressions inside the parentheses provide arguments of the function
+call. The number of arguments must be equal to the number of function
+parameters; otherwise a static error is raised.
+
+  
+	|FunctionCall|	   ::=   	|QName <#prod-QName> "(" (ExprSingle
+<#prod-ExprSingle> ("," ExprSingle <#prod-ExprSingle>)*)? ")"|
+
+
+A function call is evaluated as follows:
+
+ 1.
+
+    Each argument expression is evaluated, producing an argument value
+    (sequence).
+
+ 2.
+
+    If the corresponding function parameter has a required type, the
+    argument value is converted to this type.
+
+ 3.
+
+    The function is executed using the converted argument values. The
+    result is a value of the function's declared return type.
+
+STXPath function names are contained in the reserved namespace
+|http://stx.sourceforge.net/2003/functions|. The |sf:| prefix is used to
+refer to this namespace in this document. The default function namespace
+is assigned to this reserved namespace in STX. Thus, the functions
+namespace does not need to be declared in stx-sheets and STXPath
+functions can be invoked without any namespace prefix.
+
+Some STXPath functions have the same definitions as their counterparts
+(functions with the same local name) in XPath 2.0. These functions are
+not re-defined in this section. Instead, original definitions in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO> are referenced.
+Other STXPath functions are either different from their XPath 2.0
+counterparts or have no such counterparts; these functions are defined
+in this section.
+
+
+        6.5.1 Sequence Functions
+
+*sf:empty*(sequence) as /boolean/
+
+Indicates whether or not the provided sequence is empty.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-empty> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:exists*(sequence) as /boolean/
+
+Indicates whether or not the provided sequence is not empty.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-exists>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:item-at*(sequence, number) as /item/
+
+Returns the item at the given index. The first position is 1.
+
+*sf:index-of*(sequence, item) as /number/
+
+Returns a sequence of integer numbers, each of which is the index of a
+member of the specified sequence that is equal to the item that is the
+value of the second argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-index-of>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:subsequence*(sequence, number, number?) as /sequence/
+
+Returns the subsequence of a given sequence identified by location.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-subsequence> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:insert-before*(sequence, number, sequence) as /sequence/
+
+Inserts an item or sequence of items into a specified position of a
+sequence.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-insert-before> in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:remove*(sequence, number) as /sequence/
+
+Removes an item from a specified position of a sequence.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-remove>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+
+        6.5.2 Node Functions
+
+*sf:name*(node?) as /string/
+
+Returns the name of the current node or the specified node.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-xpath-name> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:namespace-uri*(node?) as /string/
+
+Returns the namespace URI for the QName of the argument node or the
+current node if the argument is omitted.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-namespace-uri> in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:local-name*(node?) as /string/
+
+Returns the local name of the current node or the specified node.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-local-name> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:position*() as /number/
+
+The sf:position <#F-sf:position> function returns a number equal to the
+position of the current node relative to other siblings. See *2.2
+Context* <#context> for details of sf:position() <#F-sf:position()>
+semantics.
+
+*sf:has-child-nodes*() as /boolean/
+
+The sf:has-child-nodes <#F-sf:has-child-nodes> function returns true if
+and only if the current node is the document node or an element node and
+has child nodes (it is not empty). It returns false otherwise.
+
+*sf:node-kind*(node) as /string/
+
+The sf:node-kind <#F-sf:node-kind> function returns a string value
+representing the node's kind: either "document", "element", "attribute",
+"text", "cdata", "processing-instruction", or "comment".
+
+*sf:get-in-scope-prefixes*(node) as /sequence/
+
+Returns the prefixes of the in-scope namespaces for the given element.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-get-in-scope-prefixes> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:get-namespace-uri-for-prefix*(string, node) as /string/
+
+Returns a namespace URI of one of the in-scope namespaces for the given
+element, identified by its namespace prefix.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-get-namespace-uri-for-prefix> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:lang*(string) as /boolean/
+
+Returns true or false depending on whether the language of the current
+node, as defined using the xml:lang attribute, is the same as, or a
+sub-language of, the language specified by the argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-lang> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+
+        6.5.3 Boolean Functions
+
+*sf:true*() as /boolean/
+
+Returns the boolean value TRUE.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-true> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:false*() as /boolean/
+
+Returns the boolean value FALSE.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-false> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:not*(sequence) as /boolean/
+
+Inverts the boolean value of the argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-not> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+
+        6.5.4 String Functions
+
+*sf:concat*(string, string, ... ) as /string/
+
+Concatenates two or more character strings.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-concat>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:string-join*(sequence, string) as /string/
+
+Accepts a sequence of strings and returns the strings concatenated
+together with an optional separator.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-string-join> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:starts-with*(string, string) as /boolean/
+
+Indicates whether the value of one string begins with characters of the
+value of another string.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-starts-with> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:ends-with*(string, string) as /boolean/
+
+Indicates whether the value of one string ends with characters of the
+value of another string.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-ends-with> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:contains*(string, string) as /boolean/
+
+Indicates whether the value of one string contains characters of the
+value of another string.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-contains>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:substring*(string, number, number?) as /string/
+
+Returns a string located at a specified place in the value of a string.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-substring> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:substring-before*(string, string) as /string/
+
+Returns characters of one string that precede in that string the
+characters in the value of another string.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-substring-before> in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:substring-after*(string, string) as /string/
+
+Returns characters of one string that succeed in that string the
+characters in the value of another string.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-substring-after> in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:string-length*(string) as /number/
+
+Returns the length of the argument.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-string-length> in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:normalize-space*(string) as /string/
+
+Returns the whitespace-normalized value of the argument.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-normalize-space> in [XQuery
+1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:normalize-unicode*(string, string?) as /string/
+
+Returns the normalized value of the first argument in the normalization
+form specified by the second argument.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-normalize-unicode> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:upper-case*(string) as /string/
+
+Returns the upper-cased value of the argument.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-upper-case> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:lower-case*(string) as /string/
+
+Returns the lower-cased value of the argument.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-lower-case> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:translate*(string, string, string) as /string/
+
+Returns the first argument string with occurrences of characters in the
+second argument replaced by the character at the corresponding position
+in the third string.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-translate> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:string-pad*(string, number) as /string/
+
+Returns a string composed of as many copies of its first argument as
+specified in its second argument.
+
+*sf:matches*(string, string, string?) as /boolean/
+
+Returns a boolean value that indicates whether the value of the first
+argument is matched by the regular expression that is the value of the
+second argument, using the flags in the optional third argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-matches>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:replace*(string, string, string, string?) as /string/
+
+Returns the value of the first argument with every substring matched by
+the regular expression that is the value of the second argument replaced
+by the replacement string that is the value of the third argument, using
+the flags in the optional fourth argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-replace>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:tokenize*(string, string, string?) as /sequence/
+
+Returns a sequence of zero or more strings whose values are substrings
+of the value of the first argument separated by substrings that match
+the regular expression that is the value of the second argument, using
+the flags in the optional third argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-tokenize>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:escape-uri*(string, boolean) as /string/
+
+Returns the string representing a URI value with certain characters escaped.
+
+See the definition
+<http://www.w3.org/TR/xpath-functions/#func-escape-uri> in [XQuery 1.0
+and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+
+        6.5.5 Numerical Functions
+
+*sf:floor*(number) as /number/
+
+Returns the largest integer less than or equal to the argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-floor> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:ceiling*(number) as /number/
+
+Returns the smallest integer greater than or equal to the argument.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-ceiling>
+in [XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:round*(number) as /number/
+
+Rounds to the nearest integer.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-round> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+
+        6.5.6 Aggregate Functions
+
+*sf:count*(sequence) as /number/
+
+Returns the number of items in the sequence.
+
+See the definition <http://www.w3.org/TR/xpath-functions/#func-count> in
+[XQuery 1.0 and XPath 2.0 Functions and Operators] <#XQXPFO>.
+
+*sf:sum*(sequence) as /number/
+
+The sf:sum <#F-sf:sum> function returns the sum, for each item in the
+argument sequence, of the result of converting the item to a number. If
+the argument is the empty sequence, the function returns zero.
+
+*sf:avg*(sequence) as /number/
+
+The sf:avg <#F-sf:avg> function returns the average of all items in the
+argument sequence converted to numbers. If the argument is the empty
+sequence, the empty sequence is returned.
+
+*sf:max*(sequence) as /number/
+
+The sf:max <#F-sf:max> function converts all items of the argument
+sequence to numbers and returns the item whose value is greater than or
+equal to the value of every other item in the argument sequence. If the
+argument contains the value NaN, the value NaN is returned. If the
+argument is the empty sequence, the empty sequence is returned.
+
+*sf:min*(sequence) as /number/
+
+The sf:min <#F-sf:min> function converts all items of the argument
+sequence to numbers and returns the item whose value is less than or
+equal to the value of every other item in the argument sequence. If the
+argument contains the value NaN, the value NaN is returned. If the
+argument is the empty sequence, the empty sequence is returned.
+
+
+        6.5.7 Conversion Functions
+
+*sf:string*(sequence) as /string/
+
+The sf:string <#F-sf:string> function returns the result of converting
+the argument to a string. See *6 STXPath* <#stxpath-lang> for details.
+
+*sf:number*(sequence) as /number/
+
+The sf:number <#F-sf:number> function returns the result of converting
+the argument to a number. See *6 STXPath* <#stxpath-lang> for details.
+
+*sf:boolean*(sequence) as /boolean/
+
+The sf:boolean <#F-sf:boolean> function returns the result of converting
+the argument to a boolean. See *6 STXPath* <#stxpath-lang> for details.
+
+
+        6.5.8 Other Functions
+
+*sf:filter-available*(string) as /boolean/
+
+The sf:filter-available <#F-sf:filter-available> function returns |true|
+if the STX processor supports the external filter identified by its
+argument, and |false| otherwise (see *5.18 Using external filters*
+<#external-filters>).
+
+
+      6.6 Path Expressions
+
+A path expression <#prod-PathExpr> can be used to locate nodes within
+the ancestor stack. It evaluates to a sequence of nodes from the stack.
+A path expression consists of a series of one or more axis steps
+<#prod-AxisStep>, separated by |/| or |//|, and optionally beginning
+with |/| or |//|.
+
+This sequence of axis steps is evaluated from left to right. Each
+operation |E1/E2| is evaluated as follows: Expression E1 is evaluated
+into a sequence of nodes. Each node resulting from the evaluation of E1
+then serves to provide an inner context for evaluation of E2. Each
+evaluation of E2 results in a (possibly empty) sequence of nodes. The
+sequences of nodes resulting from all the evaluations of E2 are
+combined, eliminating duplicate nodes based on node identity and sorting
+the result in document order.
+
+A |/| at the beginning of a path expression is an abbreviation for the
+initial step. The effect of this initial step is to begin the path at
+the root node of the current ancestor stack.
+
+A |//| at the beginning of a path expression is an abbreviation for the
+initial steps. The effect of these initial steps is to establish an
+initial node sequence that contains the root of the current ancestor
+stack, plus all nodes descended from this root. This node sequence is
+used as an input to subsequent steps in the path expression.
+
+An axis step generates a sequence of nodes from the ancestor stack and
+then filters the sequence using up to one predicate. The value of the
+step consists of those nodes that satisfy the predicate. Predicates are
+described in *6.7 Predicate* <#predicate>. Nodes are always returned in
+the document order. An axis step may be either an abbreviated forward
+step <#prod-AbbrevForwardStep> or an abbreviated reverse step
+<#prod-AbbrevReverseStep>, followed by no or one predicate. An axis step
+might be thought of as beginning at the context node and navigating to
+those nodes that are reachable from the context node via a specified
+axis. STXPath has abbreviated syntax only. The result of an abbreviated
+forward step consists of the nodes reachable from the context node via
+the specified axis (either child or attribute) that have the node kind
+<#prod-KindTest> or name <#prod-NameTest> specified by a node test
+<#prod-NodeTest>.
+
+In addition to common names (QNames <#prod-QName> and wildcards
+<#prod-Wildcard>) and kind tests known from [XPath 2.0] <#XPath2>,
+STXPath has two more kind tests:
+
+  * |doctype()| - matches the doctype node (see *3.3 Nodes* <#nodes>).
+  * |cdata()| - matches cdata nodes (see *3.3 Nodes* <#nodes>).
+
+Here are some examples of path expressions:
+
+  *
+
+    |..| - returns the parent node of the current node
+
+  *
+
+    |//foo| - returns a sequence whose items are all |foo| element on
+    the ancestor stack
+
+  *
+
+    |@foo| - returns the |foo| attribute of the current node
+
+  *
+
+    |../../@bar| - returns the |bar| attribute of the grand parent of
+    the current node
+
+  *
+
+    |/aaa/bbb| - returns a |bbb| element from the ancestor stack which
+    is a child of |aaa| element which is the root element of the
+    ancestor stack (and hence the root element of the input document)
+
+  *
+
+    |/*//node()| - returns all nodes from the ancestor stack except for
+    the first one
+
+
+      6.7 Predicate
+
+A predicate consists of an expression enclosed in square brackets. A
+predicate serves to filter a sequence, retaining some items and
+discarding others. For each item in the sequence to be filtered, the
+predicate expression is evaluated using an inner focus derived from that
+item. The result of the predicate expression is coerced to a boolean
+value (see *6 STXPath* <#stxpath-lang> for conversion rules). Those
+items for which the predicate results to true are retained, and those
+for which the predicate results to false are discarded.
+
+  
+	|Predicate|	   ::=   	|"[" Expr <#prod-Expr> "]"|
+
+
+      6.8 Sequence Expressions
+
+STXPath supports operators to construct sequences of items. Sequences
+are never nested - for example, combining the values 1, (2, 3), and ( )
+into a single sequence results in the sequence (1, 2, 3).
+
+  
+	|Expr|	   ::=   	|ExprSingle <#prod-ExprSingle> ("," ExprSingle
+<#prod-ExprSingle>)*|
+	|RangeExpr|	   ::=   	|AdditiveExpr <#prod-AdditiveExpr> ( "to"
+AdditiveExpr <#prod-AdditiveExpr> )?|
+
+
+The constructing of sequences in STXPath is equivalent to Constructing
+Sequences <http://www.w3.org/TR/xpath20/##id-sequence-expressions> in
+[XPath 2.0] <#XPath2>.
+
+
+      6.9 Arithmetic Expressions
+
+STXPath provides arithmetic operators for addition, subtraction,
+multiplication, division, and modulus, in their usual binary and unary
+forms.
+
+  
+	|AdditiveExpr|	   ::=   	|MultiplicativeExpr <#prod-MultiplicativeExpr>
+( ("+" | "-") MultiplicativeExpr <#prod-MultiplicativeExpr> )*|
+	|MultiplicativeExpr|	   ::=   	|UnaryExpr <#prod-UnaryExpr> ( ("*" |
+"div" | "idiv" | "mod") UnaryExpr <#prod-UnaryExpr> )*|
+	|UnaryExpr|	   ::=   	|("-" | "+")* ValueExpr <#prod-ValueExpr> |
+
+
+The binary subtraction operator must be preceded by a whitespace in
+order to distinguish it from a hyphen, which is a valid name character.
+
+An arithmetic expression is evaluated by applying the following rules:
+
+  *
+
+    If either operand is the empty sequence, the result of the operation
+    is the empty sequence.
+
+  *
+
+    Operands other than empty sequences are converted (*6 STXPath*
+    <#stxpath-lang>) to numbers before the expression is evaluated. If
+    the conversion fails (returns |NaN|) it returns |NaN|.
+
+
+      6.10 Comparison Expressions
+
+Comparison expressions allow two values to be compared. STXPath provides
+the following general comparison operators: =, !=, <, <=, >, >=. The
+result of a comparison is always true or false (a singleton sequence
+containing one boolean item).
+
+  
+	|GeneralComp|	   ::=   	|"=" | "!=" | "<" | "<=" | ">" | ">="|
+
+
+The result of a comparison of sequences is defined by applying the
+following rules, in order:
+
+ 1.
+
+    If either operand is the empty sequence, the result is false.
+
+ 2.
+
+    The comparison |A operator B| is true for sequences |A| and |B| if
+    and only if there is a pair of items |a| and |b|, one belonging to
+    the sequence |A| and the other belonging to the sequence |B|, for
+    which the comparison |a operator b| is true.
+
+The result of a comparison of items is defined by applying the following
+rules. The rules defined in *6 STXPath* <#stxpath-lang> apply for
+conversions:
+
+  *
+
+    If both items to be compared are nodes, then the comparison will be
+    true if and only if the result of performing the comparison on the
+    string-values of the two nodes is true.
+
+  *
+
+    If one item to be compared is a node and the other is a number, then
+    the comparison will be true if and only if the result of performing
+    the comparison on the number and on the result of converting the
+    string-value of that node to a number is true.
+
+  *
+
+    If one item to be compared is a node and the other is a string, then
+    the comparison will be true if and only if the result of performing
+    the comparison on the string-value of the node and the other string
+    is true.
+
+  *
+
+    If one item to be compared is a node and the other is a boolean,
+    then the comparison will be true if and only if the result of
+    performing the comparison of true and the boolean value is true.
+
+  *
+
+    When neither item to be compared is node and the operator is = or
+    !=, then the items are compared by converting them to a common type
+    as follows and then comparing them. If at least one item to be
+    compared is a boolean, then each item to be compared is converted to
+    a boolean. Otherwise, if at least one item to be compared is a
+    number, then each item to be compared is converted to a number.
+    Otherwise, both items to be compared are converted to strings.
+
+  *
+
+    When neither item to be compared is node and the operator is <=, <,
+    >= or >, then the items are compared by converting both items to
+    numbers and comparing the numbers.
+
+  *
+
+    A numerical comparison that involves the 'NaN' value always returns
+    false.
+
+
+      6.11 Logical Expressions
+
+A logical expression is either an *and-expression* or an
+*or-expression*. The value of a logical expression is always one of the
+boolean values |true| or |false| (a singleton sequence containing a
+boolean item).
+
+  
+	|AndExpr|	   ::=   	|ComparisonExpr <#prod-ComparisonExpr> ( "and"
+ComparisonExpr <#prod-ComparisonExpr> )*|
+	|OrExpr|	   ::=   	|AndExpr <#prod-AndExpr> ( "or" AndExpr
+<#prod-AndExpr> )*|
+
+
+Logical expressions are evaluated by reducing each of its operands to an
+/effective boolean value/ by applying the following rules, in order:
+
+ 1.
+
+    If the operand is the empty sequence, its effective boolean value is
+    |false|.
+
+ 2.
+
+    If the operand is a singleton sequence containing a boolean item,
+    this item serves as the effective boolean value.
+
+ 3.
+
+    If the operand is a sequence that contains at least one node, its
+    effective boolean value is |true|.
+
+ 4.
+
+    In any other case, operands are converted to boolean (see *6
+    STXPath* <#stxpath-lang>) to get effective boolean values.
+
+An /AND/ expression returns |true| if the effective boolean values of
+both of its operands are |true|; otherwise it returns |false|.
+
+An /OR/ expression returns |false| if the effective boolean values of
+both of its operands are |false|; otherwise it returns |true|.
+
+In addition to logical expressions, STXPath provides a function *not()*
+that takes a general sequence as parameter and returns a boolean value
+(see *6.5.3 Boolean Functions* <#boolean-functions>).
+
+
+      6.12 For Expressions
+
+STXPath provides an iteration facility called a for expression.
+
+  
+	|ForExpr|	   ::=   	|SimpleForClause <#prod-SimpleForClause> "return"
+ExprSingle <#prod-ExprSingle> |
+	|SimpleForClause|	   ::=   	|"for" "$" VarName <#prod-VarName> "in"
+ExprSingle <#prod-ExprSingle> ("," "$" VarName <#prod-VarName> "in"
+ExprSingle <#prod-ExprSingle>)*|
+
+
+The evaluation of a for expression in STXPath is equivalent to For
+Expressions <http://www.w3.org/TR/xpath20/##id-for-expressions> in
+[XPath 2.0] <#XPath2>.
+
+
+      6.13 Conditional Expressions
+
+STXPath supports a conditional expression based on the keywords if,
+then, and else.
+
+  
+	|IfExpr|	   ::=   	|"if" "(" Expr <#prod-Expr> ")" "then" ExprSingle
+<#prod-ExprSingle> "else" ExprSingle <#prod-ExprSingle> |
+
+
+The expression following the |if| keyword is called the *test
+expression*, and the expressions following the |then| and |else|
+keywords are called the *then-expression* and *else-expression*,
+respectively.
+
+The first step in processing a conditional expression is to find the
+effective boolean value of the test expression, as defined in *6.11
+Logical Expressions* <#logical-expressions>.
+
+The rest of processing of a conditional expression and the rules to
+raise dynamic errors and evaluate the then-expression and the
+else-expression in STXPath are equivalent to those in [XPath 2.0]
+<#XPath2>. See Conditional Expressions
+<http://www.w3.org/TR/xpath20/#id-conditionals> for details.
+
+
+      6.14 Quantified Expressions
+
+Quantified expressions support existential and universal quantification.
+The value of a quantified expression is always |true| or |false|.
+
+  
+	|QuantifiedExpr|	   ::=   	|("some" "$" | "every" "$") VarName
+<#prod-VarName> "in" ExprSingle <#prod-ExprSingle> ("," "$" VarName
+<#prod-VarName> "in" ExprSingle <#prod-ExprSingle>)* "satisfies"
+ExprSingle <#prod-ExprSingle> |
+
+
+A quantified expression begins with a *quantifier*, which is the keyword
+|some| or |every|, followed by one or more *in-clauses* that are used to
+bind variables, followed by the keyword |satisfies| and a *test expression*.
+
+Results depend on the effective boolean values of the test expressions,
+as defined in *6.11 Logical Expressions* <#logical-expressions>.
+
+The rest of processing of a quantified expression and the rules to raise
+dynamic errors in STXPath are equivalent to those in [XPath 2.0]
+<#XPath2>. See Quantified Expressions
+<http://www.w3.org/TR/xpath20/#id-quantified-expressions> for details.
+
+
+    A References
+
+
+      A.1 Normative References
+
+XML 1.0;
+    World Wide Web Consortium. Extensible Markup Language (XML) 1.0. W3C
+    Recommendation. See http://www.w3.org/TR/REC-xml/.
+XQuery 1.0 and XPath 2.0 Data Model
+    World Wide Web Consortium. XQuery 1.0 and XPath 2.0 Data Model. W3C
+    Recommendation. See http://www.w3.org/TR/xpath-datamodel/.
+XQuery 1.0 and XPath 2.0 Functions and Operators
+    World Wide Web Consortium. XQuery 1.0 and XPath 2.0 Functions and
+    Operators. W3C Recommendation. See
+    http://www.w3.org/TR/xpath-functions/.
+XPath 2.0
+    World Wide Web Consortium. XPath 2.0. W3C Recommendation. See
+    http://www.w3.org/TR/xpath20/.
+XSLT 1.0
+    World Wide Web Consortium. XSL Transformations (XSLT) Version 1.0.
+    W3C Recommendation. See http://www.w3.org/TR/xslt.
+XML Schema Part 2: Datatypes
+    World Wide Web Consortium. XML Schema Part 2: Datatypes. W3C
+    Recommendation. See http://www.w3.org/TR/xmlschema-2/.
+XML Names
+    World Wide Web Consortium. Namespaces in XML. W3C Recommendation.
+    See http://www.w3.org/TR/REC-xml-names/.
+XSL-FO
+    World Wide Web Consortium. Extensible Stylesheet Language (XSL).
+    Version 1.0. W3C Recommendation. See http://www.w3.org/TR/xsl/.
+IANA Character Sets
+    IANA Character Sets assignment. See
+    http://www.iana.org/assignments/character-sets.
+RFC 2396
+    IETF. RFC 2396. Uniform Resource Identifiers (URI): Generic Syntax.
+    See http://www.ietf.org/rfc/rfc2396.txt.
+
+
+      A.2 Other References
+
+SAX2
+    SAX 2.0, the Simple API for XML. See http://www.saxproject.org/.
+StAX
+    JSR-000173 Streaming API for XML (StAX) 1.0. See
+    http://jcp.org/aboutJava/communityprocess/final/jsr173/index.html.
+XSLT 2.0
+    World Wide Web Consortium. XSL Transformations (XSLT) Version 2.0.
+    W3C Recommendation See http://www.w3.org/TR/xslt20/.
+XPath 1.0
+    World Wide Web Consortium. XPath 1.0. W3C Recommendation. See
+    http://www.w3c.org/TR/xpath.
+
+
+    B List of STX Instructions and Declarations
+
+Plain list only so far:
+
+	stx:transform
+	stx:include
+	stx:namespace-alias
+	stx:template
+	stx:procedure
+	stx:group
+	stx:call-procedure
+	stx:copy
+	stx:process-children
+	stx:process-attributes
+	stx:process-siblings
+	stx:process-self
+	stx:value-of
+	stx:text
+	stx:cdata
+	stx:element
+	stx:start-element
+	stx:end-element
+	stx:processing-instruction
+	stx:comment
+	stx:attribute
+	stx:if
+	stx:else
+	stx:choose
+	stx:when
+	stx:otherwise
+	stx:variable
+	stx:assign
+	stx:with-param
+	stx:param
+	stx:for-each-item
+        stx:while
+	stx:process-document
+	stx:result-document
+	stx:buffer
+	stx:process-buffer
+	stx:result-buffer
+	stx:process-siblings
+	
+
+
+    C STXPath Grammar
+
+The following is the complete grammar for STXPath in EBNF notation.
+
+
+          Main Constructs
+
+[1]   	|expression|	   ::=   	|STXPath <#prod-STXPath>|
+[2]   	|pattern|	   ::=   	|Pattern <#prod-Pattern>|
+
+
+          Named Terminals
+
+[3]   	|ExprComment|	   ::=   	|"(:" (ExprCommentContent
+<#prod-ExprCommentContent> | ExprComment <#prod-ExprComment>)* ":)"|
+[4]   	|ExprCommentContent|	   ::=   	|Char <#prod-Char> |
+[5]   	|IntegerLiteral|	   ::=   	|Digits <#prod-Digits> |
+[6]   	|DecimalLiteral|	   ::=   	|("." Digits <#prod-Digits>) | (Digits
+<#prod-Digits> "." [0-9]*)|
+[7]   	|DoubleLiteral|	   ::=   	|(("." Digits <#prod-Digits>) | (Digits
+<#prod-Digits> ("." [0-9]*)?)) ("e" | "E") ("+" | "-")? Digits
+<#prod-Digits> |
+[8]   	|StringLiteral|	   ::=   	|('"' (('"' '"') | [^"])* '"') | ("'"
+(("'" "'") | [^'])* "'")|
+[9]   	|Digits|	   ::=   	|[0-9]+|
+[10]   	|NCName|	   ::=   
+|[http://www.w3.org/TR/REC-xml-names/#NT-NCName]
+<http://www.w3.org/TR/REC-xml-names/#NT-NCName> |
+[11]   	|VarName|	   ::=   	|QName <#prod-QName> |
+[12]   	|QName|	   ::=   
+|[http://www.w3.org/TR/REC-xml-names/#NT-QName]
+<http://www.w3.org/TR/REC-xml-names/#NT-QName> |
+[13]   	|Char|	   ::=   	|[http://www.w3.org/TR/REC-xml/#NT-Char]
+<http://www.w3.org/TR/REC-xml/#NT-Char> |
+
+
+          Non-Terminals
+
+[14]   	|STXPath|	   ::=   	|Expr <#prod-Expr>?|
+[15]   	|Expr|	   ::=   	|ExprSingle <#prod-ExprSingle> ("," ExprSingle
+<#prod-ExprSingle>)*|
+[16]   	|ExprSingle|	   ::=   	|ForExpr <#prod-ForExpr> | QuantifiedExpr
+<#prod-QuantifiedExpr> | IfExpr <#prod-IfExpr> | OrExpr <#prod-OrExpr> |
+[17]   	|ForExpr|	   ::=   	|SimpleForClause <#prod-SimpleForClause>
+"return" ExprSingle <#prod-ExprSingle> |
+[18]   	|SimpleForClause|	   ::=   	|"for" "$" VarName <#prod-VarName>
+"in" ExprSingle <#prod-ExprSingle> ("," "$" VarName <#prod-VarName> "in"
+ExprSingle <#prod-ExprSingle>)*|
+[19]   	|QuantifiedExpr|	   ::=   	|("some" "$" | "every" "$") VarName
+<#prod-VarName> "in" ExprSingle <#prod-ExprSingle> ("," "$" VarName
+<#prod-VarName> "in" ExprSingle <#prod-ExprSingle>)* "satisfies"
+ExprSingle <#prod-ExprSingle> |
+[20]   	|IfExpr|	   ::=   	|"if" "(" Expr <#prod-Expr> ")" "then"
+ExprSingle <#prod-ExprSingle> "else" ExprSingle <#prod-ExprSingle> |
+[21]   	|OrExpr|	   ::=   	|AndExpr <#prod-AndExpr> ( "or" AndExpr
+<#prod-AndExpr> )*|
+[22]   	|AndExpr|	   ::=   	|ComparisonExpr <#prod-ComparisonExpr> (
+"and" ComparisonExpr <#prod-ComparisonExpr> )*|
+[23]   	|ComparisonExpr|	   ::=   	|RangeExpr <#prod-RangeExpr> (
+GeneralComp <#prod-GeneralComp> RangeExpr <#prod-RangeExpr> )?|
+[24]   	|RangeExpr|	   ::=   	|AdditiveExpr <#prod-AdditiveExpr> ( "to"
+AdditiveExpr <#prod-AdditiveExpr> )?|
+[25]   	|AdditiveExpr|	   ::=   	|MultiplicativeExpr
+<#prod-MultiplicativeExpr> ( ("+" | "-") MultiplicativeExpr
+<#prod-MultiplicativeExpr> )*|
+[26]   	|MultiplicativeExpr|	   ::=   	|UnaryExpr <#prod-UnaryExpr> (
+("*" | "div" | "idiv" | "mod") UnaryExpr <#prod-UnaryExpr> )*|
+[27]   	|UnaryExpr|	   ::=   	|("-" | "+")* ValueExpr <#prod-ValueExpr> |
+[28]   	|ValueExpr|	   ::=   	|PathExpr <#prod-PathExpr> | FilterStep
+<#prod-FilterStep> |
+[29]   	|PathExpr|	   ::=   	|"/" RelativePathExpr
+<#prod-RelativePathExpr>?|
+			|| "//" RelativePathExpr <#prod-RelativePathExpr>|
+			|| RelativePathExpr <#prod-RelativePathExpr>|
+[30]   	|RelativePathExpr|	   ::=   	|AxisStep <#prod-AxisStep> (("/" |
+"//") AxisStep <#prod-AxisStep>)*|
+[31]   	|AxisStep|	   ::=   	|(AbbrevForwardStep
+<#prod-AbbrevForwardStep> | AbbrevReverseStep <#prod-AbbrevReverseStep>)
+Predicate <#prod-Predicate>? |
+[32]   	|FilterStep|	   ::=   	|PrimaryExpr <#prod-PrimaryExpr>
+Predicate <#prod-Predicate>* |
+[33]   	|ContextItemExpr|	   ::=   	|"."|
+[34]   	|PrimaryExpr|	   ::=   	|Literal <#prod-Literal> | VarRef
+<#prod-VarRef> | ParenthesizedExpr <#prod-ParenthesizedExpr> |
+ContextItemExpr <#prod-ContextItemExpr> | FunctionCall
+<#prod-FunctionCall> |
+[35]   	|VarRef|	   ::=   	|"$" VarName <#prod-VarName> |
+[36]   	|Predicate|	   ::=   	|"[" Expr <#prod-Expr> "]"|
+[37]   	|GeneralComp|	   ::=   	|"=" | "!=" | "<" | "<=" | ">" | ">="|
+[38]   	|AbbrevForwardStep|	   ::=   	|"@"? NodeTest <#prod-NodeTest> |
+[39]   	|AbbrevReverseStep|	   ::=   	|".."|
+[40]   	|NodeTest|	   ::=   	|KindTest <#prod-KindTest> | NameTest
+<#prod-NameTest> |
+[41]   	|NameTest|	   ::=   	|QName <#prod-QName> | Wildcard
+<#prod-Wildcard> |
+[42]   	|Wildcard|	   ::=   	|"*" | NCName <#prod-NCName> ":" "*" | "*"
+":" NCName <#prod-NCName>|
+[43]   	|Literal|	   ::=   	|NumericLiteral <#prod-NumericLiteral> |
+StringLiteral <#prod-StringLiteral> |
+[44]   	|NumericLiteral|	   ::=   	|IntegerLiteral
+<#prod-IntegerLiteral> | DecimalLiteral <#prod-DecimalLiteral> |
+DoubleLiteral <#prod-DoubleLiteral> |
+[45]   	|ParenthesizedExpr|	   ::=   	|"(" Expr <#prod-Expr>? ")"|
+[46]   	|FunctionCall|	   ::=   	|QName <#prod-QName> "(" (ExprSingle
+<#prod-ExprSingle> ("," ExprSingle <#prod-ExprSingle>)*)? ")"|
+[47]   	|KindTest|	   ::=   	|PITest <#prod-PITest> | CommentTest
+<#prod-CommentTest> | TextTest <#prod-TextTest> | AnyKindTest
+<#prod-AnyKindTest> | CdataTest <#prod-CdataTest> | DoctypeTest
+<#prod-DoctypeTest> |
+[48]   	|PITest|	   ::=   	|"processing-instruction" "(" (NCName
+<#prod-NCName> | StringLiteral <#prod-StringLiteral>)? ")"|
+[49]   	|CommentTest|	   ::=   	|"comment" "(" ")"|
+[50]   	|TextTest|	   ::=   	|"text" "(" ")"|
+[51]   	|AnyKindTest|	   ::=   	|"node" "(" ")"|
+[52]   	|CdataTest|	   ::=   	|"cdata" "(" ")"|
+[53]   	|DoctypeTest|	   ::=   	|"doctype" "(" ")"|
+
+
+          Patterns
+
+[54]   	|Pattern|	   ::=   	|PathPattern <#prod-PathPattern> |
+			|| Pattern <#prod-Pattern> '|' PathPattern <#prod-PathPattern> |
+[55]   	|PathPattern|	   ::=   	|RelativePathPattern
+<#prod-RelativePathPattern> |
+			|| '/' RelativePathPattern <#prod-RelativePathPattern>?|
+[56]   	|RelativePathPattern|	   ::=   	|PatternStep <#prod-PatternStep>
+(('/' | '//') RelativePathPattern <#prod-RelativePathPattern>)?|
+[57]   	|PatternStep|	   ::=   	|PatternAxis <#prod-PatternAxis>?
+NodeTest <#prod-NodeTest> Predicate <#prod-Predicate>?|
+[58]   	|PatternAxis|	   ::=   	|'@' |
+
+
+    D Recommended filter URIs (Non-Normative)
+
+See *5.18 Using external filters* <#external-filters> for a detailed
+description on how to use these values.
+
+Filter method  	uri-reference for the |filter-method| attribute
+STX	http://stx.sourceforge.net/2002/ns
+XSLT	http://www.w3.org/1999/XSL/Transform
+
+
+    E Acknowledgments (Non-Normative)
+
+These people have contributed to this specification as they sent their
+comments to the stx@gingerall.cz mailing list:
+
+    Tom Kaiser
+    Aristotle Pagaltzis
+    Tolja Zubow
+    Pavel Hlavni?ka
+    Niko Matsakis
+    Cyrus Dolph
+    Norman Wiechmann
+    David Perez Carmona
+    Eric van der Vlist
+    Barrie Slaymaker
+    Alain Frisch
+    Tatu Saloranta
+    Nikolay Fiykov
+
+
+    F Draft Change History since WD 1 July 2004 (Non-Normative)
+
+    2005-01-04 : PC : Fixed typo in *5.18 Using external filters*
+    <#external-filters>. (XSLT stx-sheet changed to XSLT stylesheet).
+    2007-04-19 : PC : References to XPath 2.0 family specifications
+    changed to final W3C Recommendations. Consecutive Text Nodes chapter
+    (3.6) removed. Minor wording changes.
+    2007-04-26 : PC : @text-by-lines removed from stx:transform and
+    stx:process-document. Processing Text chapter (5.10) removed. Direct
+    references to SAX2 reworded. Function sf:regex-group removed.
+    Wording changes and clarifications.
+
