@@ -32,6 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.BufferEmitter;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Emitter;
@@ -40,7 +41,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>result-buffer</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.5 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
@@ -128,7 +129,7 @@ final public class ResultBufferFactory extends FactoryBase
                                     systemId,
                                     lineNo,
                                     colNo);
-        return PR_CONTINUE;
+        return CSTX.PR_CONTINUE;
       }
 
       final BufferEmitter buffer = (BufferEmitter) ((Emitter) emitter).contH;
@@ -141,14 +142,14 @@ final public class ResultBufferFactory extends FactoryBase
                                     systemId,
                                     lineNo,
                                     colNo);
-        return PR_CONTINUE;
+        return CSTX.PR_CONTINUE;
       }
 
       if (clear)
         buffer.clear ();
 
       context.pushEmitter ((Emitter) emitter);
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

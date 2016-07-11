@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Parser;
 
@@ -44,7 +44,7 @@ import net.sf.joost.stx.Parser;
  *
  * @author Zubow
  */
-public class TemplatesHandlerImpl implements TemplatesHandler, Constants
+public class TemplatesHandlerImpl implements TemplatesHandler
 {
 
   // Define a static logger variable so that it references the
@@ -52,7 +52,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
   private static Logger log;
   static
   {
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log = LoggerFactory.getLogger (TemplatesHandlerImpl.class);
   }
 
@@ -70,7 +70,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
   protected TemplatesHandlerImpl (final TransformerFactoryImpl tfactory)
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("calling constructor");
     this.tfactory = tfactory;
     // construct a tree representation of an STX stylesheet
@@ -106,7 +106,7 @@ public class TemplatesHandlerImpl implements TemplatesHandler, Constants
   public Templates getTemplates ()
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("calling getTemplates()");
     Templates templates = null;
     try

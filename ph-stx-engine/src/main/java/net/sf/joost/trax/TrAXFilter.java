@@ -38,10 +38,10 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.emitter.SAXEmitter;
-import net.sf.joost.emitter.StxEmitter;
 import net.sf.joost.stx.Processor;
 
 /**
@@ -50,7 +50,7 @@ import net.sf.joost.stx.Processor;
  * @author Zubow
  * @version 1.0
  */
-public class TrAXFilter extends XMLFilterImpl implements Constants
+public class TrAXFilter extends XMLFilterImpl
 {
 
   // Define a static logger variable so that it references the
@@ -72,7 +72,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
   protected TrAXFilter (final Templates templates)
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("calling constructor");
     this.templates = templates;
     if (templates instanceof TemplatesImpl)
@@ -94,7 +94,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
   {
 
     Transformer transformer = null;
-    if (DEBUG)
+    if (CSTX.DEBUG)
     {
       if (log.isDebugEnabled ())
         log.debug ("parsing InputSource " + input.getSystemId ());
@@ -133,7 +133,7 @@ public class TrAXFilter extends XMLFilterImpl implements Constants
         throw new SAXException ("no ContentHandler registered");
       }
       // init StxEmitter
-      StxEmitter out = null;
+      IStxEmitter out = null;
 
       // SAX specific Implementation
       out = new SAXEmitter (handler);

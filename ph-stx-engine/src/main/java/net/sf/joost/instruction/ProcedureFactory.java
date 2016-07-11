@@ -31,13 +31,14 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
 /**
  * Factory for <code>procedure</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.9 $ $Date: 2007/12/19 10:39:37 $
  * @author Oliver Becker
  */
@@ -152,7 +153,7 @@ public final class ProcedureFactory extends FactoryBase
       // restore local variables
       context.localVars = (Hashtable) localFieldStack.pop ();
       context.currentGroup = (GroupBase) localFieldStack.pop ();
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     // for debugging

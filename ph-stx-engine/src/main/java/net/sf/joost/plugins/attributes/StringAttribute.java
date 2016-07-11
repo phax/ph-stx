@@ -19,7 +19,7 @@ import java.util.Hashtable;
 
 /**
  * created on Mar 9, 2005
- * 
+ *
  * @author fiykov
  * @version $Revision: 1.1 $
  * @since
@@ -27,12 +27,15 @@ import java.util.Hashtable;
 public class StringAttribute extends Attribute
 {
 
-  public StringAttribute (final String name, final String [] validValues, final String defVal, final Hashtable col)
+  public StringAttribute (final String name,
+                          final String [] validValues,
+                          final String defVal,
+                          final Hashtable <String, Attribute> col)
   {
     super (name, validValues, defVal, col);
   }
 
-  public StringAttribute (final String name, final String defVal, final Hashtable col)
+  public StringAttribute (final String name, final String defVal, final Hashtable <String, Attribute> col)
   {
     this (name, new String [] {}, defVal, col);
   }

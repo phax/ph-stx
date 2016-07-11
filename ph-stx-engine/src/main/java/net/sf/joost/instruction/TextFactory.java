@@ -32,16 +32,17 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.emitter.StreamEmitter;
+import net.sf.joost.CSTX;
+import net.sf.joost.emitter.AbstractStreamEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.emitter.StringEmitter;
-import net.sf.joost.emitter.StxEmitter;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
 /**
  * Factory for <code>text</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.8 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -86,7 +87,7 @@ public class TextFactory extends FactoryBase
   public class Instance extends NodeBase
   {
     /** a StreamEmitter or a StringEmitter */
-    private StxEmitter stxEmitter;
+    private IStxEmitter stxEmitter;
 
     /** the buffer of the StringWriter or the StringEmitter resp. */
     private StringBuffer buffer;
@@ -110,7 +111,7 @@ public class TextFactory extends FactoryBase
         // use our StreamEmitter with a StringWriter
         final StringWriter w = new StringWriter ();
         buffer = w.getBuffer ();
-        stxEmitter = StreamEmitter.newXMLEmitter (w);
+        stxEmitter = AbstractStreamEmitter.newXMLEmitter (w);
       }
       else
       {
@@ -137,7 +138,7 @@ public class TextFactory extends FactoryBase
         buffer.setLength (0);
         context.pushEmitter (stxEmitter);
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

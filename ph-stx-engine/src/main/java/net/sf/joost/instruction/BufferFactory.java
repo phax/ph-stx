@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.BufferEmitter;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -110,7 +111,7 @@ final public class BufferFactory extends FactoryBase
       if (varTable.get (expName) != null)
       {
         context.errorHandler.error ("Buffer '" + varName + "' already declared", publicId, systemId, lineNo, colNo);
-        return PR_CONTINUE; // if the errorHandler returns
+        return CSTX.PR_CONTINUE; // if the errorHandler returns
       }
 
       final BufferEmitter buffer = new BufferEmitter ();
@@ -120,7 +121,7 @@ final public class BufferFactory extends FactoryBase
       if (varTable == context.localVars)
         parent.declareVariable (expName);
 
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

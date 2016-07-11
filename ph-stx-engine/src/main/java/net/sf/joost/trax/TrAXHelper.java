@@ -54,11 +54,12 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
+import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.DOMEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.emitter.SAXEmitter;
-import net.sf.joost.emitter.StreamEmitter;
-import net.sf.joost.emitter.StxEmitter;
 import net.sf.joost.stx.Processor;
 
 /**
@@ -91,7 +92,7 @@ public class TrAXHelper implements TrAXConstants
                                                                final ErrorListener errorListener) throws TransformerConfigurationException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("getting an InputSource from a StreamSource");
     InputSource input = null;
     String systemId = source.getSystemId ();
@@ -104,7 +105,7 @@ public class TrAXHelper implements TrAXConstants
     {
       if (source instanceof StreamSource)
       {
-        if (DEBUG)
+        if (CSTX.DEBUG)
           log.debug ("Source is a StreamSource");
         final StreamSource stream = (StreamSource) source;
         final InputStream istream = stream.getInputStream ();
@@ -138,12 +139,12 @@ public class TrAXHelper implements TrAXConstants
           }
           catch (final TransformerException e2)
           {
-            if (DEBUG)
+            if (CSTX.DEBUG)
               log.debug ("Source is not a StreamSource");
             throw new TransformerConfigurationException ("Source is not a StreamSource");
           }
         }
-        if (DEBUG)
+        if (CSTX.DEBUG)
           log.debug ("Source is not a StreamSource");
         throw new TransformerConfigurationException ("Source is not a StreamSource");
       }
@@ -176,12 +177,12 @@ public class TrAXHelper implements TrAXConstants
         }
         catch (final TransformerException e2)
         {
-          if (DEBUG)
+          if (CSTX.DEBUG)
             log.debug ("Exception", sE);
           throw new TransformerConfigurationException (sE.getMessage ());
         }
       }
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("Exception", sE);
       throw new TransformerConfigurationException (sE.getMessage ());
     }
@@ -196,15 +197,15 @@ public class TrAXHelper implements TrAXConstants
    * @return An <code>StxEmitter</code>.
    * @throws javax.xml.transform.TransformerException
    */
-  public static StxEmitter initStxEmitter (final Result result,
-                                           final Processor processor,
-                                           Properties outputProperties) throws TransformerException
+  public static IStxEmitter initStxEmitter (final Result result,
+                                            final Processor processor,
+                                            Properties outputProperties) throws TransformerException
   {
 
     if (outputProperties == null)
       outputProperties = processor.outputProperties;
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init StxEmitter");
     // Return the content handler for this Result object
     try
@@ -216,7 +217,7 @@ public class TrAXHelper implements TrAXConstants
         final ContentHandler handler = target.getHandler ();
         if (handler != null)
         {
-          if (DEBUG)
+          if (CSTX.DEBUG)
             log.debug ("return SAX specific Implementation for " + "StxEmitter");
           // SAX specific Implementation
           return new SAXEmitter (handler);
@@ -225,7 +226,7 @@ public class TrAXHelper implements TrAXConstants
       else
         if (result instanceof DOMResult)
         {
-          if (DEBUG)
+          if (CSTX.DEBUG)
             log.debug ("return DOM specific Implementation for " + "StxEmitter");
           // DOM specific Implementation
           return new DOMEmitter ((DOMResult) result);
@@ -233,7 +234,7 @@ public class TrAXHelper implements TrAXConstants
         else
           if (result instanceof StreamResult)
           {
-            if (DEBUG)
+            if (CSTX.DEBUG)
               log.debug ("return StreamResult specific Implementation " + "for StxEmitter");
             // Get StreamResult
             final StreamResult target = (StreamResult) result;
@@ -244,25 +245,25 @@ public class TrAXHelper implements TrAXConstants
             final Writer writer = target.getWriter ();
             if (writer != null)
             {
-              if (DEBUG)
+              if (CSTX.DEBUG)
                 log.debug ("get a Writer object from Result object");
-              return StreamEmitter.newEmitter (writer, DEFAULT_ENCODING, outputProperties);
+              return AbstractStreamEmitter.newEmitter (writer, CSTX.DEFAULT_ENCODING, outputProperties);
             }
             // or try to get an OutputStream from Result object
             final OutputStream ostream = target.getOutputStream ();
             if (ostream != null)
             {
-              if (DEBUG)
+              if (CSTX.DEBUG)
                 log.debug ("get an OutputStream from Result object");
-              return StreamEmitter.newEmitter (ostream, outputProperties);
+              return AbstractStreamEmitter.newEmitter (ostream, outputProperties);
             }
             // or try to get just a systemId string from Result object
             final String systemId = result.getSystemId ();
-            if (DEBUG)
+            if (CSTX.DEBUG)
               log.debug ("get a systemId string from Result object");
             if (systemId == null)
             {
-              if (DEBUG)
+              if (CSTX.DEBUG)
                 log.debug ("JAXP_NO_RESULT_ERR");
               throw new TransformerException ("JAXP_NO_RESULT_ERR");
             }
@@ -275,7 +276,7 @@ public class TrAXHelper implements TrAXConstants
             {
               url = new URL (systemId);
               os = new FileOutputStream (url.getFile ());
-              return StreamEmitter.newEmitter (os, outputProperties);
+              return AbstractStreamEmitter.newEmitter (os, outputProperties);
             }
             else
               if (systemId.startsWith ("http:"))
@@ -283,7 +284,7 @@ public class TrAXHelper implements TrAXConstants
                 url = new URL (systemId);
                 final URLConnection connection = url.openConnection ();
                 os = connection.getOutputStream ();
-                return StreamEmitter.newEmitter (os, outputProperties);
+                return AbstractStreamEmitter.newEmitter (os, outputProperties);
               }
               else
               {
@@ -291,20 +292,20 @@ public class TrAXHelper implements TrAXConstants
                 final File tmp = new File (systemId);
                 url = tmp.toURI ().toURL ();
                 os = new FileOutputStream (url.getFile ());
-                return StreamEmitter.newEmitter (os, outputProperties);
+                return AbstractStreamEmitter.newEmitter (os, outputProperties);
               }
           }
       // If we cannot create the file specified by the SystemId
     }
     catch (final IOException iE)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("Exception", iE);
       throw new TransformerException (iE);
     }
     catch (final ParserConfigurationException pE)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("Exception", pE);
       throw new TransformerException (pE);
     }
@@ -324,19 +325,19 @@ public class TrAXHelper implements TrAXConstants
                                         final ErrorListener errorListener) throws TransformerException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("getting a SAXSource from a Source");
     // SAXSource
     if (source instanceof SAXSource)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("source is an instance of SAXSource, so simple return");
       return (SAXSource) source;
     }
     // DOMSource
     if (source instanceof DOMSource)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("source is an instance of DOMSource");
       final InputSource is = new InputSource ();
       final Node startNode = ((DOMSource) source).getNode ();
@@ -349,7 +350,7 @@ public class TrAXHelper implements TrAXConstants
       {
         doc = startNode.getOwnerDocument ();
       }
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("using DOMDriver");
       final DOMDriver driver = new DOMDriver ();
       driver.setDocument (doc);
@@ -360,7 +361,7 @@ public class TrAXHelper implements TrAXConstants
     // StreamSource
     if (source instanceof StreamSource)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("source is an instance of StreamSource");
       final InputSource isource = getInputSourceForStreamSources (source, errorListener);
       return new SAXSource (isource);

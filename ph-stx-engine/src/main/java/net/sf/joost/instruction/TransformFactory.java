@@ -33,6 +33,7 @@ import java.util.Vector;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
 
@@ -137,7 +138,7 @@ public class TransformFactory extends FactoryBase
 
     final String excludedPrefixes = attrs.getValue (EXCLUDE_RESULT_PREFIXES);
     final HashSet <String> excludedNamespaces = new HashSet<> ();
-    excludedNamespaces.add (STX_NS);
+    excludedNamespaces.add (CSTX.STX_NS);
     if (excludedPrefixes != null)
     {
       int tokenNo = 0;
@@ -241,8 +242,8 @@ public class TransformFactory extends FactoryBase
         namespaceAliases = ((TransformFactory.Instance) parent).namespaceAliases;
       }
 
-      this.outputEncoding = (outputEncoding != null) ? outputEncoding : DEFAULT_ENCODING; // in
-                                                                                          // Constants
+      this.outputEncoding = (outputEncoding != null) ? outputEncoding : CSTX.DEFAULT_ENCODING; // in
+      // Constants
 
       this.outputMethod = (outputMethod != null) ? outputMethod : "xml";
 
@@ -261,16 +262,16 @@ public class TransformFactory extends FactoryBase
     public void insert (final NodeBase node) throws SAXParseException
     {
       if (compilableNodes != null)
-                                  // will only happen after this transform
-                                  // element was inserted by
-                                  // an stx:include instruction
-                                  throw new SAXParseException ("'" +
-                                                               qName +
-                                                               "' must be empty",
-                                                               node.publicId,
-                                                               node.systemId,
-                                                               node.lineNo,
-                                                               node.colNo);
+        // will only happen after this transform
+        // element was inserted by
+        // an stx:include instruction
+        throw new SAXParseException ("'" +
+                                     qName +
+                                     "' must be empty",
+                                     node.publicId,
+                                     node.systemId,
+                                     node.lineNo,
+                                     node.colNo);
 
       if (node instanceof TemplateBase || // template, procedure
           node instanceof GroupBase || // group, transform (= include)

@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -46,12 +47,12 @@ import net.sf.joost.stx.ParseContext;
 final public class MatchFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public MatchFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("regex");
     attrNames.add ("flags");
   }
@@ -123,7 +124,7 @@ final public class MatchFactory extends FactoryBase
       super.process (context);
       // store value for the regex-group function
       context.localRegExGroup.push (analyzeText.capSubstr);
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

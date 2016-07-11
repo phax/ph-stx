@@ -74,7 +74,7 @@ public abstract class AbstractInstruction implements Cloneable
    *
    * @param context
    *        the current context
-   * @return {@link net.sf.joost.Constants#PR_CONTINUE}, when the processing
+   * @return {@link net.sf.joost.CSTX#PR_CONTINUE}, when the processing
    *         should continue with the next node; otherwise when the processing
    *         should be suspended due to an <code>stx:process-<em>xxx</em></code>
    *         instruction. This in turn means that only the implementations for

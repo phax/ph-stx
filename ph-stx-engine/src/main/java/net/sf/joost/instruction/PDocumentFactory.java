@@ -43,6 +43,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -148,7 +149,7 @@ public class PDocumentFactory extends FactoryBase
     {
       Value v = href.evaluate (context, this);
       if (v.type == Value.EMPTY)
-        return PR_CONTINUE; // nothing to do
+        return CSTX.PR_CONTINUE; // nothing to do
 
       final Processor proc = context.currentProcessor;
       ContentHandler contH = proc;
@@ -158,7 +159,7 @@ public class PDocumentFactory extends FactoryBase
         // use external SAX filter (TransformerHandler)
         final TransformerHandler handler = getProcessHandler (context);
         if (handler == null)
-          return PR_ERROR;
+          return CSTX.PR_ERROR;
         contH = handler;
         lexH = handler;
       }
@@ -264,7 +265,7 @@ public class PDocumentFactory extends FactoryBase
       }
       proc.endInnerProcessing ();
       context.locator = prevLoc;
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

@@ -50,11 +50,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.OutputURIResolver;
 import net.sf.joost.TransformerHandlerResolver;
-import net.sf.joost.emitter.StreamEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.AbstractStreamEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.Processor;
 import net.sf.joost.trace.ParserListenerMgr;
 
@@ -88,7 +89,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   private boolean debugmode = false;
 
   // indicates which Emitter class for stx:message output should be used
-  private StxEmitter msgEmitter;
+  private IStxEmitter msgEmitter;
 
   // Synch object to guard against setting values from the TrAX interface
   // or reentry while the transform is going on.
@@ -107,8 +108,8 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
     try
     {
       // initialize default messageEmitter
-      msgEmitter = StreamEmitter.newEmitter (System.err, null);
-      ((StreamEmitter) msgEmitter).setOmitXmlDeclaration (true);
+      msgEmitter = AbstractStreamEmitter.newEmitter (System.err, null);
+      ((AbstractStreamEmitter) msgEmitter).setOmitXmlDeclaration (true);
     }
     catch (final UnsupportedEncodingException e)
     {
@@ -240,9 +241,9 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
             }
           }
           else
-            if (value instanceof StxEmitter)
+            if (value instanceof IStxEmitter)
             { // already instantiated
-              msgEmitter = (StxEmitter) value;
+              msgEmitter = (IStxEmitter) value;
             }
             else
             {
@@ -296,7 +297,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("setting ErrorListener");
       if (errorListener == null)
       {
@@ -418,7 +419,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
       {
         if (log.isDebugEnabled ())
           log.debug ("get a Templates-instance from Source " + source.getSystemId ());
@@ -470,7 +471,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("get a Transformer-instance");
       final Templates templates = newTemplates (source);
       final Transformer transformer = templates.newTransformer ();
@@ -497,7 +498,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("create a TemplatesHandler-instance");
       final TemplatesHandlerImpl thandler = new TemplatesHandlerImpl (this);
       return thandler;
@@ -520,7 +521,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("get a TransformerHandler " + "(identity transformation or copy)");
       final StreamSource streamSrc = new StreamSource (new StringReader (IDENTITY_TRANSFORM));
       return newTransformerHandler (streamSrc);
@@ -544,7 +545,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         if (log.isDebugEnabled ())
           log.debug ("get a TransformerHandler-instance from Source " + src.getSystemId ());
       final Templates templates = newTemplates (src);
@@ -568,7 +569,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("get a TransformerHandler-instance from Templates");
       final Transformer internal = templates.newTransformer ();
       final TransformerHandlerImpl thandler = new TransformerHandlerImpl (internal);
@@ -591,7 +592,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   public XMLFilter newXMLFilter (final Source src) throws TransformerConfigurationException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       if (log.isDebugEnabled ())
         log.debug ("getting SAXTransformerFactory.FEATURE_XMLFILTER " + "from Source " + src.getSystemId ());
     XMLFilter xFilter = null;
@@ -625,7 +626,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   public XMLFilter newXMLFilter (final Templates templates)
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("getting SAXTransformerFactory.FEATURE_XMLFILTER " + "from Templates");
 
     // Implementation
@@ -639,7 +640,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
   }
 
   /** returns the value of {@link #msgEmitter} */
-  public StxEmitter getMessageEmitter ()
+  public IStxEmitter getMessageEmitter ()
   {
     return msgEmitter;
   }
@@ -653,14 +654,14 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
    * @throws TransformerConfigurationException
    *         in case of errors
    */
-  public StxEmitter buildMessageEmitter (final String emitterClass) throws TransformerConfigurationException
+  public IStxEmitter buildMessageEmitter (final String emitterClass) throws TransformerConfigurationException
   {
 
     Object emitter = null;
     try
     {
       emitter = loadClass (emitterClass).newInstance ();
-      if (!(emitter instanceof StxEmitter))
+      if (!(emitter instanceof IStxEmitter))
       {
         throw new TransformerConfigurationException (emitterClass + " is not an StxEmitter");
       }
@@ -674,7 +675,7 @@ public class TransformerFactoryImpl extends SAXTransformerFactory implements TrA
       throw new TransformerConfigurationException (ile.getMessage (), ile);
     }
 
-    return (StxEmitter) emitter;
+    return (IStxEmitter) emitter;
   }
 
   // classloader helper

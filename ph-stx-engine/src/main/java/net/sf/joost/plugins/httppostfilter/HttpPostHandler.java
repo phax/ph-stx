@@ -42,6 +42,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.XmlEmitter;
 import net.sf.joost.stx.Processor;
 
@@ -67,7 +68,7 @@ public class HttpPostHandler extends XmlEmitter implements TransformerHandler
   // Constructor
   public HttpPostHandler (final String targetURL)
   {
-    super (null, DEFAULT_ENCODING, null); // postpone writer initialization
+    super (null, CSTX.DEFAULT_ENCODING, null); // postpone writer initialization
     writer = new StringWriter (); // catch up here
     buffer = ((StringWriter) writer).getBuffer ();
     this.targetURL = targetURL;

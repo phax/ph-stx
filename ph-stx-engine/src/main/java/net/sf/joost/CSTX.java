@@ -26,11 +26,11 @@ package net.sf.joost;
 
 /**
  * This interface contains constants shared between different classes.
- * 
+ *
  * @version $Revision: 2.4 $ $Date: 2004/10/30 15:04:35 $
  * @author Oliver Becker
  */
-public interface Constants
+public final class CSTX
 {
   /** The STX namespace */
   public static final String STX_NS = "http://stx.sourceforge.net/2002/ns";
@@ -75,4 +75,7 @@ public interface Constants
 
   /** Debugging flag, should be <code>false</code> in release versions */
   public static final boolean DEBUG = false;
+
+  private CSTX ()
+  {}
 }

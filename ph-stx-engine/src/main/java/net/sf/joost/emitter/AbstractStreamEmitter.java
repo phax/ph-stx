@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.trax.TrAXConstants;
 
@@ -51,13 +52,13 @@ import net.sf.joost.trax.TrAXConstants;
  * @version $Revision: 1.32 $ $Date: 2008/10/06 13:31:41 $
  * @author Oliver Becker
  */
-public abstract class StreamEmitter extends StxEmitterBase
+public abstract class AbstractStreamEmitter extends AbstractStxEmitterBase
 {
   // Logger initialization
-  private static Logger log = OptionalLog.getLog (StreamEmitter.class);
+  private static Logger log = OptionalLog.getLog (AbstractStreamEmitter.class);
 
   /** Joost's HTML extension output method */
-  private static String HTML_METHOD = "{" + JOOST_EXT_NS + "}html";
+  private static String HTML_METHOD = "{" + CSTX.JOOST_EXT_NS + "}html";
 
   /** Writer for the resulting text */
   protected Writer writer;
@@ -72,7 +73,7 @@ public abstract class StreamEmitter extends StxEmitterBase
   // Base constructor
   //
 
-  public StreamEmitter (final Writer writer, final String encoding)
+  public AbstractStreamEmitter (final Writer writer, final String encoding)
   {
     this.writer = writer;
     this.encoding = encoding;
@@ -98,9 +99,11 @@ public abstract class StreamEmitter extends StxEmitterBase
    *        The set of output properties to be used.
    * @return a proper stream emitter object
    */
-  public static StreamEmitter newEmitter (final Writer writer, final String encoding, final Properties outputProperties)
+  public static AbstractStreamEmitter newEmitter (final Writer writer,
+                                                  final String encoding,
+                                                  final Properties outputProperties)
   {
-    StreamEmitter emitter = null;
+    AbstractStreamEmitter emitter = null;
     if (outputProperties != null)
     {
       final String outputMethod = outputProperties.getProperty (OutputKeys.METHOD);
@@ -148,8 +151,8 @@ public abstract class StreamEmitter extends StxEmitterBase
    *         When <code>outputProperties</code> specifies an unsupported output
    *         encoding
    */
-  public static StreamEmitter newEmitter (final OutputStream out,
-                                          final Properties outputProperties) throws UnsupportedEncodingException
+  public static AbstractStreamEmitter newEmitter (final OutputStream out,
+                                                  final Properties outputProperties) throws UnsupportedEncodingException
   {
     String encoding = null;
     if (outputProperties != null)
@@ -157,7 +160,7 @@ public abstract class StreamEmitter extends StxEmitterBase
     if (encoding != null)
       encoding = encoding.toUpperCase ();
     else
-      encoding = DEFAULT_ENCODING;
+      encoding = CSTX.DEFAULT_ENCODING;
 
     OutputStreamWriter writer;
     try
@@ -166,9 +169,9 @@ public abstract class StreamEmitter extends StxEmitterBase
     }
     catch (final java.io.UnsupportedEncodingException e)
     {
-      final String msg = "Unsupported encoding " + encoding + ", using " + DEFAULT_ENCODING;
+      final String msg = "Unsupported encoding " + encoding + ", using " + CSTX.DEFAULT_ENCODING;
       log.warn (msg);
-      writer = new OutputStreamWriter (out, DEFAULT_ENCODING);
+      writer = new OutputStreamWriter (out, CSTX.DEFAULT_ENCODING);
     }
 
     return newEmitter (new BufferedWriter (writer), encoding, outputProperties);
@@ -182,9 +185,9 @@ public abstract class StreamEmitter extends StxEmitterBase
    *        A <code>Writer</code> for receiving the output.
    * @return a proper XML emitter object
    */
-  public static StreamEmitter newXMLEmitter (final Writer writer)
+  public static AbstractStreamEmitter newXMLEmitter (final Writer writer)
   {
-    return newEmitter (writer, DEFAULT_ENCODING, null);
+    return newEmitter (writer, CSTX.DEFAULT_ENCODING, null);
   }
 
   /**
@@ -202,7 +205,8 @@ public abstract class StreamEmitter extends StxEmitterBase
    * @throws IOException
    *         When an error occurs while opening the file.
    */
-  public static StreamEmitter newEmitter (final String filename, final Properties outputProperties) throws IOException
+  public static AbstractStreamEmitter newEmitter (final String filename,
+                                                  final Properties outputProperties) throws IOException
   {
     return newEmitter (new FileOutputStream (filename), outputProperties);
   }

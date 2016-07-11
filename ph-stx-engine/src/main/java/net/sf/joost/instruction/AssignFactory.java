@@ -32,6 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -131,7 +132,7 @@ final public class AssignFactory extends FactoryBase
         // on the emitter stack
         context.pushEmitter (new StringEmitter (new StringBuffer (), errorMessage));
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

@@ -38,8 +38,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.emitter.StreamEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.CSTX;
+import net.sf.joost.emitter.AbstractStreamEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -48,7 +49,7 @@ import net.sf.joost.trax.TrAXHelper;
 /**
  * Factory for <code>result-document</code> elements, which are represented by
  * the inner Instance class.
- * 
+ *
  * @version $Revision: 2.23 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
@@ -56,12 +57,12 @@ import net.sf.joost.trax.TrAXHelper;
 final public class ResultDocumentFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public ResultDocumentFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("href");
     attrNames.add ("output-encoding");
     attrNames.add ("output-method");
@@ -147,7 +148,7 @@ final public class ResultDocumentFactory extends FactoryBase
       if (method != null)
         props.setProperty (OutputKeys.METHOD, method);
 
-      StxEmitter emitter = null;
+      IStxEmitter emitter = null;
       try
       {
         if (context.outputUriResolver != null)
@@ -165,9 +166,9 @@ final public class ResultDocumentFactory extends FactoryBase
                                            lineNo,
                                            colNo);
             }
-            if (append && (emitter instanceof StreamEmitter))
+            if (append && (emitter instanceof AbstractStreamEmitter))
             {
-              ((StreamEmitter) emitter).setOmitXmlDeclaration (true);
+              ((AbstractStreamEmitter) emitter).setOmitXmlDeclaration (true);
             }
             localFieldStack.push (result);
           }
@@ -184,7 +185,7 @@ final public class ResultDocumentFactory extends FactoryBase
                                                               colNo,
                                                               append);
 
-          final StreamEmitter se = StreamEmitter.newEmitter (osw, encoding, props);
+          final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (osw, encoding, props);
           if (append)
             se.setOmitXmlDeclaration (true);
           localFieldStack.push (osw);
@@ -194,12 +195,14 @@ final public class ResultDocumentFactory extends FactoryBase
       catch (final java.io.IOException ex)
       {
         context.errorHandler.error (ex.toString (), publicId, systemId, lineNo, colNo, ex);
-        return PR_CONTINUE; // if the errorHandler returns
+        // if the errorHandler returns
+        return CSTX.PR_CONTINUE;
       }
       catch (final URISyntaxException ex)
       {
         context.errorHandler.error (ex.toString (), publicId, systemId, lineNo, colNo, ex);
-        return PR_CONTINUE; // if the errorHandler returns
+        // if the errorHandler returns
+        return CSTX.PR_CONTINUE;
       }
       catch (final TransformerException ex)
       {
@@ -208,7 +211,7 @@ final public class ResultDocumentFactory extends FactoryBase
 
       context.pushEmitter (emitter);
       context.emitter.startDocument ();
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /** Close the current result stream */

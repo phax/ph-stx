@@ -35,11 +35,11 @@ import org.xml.sax.SAXException;
 
 /**
  * This class implements an emitter for html code.
- * 
+ *
  * @version $Revision: 1.6 $ $Date: 2008/10/06 13:31:41 $
  * @author Thomas Behrends
  */
-public class HtmlEmitter extends StreamEmitter
+public class HtmlEmitter extends AbstractStreamEmitter
 {
   /** output property: omit-xml-declaration */
   private boolean propOmitXmlDeclaration = false;
@@ -54,10 +54,10 @@ public class HtmlEmitter extends StreamEmitter
    * Empty HTML 4.01 elements according to
    * http://www.w3.org/TR/1999/REC-html401-19991224/index/elements.html
    */
-  private static final HashSet emptyHTMLElements;
+  private static final HashSet <String> emptyHTMLElements;
   static
   {
-    emptyHTMLElements = new HashSet ();
+    emptyHTMLElements = new HashSet <String> ();
     emptyHTMLElements.add ("AREA");
     emptyHTMLElements.add ("BASE");
     emptyHTMLElements.add ("BASEFONT");
@@ -82,7 +82,7 @@ public class HtmlEmitter extends StreamEmitter
   /**
    * Defines whether the XML declaration should be omitted, default is
    * <code>false</code>.
-   * 
+   *
    * @param flag
    *        <code>true</code>: the XML declaration will be omitted;
    *        <code>false</code>: the XML declaration will be output

@@ -27,12 +27,12 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -168,23 +168,22 @@ final public class ParamFactory extends FactoryBase
                                       systemId,
                                       lineNo,
                                       colNo);
-          return PR_CONTINUE; // if the errorHandler returns
+          return CSTX.PR_CONTINUE; // if the errorHandler returns
+        }
+        if (select != null)
+        {
+          // select attribute present
+          v = select.evaluate (context, this);
         }
         else
-          if (select != null)
-          {
-            // select attribute present
-            v = select.evaluate (context, this);
-          }
-          else
-          {
-            // use contents
-            next = contents;
-            super.process (context);
-            context.pushEmitter (new StringEmitter (new StringBuffer (),
-                                                    "('" + qName + "' started in line " + lineNo + ")"));
-            return PR_CONTINUE;
-          }
+        {
+          // use contents
+          next = contents;
+          super.process (context);
+          context.pushEmitter (new StringEmitter (new StringBuffer (),
+                                                  "('" + qName + "' started in line " + lineNo + ")"));
+          return CSTX.PR_CONTINUE;
+        }
       }
       processParam (v, context);
       if (nodeEnd != null)
@@ -192,7 +191,7 @@ final public class ParamFactory extends FactoryBase
         // skip contents, the parameter value is already available
         next = successor;
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override
@@ -206,9 +205,9 @@ final public class ParamFactory extends FactoryBase
     public void processParam (final Value v, final Context context) throws SAXException
     {
       // determine scope
-      Hashtable varTable;
+      Hashtable <String, Value> varTable;
       if (parent instanceof GroupBase) // global parameter
-        varTable = (Hashtable) ((Stack) context.groupVars.get (parent)).peek ();
+        varTable = context.groupVars.get (parent).peek ();
       else
         varTable = context.localVars;
 

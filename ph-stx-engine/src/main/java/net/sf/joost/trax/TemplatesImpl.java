@@ -35,6 +35,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Parser;
@@ -82,7 +83,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
                            final TransformerFactoryImpl factory) throws TransformerConfigurationException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("calling constructor with existing Parser");
     this.factory = factory;
     try
@@ -114,7 +115,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
                            final TransformerFactoryImpl factory) throws TransformerConfigurationException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("calling constructor with SystemId " + isource.getSystemId ());
     this.factory = factory;
     try
@@ -140,7 +141,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
   private void init (final Parser stxParser) throws TransformerConfigurationException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init without InputSource ");
     try
     {
@@ -186,7 +187,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
   private void init (final XMLReader reader, final InputSource isource) throws TransformerConfigurationException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init with InputSource " + isource.getSystemId ());
     try
     {
@@ -203,7 +204,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
       pContext.uriResolver = factory.getURIResolver ();
       if (debugmode)
       {
-        if (DEBUG)
+        if (CSTX.DEBUG)
           log.info ("init transformer in debug mode");
         pContext.parserListener = factory.getParserListenerMgr ();
         processor = new DebugProcessor (reader, isource, pContext, factory.getMessageEmitter ());
@@ -217,7 +218,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
     }
     catch (final java.io.IOException iE)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("Exception", iE);
       throw new TransformerConfigurationException (iE.getMessage (), iE);
     }
@@ -226,13 +227,13 @@ public class TemplatesImpl implements Templates, TrAXConstants
       final Exception emb = sE.getException ();
       if (emb instanceof TransformerConfigurationException)
         throw (TransformerConfigurationException) emb;
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("Exception", sE);
       throw new TransformerConfigurationException (sE.getMessage (), sE);
     }
     catch (final java.lang.NullPointerException nE)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("Exception", nE);
       nE.printStackTrace (System.err);
       throw new TransformerConfigurationException ("could not found value for property javax.xml.parsers.SAXParser ",
@@ -251,7 +252,7 @@ public class TemplatesImpl implements Templates, TrAXConstants
 
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("calling newTransformer to get a " + "Transformer object for Transformation");
       try
       {

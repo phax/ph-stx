@@ -29,7 +29,7 @@ import java.util.Hashtable;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -43,7 +43,7 @@ import net.sf.joost.stx.Value;
  * @version $Revision: 1.6 $ $Date: 2007/11/25 14:18:00 $
  * @author Oliver Becker, Nikolay Fiykov
  */
-final public class FunctionFactory implements Constants
+final public class FunctionFactory
 {
   /**
    * Type for all functions
@@ -85,10 +85,10 @@ final public class FunctionFactory implements Constants
 
   // namespace to be prepended before function names
   // (function namespace prefix)
-  public static final String FNSP = "{" + FUNC_NS + "}";
+  public static final String FNSP = "{" + CSTX.FUNC_NS + "}";
 
   // Joost extension namespace prefix
-  public static final String JENSP = "{" + JOOST_EXT_NS + "}";
+  public static final String JENSP = "{" + CSTX.JOOST_EXT_NS + "}";
 
   /** Contains one instance for each function. */
   private static Hashtable <String, Instance> functionHash;

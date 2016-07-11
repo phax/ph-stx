@@ -33,7 +33,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.xml.sax.Locator;
 
 import net.sf.joost.OutputURIResolver;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.GroupBase;
 import net.sf.joost.instruction.NodeBase;
 import net.sf.joost.instruction.PSiblingsFactory;
@@ -116,10 +116,10 @@ public final class Context implements Cloneable
    * {@link net.sf.joost.instruction.MessageFactory.Instance#process}
    * invocation.
    */
-  public StxEmitter messageEmitter;
+  public IStxEmitter messageEmitter;
 
   /** Instantiate a new emitter object for a new result event stream */
-  public void pushEmitter (final StxEmitter stxEmitter)
+  public void pushEmitter (final IStxEmitter stxEmitter)
   {
     emitter = emitter.pushEmitter (stxEmitter);
   }
@@ -132,9 +132,9 @@ public final class Context implements Cloneable
   }
 
   /** Restore previous emitter after finishing a result event stream */
-  public StxEmitter popEmitter ()
+  public IStxEmitter popEmitter ()
   {
-    final StxEmitter stxEmitter = (StxEmitter) emitter.contH;
+    final IStxEmitter stxEmitter = (IStxEmitter) emitter.contH;
     emitter = emitter.prev;
     return stxEmitter;
   }

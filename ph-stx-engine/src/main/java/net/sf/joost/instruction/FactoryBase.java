@@ -31,7 +31,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.Constants;
 import net.sf.joost.grammar.ExprParser;
 import net.sf.joost.grammar.PatternParser;
 import net.sf.joost.grammar.Sym;
@@ -50,7 +49,7 @@ import net.sf.joost.stx.ParseContext;
  * @author Oliver Becker
  */
 
-public abstract class FactoryBase implements Constants
+public abstract class FactoryBase
 {
   /** @return the local name of this STX element */
   public abstract String getName ();
@@ -213,7 +212,7 @@ public abstract class FactoryBase implements Constants
     if (colon != -1)
     { // prefixed name
       final String prefix = qName.substring (0, colon);
-      final String uri = (String) context.nsSet.get (prefix);
+      final String uri = context.nsSet.get (prefix);
       if (uri == null)
         throw new SAXParseException ("Undeclared prefix '" + prefix + "'", context.locator);
       result.append (uri);

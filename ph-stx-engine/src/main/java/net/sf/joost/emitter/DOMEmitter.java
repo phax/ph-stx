@@ -39,6 +39,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 
 /**
@@ -48,7 +49,7 @@ import net.sf.joost.OptionalLog;
  *
  * @author Anatolij Zubow, Oliver Becker
  */
-public class DOMEmitter extends StxEmitterBase
+public class DOMEmitter extends AbstractStxEmitterBase
 {
 
   // Define a static logger variable so that it references the
@@ -57,7 +58,7 @@ public class DOMEmitter extends StxEmitterBase
 
   private Document document = null;
   private Node nextSiblingOfRootNodes = null;
-  private final Stack stack = new Stack ();
+  private final Stack <Node> stack = new Stack <Node> ();
   private boolean insideCDATA = false;
 
   /**
@@ -69,7 +70,7 @@ public class DOMEmitter extends StxEmitterBase
    */
   public DOMEmitter (final DOMResult result) throws ParserConfigurationException
   {
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init DOMEmitter");
 
     final Node rootNode = result.getNode ();
@@ -97,7 +98,7 @@ public class DOMEmitter extends StxEmitterBase
 
   private void insertNode (final Node newNode)
   {
-    final Node lastNode = (Node) stack.peek ();
+    final Node lastNode = stack.peek ();
     if (stack.size () == 1 && nextSiblingOfRootNodes != null)
     {
       lastNode.insertBefore (newNode, nextSiblingOfRootNodes);
@@ -115,7 +116,7 @@ public class DOMEmitter extends StxEmitterBase
    */
   public Node getDOMTree ()
   {
-    return (Node) stack.get (0);
+    return stack.get (0);
   }
 
   /**

@@ -37,10 +37,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.DOMEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.Processor;
 
 /**
@@ -53,7 +53,7 @@ import net.sf.joost.stx.Processor;
  *
  * @author Zubow
  */
-public class TransformerHandlerImpl implements TransformerHandler, Constants
+public class TransformerHandlerImpl implements TransformerHandler
 {
 
   // Define a static logger variable so that it references the
@@ -68,7 +68,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
   /**
    * Handler for constructing the Resulttype.
    */
-  private StxEmitter stxEmitter = null;
+  private IStxEmitter stxEmitter = null;
 
   /**
    * Necessary for the document root.
@@ -88,7 +88,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
   protected TransformerHandlerImpl (final Transformer transformer)
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("calling constructor");
     // Save the reference to the transformer
     this.transformer = transformer;
@@ -128,7 +128,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
   public void setResult (final Result result) throws IllegalArgumentException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("setting Result - here SAXResult");
 
     try
@@ -180,7 +180,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
   private void init (final Result result) throws TransformerException
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init emitter-class according to result");
 
     if (this.transformer instanceof TransformerImpl)
@@ -226,7 +226,7 @@ public class TransformerHandlerImpl implements TransformerHandler, Constants
     // set the constructed DOM-Node on the DOMResult
     if (result instanceof DOMResult)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("result is a DOMResult");
       final Node nodeResult = ((DOMEmitter) stxEmitter).getDOMTree ();
       // DOM specific Implementation

@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -39,7 +40,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>processing-instruction</code> elements, which are
  * represented by the inner Instance class.
- * 
+ *
  * @version $Revision: 2.9 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -130,7 +131,7 @@ final public class PIFactory extends FactoryBase
                                       systemId,
                                       lineNo,
                                       colNo);
-          return PR_CONTINUE; // if the errorHandler returns
+          return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
         buffer.setLength (0);
         context.pushEmitter (strEmitter);
@@ -149,7 +150,7 @@ final public class PIFactory extends FactoryBase
         }
         context.emitter.processingInstruction (piName, pi, this);
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

@@ -32,6 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -54,7 +55,7 @@ final public class WithParamFactory extends FactoryBase
   // Constructor
   public WithParamFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }
@@ -137,7 +138,7 @@ final public class WithParamFactory extends FactoryBase
       else
         context.passedParameters.put (expName, select.evaluate (context, this));
 
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -39,7 +40,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>comment</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.7 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -112,7 +113,7 @@ public class CommentFactory extends FactoryBase
         if (context.emitter.isEmitterActive (strEmitter))
         {
           context.errorHandler.error ("Can't create nested comment here", publicId, systemId, lineNo, colNo);
-          return PR_CONTINUE; // if the errorHandler returns
+          return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
         buffer.setLength (0);
         context.pushEmitter (strEmitter);
@@ -123,14 +124,18 @@ public class CommentFactory extends FactoryBase
         // Most comments won't have dashes inside, so it's reasonable
         // to skip the StringBuffer creation in these cases
         if (comment.indexOf ('-') != -1)
-                                        // have a closer look at the dashes
-                                        emitComment (new StringBuffer (comment), context);
+        {
+          // have a closer look at the dashes
+          emitComment (new StringBuffer (comment), context);
+        }
         else
-                                        // produce the comment immediately
-                                        context.emitter.comment (comment.toCharArray (), 0, comment.length (), this);
+        {
+          // produce the comment immediately
+          context.emitter.comment (comment.toCharArray (), 0, comment.length (), this);
+        }
       }
 
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**
@@ -154,7 +159,7 @@ public class CommentFactory extends FactoryBase
 
     /**
      * Check the new comment for contained dashes and send it to the emitter.
-     * 
+     *
      * @param comment
      *        the contents of the new comment
      * @param context

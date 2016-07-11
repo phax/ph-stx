@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 
 /**
@@ -40,7 +41,7 @@ import net.sf.joost.OptionalLog;
  * @version $Revision: 1.4 $ $Date: 2007/11/25 14:18:02 $
  * @author Oliver Becker, Anatolij Zubow
  */
-public class TextEmitter extends StreamEmitter
+public class TextEmitter extends AbstractStreamEmitter
 {
   // Logger initialization
   private static Logger log = OptionalLog.getLog (TextEmitter.class);
@@ -102,7 +103,7 @@ public class TextEmitter extends StreamEmitter
     try
     {
       writer.write (ch, start, length);
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("'" + new String (ch, start, length) + "'");
     }
     catch (final IOException ex)

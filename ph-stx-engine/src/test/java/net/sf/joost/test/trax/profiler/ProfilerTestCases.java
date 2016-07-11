@@ -49,7 +49,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 
-import net.sf.joost.emitter.StreamEmitter;
+import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
 
@@ -277,7 +277,7 @@ public class ProfilerTestCases
     try
     {
       final Processor pr = new Processor (new InputSource (stxFile), new ParseContext ());
-      final StreamEmitter em = StreamEmitter.newXMLEmitter (new BufferedWriter (new FileWriter ("testdata/profiler/0.xml")));
+      final AbstractStreamEmitter em = AbstractStreamEmitter.newXMLEmitter (new BufferedWriter (new FileWriter ("testdata/profiler/0.xml")));
 
       pr.setContentHandler (em);
 

@@ -30,7 +30,7 @@ package net.sf.joost.emitter;
  * @version $Revision: 1.1 $ $Date: 2005/03/13 17:12:49 $
  * @author Oliver Becker
  */
-public abstract class StxEmitterBase implements StxEmitter
+public abstract class AbstractStxEmitterBase implements IStxEmitter
 {
   /** The system identifier of this STX emitter (optional) */
   private String systemId;

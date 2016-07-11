@@ -30,12 +30,12 @@ import org.xml.sax.SAXException;
 
 /**
  * This class implements an emitter that collects characters events
- * 
+ *
  * @version $Revision: 1.9 $ $Date: 2007/11/25 14:18:02 $
  * @author Oliver Becker
  */
 
-final public class StringEmitter extends StxEmitterBase
+public final class StringEmitter extends AbstractStxEmitterBase
 {
   /** the string buffer */
   private StringBuffer buffer;

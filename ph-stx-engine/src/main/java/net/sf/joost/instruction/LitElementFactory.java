@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -61,7 +61,7 @@ final public class LitElementFactory
     {
       if (lName.equals ("transform"))
         throw new SAXParseException ("File is not an STX transformation sheet, need namespace '" +
-                                     Constants.STX_NS +
+                                     CSTX.STX_NS +
                                      "' for the 'transform' element",
                                      context.locator);
       else
@@ -163,8 +163,8 @@ final public class LitElementFactory
       }
 
       if (namespaceAliases.size () == 0)
-                                        // no aliases declared
-                                        return false;
+        // no aliases declared
+        return false;
 
       // Change namespace URI of this element
       String toNS = namespaceAliases.get (uri);
@@ -250,7 +250,7 @@ final public class LitElementFactory
             attrs.setValue (i, avtList[i].evaluate (context, this).getString ());
         context.emitter.startElement (uri, lName, qName, attrs, namespaces, this);
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

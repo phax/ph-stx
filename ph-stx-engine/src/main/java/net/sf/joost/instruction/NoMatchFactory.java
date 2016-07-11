@@ -30,6 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -85,7 +86,7 @@ public class NoMatchFactory extends FactoryBase
       // i.e. we need to store the info of a following stx:match here:
       localFieldStack.push (nodeEnd.next);
       localFieldStack.push (analyzeText.capSubstr);
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

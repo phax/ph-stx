@@ -19,7 +19,7 @@ import java.util.Hashtable;
 
 /**
  * created on Mar 9, 2005
- * 
+ *
  * @author fiykov
  * @version $Revision: 1.1 $
  * @since
@@ -27,7 +27,7 @@ import java.util.Hashtable;
 public class BooleanAttribute extends Attribute
 {
 
-  public BooleanAttribute (final String name, final String defVal, final Hashtable col)
+  public BooleanAttribute (final String name, final String defVal, final Hashtable <String, Attribute> col)
   {
     super (name, new String [] { "true", "false" }, defVal, col);
   }

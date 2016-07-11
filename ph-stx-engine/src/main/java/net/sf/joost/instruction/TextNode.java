@@ -26,13 +26,14 @@ package net.sf.joost.instruction;
 
 import org.xml.sax.SAXException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
 /**
  * Instances created by this factory represent text nodes in the transformation
  * sheet
- * 
+ *
  * @version $Revision: 2.3 $ $Date: 2006/02/27 19:47:18 $
  * @author Oliver Becker
  */
@@ -54,7 +55,7 @@ public class TextNode extends NodeBase
   public short process (final Context context) throws SAXException
   {
     context.emitter.characters (string.toCharArray (), 0, string.length (), this);
-    return PR_CONTINUE;
+    return CSTX.PR_CONTINUE;
   }
 
   /**

@@ -33,6 +33,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.BufferReader;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -44,7 +45,7 @@ import net.sf.joost.util.VariableUtils;
 /**
  * Factory for <code>process-buffer</code> elements, which are represented by
  * the inner Instance class.
- * 
+ *
  * @version $Revision: 2.17 $ $Date: 2009/08/21 12:46:17 $
  * @author Oliver Becker
  */
@@ -156,7 +157,7 @@ public class PBufferFactory extends FactoryBase
                                       lineNo,
                                       colNo);
           // if the error handler returns
-          return PR_ERROR;
+          return CSTX.PR_ERROR;
         }
         scopeDetermined = true;
       }
@@ -168,7 +169,7 @@ public class PBufferFactory extends FactoryBase
         // use external SAX filter (TransformerHandler)
         final TransformerHandler handler = getProcessHandler (context);
         if (handler == null)
-          return PR_ERROR;
+          return CSTX.PR_ERROR;
 
         try
         {
@@ -180,7 +181,7 @@ public class PBufferFactory extends FactoryBase
         {
           // add locator information
           context.errorHandler.fatalError (e.getMessage (), publicId, systemId, lineNo, colNo, e);
-          return PR_ERROR;
+          return CSTX.PR_ERROR;
         }
         // catch any unchecked exception
         catch (final RuntimeException e)
@@ -190,7 +191,7 @@ public class PBufferFactory extends FactoryBase
           sw = new java.io.StringWriter ();
           e.printStackTrace (new java.io.PrintWriter (sw));
           context.errorHandler.fatalError ("External processing failed: " + sw, publicId, systemId, lineNo, colNo, e);
-          return PR_ERROR;
+          return CSTX.PR_ERROR;
         }
       }
       else

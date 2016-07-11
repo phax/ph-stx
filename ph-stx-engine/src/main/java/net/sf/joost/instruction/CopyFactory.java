@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -189,7 +190,7 @@ final public class CopyFactory extends FactoryBase
           log.error ("Unknown SAXEvent type " + event.type);
           throw new SAXParseException ("Unknown SAXEvent type", publicId, systemId, lineNo, colNo);
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

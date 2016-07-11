@@ -46,7 +46,7 @@ import net.sf.joost.trax.TrAXHelper;
 /**
  * Factory for <code>include</code> elements, which will be replaced by groups
  * for the included transformation sheet
- * 
+ *
  * @version $Revision: 2.14 $ $Date: 2008/06/15 08:11:23 $
  * @author Oliver Becker
  */
@@ -54,12 +54,12 @@ import net.sf.joost.trax.TrAXHelper;
 final public class IncludeFactory extends FactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet attrNames;
+  private final HashSet <String> attrNames;
 
   // Constructor
   public IncludeFactory ()
   {
-    attrNames = new HashSet ();
+    attrNames = new HashSet <String> ();
     attrNames.add ("href");
   }
 
@@ -126,12 +126,9 @@ final public class IncludeFactory extends FactoryBase
     {
       if (ex.getException () instanceof TransformerConfigurationException)
         throw ex;
-      else
-      {
-        // will this ever happen?
-        // add locator information
-        throw new SAXParseException (ex.getMessage (), pContext.locator);
-      }
+      // will this ever happen?
+      // add locator information
+      throw new SAXParseException (ex.getMessage (), pContext.locator);
     }
     catch (final TransformerException te)
     {

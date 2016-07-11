@@ -34,6 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -235,7 +236,7 @@ final public class AnalyzeTextFactory extends FactoryBase
         lastIndex = 0;
         // create a pseudo variable for regex-group()
         if (context.localRegExGroup == null)
-          context.localRegExGroup = new Stack <> ();
+          context.localRegExGroup = new Stack<> ();
         matchers = new Matcher [matchChildren.length];
         for (int i = 0; i < matchChildren.length; i++)
         {
@@ -252,7 +253,7 @@ final public class AnalyzeTextFactory extends FactoryBase
           catch (final EvalException e)
           {
             context.errorHandler.fatalError (e.getMessage (), publicId, systemId, lineNo, colNo, e);
-            return PR_ERROR;
+            return CSTX.PR_ERROR;
           }
         }
       }
@@ -329,14 +330,14 @@ final public class AnalyzeTextFactory extends FactoryBase
       else // text.length() == lastIndex, we're done
         next = successor;
 
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override
     public short processEnd (final Context context) throws SAXException
     {
       continued = true;
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

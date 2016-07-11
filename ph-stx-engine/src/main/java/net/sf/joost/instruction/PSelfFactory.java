@@ -30,13 +30,14 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
 /**
  * Factory for <code>process-self</code> elements, which are represented by the
  * inner Instance class.
- * 
+ *
  * @version $Revision: 2.4 $ $Date: 2007/11/25 14:18:01 $
  * @author Oliver Becker
  */
@@ -116,9 +117,9 @@ public class PSelfFactory extends FactoryBase
         // use external SAX filter (TransformerHandler)
         context.targetHandler = getProcessHandler (context);
         if (context.targetHandler == null)
-          return PR_ERROR;
+          return CSTX.PR_ERROR;
       }
-      return PR_SELF;
+      return CSTX.PR_SELF;
     }
   }
 }

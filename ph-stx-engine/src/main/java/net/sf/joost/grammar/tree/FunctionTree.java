@@ -27,7 +27,7 @@ package net.sf.joost.grammar.tree;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.EvalException;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -73,7 +73,7 @@ final public class FunctionTree extends Tree
     }
     else
     {
-      uri = Constants.FUNC_NS;
+      uri = CSTX.FUNC_NS;
       lName = qName;
     }
 

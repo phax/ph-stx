@@ -48,9 +48,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.emitter.DOMEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.Emitter;
 import net.sf.joost.stx.Processor;
 import net.sf.joost.trace.DebugEmitter;
@@ -169,13 +170,13 @@ public class TransformerImpl extends Transformer implements TrAXConstants
   public void transform (final Source xmlSource, final Result result) throws TransformerException
   {
 
-    StxEmitter out = null;
+    IStxEmitter out = null;
     SAXSource saxSource = null;
 
     // should be synchronized
     synchronized (reentryGuard)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("perform transformation from " +
                    "xml-source(SAXSource, DOMSource, StreamSource) " +
                    "to SAXResult, DOMResult or StreamResult");
@@ -202,7 +203,7 @@ public class TransformerImpl extends Transformer implements TrAXConstants
 
         if (isource != null)
         {
-          if (DEBUG)
+          if (CSTX.DEBUG)
             log.debug ("perform transformation");
 
           if (saxSource.getXMLReader () != null)
@@ -238,11 +239,11 @@ public class TransformerImpl extends Transformer implements TrAXConstants
                 {
                   // set the required
                   // "http://xml.org/sax/features/namespaces" Feature
-                  xmlReader.setFeature (FEAT_NS, true);
+                  xmlReader.setFeature (CSTX.FEAT_NS, true);
                   // set the required
                   // "http://xml.org/sax/features/namespace-prefixes"
                   // Feature
-                  xmlReader.setFeature (FEAT_NSPREFIX, false);
+                  xmlReader.setFeature (CSTX.FEAT_NSPREFIX, false);
                   // maybe there would be other features
                 }
                 catch (final SAXException sE)
@@ -296,15 +297,15 @@ public class TransformerImpl extends Transformer implements TrAXConstants
    * @param out
    *        <code>StxEmitter</code>.
    */
-  private void performResults (final Result result, final StxEmitter out)
+  private void performResults (final Result result, final IStxEmitter out)
   {
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("perform result");
     // DOMResult
     if (result instanceof DOMResult)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("result is a DOMResult");
       final Node nodeResult = ((DOMEmitter) out).getDOMTree ();
       // DOM specific Implementation
@@ -314,14 +315,14 @@ public class TransformerImpl extends Transformer implements TrAXConstants
     // StreamResult
     if (result instanceof StreamResult)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("result is a StreamResult");
       return;
     }
     // SAXResult
     if (result instanceof SAXResult)
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("result is a SAXResult");
       return;
     }

@@ -41,7 +41,7 @@ import net.sf.joost.stx.SAXEvent;
  * @author Oliver Becker
  */
 
-public class BufferEmitter extends StxEmitterBase
+public class BufferEmitter extends AbstractStxEmitterBase
 {
 
   /** the event buffer */

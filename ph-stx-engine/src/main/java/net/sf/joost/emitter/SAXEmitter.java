@@ -32,6 +32,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+import net.sf.joost.CSTX;
+
 /**
  * This class implements the common interface <code>StxEmitter</code>. Is is
  * designed for using <code>SAXResult</code>. So this class outputs a
@@ -40,17 +42,12 @@ import org.xml.sax.ext.LexicalHandler;
  *
  * @author Zubow
  */
-public class SAXEmitter extends StxEmitterBase
+public class SAXEmitter extends AbstractStxEmitterBase
 {
 
   // Define a static logger variable so that it references the
   // Logger instance named "SAXEmitter".
-  private static Logger log;
-  static
-  {
-    if (DEBUG)
-      log = LoggerFactory.getLogger (SAXEmitter.class);
-  }
+  private static final Logger log = LoggerFactory.getLogger (SAXEmitter.class);
 
   /**
    * The {@link SAXEmitter} acts as a proxy und propagates SAX2 events to this
@@ -72,8 +69,7 @@ public class SAXEmitter extends StxEmitterBase
    */
   public SAXEmitter (final ContentHandler saxSourceHandler)
   {
-
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init SAXEmitter");
     this.saxContentHandler = saxSourceHandler;
     if (saxSourceHandler instanceof LexicalHandler)

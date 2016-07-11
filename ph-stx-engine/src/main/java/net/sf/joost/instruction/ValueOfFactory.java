@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -52,7 +53,7 @@ final public class ValueOfFactory extends FactoryBase
   // Constructor
   public ValueOfFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("select");
     attrNames.add ("separator");
   }
@@ -127,7 +128,7 @@ final public class ValueOfFactory extends FactoryBase
         s = sb.toString ();
       }
       context.emitter.characters (s.toCharArray (), 0, s.length (), this);
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override
@@ -140,6 +141,5 @@ final public class ValueOfFactory extends FactoryBase
       if (separator != null)
         theCopy.separator = separator.deepCopy (copies);
     }
-
   }
 }

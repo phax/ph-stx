@@ -40,7 +40,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>script</code> elements, which are represented by the inner
  * Instance class. <code>script</code> is an extension element that belongs to
- * the Joost namespace {@link net.sf.joost.Constants#JOOST_EXT_NS}.
+ * the Joost namespace {@link net.sf.joost.CSTX#JOOST_EXT_NS}.
  *
  * @version $Revision: 2.6 $ $Date: 2007/12/19 10:39:37 $
  * @author Nikolay Fiykov, Oliver Becker

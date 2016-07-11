@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -53,7 +54,7 @@ final public class ElementFactory extends FactoryBase
   // Constructor
   public ElementFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("namespace");
   }
@@ -124,7 +125,7 @@ final public class ElementFactory extends FactoryBase
                                              systemId,
                                              lineNo,
                                              colNo);
-            return PR_CONTINUE; // if the errorHandler returns
+            return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
         else
@@ -143,7 +144,7 @@ final public class ElementFactory extends FactoryBase
                                              systemId,
                                              lineNo,
                                              colNo);
-            return PR_CONTINUE; // if the errorHandler returns
+            return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
       }
@@ -165,7 +166,7 @@ final public class ElementFactory extends FactoryBase
       localFieldStack.push (elUri);
       localFieldStack.push (elLocal);
       localFieldStack.push (elName);
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

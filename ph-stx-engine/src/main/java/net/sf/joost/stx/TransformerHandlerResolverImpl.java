@@ -37,7 +37,7 @@ import org.xml.sax.XMLReader;
 
 import com.helger.commons.lang.ServiceLoaderHelper;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.TransformerHandlerResolver;
 
@@ -56,7 +56,7 @@ import net.sf.joost.TransformerHandlerResolver;
  * @author fikin
  */
 
-public final class TransformerHandlerResolverImpl implements TransformerHandlerResolver, Constants
+public final class TransformerHandlerResolverImpl implements TransformerHandlerResolver
 {
   /** logging object */
   private static Logger log = OptionalLog.getLog (TransformerHandlerResolverImpl.class);
@@ -107,13 +107,13 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
     if (!notInitializedYet)
       return;
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init() : entering");
 
     // system property which says what to do in case of
     // duplicated method implementations
     final String prop = System.getProperty (flgName);
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug (flgName + "=" + prop);
     int flg;
     // fail with exception if duplicate is found
@@ -138,7 +138,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
     // loop over founded classes
     for (final TransformerHandlerResolver plg : ServiceLoaderHelper.getAllSPIImplementations (TransformerHandlerResolver.class))
     {
-      if (DEBUG)
+      if (CSTX.DEBUG)
         log.debug ("scanning implemented stx-filter-methods of class" + plg.getClass ());
 
       // lookup over implemented methods
@@ -146,7 +146,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
       for (final String mt : uriMethods)
       {
 
-        if (DEBUG)
+        if (CSTX.DEBUG)
           log.debug ("stx-filter-method found : " + mt);
 
         // see if method is already defined by some other plugin ?
@@ -163,7 +163,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
                              "'!";
           if (flg == FLAG_FAIL)
           {
-            if (DEBUG)
+            if (CSTX.DEBUG)
               log.debug ("plugin already implemented!");
             throw new SAXException (msg);
           }
@@ -190,7 +190,7 @@ public final class TransformerHandlerResolverImpl implements TransformerHandlerR
     // revert init() flag
     notInitializedYet = false;
 
-    if (DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("init() : exiting");
   }
 

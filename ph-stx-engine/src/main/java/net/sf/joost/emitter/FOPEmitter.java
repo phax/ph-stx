@@ -40,9 +40,9 @@ import org.xml.sax.helpers.XMLFilterImpl;
  *          0.20.4
  * @author Oliver Becker
  */
-public class FOPEmitter extends XMLFilterImpl implements StxEmitter
+public class FOPEmitter extends XMLFilterImpl implements IStxEmitter
 {
-  /** The system identifier required by {@link StxEmitter} */
+  /** The system identifier required by {@link IStxEmitter} */
   private String systemId;
 
   /**

@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.instruction.AnalyzeTextFactory;
 import net.sf.joost.instruction.AssignFactory;
 import net.sf.joost.instruction.AttributeFactory;
@@ -95,7 +95,7 @@ import net.sf.joost.instruction.WithParamFactory;
  * @author Oliver Becker
  */
 
-public class Parser implements Constants, ContentHandler // , ErrorHandler
+public class Parser implements ContentHandler // , ErrorHandler
 {
   /** The context object for parsing */
   private final ParseContext pContext;
@@ -319,7 +319,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
 
       NodeBase newNode;
       pContext.nsSet = getInScopeNamespaces ();
-      if (STX_NS.equals (uri))
+      if (CSTX.STX_NS.equals (uri))
       {
         final FactoryBase fac = stxFactories.get (lName);
         if (fac == null)
@@ -344,7 +344,7 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
           newNamespaces = getInScopeNamespaces ();
       }
       else
-        if (JOOST_EXT_NS.equals (uri))
+        if (CSTX.JOOST_EXT_NS.equals (uri))
         {
           final FactoryBase fac = joostFactories.get (lName);
           if (fac == null)
@@ -377,16 +377,15 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
         // "default" means false -> nothing to do
       }
       else
-        if (newNode instanceof TextFactory.Instance ||
-            newNode instanceof CdataFactory.Instance)
-                                                     // these elements behave as
-                                                     // if xml:space was set to
-                                                     // "preserve"
-                                                     newNode.preserveSpace = true;
+        if (newNode instanceof TextFactory.Instance || newNode instanceof CdataFactory.Instance)
+          // these elements behave as
+          // if xml:space was set to
+          // "preserve"
+          newNode.preserveSpace = true;
         else
           if (currentNode != null)
-                                  // inherit from parent
-                                  newNode.preserveSpace = currentNode.preserveSpace;
+            // inherit from parent
+            newNode.preserveSpace = currentNode.preserveSpace;
 
       if (currentNode != null)
         currentNode.insert (newNode);
@@ -412,20 +411,20 @@ public class Parser implements Constants, ContentHandler // , ErrorHandler
       currentNode.setEndLocation (pContext);
 
       if (currentNode instanceof LitElementFactory.Instance)
-                                                            // restore the newly
-                                                            // declared
-                                                            // namespaces from
-                                                            // this element
-                                                            // (this is a deep
-                                                            // copy)
-                                                            newNamespaces = ((LitElementFactory.Instance) currentNode).getNamespaces ();
+        // restore the newly
+        // declared
+        // namespaces from
+        // this element
+        // (this is a deep
+        // copy)
+        newNamespaces = ((LitElementFactory.Instance) currentNode).getNamespaces ();
 
       // Don't call compile for an included stx:transform, because
       // the including Parser will call it
       if (!(currentNode == pContext.transformNode && includingGroup != null))
         if (currentNode.compile (0, pContext))
-                                              // need another invocation
-                                              compilableNodes.addElement (currentNode);
+          // need another invocation
+          compilableNodes.addElement (currentNode);
       // add the compilable nodes from an included stx:transform
       if (currentNode instanceof TransformFactory.Instance && currentNode != pContext.transformNode)
         compilableNodes.addAll (((TransformFactory.Instance) currentNode).compilableNodes);

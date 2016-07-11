@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -38,7 +39,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>if</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.10 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -127,7 +128,7 @@ final public class IfFactory extends FactoryBase
         // skip if instruction
         next = falseNext;
       }
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

@@ -33,6 +33,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
@@ -54,7 +55,7 @@ final public class AttributeFactory extends FactoryBase
   // Constructor
   public AttributeFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
     attrNames.add ("namespace");
@@ -87,7 +88,7 @@ final public class AttributeFactory extends FactoryBase
   final public class Instance extends NodeBase
   {
     private Tree name, namespace, select;
-    private final Hashtable nsSet;
+    private final Hashtable <String, String> nsSet;
     private StringEmitter strEmitter;
 
     protected Instance (final String elementName,
@@ -102,7 +103,7 @@ final public class AttributeFactory extends FactoryBase
              context,
              // this element must be empty if there is a select attribute
              select == null);
-      this.nsSet = (Hashtable) context.nsSet.clone ();
+      this.nsSet = (Hashtable <String, String>) context.nsSet.clone ();
       this.name = name;
       this.namespace = namespace;
       this.select = select;
@@ -156,14 +157,14 @@ final public class AttributeFactory extends FactoryBase
                                         systemId,
                                         lineNo,
                                         colNo);
-            return PR_CONTINUE; // if the errorHandler returns
+            return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
         else
         { // no namespace attribute
           // look into the set of in-scope namespaces
           // (of the transformation sheet)
-          attUri = (String) nsSet.get (prefix);
+          attUri = nsSet.get (prefix);
           if (attUri == null)
           {
             context.errorHandler.error ("Attempt to create attribute '" +
@@ -175,7 +176,7 @@ final public class AttributeFactory extends FactoryBase
                                         systemId,
                                         lineNo,
                                         colNo);
-            return PR_CONTINUE; // if the errorHandler returns
+            return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
       }
@@ -197,7 +198,7 @@ final public class AttributeFactory extends FactoryBase
                                         systemId,
                                         lineNo,
                                         colNo);
-            return PR_CONTINUE; // if the errorHandler returns
+            return CSTX.PR_CONTINUE; // if the errorHandler returns
           }
         }
       }
@@ -217,7 +218,7 @@ final public class AttributeFactory extends FactoryBase
         localFieldStack.push (attName);
       }
 
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

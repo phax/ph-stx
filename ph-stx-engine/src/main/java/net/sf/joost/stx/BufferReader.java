@@ -39,18 +39,18 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.LocatorImpl;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.BufferEmitter;
 import net.sf.joost.instruction.GroupBase;
 
 /**
  * An XMLReader object that uses the events from a buffer.
- * 
+ *
  * @version $Revision: 1.7 $ $Date: 2008/03/29 12:12:57 $
  * @author Oliver Becker
  */
 
-public class BufferReader implements XMLReader, Constants
+public class BufferReader implements XMLReader
 {
   /** the lexical handler object */
   private LexicalHandler lexH;
@@ -65,7 +65,7 @@ public class BufferReader implements XMLReader, Constants
 
   /**
    * Constructs a new <code>BufferReader</code> object.
-   * 
+   *
    * @param context
    *        the current context
    * @param bufExpName
@@ -98,7 +98,7 @@ public class BufferReader implements XMLReader, Constants
   public void setFeature (final String name, final boolean state) throws SAXNotRecognizedException,
                                                                   SAXNotSupportedException
   {
-    if (name.equals (FEAT_NS))
+    if (name.equals (CSTX.FEAT_NS))
     {
       if (!state)
         throw new SAXNotSupportedException ("Cannot switch off namespace support (attempt setting " +
@@ -108,7 +108,7 @@ public class BufferReader implements XMLReader, Constants
                                             ")");
     }
     else
-      if (name.equals (FEAT_NSPREFIX))
+      if (name.equals (CSTX.FEAT_NSPREFIX))
       {
         if (state)
           throw new SAXNotSupportedException ("Cannot report namespace declarations as attributes " +
@@ -124,9 +124,9 @@ public class BufferReader implements XMLReader, Constants
 
   public boolean getFeature (final String name) throws SAXNotRecognizedException
   {
-    if (name.equals (FEAT_NS))
+    if (name.equals (CSTX.FEAT_NS))
       return true;
-    if (name.equals (FEAT_NSPREFIX))
+    if (name.equals (CSTX.FEAT_NSPREFIX))
       return false;
     throw new SAXNotRecognizedException (name);
   }

@@ -9,7 +9,6 @@ package net.sf.joost.util.regex;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import net.sf.joost.util.om.Whitespace;
 import net.sf.joost.util.om.XMLChar;
@@ -35,60 +34,61 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
    *      2</a>
    */
   public static final AbstractCharClass [] categoryCharClasses = new AbstractCharClass [RegexData.categories.length ()];
-  public static final AbstractCharClass [] subCategoryCharClasses = new AbstractCharClass [RegexData.subCategories.length () / 2];
+  public static final AbstractCharClass [] subCategoryCharClasses = new AbstractCharClass [RegexData.subCategories.length () /
+                                                                                           2];
 
   /**
    * CharClass for each block name in specialBlockNames.
    */
   public static final AbstractCharClass [] specialBlockCharClasses = { new CharRange (0x10300, 0x1032F),
-                                                               new CharRange (0x10330, 0x1034F),
-                                                               new CharRange (0x10400, 0x1044F),
-                                                               new CharRange (0x1D000, 0x1D0FF),
-                                                               new CharRange (0x1D100, 0x1D1FF),
-                                                               new CharRange (0x1D400, 0x1D7FF),
-                                                               new CharRange (0x20000, 0x2A6D6),
-                                                               new CharRange (0x2F800, 0x2FA1F),
-                                                               new CharRange (0xE0000, 0xE007F),
-                                                               new Union (new AbstractCharClass [] { new CharRange (0xE000,
-                                                                                                            0xF8FF),
-                                                                                             new CharRange (0xF0000,
-                                                                                                            0xFFFFD),
-                                                                                             new CharRange (0x100000,
-                                                                                                            0x10FFFD) }),
-                                                               Empty.getInstance (),
-                                                               Empty.getInstance (),
-                                                               Empty.getInstance () };
+                                                                       new CharRange (0x10330, 0x1034F),
+                                                                       new CharRange (0x10400, 0x1044F),
+                                                                       new CharRange (0x1D000, 0x1D0FF),
+                                                                       new CharRange (0x1D100, 0x1D1FF),
+                                                                       new CharRange (0x1D400, 0x1D7FF),
+                                                                       new CharRange (0x20000, 0x2A6D6),
+                                                                       new CharRange (0x2F800, 0x2FA1F),
+                                                                       new CharRange (0xE0000, 0xE007F),
+                                                                       new Union (new AbstractCharClass [] { new CharRange (0xE000,
+                                                                                                                            0xF8FF),
+                                                                                                             new CharRange (0xF0000,
+                                                                                                                            0xFFFFD),
+                                                                                                             new CharRange (0x100000,
+                                                                                                                            0x10FFFD) }),
+                                                                       Empty.getInstance (),
+                                                                       Empty.getInstance (),
+                                                                       Empty.getInstance () };
 
   private static final AbstractCharClass DOT_SCHEMA = new Complement (new Union (new AbstractCharClass [] { new SingleChar ('\n'),
-                                                                                            new SingleChar ('\r') }));
+                                                                                                            new SingleChar ('\r') }));
 
   private static final AbstractCharClass ESC_d = new Property ("Nd");
 
   private static final AbstractCharClass ESC_D = new Complement (ESC_d);
 
   private static final AbstractCharClass ESC_W = new Union (new AbstractCharClass [] { computeCategoryCharClass ('P'),
-                                                                       computeCategoryCharClass ('Z'),
-                                                                       computeCategoryCharClass ('C') });
+                                                                                       computeCategoryCharClass ('Z'),
+                                                                                       computeCategoryCharClass ('C') });
   // was: new Property("P"), new Property("Z"), new Property("C") }
 
   private static final AbstractCharClass ESC_w = new Complement (ESC_W);
 
   private static final AbstractCharClass ESC_s = new Union (new AbstractCharClass [] { new SingleChar (' '),
-                                                                       new SingleChar ('\n'),
-                                                                       new SingleChar ('\r'),
-                                                                       new SingleChar ('\t') });
+                                                                                       new SingleChar ('\n'),
+                                                                                       new SingleChar ('\r'),
+                                                                                       new SingleChar ('\t') });
 
   private static final AbstractCharClass ESC_S = new Complement (ESC_s);
 
   private static final AbstractCharClass ESC_i = makeCharClass (RegexData.NMSTRT_CATEGORIES,
-                                                        RegexData.NMSTRT_INCLUDES,
-                                                        RegexData.NMSTRT_EXCLUDE_RANGES);
+                                                                RegexData.NMSTRT_INCLUDES,
+                                                                RegexData.NMSTRT_EXCLUDE_RANGES);
 
   private static final AbstractCharClass ESC_I = new Complement (ESC_i);
 
   private static final AbstractCharClass ESC_c = makeCharClass (RegexData.NMCHAR_CATEGORIES,
-                                                        RegexData.NMCHAR_INCLUDES,
-                                                        RegexData.NMCHAR_EXCLUDE_RANGES);
+                                                                RegexData.NMCHAR_INCLUDES,
+                                                                RegexData.NMCHAR_EXCLUDE_RANGES);
 
   private static final AbstractCharClass ESC_C = new Complement (ESC_c);
 
@@ -588,7 +588,9 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     return true;
   }
 
-  private static AbstractCharClass makeCharClass (final String categories, final String includes, final String excludeRanges)
+  private static AbstractCharClass makeCharClass (final String categories,
+                                                  final String includes,
+                                                  final String excludeRanges)
   {
     final List <AbstractCharClass> includeList = new ArrayList<> (5);
     for (int i = 0, len = categories.length (); i < len; i += 2)
@@ -1005,7 +1007,7 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       // JDK 1.4 leaves Cn out of C?
       classes.add (new Subtraction (new Property ("Cn"),
                                     new Union (new AbstractCharClass [] { new SingleChar (RegexData.UNICODE_3_1_ADD_Lu),
-                                                                  new SingleChar (RegexData.UNICODE_3_1_ADD_Ll) })));
+                                                                          new SingleChar (RegexData.UNICODE_3_1_ADD_Ll) })));
       final List <AbstractCharClass> assignedRanges = new ArrayList<> (5);
       for (final int [] element : RegexData.CATEGORY_RANGES)
         for (int j = 0; j < element.length; j += 2)
@@ -1034,8 +1036,8 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
           for (int j = 0; j < element.length; j += 2)
             assignedRanges.add (new CharRange (element[j], element[j + 1]));
         return new Subtraction (new Union (new AbstractCharClass [] { base,
-                                                              new CharRange (RegexData.NONBMP_MIN,
-                                                                             RegexData.NONBMP_MAX) }),
+                                                                      new CharRange (RegexData.NONBMP_MIN,
+                                                                                     RegexData.NONBMP_MAX) }),
                                 new Union (assignedRanges));
       }
       if (name.equals ("Pi"))
@@ -1073,35 +1075,6 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
       list.add (new SingleChar (members.charAt (i)));
     return new Union (list);
   }
-
-  public static void main (final String [] args) throws RegexSyntaxException
-  {
-    final String s = translate (args[0], args[1].equals ("xpath"), false, true);
-    for (int i = 0, len = s.length (); i < len; i++)
-    {
-      final char c = s.charAt (i);
-      if (c >= 0x20 && c <= 0x7e)
-        System.err.print (c);
-      else
-      {
-        System.err.print ("\\u");
-        for (int shift = 12; shift >= 0; shift -= 4)
-          System.err.print ("0123456789ABCDEF".charAt ((c >> shift) & 0xF));
-      }
-    }
-    try
-    {
-      Pattern.compile (s);
-    }
-    catch (final Exception err)
-    {
-      System.err.println ("Error: " + err.getMessage ());
-    }
-    System.err.println ();
-  }
-
-  // }
-
 }
 
 //

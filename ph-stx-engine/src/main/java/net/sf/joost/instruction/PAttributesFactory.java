@@ -30,6 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.SAXEvent;
@@ -37,7 +38,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Factory for <code>process-attributes</code> elements, which are represented
  * by the inner Instance class.
- * 
+ *
  * @version $Revision: 2.3 $ $Date: 2003/06/03 14:30:23 $
  * @author Oliver Becker
  */
@@ -102,9 +103,8 @@ public class PAttributesFactory extends FactoryBase
       final SAXEvent event = (SAXEvent) context.ancestorStack.peek ();
 
       if (event.type != SAXEvent.ELEMENT || event.attrs.getLength () == 0)
-        return PR_CONTINUE;
-      else
-        return PR_ATTRIBUTES;
+        return CSTX.PR_CONTINUE;
+      return CSTX.PR_ATTRIBUTES;
     }
   }
 }

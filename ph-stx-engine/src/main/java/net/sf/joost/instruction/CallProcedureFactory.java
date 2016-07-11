@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -111,16 +112,16 @@ public class CallProcedureFactory extends FactoryBase
       // determine procedure object
       // targetGroup stems from compile() in ProcessBase
       super.compile (pass, context);
-      procedure = (ProcedureFactory.Instance) targetGroup.visibleProcedures.get (procExpName);
+      procedure = targetGroup.visibleProcedures.get (procExpName);
       if (procedure == null)
       {
         // not found, search group procedures
-        procedure = (ProcedureFactory.Instance) targetGroup.groupProcedures.get (procExpName);
+        procedure = targetGroup.groupProcedures.get (procExpName);
       }
       if (procedure == null)
       {
         // still not found, search global procedures
-        procedure = (ProcedureFactory.Instance) targetGroup.globalProcedures.get (procExpName);
+        procedure = targetGroup.globalProcedures.get (procExpName);
       }
 
       if (procedure == null)
@@ -150,7 +151,7 @@ public class CallProcedureFactory extends FactoryBase
 
       localFieldStack.push (procedure.nodeEnd.next);
       procedure.nodeEnd.next = nodeEnd;
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

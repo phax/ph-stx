@@ -30,6 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.StringEmitter;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.Emitter;
@@ -38,7 +39,7 @@ import net.sf.joost.stx.ParseContext;
 /**
  * Factory for <code>cdata</code> elements, which are represented by the inner
  * Instance class.
- * 
+ *
  * @version $Revision: 2.5 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -89,12 +90,12 @@ final public class CdataFactory extends FactoryBase
       if (context.emitter.isEmitterActive (strEmitter))
       {
         context.errorHandler.error ("Can't create nested CDATA section here", publicId, systemId, lineNo, colNo);
-        return PR_CONTINUE; // if the errorHandler returns
+        return CSTX.PR_CONTINUE; // if the errorHandler returns
       }
       super.process (context);
       buffer.setLength (0);
       context.pushEmitter (strEmitter);
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

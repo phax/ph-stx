@@ -36,9 +36,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
-import net.sf.joost.emitter.StreamEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.AbstractStreamEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -111,7 +112,7 @@ final public class MessageFactory extends FactoryBase
 
     private StringBuffer buffer; // used only when log != null
 
-    private StxEmitter emitter; // initialized on first processing
+    private IStxEmitter emitter; // initialized on first processing
 
     protected Instance (final String qName,
                         final NodeBase parent,
@@ -137,9 +138,9 @@ final public class MessageFactory extends FactoryBase
     /**
      * Activate the object {@link Context#messageEmitter} for the contents of
      * this element. If this object is <code>null</code> this method first
-     * creates a {@link StreamEmitter} object that writes to stderr and saves it
-     * in {@link Context#messageEmitter} for other <code>stx:message</code>
-     * instructions.
+     * creates a {@link AbstractStreamEmitter} object that writes to stderr and
+     * saves it in {@link Context#messageEmitter} for other
+     * <code>stx:message</code> instructions.
      */
     @Override
     public short process (final Context context) throws SAXException
@@ -155,9 +156,9 @@ final public class MessageFactory extends FactoryBase
             final StringWriter writer = new StringWriter ();
             buffer = writer.getBuffer ();
             // Note: encoding parameter is irrelevant here
-            final StreamEmitter se = StreamEmitter.newEmitter (writer,
-                                                               DEFAULT_ENCODING,
-                                                               context.currentProcessor.outputProperties);
+            final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (writer,
+                                                                               CSTX.DEFAULT_ENCODING,
+                                                                               context.currentProcessor.outputProperties);
             se.setOmitXmlDeclaration (true);
             emitter = se;
           }
@@ -165,18 +166,19 @@ final public class MessageFactory extends FactoryBase
             if (context.messageEmitter == null)
             {
               // create global message emitter using stderr
-              final StreamEmitter se = StreamEmitter.newEmitter (System.err, context.currentProcessor.outputProperties);
+              final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (System.err,
+                                                                                 context.currentProcessor.outputProperties);
               se.setOmitXmlDeclaration (true);
               context.messageEmitter = emitter = se;
             }
             else
-                                                // use global message emitter
-                                                emitter = context.messageEmitter;
+              // use global message emitter
+              emitter = context.messageEmitter;
         }
         catch (final java.io.IOException ex)
         {
           context.errorHandler.fatalError (ex.toString (), publicId, systemId, lineNo, colNo, ex);
-          return PR_CONTINUE; // if the errorHandler returns
+          return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
       }
 
@@ -195,7 +197,7 @@ final public class MessageFactory extends FactoryBase
         processMessage (context);
       }
 
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**

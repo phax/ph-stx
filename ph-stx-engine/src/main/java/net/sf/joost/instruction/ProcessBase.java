@@ -35,6 +35,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.EmitterAdapter;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.BufferReader;
@@ -45,7 +46,7 @@ import net.sf.joost.util.VariableUtils;
 
 /**
  * Common base class for all <code>stx:process-<em>xxx</em></code> instructions
- * 
+ *
  * @version $Revision: 2.20 $ $Date: 2009/09/22 21:13:44 $
  * @author Oliver Becker
  */
@@ -71,7 +72,7 @@ public class ProcessBase extends NodeBase
     public short process (final Context ctx)
     {
       ctx.passedParameters = (Hashtable) node.paramStack.pop ();
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override
@@ -257,13 +258,13 @@ public class ProcessBase extends NodeBase
 
     paramStack.push (context.passedParameters);
     context.passedParameters = new Hashtable ();
-    return PR_CONTINUE;
+    return CSTX.PR_CONTINUE;
   }
 
   /**
    * Returns a handler that performs a transformation according to the specified
    * {@link #filter} value.
-   * 
+   *
    * @exception SAXException
    *            if this handler couldn't be created
    */

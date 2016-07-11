@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.LocatorImpl;
 
 import net.sf.joost.OptionalLog;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.NodeBase;
 import net.sf.joost.stx.Emitter;
@@ -71,14 +71,14 @@ public class DebugEmitter extends Emitter
   }
 
   /**
-   * Called from {@link #pushEmitter(StxEmitter)}
+   * Called from {@link #pushEmitter(IStxEmitter)}
    *
    * @param prev
    *        the previous emitter
    * @param handler
    *        the new content handler
    */
-  private DebugEmitter (final DebugEmitter prev, final StxEmitter handler)
+  private DebugEmitter (final DebugEmitter prev, final IStxEmitter handler)
   {
     super (prev, handler);
     this.tmgr = prev.tmgr;
@@ -90,7 +90,7 @@ public class DebugEmitter extends Emitter
    * @see net.sf.joost.stx.Emitter#pushEmitter(net.sf.joost.emitter.StxEmitter)
    */
   @Override
-  public Emitter pushEmitter (final StxEmitter handler)
+  public Emitter pushEmitter (final IStxEmitter handler)
   {
     return new DebugEmitter (this, handler);
   }

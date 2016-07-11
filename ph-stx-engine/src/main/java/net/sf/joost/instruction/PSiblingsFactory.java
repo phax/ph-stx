@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -39,7 +40,7 @@ import net.sf.joost.stx.SAXEvent;
 /**
  * Factory for <code>process-siblings</code> elements, which are represented by
  * the inner Instance class.
- * 
+ *
  * @version $Revision: 2.5 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
@@ -118,21 +119,19 @@ public class PSiblingsFactory extends FactoryBase
       if (event.type == SAXEvent.ATTRIBUTE || event.type == SAXEvent.ROOT)
       {
         // These nodes don't have siblings, keep processing.
-        return PR_CONTINUE;
+        return CSTX.PR_CONTINUE;
       }
-      else
-      {
-        // store this instruction (the Processor object will store it)
-        context.psiblings = this;
-        return PR_SIBLINGS;
-      }
+
+      // store this instruction (the Processor object will store it)
+      context.psiblings = this;
+      return CSTX.PR_SIBLINGS;
     }
 
     /**
      * Tests if the current node matches the <code>while</code> and
      * <code>until</code> conditions of this <code>stx:process-siblings</code>
      * instruction.
-     * 
+     *
      * @return <code>true</code> if the current node matches the pattern in the
      *         <code>while</code> attribute and doesn't match the pattern in the
      *         <code>until</code> attribute; and <code>false</code> otherwise

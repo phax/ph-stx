@@ -37,9 +37,9 @@ import org.slf4j.Logger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import net.sf.joost.emitter.AbstractStreamEmitter;
 import net.sf.joost.emitter.FOPEmitter;
-import net.sf.joost.emitter.StreamEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.stx.ParseContext;
 import net.sf.joost.stx.Processor;
 
@@ -49,7 +49,7 @@ import net.sf.joost.stx.Processor;
  * @version $Revision: 1.31 $ $Date: 2008/10/06 13:31:41 $
  * @author Oliver Becker
  */
-public class Main implements Constants
+public class Main
 {
   // the logger object if available
   private static Logger log = OptionalLog.getLog (Main.class);
@@ -104,7 +104,7 @@ public class Main implements Constants
     int index;
 
     // serializer SAX -> XML text
-    StreamEmitter emitter = null;
+    AbstractStreamEmitter emitter = null;
 
     // filenames for the usage and version info
     final String USAGE = "usage.txt", VERSION = "version.txt";
@@ -280,10 +280,10 @@ public class Main implements Constants
       if (meClassname != null && !wrongParameter)
       {
         // create object
-        StxEmitter messageEmitter = null;
+        IStxEmitter messageEmitter = null;
         try
         {
-          messageEmitter = (StxEmitter) Class.forName (meClassname).newInstance ();
+          messageEmitter = (IStxEmitter) Class.forName (meClassname).newInstance ();
         }
         catch (final ClassNotFoundException ex)
         {
@@ -302,7 +302,7 @@ public class Main implements Constants
         }
         catch (final ClassCastException ex)
         {
-          System.err.println ("Wrong message emitter: " + meClassname + " doesn't implement the " + StxEmitter.class);
+          System.err.println ("Wrong message emitter: " + meClassname + " doesn't implement the " + IStxEmitter.class);
           wrongParameter = true;
         }
         if (messageEmitter != null)
@@ -357,11 +357,11 @@ public class Main implements Constants
         // Create XML output
         if (outFile != null)
         {
-          emitter = StreamEmitter.newEmitter (outFile, processor.outputProperties);
+          emitter = AbstractStreamEmitter.newEmitter (outFile, processor.outputProperties);
           emitter.setSystemId (new File (outFile).toURI ().toString ());
         }
         else
-          emitter = StreamEmitter.newEmitter (System.out, processor.outputProperties);
+          emitter = AbstractStreamEmitter.newEmitter (System.out, processor.outputProperties);
         processor.setContentHandler (emitter);
         processor.setLexicalHandler (emitter);
         // the previous line is a short-cut for
@@ -449,9 +449,9 @@ public class Main implements Constants
               systemId = systemId.substring (7);
             else
               if (systemId.startsWith ("file:"))
-                                                // bug in JDK 1.4 / Crimson?
-                                                // (see rfc1738)
-                                                systemId = systemId.substring (5);
+                // bug in JDK 1.4 / Crimson?
+                // (see rfc1738)
+                systemId = systemId.substring (5);
             System.err.println (systemId +
                                 ":" +
                                 sl.getLineNumber () +
@@ -497,7 +497,7 @@ public class Main implements Constants
         if (line.startsWith ("@@@ "))
         { // special control line
           if (line.equals ("@@@ START DEBUG ONLY"))
-            doOutput = DEBUG;
+            doOutput = CSTX.DEBUG;
           else
             if (line.equals ("@@@ END DEBUG ONLY"))
               doOutput = true;

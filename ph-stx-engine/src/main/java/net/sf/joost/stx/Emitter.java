@@ -39,9 +39,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.emitter.BufferEmitter;
-import net.sf.joost.emitter.StxEmitter;
+import net.sf.joost.emitter.IStxEmitter;
 import net.sf.joost.instruction.AbstractInstruction;
 import net.sf.joost.instruction.NodeBase;
 import net.sf.joost.stx.helpers.MutableAttributes;
@@ -56,7 +56,7 @@ import net.sf.joost.stx.helpers.MutableAttributesImpl;
  * @author Oliver Becker
  */
 
-public class Emitter implements Constants
+public class Emitter
 {
   public ContentHandler contH;
   private LexicalHandler lexH;
@@ -94,8 +94,8 @@ public class Emitter implements Constants
     this.errorHandler = errorHandler;
   }
 
-  /** Called from {@link #pushEmitter(StxEmitter)} */
-  protected Emitter (final Emitter prev, final StxEmitter handler)
+  /** Called from {@link #pushEmitter(IStxEmitter)} */
+  protected Emitter (final Emitter prev, final IStxEmitter handler)
   {
     this (prev.errorHandler);
 
@@ -112,13 +112,13 @@ public class Emitter implements Constants
    *        the STX handler for the new emitter
    * @return a new emitter object
    */
-  public Emitter pushEmitter (final StxEmitter handler)
+  public Emitter pushEmitter (final IStxEmitter handler)
   {
-    if (handler.getSystemId () == null && contH instanceof StxEmitter)
+    if (handler.getSystemId () == null && contH instanceof IStxEmitter)
     {
       // if the new handler doesn't have its own system identifier set
       // then use the system identifier of the parent
-      handler.setSystemId (((StxEmitter) contH).getSystemId ());
+      handler.setSystemId (((IStxEmitter) contH).getSystemId ());
     }
     return new Emitter (this, handler);
   }
@@ -599,7 +599,7 @@ public class Emitter implements Constants
   /**
    * @return true if this emitter is in use or on the stack
    */
-  public boolean isEmitterActive (final StxEmitter emitter)
+  public boolean isEmitterActive (final IStxEmitter emitter)
   {
     if (contH == emitter)
       return true;
@@ -641,9 +641,9 @@ public class Emitter implements Constants
 
     File hrefFile = null; // the file object representing href
 
-    if (contH instanceof StxEmitter)
+    if (contH instanceof IStxEmitter)
     { // we may extract a base URI
-      final String base = ((StxEmitter) contH).getSystemId ();
+      final String base = ((IStxEmitter) contH).getSystemId ();
       if (base != null)
         hrefFile = new File (new URI (base).resolve (href));
     }
@@ -670,9 +670,9 @@ public class Emitter implements Constants
     }
     catch (final java.io.UnsupportedEncodingException e)
     {
-      final String msg = "Unsupported encoding '" + encoding + "', using " + DEFAULT_ENCODING;
+      final String msg = "Unsupported encoding '" + encoding + "', using " + CSTX.DEFAULT_ENCODING;
       errorHandler.warning (msg, publicId, systemId, lineNo, colNo, e);
-      osw = new OutputStreamWriter (fos, encoding = DEFAULT_ENCODING);
+      osw = new OutputStreamWriter (fos, encoding = CSTX.DEFAULT_ENCODING);
     }
     return osw;
   }

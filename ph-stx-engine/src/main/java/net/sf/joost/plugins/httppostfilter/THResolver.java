@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.OptionalLog;
 import net.sf.joost.TransformerHandlerResolver;
 
@@ -102,7 +102,7 @@ public final class THResolver implements TransformerHandlerResolver
                                       final XMLReader reader,
                                       final Hashtable params) throws SAXException
   {
-    if (Constants.DEBUG)
+    if (CSTX.DEBUG)
       log.debug ("hppt-post-filter : resolve '" + method + "'");
 
     if (!available (method))

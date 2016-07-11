@@ -26,7 +26,7 @@ import java.util.Hashtable;
 
 /**
  * This class encapsulates base Attribute interface created on Mar 9, 2005
- * 
+ *
  * @author fiykov
  * @version $Revision: 1.1 $
  * @since
@@ -45,11 +45,14 @@ public abstract class Attribute
 
   /**
    * Default constructor
-   * 
+   *
    * @param name
    * @param validValues
    */
-  public Attribute (final String name, final String [] validValues, final String defVal, final Hashtable col)
+  public Attribute (final String name,
+                    final String [] validValues,
+                    final String defVal,
+                    final Hashtable <String, Attribute> col)
   {
     this.name = name;
     this.validValues = validValues;
@@ -59,7 +62,7 @@ public abstract class Attribute
 
   /**
    * Set value interface
-   * 
+   *
    * @param value
    */
   public void setValue (final String value) throws IllegalArgumentException
@@ -83,7 +86,7 @@ public abstract class Attribute
 
   /**
    * Sub-classes implement this one
-   * 
+   *
    * @param value
    * @return
    */
@@ -91,7 +94,7 @@ public abstract class Attribute
 
   /**
    * Get the value as string
-   * 
+   *
    * @return
    */
   public String getValueStr ()
@@ -101,7 +104,7 @@ public abstract class Attribute
 
   /**
    * Get the value as string
-   * 
+   *
    * @return
    */
   public Object getValue ()
@@ -117,8 +120,7 @@ public abstract class Attribute
   {
     if (obj instanceof Attribute)
       return name.equals (((Attribute) obj).name);
-    else
-      return super.equals (obj);
+    return super.equals (obj);
   }
 
   /**

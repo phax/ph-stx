@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -53,7 +54,7 @@ final public class WhenFactory extends FactoryBase
   //
   public WhenFactory ()
   {
-    attrNames = new HashSet <> ();
+    attrNames = new HashSet<> ();
     attrNames.add ("test");
   }
 
@@ -121,7 +122,7 @@ final public class WhenFactory extends FactoryBase
       }
       else
         next = falseNext;
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     @Override

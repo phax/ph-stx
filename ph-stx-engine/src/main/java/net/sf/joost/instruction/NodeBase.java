@@ -31,7 +31,7 @@ import java.util.Vector;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sf.joost.Constants;
+import net.sf.joost.CSTX;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
 
@@ -42,7 +42,7 @@ import net.sf.joost.stx.ParseContext;
  * @version $Revision: 2.15 $ $Date: 2008/10/04 17:13:14 $
  * @author Oliver Becker
  */
-public abstract class NodeBase extends AbstractInstruction implements Constants
+public abstract class NodeBase extends AbstractInstruction
 {
   //
   // Inner classes
@@ -227,7 +227,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
 
     // create vector for variable names if necessary
     if (node instanceof VariableBase && scopedVariables == null)
-      scopedVariables = new Vector <> ();
+      scopedVariables = new Vector<> ();
   }
 
   /**
@@ -307,7 +307,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
   /**
    * Save local variables if needed.
    *
-   * @return {@link Constants#PR_CONTINUE}
+   * @return {@link CSTX#PR_CONTINUE}
    * @exception SAXException
    *            if an error occurs (in a derived class)
    */
@@ -320,7 +320,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
       localFieldStack.push (scopedVariables.clone ());
       scopedVariables.clear ();
     }
-    return PR_CONTINUE;
+    return CSTX.PR_CONTINUE;
   }
 
   /**
@@ -329,7 +329,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
    *
    * @param context
    *        the current context
-   * @return {@link Constants#PR_CONTINUE}
+   * @return {@link CSTX#PR_CONTINUE}
    * @exception SAXException
    *            if an error occurs (in a derived class)
    */
@@ -343,7 +343,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
         context.localVars.remove (obj);
       scopedVariables = (Vector <String>) localFieldStack.pop ();
     }
-    return PR_CONTINUE;
+    return CSTX.PR_CONTINUE;
   }
 
   /**
@@ -375,7 +375,7 @@ public abstract class NodeBase extends AbstractInstruction implements Constants
     if (parent != null)
       theCopy.parent = (NodeBase) parent.deepCopy (copies);
     if (scopedVariables != null)
-      theCopy.scopedVariables = new Vector <> ();
+      theCopy.scopedVariables = new Vector<> ();
   }
 
   // for debugging

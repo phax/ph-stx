@@ -33,6 +33,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sf.joost.CSTX;
 import net.sf.joost.grammar.Tree;
 import net.sf.joost.stx.Context;
 import net.sf.joost.stx.ParseContext;
@@ -92,7 +93,7 @@ final public class ForEachFactory extends FactoryBase
      * this for-each-item was interrupted via
      * <code>stx:process-<em>xxx</em></code>
      */
-    private Stack resultStack = new Stack ();
+    private Stack <Value> resultStack = new Stack<> ();
 
     private AbstractInstruction contents, successor;
 
@@ -147,7 +148,7 @@ final public class ForEachFactory extends FactoryBase
       Value selectResult;
       if (continued)
       {
-        selectResult = (Value) resultStack.pop ();
+        selectResult = resultStack.pop ();
         continued = false;
       }
       else
@@ -162,7 +163,7 @@ final public class ForEachFactory extends FactoryBase
                                            systemId,
                                            lineNo,
                                            colNo);
-          return PR_ERROR;// if the errorHandler returns
+          return CSTX.PR_ERROR;// if the errorHandler returns
         }
 
         selectResult = select.evaluate (context, this);
@@ -172,7 +173,7 @@ final public class ForEachFactory extends FactoryBase
       {
         // for-each-item finished (empty sequence left)
         next = successor;
-        return PR_CONTINUE;
+        return CSTX.PR_CONTINUE;
       }
 
       super.process (context); // enter new scope for local variables
@@ -183,7 +184,7 @@ final public class ForEachFactory extends FactoryBase
       declareVariable (expName);
 
       next = contents;
-      return PR_CONTINUE;
+      return CSTX.PR_CONTINUE;
     }
 
     /**
