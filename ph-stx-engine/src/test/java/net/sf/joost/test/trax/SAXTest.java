@@ -30,8 +30,8 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -43,18 +43,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  */
 public class SAXTest extends XMLFilterImpl
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "RunTests".
-  static Logger log = Logger.getLogger (SAXTest.class);
-
-  private static String log4jprop = "conf/log4j.properties";
-
-  static
-  {
-    // calling once
-    PropertyConfigurator.configure (log4jprop);
-  }
+  private static final Logger log = LoggerFactory.getLogger (SAXTest.class);
 
   public static void main (final String [] args)
   {

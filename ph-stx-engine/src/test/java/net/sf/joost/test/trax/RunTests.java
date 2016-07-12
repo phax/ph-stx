@@ -26,8 +26,8 @@ package net.sf.joost.test.trax;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to run the tests
@@ -39,9 +39,7 @@ public class RunTests
 
   // Define a static logger variable so that it references the
   // Logger instance named "RunTests".
-  static Logger log = Logger.getLogger (RunTests.class);
-
-  private static String log4jprop = "joost/conf/log4j.properties";
+  private static final Logger log = LoggerFactory.getLogger (RunTests.class);
 
   // xml-source
   private static String xmlId = null;
@@ -51,12 +49,6 @@ public class RunTests
 
   // resultfilename
   private static String outId = null;
-
-  static
-  {
-    // calling once
-    PropertyConfigurator.configure (log4jprop);
-  }
 
   // mounting point
   public static void main (final String [] args)

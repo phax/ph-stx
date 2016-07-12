@@ -42,8 +42,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -58,9 +59,7 @@ import net.sf.joost.stx.Processor;
  */
 public class ProfilerTestCases
 {
-
-  // Logger instance named "ProfilerTestCases".
-  static Logger log = Logger.getLogger (ProfilerTestCases.class);
+  private static final Logger log = LoggerFactory.getLogger (ProfilerTestCases.class);
 
   // *****************************************************************************
   // some Tests

@@ -65,7 +65,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -84,10 +85,7 @@ import net.sf.joost.trax.CTrAX;
  */
 public class TestCases
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "TemplatesImpl".
-  static Logger log = Logger.getLogger (TestCases.class);
+  private static final Logger log = LoggerFactory.getLogger (TestCases.class);
 
   // DEFAULTSETTINGS
   private final static String DEFXML = "data/flat.xml";

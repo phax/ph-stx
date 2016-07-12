@@ -24,7 +24,8 @@
 
 package net.sf.joost.test.trax;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -40,7 +41,7 @@ public class ExampleContentHandler implements ContentHandler
 
   // Define a static logger variable so that it references the
   // Logger instance named "RunTests".
-  static Logger log = Logger.getLogger (ExampleContentHandler.class);
+  private static final Logger log = LoggerFactory.getLogger (ExampleContentHandler.class);
 
   public void setDocumentLocator (final Locator locator)
   {
