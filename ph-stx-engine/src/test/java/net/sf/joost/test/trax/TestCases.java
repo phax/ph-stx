@@ -24,15 +24,17 @@
 
 package net.sf.joost.test.trax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -61,8 +63,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-import org.apache.xml.serialize.DOMSerializerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -71,7 +73,9 @@ import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import junit.framework.Assert;
+import com.helger.commons.io.stream.StreamHelper;
+import com.helger.xml.serialize.write.XMLWriter;
+
 import net.sf.joost.IOutputURIResolver;
 import net.sf.joost.trax.CTrAX;
 
@@ -80,42 +84,34 @@ import net.sf.joost.trax.CTrAX;
  */
 public class TestCases
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "TemplatesImpl".
-  static Logger log = Logger.getLogger (TestCases.class);
+  private static final Logger log = LoggerFactory.getLogger (TestCases.class);
 
   // DEFAULTSETTINGS
   private final static String DEFXML = "data/flat.xml";
-
   private final static String DEFXML2 = "data/flat2.xml";
-
   private final static String DEFSTX1 = "data/flat.stx";
-
   private final static String DEFSTX2 = "data/indent.stx";
-
   private final static String DEFSTX3 = "data/copy.stx";
-
   private final static String DEFDEST = "result/result.xml";
 
-  private static InputStream getStream (final String id)
+  private static InputStream _getStream (final String id)
   {
     return TestCases.class.getResourceAsStream (id);
   }
 
-  private static Source getSource (final String id)
+  private static Source _getSource (final String id)
   {
-    return new StreamSource (getStream (id));
+    return new StreamSource (_getStream (id));
   }
 
-  private static String getSystemId (final String id)
+  private static String _getSystemId (final String id)
   {
     return TestCases.class.getResource (id).toExternalForm ();
   }
 
-  private static InputSource getInputSource (final String id)
+  private static InputSource _getInputSource (final String id)
   {
-    return new InputSource (getStream (id));
+    return new InputSource (_getStream (id));
   }
 
   /**
@@ -123,24 +119,16 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests0 (String xmlsrc)
+  public static boolean runTests0 (final String xmlsrc)
   {
-
-    if (xmlsrc == null)
-    {
-      xmlsrc = DEFXML;
-    }
-
     log.debug ("\n\n==== exampleIdentity ====");
     try
     {
-
-      return exampleIdentity (xmlsrc);
-
+      return exampleIdentity (xmlsrc == null ? DEFXML : xmlsrc);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -150,25 +138,16 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests1 (String xmlsrc, String stx)
+  public static boolean runTests1 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleSimple ====");
     try
     {
-
-      return exampleSimple1 (xmlsrc, stx);
-
+      return exampleSimple1 (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       // ex.printStackTrace();
       return false;
     }
@@ -180,28 +159,18 @@ public class TestCases
    * @param stx
    * @param dest
    */
-  public static void runTests2 (String xmlsrc, String stx, String dest)
+  public static void runTests2 (final String xmlsrc, final String stx, final String dest)
   {
-
-    if ((xmlsrc == null) || (stx == null) || (dest == null))
-    {
-
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-      dest = DEFDEST;
-    }
-
-    log.debug ("\n\n==== exampleSimple2 (see " + dest + " ) ====");
+    final String sDest = dest != null ? dest : DEFDEST;
+    log.debug ("\n\n==== exampleSimple2 (see " + sDest + " ) ====");
 
     try
     {
-
-      exampleSimple2 (xmlsrc, stx, dest);
-
+      exampleSimple2 (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx, sDest);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
     }
   }
 
@@ -210,27 +179,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests3 (String xmlsrc, String stx)
+  public static boolean runTests3 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleFromStream ====");
 
     try
     {
-
-      return (exampleFromStream (xmlsrc, stx));
-
+      return exampleFromStream (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -240,27 +199,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests4 (String xmlsrc, String stx)
+  public static boolean runTests4 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleFromReader ====");
 
     try
     {
-
-      return (exampleFromReader (xmlsrc, stx));
-
+      return exampleFromReader (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -271,27 +220,19 @@ public class TestCases
    * @param xmlsrc2
    * @param stx
    */
-  public static boolean runTests5 (String xmlsrc1, String xmlsrc2, String stx)
+  public static boolean runTests5 (final String xmlsrc1, final String xmlsrc2, final String stx)
   {
-
-    if ((xmlsrc1 == null) || (xmlsrc2 == null) || (stx == null))
-    {
-      xmlsrc1 = DEFXML;
-      xmlsrc2 = DEFXML2;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleUseTemplatesObj ====");
 
     try
     {
-
-      return (exampleUseTemplatesObj (xmlsrc1, xmlsrc2, stx));
-
+      return exampleUseTemplatesObj (xmlsrc1 != null ? xmlsrc1 : DEFXML,
+                                     xmlsrc2 != null ? xmlsrc2 : DEFXML2,
+                                     stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -301,26 +242,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests6 (String xmlsrc, String stx)
+  public static boolean runTests6 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleContentHandlerToContentHandler ====");
 
     try
     {
-
-      return (exampleContentHandlerToContentHandler (xmlsrc, stx));
-
+      return exampleContentHandlerToContentHandler (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -330,24 +262,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests7 (String xmlsrc, String stx)
+  public static boolean runTests7 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleXMLReader ====");
 
     try
     {
-      return (exampleXMLReader (xmlsrc, stx));
+      return exampleXMLReader (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -357,24 +282,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests8 (String xmlsrc, String stx)
+  public static boolean runTests8 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleXMLFilter ====");
 
     try
     {
-      return (exampleXMLFilter (xmlsrc, stx));
+      return exampleXMLFilter (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -385,25 +303,19 @@ public class TestCases
    * @param stx1
    * @param stx2
    */
-  public static boolean runTests9 (String xmlsrc, String stx1, String stx2)
+  public static boolean runTests9 (final String xmlsrc, final String stx1, final String stx2)
   {
-
-    if ((xmlsrc == null) || (stx1 == null) || (stx2 == null))
-    {
-      xmlsrc = DEFXML;
-      stx1 = DEFSTX1;
-      stx2 = DEFSTX2;
-    }
-
     log.debug ("\n\n==== exampleXMLFilterChain ====");
 
     try
     {
-      return (exampleXMLFilterChain (xmlsrc, stx1, stx2));
+      return exampleXMLFilterChain (xmlsrc == null ? DEFXML : xmlsrc,
+                                    stx1 == null ? DEFSTX1 : stx1,
+                                    stx2 == null ? DEFSTX2 : stx2);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -413,26 +325,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests10 (String xmlsrc, String stx)
+  public static boolean runTests10 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleDOM2DOM ====");
 
     try
     {
-
       // print DOMResult
-      final Node nodeResult = exampleDOM2DOM (xmlsrc, stx);
+      final Node nodeResult = exampleDOM2DOM (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
 
       if (nodeResult != null)
       {
-
         final String result = serializeDOM2String (nodeResult);
 
         log.info ("*** print out DOM-document - DOMResult ***");
@@ -441,7 +344,7 @@ public class TestCases
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
     return true;
@@ -452,24 +355,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests11 (String xmlsrc, String stx)
+  public static boolean runTests11 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleParam ====");
 
     try
     {
-      return (exampleParam (xmlsrc, stx));
+      return exampleParam (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -479,24 +375,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests12 (String xmlsrc, String stx)
+  public static boolean runTests12 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleTransformerReuse ====");
 
     try
     {
-      return (exampleTransformerReuse (xmlsrc, stx));
+      return exampleTransformerReuse (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -506,24 +395,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests13 (String xmlsrc, String stx)
+  public static boolean runTests13 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleOutputProperties ====");
 
     try
     {
-      return (exampleOutputProperties (xmlsrc, stx));
+      return exampleOutputProperties (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -532,22 +414,17 @@ public class TestCases
    * @todo : description
    * @param xmlsrc
    */
-  public static boolean runTests14 (String xmlsrc)
+  public static boolean runTests14 (final String xmlsrc)
   {
-    if (xmlsrc == null)
-    {
-      xmlsrc = DEFXML;
-    }
-
     log.debug ("\n\n==== exampleUseAssociated ====");
 
     try
     {
-      return (exampleUseAssociated (xmlsrc));
+      return exampleUseAssociated (xmlsrc == null ? DEFXML : xmlsrc);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -557,24 +434,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests15 (String xmlsrc, String stx)
+  public static boolean runTests15 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleContentHandler2DOM ====");
 
     try
     {
-      return (exampleContentHandler2DOM (xmlsrc, stx));
+      return exampleContentHandler2DOM (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -584,24 +454,17 @@ public class TestCases
    * @param xmlsrc
    * @param stx
    */
-  public static boolean runTests16 (String xmlsrc, String stx)
+  public static boolean runTests16 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleAsSerializer ====");
 
     try
     {
-      return (exampleAsSerializer (xmlsrc, stx));
+      return exampleAsSerializer (xmlsrc == null ? DEFXML : xmlsrc);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -614,26 +477,20 @@ public class TestCases
    * @param stx3
    * @return
    */
-  public static boolean runTests18 (String xmlsrc, String stx1, String stx2, String stx3)
+  public static boolean runTests18 (final String xmlsrc, final String stx1, final String stx2, final String stx3)
   {
-
-    if ((xmlsrc == null) || (stx1 == null) || (stx2 == null) || (stx3 == null))
-    {
-      xmlsrc = DEFXML;
-      stx1 = DEFSTX1;
-      stx2 = DEFSTX2;
-      stx3 = DEFSTX3;
-    }
-
     log.debug ("\n\n==== exampleXMLFilterBigChain ====");
 
     try
     {
-      return (exampleXMLFilterBigChain (xmlsrc, stx1, stx2, stx3));
+      return (exampleXMLFilterBigChain (xmlsrc == null ? DEFXML : xmlsrc,
+                                        stx1 == null ? DEFSTX1 : stx1,
+                                        stx2 == null ? DEFSTX2 : stx2,
+                                        stx3 == null ? DEFSTX3 : stx3));
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -645,24 +502,17 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static String runTests19 (String xmlsrc, String stx)
+  public static String runTests19 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleStreamSourceToDomResult ====");
 
     try
     {
-      return exampleStreamSourceToDomResult (xmlsrc, stx);
+      return exampleStreamSourceToDomResult (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return null;
     }
   }
@@ -674,24 +524,17 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests20 (String xmlsrc, String stx)
+  public static boolean runTests20 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleDomSourceStylesheetToStreamResult ====");
 
     try
     {
-      return exampleDomSourceStylesheetToStreamResult (xmlsrc, stx);
+      return exampleDomSourceStylesheetToStreamResult (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -703,24 +546,17 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests21 (String xmlsrc, String stx)
+  public static boolean runTests21 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleDomSourceForBoth ====");
 
     try
     {
-      return exampleDomSourceForBoth (xmlsrc, stx);
+      return exampleDomSourceForBoth (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -732,24 +568,17 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests22 (String xmlsrc, String stx)
+  public static boolean runTests22 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleDOMSourceAndDomResult ====");
 
     try
     {
-      return exampleDOMSourceAndDomResult (xmlsrc, stx);
+      return exampleDOMSourceAndDomResult (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -761,24 +590,17 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests23 (String xmlsrc, String stx)
+  public static boolean runTests23 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleSaxSourceForBoth ====");
 
     try
     {
-      return exampleSaxSourceForBoth (xmlsrc, stx);
+      return exampleSaxSourceForBoth (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -790,24 +612,17 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests24 (String xmlsrc, String stx)
+  public static boolean runTests24 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     log.debug ("\n\n==== exampleSaxSourceAndSaxResult ====");
 
     try
     {
-      return exampleSaxSourceAndSaxResult (xmlsrc, stx);
+      return exampleSaxSourceAndSaxResult (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -820,15 +635,8 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests25 (String xmlsrc, String stx)
+  public static boolean runTests25 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     // set env-values
     // setting new
     final String key = "org.xml.sax.driver";
@@ -845,11 +653,11 @@ public class TestCases
 
     try
     {
-      return exampleSaxResultWithContentHandler (xmlsrc, stx);
+      return exampleSaxResultWithContentHandler (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -861,15 +669,8 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests26 (String xmlsrc, String stx)
+  public static boolean runTests26 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     // set env-values
     // setting new
     final String key = "org.xml.sax.driver";
@@ -886,11 +687,11 @@ public class TestCases
 
     try
     {
-      return exampleTemplatesHandler (xmlsrc, stx);
+      return exampleTemplatesHandler (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
@@ -902,15 +703,8 @@ public class TestCases
    * @param stx
    * @return
    */
-  public static boolean runTests27 (String xmlsrc, String stx)
+  public static boolean runTests27 (final String xmlsrc, final String stx)
   {
-
-    if ((xmlsrc == null) || (stx == null))
-    {
-      xmlsrc = DEFXML;
-      stx = DEFSTX1;
-    }
-
     // set env-values
     // setting new
     final String key = "org.xml.sax.driver";
@@ -927,43 +721,37 @@ public class TestCases
 
     try
     {
-      return exampleSAXTransformerFactory (xmlsrc, stx);
+      return exampleSAXTransformerFactory (xmlsrc == null ? DEFXML : xmlsrc, stx == null ? DEFSTX1 : stx);
     }
     catch (final Exception ex)
     {
-      handleException (ex);
+      _handleException (ex);
       return false;
     }
   }
 
-  public static boolean runTests28 (String xmlsrc)
+  public static boolean runTests28 (final String xmlsrc)
   {
-    if (xmlsrc == null)
-      xmlsrc = DEFXML;
-
     try
     {
-      return exampleOutputURIResolver (xmlsrc);
+      return exampleOutputURIResolver (xmlsrc == null ? DEFXML : xmlsrc);
     }
     catch (final Exception e)
     {
-      handleException (e);
+      _handleException (e);
       return false;
     }
   }
 
-  public static boolean runTests29 (String xmlsrc)
+  public static boolean runTests29 (final String xmlsrc)
   {
-    if (xmlsrc == null)
-      xmlsrc = DEFXML;
-
     try
     {
-      return exampleDisableOutputEscaping (xmlsrc);
+      return exampleDisableOutputEscaping (xmlsrc == null ? DEFXML : xmlsrc);
     }
     catch (final Exception e)
     {
-      handleException (e);
+      _handleException (e);
       return false;
     }
   }
@@ -988,7 +776,7 @@ public class TestCases
     transformer.setErrorListener (tListener);
 
     // Transform the source XML to System.out.
-    transformer.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     return true;
   }
@@ -1009,11 +797,11 @@ public class TestCases
 
     final ErrorListener tListener = new ErrorListenerImpl ("Transformer");
     // Create a transformer for the stylesheet.
-    final Transformer transformer = tfactory.newTransformer (getSource (stxID));
+    final Transformer transformer = tfactory.newTransformer (_getSource (stxID));
     transformer.setErrorListener (tListener);
 
     // Transform the source XML to System.out.
-    transformer.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     return true;
   }
@@ -1031,7 +819,7 @@ public class TestCases
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     // Create a transformer for the stylesheet.
-    final Transformer transformer = tfactory.newTransformer (getSource (stxID));
+    final Transformer transformer = tfactory.newTransformer (_getSource (stxID));
 
     // Transform the source XML to flat.out.
     transformer.transform (new StreamSource (new File (sourceID)), new StreamResult (new File (dest)));
@@ -1043,15 +831,14 @@ public class TestCases
    */
 
   public static boolean exampleFromStream (final String sourceID, final String stxID) throws TransformerException,
-                                                                                      TransformerConfigurationException,
-                                                                                      FileNotFoundException
+                                                                                      TransformerConfigurationException
   {
 
     // Create a transform factory instance.
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-    final InputStream stxIS = new BufferedInputStream (getStream (stxID));
+    final InputStream stxIS = new BufferedInputStream (_getStream (stxID));
 
     final StreamSource stxSource = new StreamSource (stxIS);
 
@@ -1062,7 +849,7 @@ public class TestCases
     // Create a transformer for the stylesheet.
     final Transformer transformer = tfactory.newTransformer (stxSource);
 
-    final InputStream xmlIS = new BufferedInputStream (getStream (sourceID));
+    final InputStream xmlIS = new BufferedInputStream (_getStream (sourceID));
 
     final StreamSource xmlSource = new StreamSource (xmlIS);
 
@@ -1081,15 +868,14 @@ public class TestCases
    * use case is discouraged, since the XML encoding can not be processed.
    */
   public static boolean exampleFromReader (final String sourceID, final String stxID) throws TransformerException,
-                                                                                      TransformerConfigurationException,
-                                                                                      FileNotFoundException
+                                                                                      TransformerConfigurationException
   {
 
     // Create a transform factory instance.
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     // Note that in this case the XML encoding can not be processed!
-    final Reader stxReader = new BufferedReader (new InputStreamReader (getStream (stxID)));
+    final Reader stxReader = new BufferedReader (new InputStreamReader (_getStream (stxID)));
 
     final StreamSource stxSource = new StreamSource (stxReader);
 
@@ -1101,7 +887,7 @@ public class TestCases
     final Transformer transformer = tfactory.newTransformer (stxSource);
 
     // Note that in this case the XML encoding can not be processed!
-    final Reader xmlReader = new BufferedReader (new InputStreamReader (getStream (sourceID)));
+    final Reader xmlReader = new BufferedReader (new InputStreamReader (_getStream (sourceID)));
 
     final StreamSource xmlSource = new StreamSource (xmlReader);
 
@@ -1128,7 +914,7 @@ public class TestCases
 
     // Create a templates object, which is the processed,
     // thread-safe representation of the stylesheet.
-    final Templates templates = tfactory.newTemplates (getSource (stxID));
+    final Templates templates = tfactory.newTemplates (_getSource (stxID));
 
     // Illustrate the fact that you can make multiple transformers
     // from the same template.
@@ -1138,11 +924,11 @@ public class TestCases
 
     log.debug ("\n\n----- transform of " + sourceID1 + " -----");
 
-    transformer1.transform (getSource (sourceID1), new StreamResult (System.out));
+    transformer1.transform (_getSource (sourceID1), new StreamResult (System.out));
 
     log.debug ("\n\n----- transform of " + sourceID2 + " -----");
 
-    transformer2.transform (getSource (sourceID2), new StreamResult (System.out));
+    transformer2.transform (_getSource (sourceID2), new StreamResult (System.out));
 
     return true;
   }
@@ -1168,10 +954,10 @@ public class TestCases
 
       // A TransformerHandler is a ContentHandler that will listen for
       // SAX events, and transform them to the result.
-      final TransformerHandler handler = stfactory.newTransformerHandler (getSource (stxID));
+      final TransformerHandler handler = stfactory.newTransformerHandler (_getSource (stxID));
 
       // Set the result handling to be a serialization to System.out.
-      final Result result = new SAXResult (new ExampleContentHandler ());
+      final Result result = new SAXResult (new ContentHandlerTest ());
 
       handler.setResult (result);
 
@@ -1190,7 +976,7 @@ public class TestCases
 
         final javax.xml.parsers.SAXParser jaxpParser =
 
-                                                     factory.newSAXParser ();
+            factory.newSAXParser ();
 
         reader = jaxpParser.getXMLReader ();
 
@@ -1217,7 +1003,7 @@ public class TestCases
 
       // Parse the source XML, and send the parse events to the
       // TransformerHandler.
-      reader.parse (getInputSource (sourceID));
+      reader.parse (_getInputSource (sourceID));
     }
     else
     {
@@ -1246,11 +1032,11 @@ public class TestCases
     if (tfactory.getFeature (SAXSource.FEATURE))
     {
 
-      final XMLReader reader = ((SAXTransformerFactory) tfactory).newXMLFilter (getSource (stxID));
+      final XMLReader reader = ((SAXTransformerFactory) tfactory).newXMLFilter (_getSource (stxID));
 
-      reader.setContentHandler (new ExampleContentHandler ());
+      reader.setContentHandler (new ContentHandlerTest ());
 
-      reader.parse (getInputSource (sourceID));
+      reader.parse (_getInputSource (sourceID));
     }
     else
     {
@@ -1306,7 +1092,7 @@ public class TestCases
       reader = XMLReaderFactory.createXMLReader ();
 
     // The transformer will use a SAX parser as it's reader.
-    reader.setContentHandler (new ExampleContentHandler ());
+    reader.setContentHandler (new ContentHandlerTest ());
     try
     {
       reader.setFeature ("http://xml.org/sax/features/namespace-prefixes", true);
@@ -1317,14 +1103,14 @@ public class TestCases
       se.printStackTrace ();
     }
 
-    final XMLFilter filter = ((SAXTransformerFactory) tfactory).newXMLFilter (getSource (stxID));
+    final XMLFilter filter = ((SAXTransformerFactory) tfactory).newXMLFilter (_getSource (stxID));
 
     filter.setParent (reader);
 
     // Now, when you call transformer.parse, it will set itself as
     // the content handler for the parser object (it's "parent"), and
     // will then call the parse method on the parser.
-    filter.parse (getInputSource (sourceID));
+    filter.parse (_getInputSource (sourceID));
 
     return true;
   }
@@ -1364,9 +1150,9 @@ public class TestCases
       final XMLReader reader = XMLReaderFactory.createXMLReader ();
 
       // init transformation-filter
-      final XMLFilter filter1 = stf.newXMLFilter (getSource (stxID_1));
+      final XMLFilter filter1 = stf.newXMLFilter (_getSource (stxID_1));
 
-      final XMLFilter filter2 = stf.newXMLFilter (getSource (stxID_2));
+      final XMLFilter filter2 = stf.newXMLFilter (_getSource (stxID_2));
 
       if (null != filter1) // If one success, assume all were success.
       {
@@ -1379,7 +1165,7 @@ public class TestCases
         // transformer2 will use transformer1 as it's reader.
         filter2.setParent (filter1);
 
-        filter2.setContentHandler (new ExampleContentHandler ());
+        filter2.setContentHandler (new ContentHandlerTest ());
 
         // filter2.setContentHandler(new
         // org.xml.sax.helpers.DefaultHandler());
@@ -1397,7 +1183,7 @@ public class TestCases
         // SAX parser, and call parser.parse(new
         // InputSource("xml/flat.xml")).
 
-        filter2.parse (getInputSource (sourceID));
+        filter2.parse (_getInputSource (sourceID));
 
       }
       else
@@ -1467,11 +1253,11 @@ public class TestCases
       if (reader == null)
         reader = XMLReaderFactory.createXMLReader ();
 
-      final XMLFilter filter1 = stf.newXMLFilter (getSource (stxID_1));
+      final XMLFilter filter1 = stf.newXMLFilter (_getSource (stxID_1));
 
-      final XMLFilter filter2 = stf.newXMLFilter (getSource (stxID_2));
+      final XMLFilter filter2 = stf.newXMLFilter (_getSource (stxID_2));
 
-      final XMLFilter filter3 = stf.newXMLFilter (getSource (stxID_3));
+      final XMLFilter filter3 = stf.newXMLFilter (_getSource (stxID_3));
 
       if (null != filter1) // If one success, assume all were success.
       {
@@ -1483,7 +1269,7 @@ public class TestCases
         filter2.setParent (filter1);
 
         filter3.setParent (filter2);
-        filter3.setContentHandler (new ExampleContentHandler ());
+        filter3.setContentHandler (new ContentHandlerTest ());
 
         // filter3.setContentHandler(new
         // org.xml.sax.helpers.DefaultHandler());
@@ -1501,7 +1287,7 @@ public class TestCases
         // SAX parser, and call parser.parse(new
         // InputSource("xml/flat.xml")).
 
-        filter3.parse (getInputSource (sourceID));
+        filter3.parse (_getInputSource (sourceID));
       }
       else
       {
@@ -1547,7 +1333,7 @@ public class TestCases
 
         // i think there is an error, so fix
 
-        final InputSource isource = getInputSource (stxID);
+        final InputSource isource = _getInputSource (stxID);
 
         final Node doc = docBuilder.parse (isource);
 
@@ -1573,22 +1359,18 @@ public class TestCases
 
       final org.w3c.dom.Document outNode = docBuilder.newDocument ();
 
-      final Node doc = docBuilder.parse (getInputSource (sourceID));
+      final Node doc = docBuilder.parse (_getInputSource (sourceID));
 
       // fix errors
       final DOMSource domInSource = new DOMSource (doc);
-      domInSource.setSystemId (getSystemId (sourceID));
+      domInSource.setSystemId (_getSystemId (sourceID));
 
       final DOMResult domresult = new DOMResult (outNode);
       transformer.transform (domInSource, domresult);
 
       return domresult.getNode ();
-
     }
-    else
-    {
-      throw new org.xml.sax.SAXNotSupportedException ("DOM node processing not supported!");
-    }
+    throw new org.xml.sax.SAXNotSupportedException ("DOM node processing not supported!");
   }
 
   /**
@@ -1602,7 +1384,7 @@ public class TestCases
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-    final Templates templates = tfactory.newTemplates (getSource (stxID));
+    final Templates templates = tfactory.newTemplates (_getSource (stxID));
 
     final Transformer transformer1 = templates.newTransformer ();
 
@@ -1610,12 +1392,12 @@ public class TestCases
 
     transformer1.setParameter ("a-param", "hello to you!");
 
-    transformer1.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer1.transform (_getSource (sourceID), new StreamResult (System.out));
 
     log.debug ("\n=========");
 
     // transformer2.setOutputProperty(OutputKeys.INDENT, "yes");
-    transformer2.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer2.transform (_getSource (sourceID), new StreamResult (System.out));
 
     return true;
   }
@@ -1633,12 +1415,12 @@ public class TestCases
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     // Create a transformer for the stylesheet.
-    final Transformer transformer = tfactory.newTransformer (getSource (stxID));
+    final Transformer transformer = tfactory.newTransformer (_getSource (stxID));
 
     transformer.setParameter ("a-param", "hello to you!");
 
     // Transform the source XML to System.out.
-    transformer.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     log.debug ("\n=========\n");
 
@@ -1647,7 +1429,7 @@ public class TestCases
     // transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
     // Transform the source XML to System.out.
-    transformer.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     return true;
   }
@@ -1662,7 +1444,7 @@ public class TestCases
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-    final Templates templates = tfactory.newTemplates (getSource (stxID));
+    final Templates templates = tfactory.newTemplates (_getSource (stxID));
 
     final Properties oprops = templates.getOutputProperties ();
 
@@ -1672,7 +1454,7 @@ public class TestCases
 
     transformer.setOutputProperties (oprops);
 
-    transformer.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     // to be ignored
     transformer.setOutputProperty (OutputKeys.INDENT, "yes");
@@ -1705,14 +1487,14 @@ public class TestCases
 
       final SAXTransformerFactory stf = ((SAXTransformerFactory) tfactory);
 
-      final Source sources = stf.getAssociatedStylesheet (getSource (sourceID), null, null, null);
+      final Source sources = stf.getAssociatedStylesheet (_getSource (sourceID), null, null, null);
 
       if (null != sources)
       {
 
         final Transformer transformer = tfactory.newTransformer (sources);
 
-        transformer.transform (getSource (sourceID), new StreamResult (System.out));
+        transformer.transform (_getSource (sourceID), new StreamResult (System.out));
       }
       else
       {
@@ -1753,7 +1535,7 @@ public class TestCases
 
       // Create a ContentHandler that can liston to SAX events
       // and transform the output to DOM nodes.
-      final TransformerHandler handler = sfactory.newTransformerHandler (getSource (stxID));
+      final TransformerHandler handler = sfactory.newTransformerHandler (_getSource (stxID));
 
       final DOMResult domresult = new DOMResult (outNode);
 
@@ -1796,7 +1578,7 @@ public class TestCases
 
       // Send the SAX events from the parser to the transformer,
       // and thus to the DOM tree.
-      reader.parse (getInputSource (sourceID));
+      reader.parse (_getInputSource (sourceID));
 
       // Serialize the node for diagnosis.
       exampleSerializeNode (domresult);
@@ -1813,11 +1595,7 @@ public class TestCases
    * Serialize a node to System.out.
    */
 
-  public static void exampleSerializeNode (final DOMResult result) throws TransformerException,
-                                                                   TransformerConfigurationException,
-                                                                   SAXException,
-                                                                   IOException,
-                                                                   ParserConfigurationException
+  public static void exampleSerializeNode (final DOMResult result) throws IOException
   {
     if (result != null)
     {
@@ -1831,39 +1609,32 @@ public class TestCases
    * A fuller example showing how the TrAX interface can be used to serialize a
    * DOM tree.
    */
-  public static boolean exampleAsSerializer (final String sourceID,
-                                             final String stxID) throws TransformerException,
+  public static boolean exampleAsSerializer (final String sourceID) throws TransformerException,
                                                                  TransformerConfigurationException,
                                                                  SAXException,
                                                                  IOException,
                                                                  ParserConfigurationException
   {
-
     final DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance ();
-
     final DocumentBuilder docBuilder = dfactory.newDocumentBuilder ();
-
-    final Node doc = docBuilder.parse (getInputSource (sourceID));
-
+    final Node doc = docBuilder.parse (_getInputSource (sourceID));
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     // This creates a transformer that does a simple identity transform,
     // and thus can be used for all intents and purposes as a serializer.
     final Transformer serializer = tfactory.newTransformer ();
 
-    // serializer.transform(new StreamSource(sourceID), new
-    // StreamResult(System.out));
+    if (false)
+      serializer.transform (new StreamSource (sourceID), new StreamResult (System.out));
 
     final Properties oprops = new Properties ();
-
     oprops.put ("method", "html");
-
     oprops.put ("indent-amount", "2");
 
     // serializer.setOutputProperties(oprops);
 
     final DOMSource domInSource = new DOMSource (doc);
-    domInSource.setSystemId (getSystemId (sourceID));
+    domInSource.setSystemId (_getSystemId (sourceID));
 
     serializer.transform (domInSource, new StreamResult (System.out));
 
@@ -1881,7 +1652,7 @@ public class TestCases
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     // Create a transformer for the stylesheet.
-    final Templates templates = tfactory.newTemplates (getSource (stxId));
+    final Templates templates = tfactory.newTemplates (_getSource (stxId));
 
     final DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance ();
 
@@ -1898,7 +1669,7 @@ public class TestCases
 
     final DOMResult myDomResult = new DOMResult (outNode);
 
-    transformer.transform (getSource (xmlId), myDomResult);
+    transformer.transform (_getSource (xmlId), myDomResult);
 
     // print DOMResult
 
@@ -1914,10 +1685,7 @@ public class TestCases
 
       return "";
     }
-    else
-    {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -1939,7 +1707,7 @@ public class TestCases
     final DocumentBuilder docBuilder = dfactory.newDocumentBuilder ();
 
     // test
-    final InputSource is = getInputSource (stxId);
+    final InputSource is = _getInputSource (stxId);
 
     final Node doc = docBuilder.parse (is);
 
@@ -1968,7 +1736,7 @@ public class TestCases
 
     final Transformer transformer = templates.newTransformer ();
     // DOMResult myDomResult = new DOMResult(outNode);
-    transformer.transform (getSource (xmlId), new StreamResult (System.out));
+    transformer.transform (_getSource (xmlId), new StreamResult (System.out));
 
     return true;
   }
@@ -1992,7 +1760,7 @@ public class TestCases
     final DocumentBuilder docBuilder = dfactory.newDocumentBuilder ();
 
     // test
-    final InputSource is = getInputSource (stxId);
+    final InputSource is = _getInputSource (stxId);
 
     final Node doc = docBuilder.parse (is);
 
@@ -2013,7 +1781,7 @@ public class TestCases
 
     final DOMSource domSource = new DOMSource (doc);
 
-    domSource.setSystemId (getSystemId (stxId));
+    domSource.setSystemId (_getSystemId (stxId));
 
     log.debug ("id = " + domSource.getSystemId ());
 
@@ -2025,7 +1793,7 @@ public class TestCases
 
     final DOMSource docInSource = new DOMSource (doc);
 
-    docInSource.setSystemId (getSystemId (xmlId));
+    docInSource.setSystemId (_getSystemId (xmlId));
 
     transformer.transform (docInSource, new StreamResult (System.out));
 
@@ -2051,9 +1819,9 @@ public class TestCases
 
     docBuilder = dfactory.newDocumentBuilder ();
 
-    doc = docBuilder.parse (getInputSource (stxId));
+    doc = docBuilder.parse (_getInputSource (stxId));
     final DOMSource domSource = new DOMSource (doc);
-    domSource.setSystemId (getSystemId (stxId));
+    domSource.setSystemId (_getSystemId (stxId));
 
     log.debug ("id = " + domSource.getSystemId ());
 
@@ -2066,9 +1834,9 @@ public class TestCases
 
     docBuilder = dfactory.newDocumentBuilder ();
 
-    doc = docBuilder.parse (getInputSource (xmlId));
+    doc = docBuilder.parse (_getInputSource (xmlId));
     final DOMSource docInSource = new DOMSource (doc);
-    docInSource.setSystemId (getSystemId (xmlId));
+    docInSource.setSystemId (_getSystemId (xmlId));
 
     // construct a DOMResult
 
@@ -2076,7 +1844,7 @@ public class TestCases
     final DOMResult myDomResult = new DOMResult (newDoc);
 
     transformer.transform (docInSource, myDomResult);
-    Assert.assertEquals (newDoc, myDomResult.getNode ());
+    assertEquals (newDoc, myDomResult.getNode ());
 
     // print DOMResult
     final Node nodeResult = myDomResult.getNode ();
@@ -2104,7 +1872,7 @@ public class TestCases
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-    final InputSource isStx = getInputSource (stxId);
+    final InputSource isStx = _getInputSource (stxId);
 
     final SAXSource saxSourceStx = new SAXSource (isStx);
 
@@ -2115,7 +1883,7 @@ public class TestCases
 
     final Transformer transformer = templates.newTransformer ();
 
-    final InputSource isXmlIn = getInputSource (xmlId);
+    final InputSource isXmlIn = _getInputSource (xmlId);
 
     final SAXSource saxSourceXmlIn = new SAXSource (isXmlIn);
 
@@ -2134,7 +1902,7 @@ public class TestCases
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-    final InputSource isStx = getInputSource (stxId);
+    final InputSource isStx = _getInputSource (stxId);
 
     final SAXSource saxSourceStx = new SAXSource (isStx);
 
@@ -2145,13 +1913,13 @@ public class TestCases
 
     final Transformer transformer = templates.newTransformer ();
 
-    final InputSource isXmlIn = getInputSource (xmlId);
+    final InputSource isXmlIn = _getInputSource (xmlId);
 
     final SAXSource saxSourceXmlIn = new SAXSource (isXmlIn);
 
     // Set the result handling to be a serialization to System.out.
 
-    final SAXResult saxResultXml = new SAXResult (new ExampleContentHandler ());
+    final SAXResult saxResultXml = new SAXResult (new ContentHandlerTest ());
 
     transformer.transform (saxSourceXmlIn, saxResultXml);
 
@@ -2180,11 +1948,11 @@ public class TestCases
       // A TransformerHandler is a ContentHandler that will listen for
       // SAX events, and transform them to the result.
 
-      final TransformerHandler handler = stfactory.newTransformerHandler (getSource (stxId));
+      final TransformerHandler handler = stfactory.newTransformerHandler (_getSource (stxId));
 
       // Set the result handling to be a serialization to System.out.
 
-      final Result result = new SAXResult (new ExampleContentHandler ());
+      final Result result = new SAXResult (new ContentHandlerTest ());
       handler.setResult (result);
 
       // Create a reader, and set it's content handler to be the
@@ -2200,7 +1968,7 @@ public class TestCases
       // Parse the source XML, and send the parse events to the
       // TransformerHandler.
 
-      reader.parse (getInputSource (xmlId));
+      reader.parse (_getInputSource (xmlId));
 
     }
     else
@@ -2263,7 +2031,7 @@ public class TestCases
       reader.setContentHandler (tempHandler);
 
       // Parse the stylesheet
-      reader.parse (getInputSource (stxID));
+      reader.parse (_getInputSource (stxID));
 
       // hole das Template from TemplatesHandler
       final Templates templates = tempHandler.getTemplates ();
@@ -2272,7 +2040,7 @@ public class TestCases
       final TransformerHandler transHandler = stfactory.newTransformerHandler (templates);
 
       // Set the result handling to be a serialization to System.out.
-      final Result result = new SAXResult (new ExampleContentHandler ());
+      final Result result = new SAXResult (new ContentHandlerTest ());
 
       // setting Emitter
       transHandler.setResult (result);
@@ -2285,7 +2053,7 @@ public class TestCases
 
       // Parse the source XML, and send the parse events to the
       // TransformerHandler.
-      reader.parse (getInputSource (sourceID));
+      reader.parse (_getInputSource (sourceID));
 
     }
     else
@@ -2318,18 +2086,18 @@ public class TestCases
       final SAXTransformerFactory stfactory = ((SAXTransformerFactory) tfactory);
 
       final TemplatesHandler handler = stfactory.newTemplatesHandler ();
-      handler.setSystemId (getSystemId (stxID));
+      handler.setSystemId (_getSystemId (stxID));
 
       final XMLReader reader = XMLReaderFactory.createXMLReader ();
       reader.setContentHandler (handler);
 
-      reader.parse (getInputSource (stxID));
+      reader.parse (_getInputSource (stxID));
 
       final Templates templates = handler.getTemplates ();
 
       // transform
       final Transformer transformer = templates.newTransformer ();
-      transformer.transform (getSource (sourceID), new StreamResult (System.out));
+      transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     }
 
@@ -2367,26 +2135,17 @@ public class TestCases
 
       public void close (final Result result) throws TransformerException
       {
-        final OutputStream stream = resultMap.get (result);
-        try
-        {
-          if (stream != null)
-            stream.close ();
-        }
-        catch (final IOException e)
-        {
-          throw new TransformerException (e);
-        }
+        StreamHelper.close (resultMap.get (result));
       }
     };
 
     tfactory.setAttribute (CTrAX.KEY_OUTPUT_URI_RESOLVER, resolver);
 
     // Create a transformer for the stylesheet.
-    final Transformer transformer = tfactory.newTransformer (getSource ("data/result-doc.stx"));
+    final Transformer transformer = tfactory.newTransformer (_getSource ("data/result-doc.stx"));
 
     // Transform the source XML to flat.out.
-    transformer.transform (getSource (sourceID), new StreamResult (System.out));
+    transformer.transform (_getSource (sourceID), new StreamResult (System.out));
 
     final String string = baoStream.toString ("iso-8859-1");
     System.out.println ("Result:");
@@ -2401,26 +2160,26 @@ public class TestCases
     final ByteArrayOutputStream baos = new ByteArrayOutputStream ();
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
-    final Templates templates = tfactory.newTemplates (getSource ("data/doe.stx"));
+    final Templates templates = tfactory.newTemplates (_getSource ("data/doe.stx"));
 
     Transformer transformer = templates.newTransformer ();
     transformer.setOutputProperty (CTrAX.OUTPUT_KEY_SUPPORT_DISABLE_OUTPUT_ESCAPING, "yes");
-    transformer.transform (getSource (sourceId), new StreamResult (baos));
+    transformer.transform (_getSource (sourceId), new StreamResult (baos));
 
     String result = new String (baos.toByteArray (), "UTF-8");
-    Assert.assertTrue (result.contains ("<>"));
-    Assert.assertFalse (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
-    Assert.assertFalse (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
+    assertTrue (result.contains ("<>"));
+    assertFalse (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
+    assertFalse (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
 
     baos.reset ();
 
     transformer = templates.newTransformer ();
-    transformer.transform (getSource (sourceId), new StreamResult (baos));
+    transformer.transform (_getSource (sourceId), new StreamResult (baos));
 
     result = new String (baos.toByteArray (), "UTF-8");
-    Assert.assertFalse (result.contains ("<>"));
-    Assert.assertTrue (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
-    Assert.assertTrue (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
+    assertFalse (result.contains ("<>"));
+    assertTrue (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
+    assertTrue (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
 
     return true; // TODO rewrite these strange test architecture
   }
@@ -2435,10 +2194,7 @@ public class TestCases
    */
   public static String serializeDOM2String (final Node node) throws IOException
   {
-
-    final DOMSerializerImpl serializer = new DOMSerializerImpl ();
-
-    return serializer.writeToString (node);
+    return XMLWriter.getXMLString (node);
   }
 
   /**
@@ -2446,7 +2202,7 @@ public class TestCases
    *
    * @param ex
    */
-  private static void handleException (final Exception ex)
+  private static void _handleException (final Exception ex)
   {
 
     log.error ("EXCEPTION: ");

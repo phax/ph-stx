@@ -42,6 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.junit.Test;
 
 import net.sf.joost.trax.CTrAX;
+import net.sf.joost.trax.TransformerFactoryImpl;
 
 /**
  * @version $Revision: 1.3 $ $Date: 2008/10/06 13:31:42 $
@@ -52,7 +53,7 @@ public class StxTest
   private static TransformerFactory factory;
   static
   {
-    System.setProperty ("javax.xml.transform.TransformerFactory", "net.sf.joost.trax.TransformerFactoryImpl");
+    System.setProperty ("javax.xml.transform.TransformerFactory", TransformerFactoryImpl.class.getName ());
     factory = TransformerFactory.newInstance ();
   }
 

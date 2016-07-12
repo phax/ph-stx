@@ -24,7 +24,13 @@
 
 package net.sf.joost.test.trax;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -35,12 +41,12 @@ import org.xml.sax.SAXException;
  *
  * @author Zubow
  */
-public class ExampleContentHandler implements ContentHandler
+public class ContentHandlerTest implements ContentHandler
 {
 
   // Define a static logger variable so that it references the
   // Logger instance named "RunTests".
-  static Logger log = Logger.getLogger (ExampleContentHandler.class);
+  private static final Logger log = LoggerFactory.getLogger (ContentHandlerTest.class);
 
   public void setDocumentLocator (final Locator locator)
   {
@@ -121,7 +127,8 @@ public class ExampleContentHandler implements ContentHandler
     log.info ("skippedEntity: " + name);
   }
 
-  public static void main (final String [] args) throws Exception
+  @Test
+  public void testBasic () throws SAXException, ParserConfigurationException, IOException
   {
     final org.xml.sax.XMLReader parser = javax.xml.parsers.SAXParserFactory.newInstance ()
                                                                            .newSAXParser ()
@@ -129,8 +136,10 @@ public class ExampleContentHandler implements ContentHandler
 
     log.error ("Parser: " + parser.getClass ());
 
-    parser.setContentHandler (new ExampleContentHandler ());
+    parser.setContentHandler (new ContentHandlerTest ());
 
-    parser.parse (new java.io.File (args[0]).toURL ().toString ());
+    final String sURL = getClass ().getResource ("errorDocument.xml").toExternalForm ();
+    log.info ("Parsing " + sURL);
+    parser.parse (sURL);
   }
 }

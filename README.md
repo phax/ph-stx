@@ -7,11 +7,14 @@ Changes so far:
 * Integrated jflex and java_cup for consistency
 * Upgraded to JUnit 4
 * Changed from commons-logging to SLF4J
+* Changed from log4j to SLF4J
 * Removed commons-discovery in favour of ServiceLoader
 * Removed bsf - will use the Java scripting API instead
 * Started a JavaCC based parser
+* Using generics where applicable
 
 Todos:
 * Remove unnecessary dependencies
 * Changed to a more convenient grammar
 * Modernize
+* Use scripting API

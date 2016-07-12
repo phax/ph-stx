@@ -416,7 +416,7 @@ public class TransformerImpl extends Transformer
     {
       IllegalArgumentException iE;
       // check properties in oformat
-      for (final Enumeration e = oformat.keys (); e.hasMoreElements ();)
+      for (final Enumeration <?> e = oformat.keys (); e.hasMoreElements ();)
       {
         final Object propKey = e.nextElement ();
         if (ignoredProperties.contains (propKey))

@@ -25,7 +25,7 @@
 package net.sf.joost.samples;
 
 import java.io.ByteArrayInputStream;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.transform.Transformer;
@@ -33,6 +33,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import com.helger.xml.transform.StringStreamSource;
 
 /**
  * Self-containing example class that demonstrates the usage of STX for creating
@@ -61,49 +63,49 @@ import javax.xml.transform.stream.StreamSource;
 public class DataStore
 {
   // Member fields
-  private final String given;
-  private final String name;
-  private final String subject;
-  private String headOf;
+  private final String m_sGiven;
+  private final String m_sName;
+  private final String m_sSubject;
+  private String m_sHeadOf;
 
   // Constructors
   DataStore (final String given, final String name, final String subject, final String headOf)
   {
     this (given, name, subject);
-    this.headOf = headOf;
+    this.m_sHeadOf = headOf;
   }
 
   DataStore (final String given, final String name, final String subject)
   {
-    this.given = given;
-    this.name = name;
-    this.subject = subject;
+    this.m_sGiven = given;
+    this.m_sName = name;
+    this.m_sSubject = subject;
   }
 
   // Getter methods
   public String getGiven ()
   {
-    return given;
+    return m_sGiven;
   }
 
   public String getName ()
   {
-    return name;
+    return m_sName;
   }
 
   public String getSubject ()
   {
-    return subject;
+    return m_sSubject;
   }
 
   public String getHeadOf ()
   {
-    return headOf;
+    return m_sHeadOf;
   }
 
   public boolean isHead ()
   {
-    return headOf != null;
+    return m_sHeadOf != null;
   }
 
   // ********************************************************************
@@ -119,7 +121,7 @@ public class DataStore
   public static void main (final String [] args)
   {
     // example data (taken from http://www.hp-lexicon.org/)
-    final Set <DataStore> teachers = new HashSet<> ();
+    final Set <DataStore> teachers = new LinkedHashSet<> ();
     teachers.add (new DataStore ("Minerva", "McGonagall", "Transfiguration", "Gryffindor"));
     teachers.add (new DataStore ("Severus", "Snape", "Potions", "Slytherin"));
     teachers.add (new DataStore ("Filius", "Flitwick", "Charms", "Ravenclaw"));
@@ -133,7 +135,7 @@ public class DataStore
     {
       final TransformerFactory factory = TransformerFactory.newInstance ();
 
-      final Transformer transformer = factory.newTransformer (new StreamSource (new ByteArrayInputStream (STX_SHEET.getBytes ())));
+      final Transformer transformer = factory.newTransformer (new StringStreamSource (STX_SHEET));
 
       // pass the iterator as a global parameter to the transformation
       transformer.setParameter ("iter", teachers.iterator ());

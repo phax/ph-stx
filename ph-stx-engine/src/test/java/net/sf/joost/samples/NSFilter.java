@@ -122,7 +122,7 @@ public class NSFilter extends XMLFilterImpl implements TransformerHandler, ITran
                                      final String base,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable params) throws SAXException
+                                     final Hashtable <String, Object> params) throws SAXException
   {
     if (METHOD.equals (method))
     {
@@ -138,7 +138,7 @@ public class NSFilter extends XMLFilterImpl implements TransformerHandler, ITran
                                      final XMLReader reader,
                                      final URIResolver uriResolver,
                                      final ErrorListener errorListener,
-                                     final Hashtable params) throws SAXException
+                                     final Hashtable <String, Object> params) throws SAXException
   {
     if (METHOD.equals (method))
       throw new SAXException ("Provision of internal code not allowed for " + method);

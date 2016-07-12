@@ -30,39 +30,28 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.junit.Test;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.XMLFilterImpl;
 
+import com.helger.commons.io.resource.ClassPathResource;
+
+import net.sf.joost.trax.TransformerFactoryImpl;
+
 /**
  * @author Zubow
  */
 public class SAXTest extends XMLFilterImpl
 {
-
-  // Define a static logger variable so that it references the
-  // Logger instance named "RunTests".
-  static Logger log = Logger.getLogger (SAXTest.class);
-
-  private static String log4jprop = "conf/log4j.properties";
-
-  static
+  @Test
+  public void testBasic ()
   {
-    // calling once
-    PropertyConfigurator.configure (log4jprop);
-  }
+    final String stxId = new ClassPathResource ("examples/flat.stx").getAsURL ().toExternalForm ();
 
-  public static void main (final String [] args)
-  {
-
-    final String xmlId = "test/flat.xml";
-    final String stxId = "test/flat.stx";
-
-    System.setProperty ("javax.xml.transform.TransformerFactory", "net.sf.joost.trax.TransformerFactoryImpl");
+    System.setProperty ("javax.xml.transform.TransformerFactory", TransformerFactoryImpl.class.getName ());
 
     try
     {
@@ -70,7 +59,7 @@ public class SAXTest extends XMLFilterImpl
       final TransformerFactory factory = TransformerFactory.newInstance ();
       final Transformer transformer = factory.newTransformer (new StreamSource (stxId));
 
-      transformer.transform (new SAXSource (new SAXTest (xmlId), new InputSource ()), new StreamResult (System.out));
+      transformer.transform (new SAXSource (new SAXTest (), new InputSource ()), new StreamResult (System.out));
 
     }
     catch (final Exception e)
@@ -79,20 +68,9 @@ public class SAXTest extends XMLFilterImpl
     }
   }
 
-  // *********************************************************************
-
-  private final String data;
-
-  public SAXTest (final String data)
-  {
-    // init somehow
-    this.data = data;
-  }
-
   @Override
   public void parse (final InputSource dummy) throws SAXException
   {
-
     final ContentHandler h = getContentHandler ();
     h.startDocument ();
     h.startElement ("", "flat", "flat", new AttributesImpl ());
@@ -100,7 +78,7 @@ public class SAXTest extends XMLFilterImpl
     for (int i = 0; i < 14; i++)
     {
       h.startElement ("", "entry", "entry", new AttributesImpl ());
-      final String data = "" + new Integer ((123 + i));
+      final String data = Integer.valueOf (123 + i).toString ();
       h.characters (data.toCharArray (), 0, data.length ());
       h.endElement ("", "entry", "entry");
     }

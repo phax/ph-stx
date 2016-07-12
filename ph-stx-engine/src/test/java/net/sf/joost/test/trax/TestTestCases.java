@@ -83,13 +83,9 @@ public class TestTestCases
 
     TestCases.runTests2 (xmlId, stxId, outId);
 
-    try
+    try (final BufferedReader resultStream = new BufferedReader (new FileReader (outId));
+        final BufferedReader checkStream = new BufferedReader (new FileReader (check)))
     {
-
-      final BufferedReader resultStream = new BufferedReader (new FileReader (outId));
-
-      final BufferedReader checkStream = new BufferedReader (new FileReader (check));
-
       while (resultStream.ready () && checkStream.ready ())
       {
         if (!(resultStream.readLine ().equals (checkStream.readLine ())))

@@ -31,38 +31,38 @@ import java.math.BigInteger;
  */
 public class ExtensionFunctionTarget
 {
-  private int intValue = Integer.MIN_VALUE;
-  private Integer integerValue = new Integer (Integer.MIN_VALUE);
-  private BigInteger bigIntegerValue = BigInteger.ZERO;
+  private int m_nIntValue = Integer.MIN_VALUE;
+  private Integer m_aIntegerValue = Integer.valueOf (Integer.MIN_VALUE);
+  private BigInteger m_aBigIntegerValue = BigInteger.ZERO;
 
   public int getIntValue ()
   {
-    return intValue;
+    return m_nIntValue;
   }
 
   public void setIntValue (final int intValue)
   {
-    this.intValue = intValue;
+    this.m_nIntValue = intValue;
   }
 
   public Integer getIntegerValue ()
   {
-    return integerValue;
+    return m_aIntegerValue;
   }
 
   public void setIntegerValue (final Integer integerValue)
   {
-    this.integerValue = integerValue;
+    this.m_aIntegerValue = integerValue;
   }
 
   public BigInteger getBigIntegerValue ()
   {
-    return bigIntegerValue;
+    return m_aBigIntegerValue;
   }
 
   public void setBigIntegerValue (final BigInteger bigIntegerValue)
   {
-    this.bigIntegerValue = bigIntegerValue;
+    this.m_aBigIntegerValue = bigIntegerValue;
   }
 
   public static BigInteger parseBigInt (final long value)

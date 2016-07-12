@@ -24,44 +24,35 @@
 
 package net.sf.joost.test.trax.thread;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import com.helger.commons.io.resource.ClassPathResource;
+
 /**
  * Thread-safety test
- * 
+ *
  * @author Zubow
  */
 public class RunThreadTest
 {
-
-  private static String xmlId = "test/flat.xml";
-  private static String stxId = "test/flat.stx";
-  private static String outId = "testdata/out.html";
+  private static String stxId = "examples/flat.stx";
 
   public static void main (final String args[])
   {
-
     try
     {
-
-      settingProps ();
+      _settingProps ();
 
       // Create a transform factory instance.
-      final String tProp = System.getProperty ("javax.xml.transform.TransformerFactory");
-
       final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
-      final InputStream stxIS = new BufferedInputStream (new FileInputStream (stxId));
+      final InputStream stxIS = new ClassPathResource (stxId).getInputStream ();
       final StreamSource stxSource = new StreamSource (stxIS);
       stxSource.setSystemId (stxId);
 
@@ -70,38 +61,38 @@ public class RunThreadTest
       final Transformer transformer = templates.newTransformer ();
 
       // init threads - sharing Transformer
-      final TransformerThread firstThread = new TransformerThread (transformer, "first");
-      final TransformerThread secondThread = new TransformerThread (transformer, "second");
+      TransformerThread firstThread = new TransformerThread (transformer, "first");
+      TransformerThread secondThread = new TransformerThread (transformer, "second");
 
       // init threads - sharing Templates
-      // TransformerThread firstThread = new TransformerThread(templates,
-      // "first");
-      // TransformerThread secondThread = new TransformerThread(templates,
-      // "second");
+      if (false)
+      {
+        firstThread = new TransformerThread (templates, "first");
+        secondThread = new TransformerThread (templates, "second");
+      }
 
       // init threads - sharing transformerfactory
-      // TransformerThread firstThread = new TransformerThread(tfactory,
-      // "first");
-      // TransformerThread secondThread = new TransformerThread(tfactory,
-      // "second");
+      if (false)
+      {
+        firstThread = new TransformerThread (tfactory, "first");
+        secondThread = new TransformerThread (tfactory, "second");
+      }
 
       // starting
       firstThread.start ();
       secondThread.start ();
 
+      firstThread.join ();
+      secondThread.join ();
     }
-    catch (final FileNotFoundException fE)
-    {
-      fE.printStackTrace ();
-    }
-    catch (final TransformerConfigurationException tE)
+    catch (final Exception tE)
     {
       tE.printStackTrace ();
     }
 
   }
 
-  private static void settingProps ()
+  private static void _settingProps ()
   {
 
     // setting joost as transformer

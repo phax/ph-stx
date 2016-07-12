@@ -36,9 +36,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.helger.commons.io.resource.ClassPathResource;
+import com.helger.xml.transform.ResourceStreamSource;
+
 /**
  * Transformationthread
- * 
+ *
  * @author Zubow
  */
 
@@ -46,12 +49,12 @@ public class TransformerThread extends Thread
 {
 
   // private Templates templates;
-  private Transformer transformer;
-  private final String name;
+  private Transformer m_aTransformer;
+  private final String m_sName;
 
-  private final static String xmlId = "test/flat.xml";
+  private final static String xmlId = "examples/flat.xml";
   private final static String out = "testdata/thread/";
-  private final static String stxId = "test/flat.stx";
+  private final static String stxId = "examples/flat.stx";
 
   private int counter;
 
@@ -60,8 +63,8 @@ public class TransformerThread extends Thread
   public TransformerThread (final Transformer transformer, final String name)
   {
     super (name);
-    this.transformer = transformer;
-    this.name = name;
+    this.m_aTransformer = transformer;
+    this.m_sName = name;
     this.counter = 0;
 
   }
@@ -71,13 +74,13 @@ public class TransformerThread extends Thread
   public TransformerThread (final Templates templates, final String name)
   {
     super (name);
-    this.name = name;
+    this.m_sName = name;
     this.counter = 0;
 
     try
     {
 
-      this.transformer = templates.newTransformer ();
+      this.m_aTransformer = templates.newTransformer ();
 
     }
     catch (final TransformerConfigurationException ex)
@@ -90,7 +93,7 @@ public class TransformerThread extends Thread
   public TransformerThread (final TransformerFactory tfactory, final String name)
   {
     super (name);
-    this.name = name;
+    this.m_sName = name;
     this.counter = 0;
 
     try
@@ -101,7 +104,7 @@ public class TransformerThread extends Thread
       stxSource.setSystemId (stxId);
 
       // get Transformer from Factory
-      this.transformer = tfactory.newTransformer (stxSource);
+      this.m_aTransformer = tfactory.newTransformer (stxSource);
 
       // Templates templates = tfactory.newTemplates(stxSource);
 
@@ -122,15 +125,16 @@ public class TransformerThread extends Thread
     while (counter < 5)
     {
 
-      System.out.println ("-->" + name);
+      System.out.println ("-->" + m_sName);
 
-      final String filename = out + name + (new Integer (counter)).toString () + ".xml";
+      final String filename = out + m_sName + Integer.toString (counter) + ".xml";
 
       try
       {
 
         // Transform the source XML to System.out.
-        transformer.transform (new StreamSource (xmlId), new StreamResult (filename));
+        m_aTransformer.transform (new ResourceStreamSource (new ClassPathResource (xmlId)),
+                                  new StreamResult (filename));
       }
       catch (final TransformerException ex)
       {

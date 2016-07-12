@@ -35,14 +35,14 @@ import javax.xml.transform.TransformerException;
 public class ErrorListenerImpl implements ErrorListener
 {
 
-  private final String name;
+  private final String m_sName;
 
   /**
    * Constructor
    */
   public ErrorListenerImpl (final String name)
   {
-    this.name = name;
+    this.m_sName = name;
   }
 
   /**
@@ -68,7 +68,7 @@ public class ErrorListenerImpl implements ErrorListener
   public void warning (final TransformerException exception) throws TransformerException
   {
 
-    System.err.println ("WARNING occured - ErrorListenerImpl " + name);
+    System.err.println ("WARNING occured - ErrorListenerImpl " + m_sName);
   }
 
   /**
@@ -90,7 +90,7 @@ public class ErrorListenerImpl implements ErrorListener
   public void error (final TransformerException exception) throws TransformerException
   {
 
-    System.err.println ("ERROR occured - ErrorListenerImpl " + name);
+    System.err.println ("ERROR occured - ErrorListenerImpl " + m_sName);
     System.err.println (exception.getMessageAndLocation ());
     throw exception;
   }
@@ -114,7 +114,7 @@ public class ErrorListenerImpl implements ErrorListener
   public void fatalError (final TransformerException exception) throws TransformerException
   {
 
-    System.err.println ("FATALERROR occured - ErrorListenerImpl " + name);
+    System.err.println ("FATALERROR occured - ErrorListenerImpl " + m_sName);
     System.err.println (exception.getMessage ());
     // cancel transformation
     throw exception;

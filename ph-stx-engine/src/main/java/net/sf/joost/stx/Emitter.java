@@ -647,17 +647,25 @@ public class Emitter
     File hrefFile = null; // the file object representing href
 
     if (m_aContH instanceof IStxEmitter)
-    { // we may extract a base URI
+    {
+      // we may extract a base URI
       final String base = ((IStxEmitter) m_aContH).getSystemId ();
       if (base != null)
         hrefFile = new File (new URI (base).resolve (href));
     }
     if (hrefFile == null)
-    { // still null (means: no base available)
-      if (href.indexOf (':') != -1) // href is a URI
+    {
+      // still null (means: no base available)
+      if (href.indexOf (':') != -1)
+      {
+        // href is a URI
         hrefFile = new File (new URI (href));
-      else // href is just a path
+      }
+      else
+      {
+        // href is just a path
         hrefFile = new File (href);
+      }
     }
 
     // create missing directories
