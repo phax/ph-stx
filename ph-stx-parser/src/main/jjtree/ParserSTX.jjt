@@ -148,61 +148,30 @@ TOKEN :
 | < EXPR_SHR: ">>" >
 | < #ESCAPE_QUOT: "\"\"" >                    
 | < #ESCAPE_APOS: "''" >
-| < AS: "as" >
-| < EQ: "eq" >
-| < GE: "ge" >
-| < GT: "gt" >
 | < IF: "if" >
 | < IN: "in" >
-| < IS: "is" >
-| < LE: "le" >
-| < LT: "lt" >
-| < NE: "ne" >
-| < OF: "of" >
 | < OR: "or" >
 | < TO: "to" >
 | < AND: "and" >
 | < DIV: "div" >
 | < FOR: "for" >
 | < MOD: "mod" >
-| < CAST: "cast" >
 | < ELSE: "else" >
 | < IDIV: "idiv" >
 | < NODE: "node" >
-| < SELF: "self" >
 | < SOME: "some" >
 | < TEXT: "text" >
 | < THEN: "then" >
 | < CDATA: "cdata" >
-| < CHILD: "child" >
 | < EVERY: "every" >
-| < TREAT: "treat" >
 | < UNION: "union" >
 | < EXCEPT: "except" >
-| < PARENT: "parent" >
 | < RETURN: "return" >
 | < COMMENT: "comment" >
 | < DOCTYPE: "doctype" >
 | < ELEMENT: "element" >
-| < ANCESTOR: "ancestor" >
-| < CASTABLE: "castable" >
-| < EXTERNAL: "external" >
-| < INSTANCE: "instance" >
-| < ATTRIBUTE: "attribute" >
-| < FOLLOWING: "following" >
 | < INTERSECT: "intersect" >
-| < NAMESPACE: "namespace" >
-| < PRECEDING: "preceding" >
 | < SATISFIES: "satisfies" >
-| < DESCENDANT: "descendant" >
-| < DOCUMENT_NODE: "document-node" >
-| < EMPTY_SEQUENCE: "empty-sequence" >
-| < SCHEMA_ELEMENT: "schema-element" >
-| < ANCESTOR_OR_SELF: "ancestor-or-self" >                    
-| < SCHEMA_ATTRIBUTE: "schema-attribute" >
-| < FOLLOWING_SIBLING: "following-sibling" >
-| < PRECEDING_SIBLING: "preceding-sibling" >
-| < DESCENDANT_OR_SELF: "descendant-or-self" >
 | < PROCESSING_INSTRUCTION: "processing-instruction" >
 
 // private reg ex (no actions possible!)
@@ -266,62 +235,31 @@ String NCName() #void : {}
 ( <NC_NAME1>
 | <NC_NAME2>
 // add all valid tokens here as well  
-| <AS>
-| <EQ>
-| <GE>
-| <GT>
 //| <IF>
 | <IN>
-| <IS>
-| <LE>
-| <LT>
-| <NE>
-| <OF>
 | <OR>
 | <TO>
 | <AND>
 | <DIV>
 | <FOR>
 | <MOD>
-| <CAST>
 | <ELSE>
 | <IDIV>
 //| <NODE>
-| <SELF>
 | <SOME>
 //| <TEXT>
 | <THEN>
 //| <CDATA>
-| <CHILD>
 | <EVERY>
-| <TREAT>
 | <UNION>
 | <EXCEPT>
-| <PARENT>
 | <RETURN>
 //| <COMMENT>
 //| <DOCTYPE>
 // Leads to a grammar error when using: element(person, surgeon?)
 //| <ELEMENT>
-| <ANCESTOR>
-| <CASTABLE>
-| <EXTERNAL>
-| <INSTANCE>
-//| <ATTRIBUTE>
-| <FOLLOWING>
 | <INTERSECT>
-| <NAMESPACE>
-| <PRECEDING>
 | <SATISFIES>
-| <DESCENDANT>
-//| <DOCUMENT_NODE>
-//| <EMPTY_SEQUENCE>
-//| <SCHEMA_ELEMENT>
-| <ANCESTOR_OR_SELF>
-//| <SCHEMA_ATTRIBUTE>
-| <FOLLOWING_SIBLING>
-| <PRECEDING_SIBLING>
-| <DESCENDANT_OR_SELF>
 //| <PROCESSING_INSTRUCTION>
 )
 { return token.image; }
