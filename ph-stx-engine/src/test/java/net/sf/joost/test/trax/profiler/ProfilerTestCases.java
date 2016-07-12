@@ -59,8 +59,6 @@ import net.sf.joost.stx.Processor;
  */
 public class ProfilerTestCases
 {
-
-  // Logger instance named "ProfilerTestCases".
   private static final Logger log = LoggerFactory.getLogger (ProfilerTestCases.class);
 
   // *****************************************************************************

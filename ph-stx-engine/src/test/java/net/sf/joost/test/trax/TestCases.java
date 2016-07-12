@@ -1610,10 +1610,10 @@ public class TestCases
    * DOM tree.
    */
   public static boolean exampleAsSerializer (final String sourceID) throws TransformerException,
-                                                                 TransformerConfigurationException,
-                                                                 SAXException,
-                                                                 IOException,
-                                                                 ParserConfigurationException
+                                                                    TransformerConfigurationException,
+                                                                    SAXException,
+                                                                    IOException,
+                                                                    ParserConfigurationException
   {
     final DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance ();
     final DocumentBuilder docBuilder = dfactory.newDocumentBuilder ();
@@ -2204,23 +2204,15 @@ public class TestCases
    */
   private static void _handleException (final Exception ex)
   {
-
     log.error ("EXCEPTION: ");
-
     ex.printStackTrace ();
-
     if (ex instanceof TransformerConfigurationException)
     {
-
       final Throwable ex1 = ((TransformerConfigurationException) ex).getException ();
-
       log.error ("Internal exception: ", ex1);
-
       if (ex1 instanceof SAXException)
       {
-
         final Exception ex2 = ((SAXException) ex1).getException ();
-
         log.error ("Internal sub-exception: ", ex2);
       }
     }
