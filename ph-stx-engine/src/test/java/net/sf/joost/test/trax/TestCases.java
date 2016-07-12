@@ -24,6 +24,10 @@
 
 package net.sf.joost.test.trax;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -62,7 +66,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.DOMSerializerImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -71,7 +74,8 @@ import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import junit.framework.Assert;
+import com.helger.xml.serialize.write.XMLWriter;
+
 import net.sf.joost.IOutputURIResolver;
 import net.sf.joost.trax.CTrAX;
 
@@ -2076,7 +2080,7 @@ public class TestCases
     final DOMResult myDomResult = new DOMResult (newDoc);
 
     transformer.transform (docInSource, myDomResult);
-    Assert.assertEquals (newDoc, myDomResult.getNode ());
+    assertEquals (newDoc, myDomResult.getNode ());
 
     // print DOMResult
     final Node nodeResult = myDomResult.getNode ();
@@ -2408,9 +2412,9 @@ public class TestCases
     transformer.transform (getSource (sourceId), new StreamResult (baos));
 
     String result = new String (baos.toByteArray (), "UTF-8");
-    Assert.assertTrue (result.contains ("<>"));
-    Assert.assertFalse (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
-    Assert.assertFalse (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
+    assertTrue (result.contains ("<>"));
+    assertFalse (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
+    assertFalse (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
 
     baos.reset ();
 
@@ -2418,9 +2422,9 @@ public class TestCases
     transformer.transform (getSource (sourceId), new StreamResult (baos));
 
     result = new String (baos.toByteArray (), "UTF-8");
-    Assert.assertFalse (result.contains ("<>"));
-    Assert.assertTrue (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
-    Assert.assertTrue (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
+    assertFalse (result.contains ("<>"));
+    assertTrue (result.contains (Result.PI_DISABLE_OUTPUT_ESCAPING));
+    assertTrue (result.contains (Result.PI_ENABLE_OUTPUT_ESCAPING));
 
     return true; // TODO rewrite these strange test architecture
   }
@@ -2435,10 +2439,7 @@ public class TestCases
    */
   public static String serializeDOM2String (final Node node) throws IOException
   {
-
-    final DOMSerializerImpl serializer = new DOMSerializerImpl ();
-
-    return serializer.writeToString (node);
+    return XMLWriter.getXMLString (node);
   }
 
   /**
@@ -2448,23 +2449,15 @@ public class TestCases
    */
   private static void handleException (final Exception ex)
   {
-
     log.error ("EXCEPTION: ");
-
     ex.printStackTrace ();
-
     if (ex instanceof TransformerConfigurationException)
     {
-
       final Throwable ex1 = ((TransformerConfigurationException) ex).getException ();
-
       log.error ("Internal exception: ", ex1);
-
       if (ex1 instanceof SAXException)
       {
-
         final Exception ex2 = ((SAXException) ex1).getException ();
-
         log.error ("Internal sub-exception: ", ex2);
       }
     }
