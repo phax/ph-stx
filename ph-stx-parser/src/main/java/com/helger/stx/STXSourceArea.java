@@ -27,9 +27,9 @@ import com.helger.commons.hashcode.HashCodeGenerator;
 import com.helger.commons.string.ToStringGenerator;
 
 /**
- * Defines the source location of a single token when reading XPath from a
- * stream. It consists of the start position (getTokenBegin*) and the end
- * position (getTokenEnd*).
+ * Defines the source location of a single token when reading STX from a stream.
+ * It consists of the start position (getTokenBegin*) and the end position
+ * (getTokenEnd*).
  *
  * @author Philip Helger
  */

@@ -16,12 +16,12 @@ Authors and Contributors:
     Petr Cimprich <petr at NO-SPAM.gingerall.cz> <mailto:n/a>
     Oliver Becker <obecker at NO-SPAM.informatik.hu-berlin.de> <mailto:n/a>
     Christian Nentwich <c.nentwich at NO-SPAM.cs.ucl.ac.uk> <mailto:n/a>
-    Honza Jiroušek <honza.jirousek at NO-SPAM.ecn.cz> <mailto:n/a>
+    Honza Jirouï¿½ek <honza.jirousek at NO-SPAM.ecn.cz> <mailto:n/a>
     Manos Batsis <mbatsis at NO-SPAM.humanmarkup.org> <mailto:n/a>
     Paul Brown <prb at NO-SPAM.fivesight.com> <mailto:n/a>
     Michael Kay <michael.h.kay at NO-SPAM.ntlworld.com> <mailto:n/a>
 
-Copyright © 2002-2005 authors and contributors. All rights reserved.
+Copyright ï¿½ 2002-2005 authors and contributors. All rights reserved.
 
 ------------------------------------------------------------------------
 

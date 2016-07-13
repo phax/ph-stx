@@ -31,7 +31,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 
 /**
- * Defines the source location of an object when reading XPath from a stream. It
+ * Defines the source location of an object when reading STX from a stream. It
  * consists of the position of the start token and the position of the end
  * token.
  *
