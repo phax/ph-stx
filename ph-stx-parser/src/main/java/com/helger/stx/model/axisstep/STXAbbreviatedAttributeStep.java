@@ -25,11 +25,11 @@ import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.stx.model.nodetest.ISTXNodeTest;
 
-public class XP2AbbreviatedAttributeStep extends AbstractXP2SingleStep
+public class STXAbbreviatedAttributeStep extends AbstractSTXSingleStep
 {
   private final ISTXNodeTest m_aNodeTest;
 
-  public XP2AbbreviatedAttributeStep (@Nonnull final ISTXNodeTest aNodeTest)
+  public STXAbbreviatedAttributeStep (@Nonnull final ISTXNodeTest aNodeTest)
   {
     m_aNodeTest = ValueEnforcer.notNull (aNodeTest, "NodeTest");
   }

@@ -16,18 +16,15 @@
  */
 package com.helger.stx.model.axisstep;
 
-import java.io.IOException;
-import java.io.Writer;
-
-import javax.annotation.Nonnull;
-
-public class XP2AbbreviatedReverseStep extends AbstractXP2SingleStep
+/**
+ * Defines the vertical depth of a single axis (siblings).
+ *
+ * @author Philip Helger
+ */
+public enum ESTXVerticalDepth
 {
-  public XP2AbbreviatedReverseStep ()
-  {}
-
-  public void writeTo (@Nonnull final Writer aWriter) throws IOException
-  {
-    aWriter.write ("..");
-  }
+  /** Refers to this node only */
+  SELF,
+  /** Refers to 1 or more levels up or down. */
+  UNBOUNDED;
 }

@@ -16,9 +16,18 @@
  */
 package com.helger.stx.model.axisstep;
 
-import com.helger.stx.model.ISTXObject;
+import java.io.IOException;
+import java.io.Writer;
 
-public interface IXP2SingleStep extends ISTXObject
+import javax.annotation.Nonnull;
+
+public class STXAbbreviatedReverseStep extends AbstractSTXSingleStep
 {
+  public STXAbbreviatedReverseStep ()
+  {}
 
+  public void writeTo (@Nonnull final Writer aWriter) throws IOException
+  {
+    aWriter.write ("..");
+  }
 }

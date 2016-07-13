@@ -23,40 +23,43 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.stx.model.nodetest.ISTXNodeTest;
+import com.helger.stx.model.AbstractSTXStepExpression;
+import com.helger.stx.model.STXPredicateList;
 
-public class XP2SingleStep extends AbstractXP2SingleStep
+public class STXAxisStep extends AbstractSTXStepExpression
 {
-  private final EXP2Axis m_eAxis;
-  private final ISTXNodeTest m_aNodeTest;
+  private final ISTXSingleStep m_aSingleStep;
+  private final STXPredicateList m_aPredicateList;
 
-  public XP2SingleStep (@Nonnull final EXP2Axis eAxis, @Nonnull final ISTXNodeTest aNodeTest)
+  public STXAxisStep (@Nonnull final ISTXSingleStep aSingleStep, @Nonnull final STXPredicateList aPredicateList)
   {
-    m_eAxis = ValueEnforcer.notNull (eAxis, "Axis");
-    m_aNodeTest = ValueEnforcer.notNull (aNodeTest, "NodeTest");
+    m_aSingleStep = ValueEnforcer.notNull (aSingleStep, "SingleStep");
+    m_aPredicateList = ValueEnforcer.notNull (aPredicateList, "PredicateList");
   }
 
   @Nonnull
-  public EXP2Axis getAxis ()
+  public ISTXSingleStep getSingleStep ()
   {
-    return m_eAxis;
+    return m_aSingleStep;
   }
 
   @Nonnull
-  public ISTXNodeTest getNodeTest ()
+  public STXPredicateList getPredicateList ()
   {
-    return m_aNodeTest;
+    return m_aPredicateList;
   }
 
   public void writeTo (@Nonnull final Writer aWriter) throws IOException
   {
-    m_eAxis.writeTo (aWriter);
-    m_aNodeTest.writeTo (aWriter);
+    m_aSingleStep.writeTo (aWriter);
+    m_aPredicateList.writeTo (aWriter);
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("axis", m_eAxis).append ("nodeTest", m_aNodeTest).toString ();
+    return new ToStringGenerator (this).append ("singleStep", m_aSingleStep)
+                                       .append ("predicateList", m_aPredicateList)
+                                       .toString ();
   }
 }

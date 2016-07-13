@@ -23,43 +23,31 @@ import javax.annotation.Nonnull;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.string.ToStringGenerator;
-import com.helger.stx.model.AbstractSTXStepExpression;
-import com.helger.stx.model.STXPredicateList;
+import com.helger.stx.model.nodetest.ISTXNodeTest;
 
-public class XP2AxisStep extends AbstractSTXStepExpression
+public class STXAbbreviatedElementStep extends AbstractSTXSingleStep
 {
-  private final IXP2SingleStep m_aSingleStep;
-  private final STXPredicateList m_aPredicateList;
+  private final ISTXNodeTest m_aNodeTest;
 
-  public XP2AxisStep (@Nonnull final IXP2SingleStep aSingleStep, @Nonnull final STXPredicateList aPredicateList)
+  public STXAbbreviatedElementStep (@Nonnull final ISTXNodeTest aNodeTest)
   {
-    m_aSingleStep = ValueEnforcer.notNull (aSingleStep, "SingleStep");
-    m_aPredicateList = ValueEnforcer.notNull (aPredicateList, "PredicateList");
+    m_aNodeTest = ValueEnforcer.notNull (aNodeTest, "NodeTest");
   }
 
   @Nonnull
-  public IXP2SingleStep getSingleStep ()
+  public ISTXNodeTest getNodeTest ()
   {
-    return m_aSingleStep;
-  }
-
-  @Nonnull
-  public STXPredicateList getPredicateList ()
-  {
-    return m_aPredicateList;
+    return m_aNodeTest;
   }
 
   public void writeTo (@Nonnull final Writer aWriter) throws IOException
   {
-    m_aSingleStep.writeTo (aWriter);
-    m_aPredicateList.writeTo (aWriter);
+    m_aNodeTest.writeTo (aWriter);
   }
 
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("singleStep", m_aSingleStep)
-                                       .append ("predicateList", m_aPredicateList)
-                                       .toString ();
+    return new ToStringGenerator (this).append ("nodeTest", m_aNodeTest).toString ();
   }
 }

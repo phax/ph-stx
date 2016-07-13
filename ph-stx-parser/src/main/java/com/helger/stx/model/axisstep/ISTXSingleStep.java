@@ -16,13 +16,9 @@
  */
 package com.helger.stx.model.axisstep;
 
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.stx.model.ISTXObject;
 
-public abstract class AbstractXP2SingleStep implements IXP2SingleStep
+public interface ISTXSingleStep extends ISTXObject
 {
-  @Override
-  public String toString ()
-  {
-    return new ToStringGenerator (this).toString ();
-  }
+
 }

@@ -14,31 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.stx.model.types;
+package com.helger.stx.model.axisstep;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.xml.namespace.QName;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.xml.CXML;
-
-public class XSType extends XPathType
+/**
+ * Defines the horizontal depth of a single axis (parent and children).
+ *
+ * @author Philip Helger
+ */
+public enum ESTXHorizontalDepth
 {
-  public XSType (@Nonnull @Nonempty final String sLocalName, @Nullable final XSType aParentType)
-  {
-    super (createName (sLocalName), aParentType);
-  }
-
-  @Override
-  public boolean isBuiltIn ()
-  {
-    return true;
-  }
-
-  @Nonnull
-  public static QName createName (@Nonnull @Nonempty final String sLocalName)
-  {
-    return new QName (CXML.XML_NS_XSD, sLocalName, "xs");
-  }
+  /** Refers to this node only */
+  SELF,
+  /** Refers exactly 1 level up or down. */
+  ONE,
+  /** Refers to 1 or more levels up or down. */
+  UNBOUNDED;
 }

@@ -56,11 +56,11 @@ import com.helger.stx.model.STXStringLiteral;
 import com.helger.stx.model.STXUnaryExpression;
 import com.helger.stx.model.STXVarNameAndExpression;
 import com.helger.stx.model.STXVariableReference;
-import com.helger.stx.model.axisstep.IXP2SingleStep;
-import com.helger.stx.model.axisstep.XP2AbbreviatedAttributeStep;
-import com.helger.stx.model.axisstep.XP2AbbreviatedElementStep;
-import com.helger.stx.model.axisstep.XP2AbbreviatedReverseStep;
-import com.helger.stx.model.axisstep.XP2AxisStep;
+import com.helger.stx.model.axisstep.ISTXSingleStep;
+import com.helger.stx.model.axisstep.STXAbbreviatedAttributeStep;
+import com.helger.stx.model.axisstep.STXAbbreviatedElementStep;
+import com.helger.stx.model.axisstep.STXAbbreviatedReverseStep;
+import com.helger.stx.model.axisstep.STXAxisStep;
 import com.helger.stx.model.nodetest.ISTXKindTest;
 import com.helger.stx.model.nodetest.ISTXNameTest;
 import com.helger.stx.model.nodetest.ISTXNodeTest;
@@ -445,19 +445,19 @@ public final class STXNodeToDomainObject
 
   // [34] AbbrevReverseStep ::= ".."
   @Nonnull
-  private static XP2AbbreviatedReverseStep _convertAbbreviatedReverseStep (@Nonnull final STXNode aNode)
+  private static STXAbbreviatedReverseStep _convertAbbreviatedReverseStep (@Nonnull final STXNode aNode)
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTABBREVREVERSESTEP);
     final int nChildCount = aNode.jjtGetNumChildren ();
     if (nChildCount != 0)
       _throwUnexpectedChildrenCount (aNode, "Expected exactly 0 children!");
 
-    return new XP2AbbreviatedReverseStep ();
+    return new STXAbbreviatedReverseStep ();
   }
 
   // [32] ReverseStep ::= (ReverseAxis NodeTest) | AbbrevReverseStep
   @Nonnull
-  private static IXP2SingleStep _convertReverseStep (@Nonnull final STXNode aNode)
+  private static ISTXSingleStep _convertReverseStep (@Nonnull final STXNode aNode)
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTREVERSESTEP);
     final int nChildCount = aNode.jjtGetNumChildren ();
@@ -468,7 +468,7 @@ public final class STXNodeToDomainObject
   }
 
   // [31] AbbrevForwardStep ::= "@"? NodeTest
-  private static IXP2SingleStep _convertAbbreviatedForwardStep (@Nonnull final STXNode aNode)
+  private static ISTXSingleStep _convertAbbreviatedForwardStep (@Nonnull final STXNode aNode)
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTABBREVFORWARDSTEP);
     final int nChildCount = aNode.jjtGetNumChildren ();
@@ -478,17 +478,17 @@ public final class STXNodeToDomainObject
     if (nChildCount == 1)
     {
       final ISTXNodeTest aNodeTest = _convertNodeTest (aNode.jjtGetChild (0));
-      return new XP2AbbreviatedElementStep (aNodeTest);
+      return new STXAbbreviatedElementStep (aNodeTest);
     }
 
     // child "0" is the "@" sign
     final ISTXNodeTest aNodeTest = _convertNodeTest (aNode.jjtGetChild (1));
-    return new XP2AbbreviatedAttributeStep (aNodeTest);
+    return new STXAbbreviatedAttributeStep (aNodeTest);
   }
 
   // [29] ForwardStep ::= AbbrevForwardStep
   @Nonnull
-  private static IXP2SingleStep _convertForwardStep (@Nonnull final STXNode aNode)
+  private static ISTXSingleStep _convertForwardStep (@Nonnull final STXNode aNode)
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTFORWARDSTEP);
     final int nChildCount = aNode.jjtGetNumChildren ();
@@ -500,7 +500,7 @@ public final class STXNodeToDomainObject
 
   // [28] AxisStep ::= (ReverseStep | ForwardStep) Predicate?
   @Nonnull
-  private static XP2AxisStep _convertAxisStep (@Nonnull final STXNode aNode)
+  private static STXAxisStep _convertAxisStep (@Nonnull final STXNode aNode)
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTAXISSTEP);
     final int nChildCount = aNode.jjtGetNumChildren ();
@@ -508,7 +508,7 @@ public final class STXNodeToDomainObject
       _throwUnexpectedChildrenCount (aNode, "Expected exactly 1 or 2 children!");
 
     final STXNode aChildNode = aNode.jjtGetChild (0);
-    IXP2SingleStep aSingleStep;
+    ISTXSingleStep aSingleStep;
     if (aChildNode.getNodeType () == ParserSTXTreeConstants.JJTREVERSESTEP)
       aSingleStep = _convertReverseStep (aChildNode);
     else
@@ -520,7 +520,7 @@ public final class STXNodeToDomainObject
       final STXPredicate aPredicate = _convertPredicate (aNode.jjtGetChild (1));
       aPredicates.add (aPredicate);
     }
-    return new XP2AxisStep (aSingleStep, new STXPredicateList (aPredicates));
+    return new STXAxisStep (aSingleStep, new STXPredicateList (aPredicates));
   }
 
   // [27] StepExpr ::= AxisStep

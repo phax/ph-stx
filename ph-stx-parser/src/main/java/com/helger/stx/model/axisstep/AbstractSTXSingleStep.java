@@ -16,17 +16,13 @@
  */
 package com.helger.stx.model.axisstep;
 
-/**
- * Defines the horizontal depth of a single axis (parent and children).
- *
- * @author Philip Helger
- */
-public enum EXP2HorizontalDepth
+import com.helger.commons.string.ToStringGenerator;
+
+public abstract class AbstractSTXSingleStep implements ISTXSingleStep
 {
-  /** Refers to this node only */
-  SELF,
-  /** Refers exactly 1 level up or down. */
-  ONE,
-  /** Refers to 1 or more levels up or down. */
-  UNBOUNDED;
+  @Override
+  public String toString ()
+  {
+    return new ToStringGenerator (this).toString ();
+  }
 }
