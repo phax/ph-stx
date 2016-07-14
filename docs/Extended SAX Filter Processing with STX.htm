@@ -1,0 +1,1411 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+   
+      <title>Extended SAX Filter Processing with STX</title>
+   </head>
+   <body bgcolor="#ffffff">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>1 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <div align="center">
+               
+         <h2>Extended SAX Filter Processing with STX</h2>
+               
+         <p><br><br></p>
+               
+         <h3>Oliver Becker</h3>
+               
+         <p><strong>Humboldt University Berlin</strong></p>
+               
+         <p>Extreme Markup Languages<br>2003–08–06
+         </p>
+             
+      </div>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>2 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h2>Roadmap:</h2>
+          
+      <ul>
+               
+         <li>SAX for the Ignorant</li>
+             
+      </ul>
+          
+      <ul>
+               
+         <li>SAX Filter Chains</li>
+             
+      </ul>
+          
+      <ul>
+               
+         <li>The STX Vision</li>
+             
+      </ul>
+          
+      <ul>
+               
+         <li>Combining SAX, XSLT, and STX</li>
+             
+      </ul>
+          
+      <ul>
+               
+         <li>A Proof of Concept: Schematron</li>
+             
+      </ul>
+          
+      <ul>
+               
+         <li>Pluggable Filters for Joost</li>
+             
+      </ul>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>3 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h2>SAX for the Ignorant</h2>
+          
+      <ul>
+               
+         <li>Simple API for XML</li>
+               
+         <li>Event-based parser API</li>
+               
+         <li>Push model</li>
+             
+      </ul>
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            The Simple API for XML (SAX) enables the processing of XML data as a stream.
+            A SAX producer generates events that correspond to XML markup, a SAX consumer
+            processes such events. In most of the cases the SAX producer is an XML Parser
+            (an <code>XMLReader</code> object) and the SAX consumer is an application that
+            wants to read and process XML encoded data.
+                  </font></blockquote>
+          
+          
+              
+      <div align="center">
+                   <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/sax-basics.svg"><img src="Extended%20SAX%20Filter%20Processing%20with%20STX-Dateien/sax-basics.png" alt="" border="0" width="780" height="445"></a>
+                 
+      </div>
+            
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            (This graphic is linked to an animated SVG.)
+          </font></blockquote>
+      
+          
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>4 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>SAX Filters</h3>
+          
+      <ul>
+               
+         <li>Event producer doesn't have to be an XML parser;<br>
+                      it could be
+                    
+            <ul>
+                         
+               <li>any application that produces XML data</li>
+                         
+               <li>any specialized parser that provides an XML view to non-XML
+                                data
+               </li>
+                       
+            </ul>
+                  
+         </li>
+               
+         <li>Event consumer might in turn emit SAX events<br>
+                      (it acts as a SAX filter)
+         </li>
+             
+      </ul>
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            There are many more potential applications on the producer side. Any software 
+            that wants to provide an XML view on its data might decide to produce SAX 
+            events instead of generating a well-formed XML file as a byte stream 
+            (which in turn would have to be parsed on the consumer side). In addition, 
+            transformation tools that read a proprietary data format and turn it into 
+            SAX events enable all kinds of XML processing for non-XML data.
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            A special type of a SAX processing participant is a SAX filter component.
+            A filter acts as consumer and producer simultaneously. The consumed events
+            could be modified, removed, or used for creating a completely new set of 
+            events. Using this technology, a filter chain could easily be established,
+            in which the first producer is often an XML parser and the last consumer is
+            often an XML serializer that creates an XML document from the event stream.
+            The Cocoon framework for example uses this technology to create processing
+            pipelines.
+                  </font></blockquote>
+          
+          
+              
+      <p><strong>Filter chain:</strong></p>
+              
+      <div align="center">
+                   <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/flow1.svg"><img src="Extended%20SAX%20Filter%20Processing%20with%20STX-Dateien/flow1.png" alt="" border="0" width="700" height="120"></a>
+                 
+      </div>
+              
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+              (This graphic is linked to an animated SVG. The animation
+              starts by clicking into this SVG.)
+            </font></blockquote>
+              
+      <p>No semantic difference between "Filter" and "Transformer"</p>
+            
+      
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>5 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>SAX-Based Transformations?</h3>
+          
+      <ul>
+               
+         <li>requires low-level programming</li>
+               
+         <li>programmer needs to maintain state, namespaces, etc</li>
+               
+         <li>laborious to create XML</li>
+             
+      </ul>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            There are several ways to implement the single components of this pipeline
+            (the individual filter objects). Using the SAX interfaces directly on the
+            Java level requires low-level SAX programming. This could be a small barrier 
+            to non-experienced programmers. While simple tasks may be relatively easy to 
+            solve, it gets more complicated for a filter mechanism that needs to keep 
+            track of the current context in the event stream. Last but not least, 
+            creating SAX output events in a filter scenario requires a great deal of 
+            attention to detail.
+                  </font></blockquote>
+          
+              
+      <p><br><strong>A deterrent example:</strong><br>
+                   add an <code>id</code> attribute that belongs to a special namespace
+      </p>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>// <em>"declare" the additional namespace before a startElement()</em>
+handler.startPrefixMapping("ex", "http://www.example.com");</pre></td>
+         </tr>
+      </tbody></table>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>// <em>within the implementation of startElement(uri, lName, qName, atts)</em>
+AttributesImpl newAtts = new AttributesImpl(atts);
+newAtts.addAttribute("http://www.example.com", "id", "ex:id",
+                     "CDATA", String.valueOf(count++));
+handler.startElement(uri, lName, qName, newAtts);</pre></td>
+         </tr>
+      </tbody></table>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>// <em>"undeclare" the additional namespace after the proper endElement()</em>
+handler.endPrefixMapping("ex");</pre></td>
+         </tr>
+      </tbody></table>
+            
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>6 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <p><strong>Luckily ...</strong></p>
+          
+      <ul>
+               
+         <li>the W3C invented the XML transformation language XSLT</li>
+               
+                   
+         <li>JAXP 1.1 (Java API for XML Processing) provides a SAX interface
+                        to XSLT transformations:
+         </li>
+                 
+             
+      </ul>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            The solution for more complex filter algorithms would be the use of 
+            special transformation components, for example an XSLT engine (in fact 
+            there is no difference between a filter and an XML transformer from the 
+            user's perspective). The Java interfaces for XSLT in the JAXP 1.1 
+            (Java API for XML Processing) specification include a special SAX package 
+            (<code>javax.xml.transform.sax</code>) that enables the chain-linking of
+            several transformer objects into a SAX filter pipeline.
+                  </font></blockquote>
+          
+          
+                
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>TransformerFactory tFactory = TransformerFactory.newInstance();
+SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tFactory;
+// <strong><em>create two XSLT transformer objects</em>
+TransformerHandler tHandler1 = 
+    saxTFactory.newTransformerHandler(new StreamSource("step1.xsl"));
+TransformerHandler tHandler2 = 
+    saxTFactory.newTransformerHandler(new StreamSource("step2.xsl"));</strong>
+XMLReader myReader = XMLReaderFactory.createXMLReader();
+ContentHandler mySerializer = ...
+
+// <strong><em>create a transformation chain</em>
+myReader.setContentHandler(tHandler1);</strong>
+myReader.setProperty("http://xml.org/sax/properties/lexical-handler", 
+                     tHandler1);<strong>
+tHandler1.setResult(new SAXResult(tHandler2));
+tHandler2.setResult(new SAXResult(mySerializer));</strong>
+
+// <em>run the transformation</em>
+myReader.parse("input.xml");</pre></td>
+         </tr>
+      </tbody></table>
+              
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+                    A <code>SAXTransformerFactory</code> creates two handler objects.
+                    One uses the XSLT instructions in the file step1.xsl, the other
+                    one uses the file step2.xsl. A <code>TransformerHandler</code>
+                    is a sub-interface of <code>ContentHandler</code>, so it can be
+                    registered at an <code>XMLReader</code> object. In this scenario
+                    <code>tHandler1</code> acts as the consumer for the
+                    <code>myReader</code> object. Then <code>tHandler2</code> is
+                    registered as a consumer (result object) for <code>tHandler1</code>,
+                    and finally <code>mySerializer</code> consumes the output from
+                    <code>tHandler2</code>.
+                  </font></blockquote>
+      
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>7 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <p><strong>But ...</strong></p>
+          
+      <p>the use of XSLT prevents real stream processing</p>
+          
+      <ul>
+               
+         <li>XSLT/XPath needs an in-memory representation of the whole
+                      document.
+         </li>
+               
+         <li>The transformation won't start before the last event has been
+                      consumed.
+         </li>
+               
+         <li>This is inappropriate for large XML documents.</li>
+             
+      </ul>
+          
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            The drawback of XSLT is that it does not process its input as a stream.
+            Rather, it consumes the incoming SAX events completely, creates an in-memory
+            tree representation of the data, performs the transformation into a result 
+            tree, and then afterwards produces SAX events for this result. XSLT is 
+            tree-oriented by design, it is build on top of XPath. This characteristic 
+            will be problematic for memory-intensive cases, that means for SAX streams 
+            that represent large XML documents. If only one component of a pipeline 
+            needs a tree-oriented XML representation (like XSLT), the whole data flow
+            within the pipeline would be accumulated in this component before the
+            next one starts its processing.
+                  </font></blockquote>
+      
+          
+              
+      <div align="center">
+                   <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/flow2.svg"><img src="Extended%20SAX%20Filter%20Processing%20with%20STX-Dateien/flow2.png" alt="" border="0" width="700" height="180"></a>
+                 
+      </div>
+              
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+              (This graphic is linked to an animated SVG. The animation
+              starts by clicking into this SVG.)
+                  </font></blockquote>
+              
+      <p><em>XSLT is like an (event) dam in the SAX event stream.</em></p>
+            
+      
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>8 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>SAX or XSLT? – STX!</h3>
+          
+                
+      <p>STX = Streaming Transformations for XML<br>
+                     <a href="http://stx.sourceforge.net/" target="_blank">http://stx.sourceforge.net/</a></p>
+              
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            STX (Streaming Transformations for XML) [1] offers a solution for this memory
+            problem. STX is built directly on SAX; it processes its input without 
+            building an internal tree representation. STX enables a streaming processing 
+            that resembles XSLT on the syntactic level. 
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            STX was introduced in an article on xml.com [2] and at the XML Europe 2003
+            conference in London [3].
+                  </font></blockquote>
+          
+              
+      <ul>
+                   
+         <li>processes a stream of SAX events</li>
+                 
+      </ul>
+              
+      <ul>
+                   
+         <li>doesn't build an internal tree representation of the
+                          document
+         </li>
+                 
+      </ul>
+              
+      <ul>
+                   
+         <li>resembles XSLT on the syntactic level:
+                        
+            <ul>
+                             
+               <li>XML document that contains templates</li>
+                             
+               <li>templates will be matched using patterns</li>
+                             
+               <li>mix of instructions and literal result elements</li>
+                             
+               <li>STXPath very similar to XPath, but no explicit axes</li>
+                           
+            </ul>
+                      
+         </li>
+                 
+      </ul>
+              
+      <ul>
+                   
+         <li>uses a strict forward processing model</li>
+                 
+      </ul>
+            
+          
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>9 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>A Simple STX Example</h3>
+          
+      <p><em>Modify the input by adding a consecutive ID attribute to certain
+                    elements (footnotes that appear within chapters).</em></p>
+          
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>&lt;stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:ex="http://www.example.com/"
+               version="1.0" pass-through="all"&gt;
+      
+  &lt;stx:variable name="count" select="1" /&gt;
+      
+  &lt;stx:template match="chapter//footnote"&gt;
+    &lt;stx:copy attributes="@*"&gt;
+      &lt;stx:attribute name="ex:id" select="$count" /&gt;
+      &lt;stx:assign name="count" select="$count + 1" /&gt;
+      &lt;stx:process-children /&gt;
+    &lt;/stx:copy&gt;
+  &lt;/stx:template&gt;
+      
+&lt;/stx:transform&gt;</pre></td>
+         </tr>
+      </tbody></table>
+          
+      <p><br>
+               <strong>STX combines SAX processing with the XSLT syntax.</strong>
+             
+      </p>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            Using STX removes the burden of keeping track of the current context (the 
+            ancestors, the position among siblings, and the namespaces in scope) from 
+            the programmer and makes it very easy to create XML output. Nevertheless, 
+            complex transformations that need more than the actual ancestor list are 
+            still difficult to develop in a pure streaming scenario.
+                  </font></blockquote>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>10 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Java and STX?</h3>
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            The good thing from the Java programmer's point of view is that the API
+            side is already familiar. The Java-based STX implementation Joost [4] enables
+            an STX transformation via the JAXP 1.1 interfaces discussed above. That 
+            means using Joost as STX engine within a Java application requires only
+            a tiny bit of configuration. Switching from XSLT to STX is trivial.
+            Moreover, using STX in existing applications as for example Cocoon 
+            is just as simple.
+                  </font></blockquote>
+          
+          
+      <p>STX <em>is</em> a transformation language, that means STX can be
+               used via JAXP just as XSLT.
+      </p>
+          
+      <p>Using the Java-based implementation Joost:</p>
+          
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>// <em>use Joost as transformation engine</em><strong>
+System.setProperty("javax.xml.transform.TransformerFactory",
+                   "net.sf.joost.trax.TransformerFactoryImpl");</strong>
+
+// <em>the remaining code is known area</em>
+TransformerFactory tFactory = TransformerFactory.newInstance();
+SAXTransformerFactory saxTFactory = (SAXTransformerFactory) tFactory;
+
+// <em>of course the transformation source must be different</em>
+TransformerHandler tHandler1 = 
+    saxTFactory.newTransformerHandler(new StreamSource("<strong>trans.stx</strong>"));
+...
+myReader.setContentHandler(tHandler1);
+myReader.setProperty("http://xml.org/sax/properties/lexical-handler", 
+                     tHandler1);
+tHandler1.setResult(new SAXResult(tHandler2));
+...</pre></td>
+         </tr>
+      </tbody></table>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+                    From the Java point of view, the <code>TransformerHandler</code>
+                    object is simply a "black box" that does the XML transformation
+                    somehow and that has a standardized interface. Switching to STX
+                    simply means: use a different black box.
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            [Note: This example shows that a future JAXP version should provide an 
+            intermediate level for specifying the kind of transformation. Currently
+            without the property for a TransformerFactory the Java runtime system
+            instantiates a default factory (which should be able to create XSLT
+            transformers). Using STX requires the class name of an STX transformer 
+            factory. However, it is not possible to request a "default" STX transformer 
+            without knowing a concrete implementation.]
+                  </font></blockquote>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>11 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>XSLT and STX: Two Extremes (!)</h3>
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            In the current situation one has to choose between the streaming approach
+            (SAX, STX) and the full tree approach (DOM, XSLT). Both extremes seem
+            to be inadequate for non-trivial transformations of large documents.
+                  </font></blockquote>
+          
+          
+      <table border="1" cellpadding="5" cellspacing="0" width="100%">
+               
+         <tbody><tr>
+                    
+            <th width="50%">XSLT</th>
+                    
+            <th width="50%">STX</th>
+                  
+         </tr>
+               
+         <tr>
+                    
+            <td>Full in-memory representation of the document</td>
+                    
+            <td>Ancestor stack</td>
+                  
+         </tr>
+               
+         <tr>
+                    
+            <td>Random access to all data in the document</td>
+                    
+            <td>Only current node and its ancestors accessible</td>
+                  
+         </tr>
+             
+      </tbody></table>
+          
+              
+      <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                   
+         <tbody><tr>
+                        
+            <td align="right" width="50%"><em>a book</em></td>
+                        
+            <td align="right" width="50%"><em>a reading</em></td>
+                      
+         </tr>
+                 
+      </tbody></table>
+            
+          
+              
+      <p><strong>Is there a compromise?</strong> <br>
+                   Use a hybrid transformation approach.
+      </p>
+              
+      <p>Split the document into fragments. Transform each fragment
+                    with XSLT (or any other tree-oriented transformation).
+      </p>
+            
+          
+              
+      <p align="right">
+                   <em>a chapter-wise tape-record of a long reading</em></p>
+            
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            A possible solution is to use a hybrid approach that reads a SAX stream,
+            identifies smaller pieces (XML fragments), and passes these fragments to a
+            tree-oriented application. By this means the new scenario describes not a 
+            linear pipeline, but rather a flow with laterally connected transformation 
+            components. Technically, each component is just a common SAX filter that 
+            may build an in-memory tree representation of the fragment. The component
+            itself doesn't take notice of its special usage.
+                  </font></blockquote>
+          
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>12 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <p><strong>Using a splitter component</strong></p>
+          
+      <p>The splitter passes the fragments to independent transformers.</p>
+          
+      <div align="center">
+               <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/flow3.svg"><img src="Extended%20SAX%20Filter%20Processing%20with%20STX-Dateien/flow3.png" alt="" border="0" width="700" height="300"></a>
+             
+      </div>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+              (This graphic is linked to an animated SVG. The animation
+              starts by clicking into this SVG.)
+</font></blockquote>
+          
+      <ul>
+               
+         <li>non-linear transformation</li>
+               
+         <li>completely SAX-based, uses standard SAX interfaces</li>
+               
+         <li><em>Filter 2</em> doesn't take notice of its special usage
+         </li>
+             
+      </ul>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            STX provides a simple interface to these external SAX filters. As you
+            will see in a moment, this interface is completely independent from
+            the implementation of such an external filter.
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            [Technical detail: the SAX event stream for the fragment should be
+            enclosed in a <code>startDocument</code> / <code>endDocument</code> event
+            pair, as well as <code>startPrefixMapping</code> /
+            <code>endPrefixMapping</code> events for all namespaces that are in scope
+            at the start of the fragment.]
+                  </font></blockquote>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>13 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <p><strong>STX can be used to split a document</strong></p>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            Before I explain the details, I will say a few words about STX's general 
+            processing model. STX processes SAX events, i.e. it processes an XML 
+            document in document order. In XSLT, the instruction to process other 
+            parts of the input (other nodes) is <code>xsl:apply-templates</code>. While 
+            <code>xsl:apply-templates</code> is able to process arbitrary nodes of the
+            input tree, an analogous STX instruction can only process nodes that follow
+            the current node. To this end STX provides several individual instructions.
+                  </font></blockquote>
+          
+      <p><strong>Idea:</strong>
+                 extend the <code>stx:process-</code>... instructions<br>
+                 (STX's replacement for <code>xsl:apply-templates</code>)
+      </p>
+          
+      <table border="0" cellpadding="3" cellspacing="0">
+               
+         <tbody><tr>
+            <td>
+                         
+               <ul>
+                              
+                  <li><code>stx:process-children</code></li>
+                              
+                  <li><code>stx:process-attributes</code></li>
+                              
+                  <li><code>stx:process-self</code></li>
+                              
+                  <li><code>stx:process-siblings</code></li>
+                              
+                  <li>(<code>stx:process-buffer</code>)
+                  </li>
+                              
+                  <li>(<code>stx:process-document</code>)
+                  </li>
+                            
+               </ul>
+                       
+            </td>
+            <td><img src="Extended%20SAX%20Filter%20Processing%20with%20STX-Dateien/stxprocessing.gif" alt=""></td>
+         </tr>
+      </tbody></table>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">STX has buffers: FIFO (first in first out) stores for SAX events.
+                    A temporary result of an STX transformation can be stored in a
+                    buffer and then processed again using the
+                    <code>stx:process-buffer</code> instruction.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            With the exception of <code>stx:process-attributes</code> each of these
+            instructions
+            addresses an XML fragment that is subject of the following processing steps. 
+            While normally the templates of the STX transformation sheet do this 
+            processing, it is easy to extend the instructions above to direct the 
+            selected fragment to an external SAX filter.
+                  </font></blockquote>
+              
+          
+      <p>Every instruction addresses an XML fragment that can be passed to an
+               external SAX filter component<br>
+               (except for <code>stx:process-attributes</code>)
+      </p>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>14 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>How to Identify the External Filter?</h3>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            To address the the external SAX filter, one needs an identification of 
+            the filter and possibly a source for special filter instructions. In the 
+            case of XSLT we need to express that an XSLT transformer is required and 
+            which stylesheet has to be used.
+                  </font></blockquote>
+          
+      <p>We need
+               
+         </p><ul>
+                    
+            <li>a unique name for the filter (implementation-independent)</li>
+                    
+            <li>possibly a source for the filter instructions</li>
+                  
+         </ul>
+             
+      <p></p>
+          
+              
+      <p>The web-typical solution for a unique name:
+                   a <strong>URI</strong></p>
+            
+          
+              
+      <p><br><strong>See</strong>: extension functions in XSLT
+      </p>
+              
+      <p>Bad solution (depends on a Java implementation)</p>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>&lt;xsl:value-of select="date:new()"
+              xmlns:date="<strong>java:java.util.Date</strong>" /&gt;</pre></td>
+         </tr>
+      </tbody></table>
+            
+          
+              
+      <p>Good solution (EXSLT)</p>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>&lt;xsl:value-of select="date:date-time()"
+              xmlns:date="<strong>http://exslt.org/dates-and-times</strong>" /&gt;</pre></td>
+         </tr>
+      </tbody></table>
+              
+      <blockquote><font style="font-family: sans-serif;" size="-1">In this examples the first invocation of <code>xsl:value-of</code>
+                        presumably works only in a Java-based implementation of the XSLT
+                        processor, because it directly addresses a method in a Java class.
+                        The second example uses an extension function whose specification
+                        is defined independent of an underlying programming language.
+                        Thus every XSLT processor should be able to provide an
+                        implementation of this function.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">The same approach is used to identify an external filter: it
+                        doesn't address the implementation, but uses a URI that every
+                        STX engine can map to its specific implementation of the filter.
+                        (<em>It's all about indirection in XML!</em>)</font></blockquote>
+            
+          
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>15 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Filter URIs</h3>
+          
+      <p>Do we have to invent new URIs for all kinds of SAX filters?</p>
+      
+          
+              
+      <p><strong>No, some do have already canonical names:</strong></p>
+              
+      <ul>
+                   
+         <li>XSLT:<br>
+                        <strong><code>http://www.w3.org/1999/XSL/Transform</code></strong>
+                      
+         </li>
+                 
+      </ul>
+              
+      <ul>
+                   
+         <li>STX:<br>
+                        <strong><code>http://stx.sourceforge.net/2002/ns</code></strong>
+                      
+         </li>
+                 
+      </ul>
+              
+      <ul>
+                   
+         <li>XML Signature:<br>
+                        <strong><code>http://www.w3.org/2000/09/xmldsig#</code></strong>
+                      
+         </li>
+                 
+      </ul>
+              
+      <ul>
+                   
+         <li>SAX:<br>
+                        <strong><code>http://xml.org/sax</code></strong>
+                      
+         </li>
+                 
+      </ul>
+              
+      <blockquote><font style="font-family: sans-serif;" size="-1">If some transformation approach belongs to a specified
+                        namespace, this namespace should be used to identify the filter.
+                        Of course it is possible to extend this URI list for all kinds
+                        of specialized filters.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">The SAX filter listed above is meant as a transformer that
+                        consumes text as a (series of) <code>characters</code> events
+                        and emits SAX events from parsing this text. This is useful for
+                        unparsed XML content, for example from within a CDATA section.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">In the end it is up to the STX engine to recognize a filter
+                        URI and to identify and resolve a proper implementation for
+                        that filter. The STX function <code>filter-available()</code>
+                        can be used to check whether a requested filter is available
+                        or not. On the STX level, there's no implementation-specific
+                        knowledge necessary (for example a Java class name);
+                        this extended filter interface is portable and
+                        implementation-independent.</font></blockquote>
+            
+          
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>16 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Filter Sources</h3>
+          
+      <p>Some filters need additional filter instructions<br>
+                (for example an XSLT stylesheet)
+      </p>
+          
+      <p><strong>Two ways for specifying a source:</strong></p>
+          
+      <ul>
+               
+         <li>reference to an external resource<br>
+                      <code><strong>url(<em>link</em>)</strong></code>
+                      <br>
+                      necessary if the source is non-XML data
+                      
+         </li>
+             
+      </ul>
+          
+              
+      <ul>
+                   
+         <li>source is the contents of an STX buffer<br>
+                        <code><strong>buffer(<em>buffer-name</em>)</strong></code>
+                        <br>
+                        requires that the filter accepts SAX events for its
+                        initialization
+         </li>
+                 
+      </ul>
+            
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            The specification of a filter source is possible by reference, using
+            the "<code>url(...)</code>" syntax already known from several W3C documents
+            (namely CSS and XSLFO), and inline with the help of an STX buffer, using the 
+            "<code>buffer(...)</code>" notation. This second variant enables
+            self-containing transformation sheets, provided the source is XML that can
+            be passed to the filter as a SAX event stream.
+                  </font></blockquote>
+          
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>17 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <p><strong>Two attributes for <code>stx:process-</code>...</strong></p>
+          
+      <ul>
+               
+         <li><strong><code>filter-method</code></strong><br>
+                      specifies the URI that identifies the transformation
+         </li>
+               
+         <li><strong><code>filter-src</code></strong><br>
+                      specifies the source for the transformation instructions
+         </li>
+             
+      </ul>
+          
+              
+      <p>Parameters are passed using the familiar syntax:</p>
+              
+      <p><br></p>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>&lt;stx:process-children
+        <strong>filter-method="http://www.w3.org/1999/XSL/Transform"
+        filter-src="url('sorter.xsl')"</strong>&gt;
+   &lt;stx:with-param name="attrname" select="'size'" /&gt;
+&lt;/stx:process-children&gt;</pre></td>
+         </tr>
+      </tbody></table>
+              
+      <p><br></p>
+              
+      <table border="0">
+                   
+         <tbody><tr>
+                        
+            <td valign="top">means:&nbsp;&nbsp;</td>
+                        
+            <td><em>Transform the children of the current node with the
+                                  XSLT stylesheet 'sorter.xsl' and pass the string
+                                  '<code>size</code>' as value for the stylesheet parameter
+                                  <code>attrname</code>.</em></td>
+                      
+         </tr>
+                 
+      </tbody></table>
+            
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>18 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Inline XSLT Stylesheets in STX</h3>
+          
+      <p>With the help of buffers it is possible to describe an STX
+               transformation that uses an XSLT process within one source file:
+      </p>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre><strong>&lt;stx:buffer name="xslt-code"&gt;</strong>
+  &lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                  version="1.0"&gt;
+    &lt;xsl:param name="par" /&gt;
+    &lt;xsl:template match="/"&gt;
+       ...
+    &lt;/xsl:template&gt;
+    ...
+  &lt;/xsl:stylesheet&gt;
+&lt;/stx:buffer&gt;
+
+&lt;stx:template match="foo"&gt;
+  &lt;stx:process-self
+          filter-method="http://www.w3.org/1999/XSL/Transform"<strong>
+          filter-src="buffer(xslt-code)"</strong>&gt;
+    &lt;stx:with-param name="par" select="123" /&gt;
+  &lt;/stx:process-self&gt;
+&lt;/stx:template&gt;</pre></td>
+         </tr>
+      </tbody></table>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>19 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Inline Code for External Transformations</h3>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">From the STX point of view, the contents of a buffer is simply XML
+                    data. That means the buffer contents can be created or modified
+                    by STX template rules or again with the help of an external SAX
+                    filter.</font></blockquote>
+          
+      <p>This technique allows transformations that modify their source
+               dynamically prior to its usage!
+      </p>
+          
+              
+      <p>The meta-information for the transformation could be located</p>
+              
+      <ul>
+                   
+         <li>in another document</li>
+                   
+         <li>at the start of the document</li>
+                 
+      </ul>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>&lt;magic&gt;
+  &lt;head&gt;
+    &lt;important path="<strong>charm[2]/@spell</strong>" /&gt;
+    &lt;important path="<strong>charm[4]/@spell</strong>" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;charm spell="Abracadabra"&gt;???&lt;/charm&gt;
+    &lt;charm spell="Obliviate"&gt;
+             Modifies or erases portions of a person's memory.&lt;/charm&gt;
+    &lt;charm spell="Peskipiksi Pesternomi"&gt;Freezing Charm?&lt;/charm&gt;
+    &lt;charm spell="Wingardium Leviosa"&gt;
+             Causes a feather to levitate.&lt;/charm&gt;
+  &lt;/body&gt;
+&lt;/magic&gt;</pre></td>
+         </tr>
+      </tbody></table>
+              
+      <blockquote><font style="font-family: sans-serif;" size="-1">In this example the transformation has to extract the
+                        information that is specified in the <code>path</code> attribute
+                        of the <code>head/important</code> elements. Using pure XSLT
+                        this is impossible, or at least very difficult (unless of course
+                        one uses for example such magic functions like Saxon's
+                        <code>evaluate</code>).</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">Using the <code>stx:process-buffer</code> approach, STX can
+                        transform the <code>head</code> element into transformation
+                        instructions, store these in a buffer, and apply the contents
+                        of this buffer afterwards to the <code>body</code> part of
+                        the document, see <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/magic.xml" target="_blank">magic.xml</a> and
+                        <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/magic.stx" target="_blank">magic.stx</a>.</font></blockquote>
+            
+      
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>20 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>A Proof of Concept: Schematron via STX</h3>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">A more real life example is the XSLT-based implementation of
+                    Schematron [5]. Using this pure XSLT approach one has to transform
+                    the Schematron schema into a validating stylesheet. After this step
+                    this stylesheet can be applied to an XML document, which should
+                    conform to the Schematron schema. It is not possible in this
+                    implementation to apply the schema directly to the document. This
+                    might appear strange to less experienced users.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">Since the validating stylesheet is a temporary file that results
+                    directly from the Schematron schema, it can be computed dynamically
+                    and stored in a buffer. The following graphic demonstrates this
+                    approach.</font></blockquote>
+          
+      <div align="center">
+               <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/schematron-stx.svg"><img src="Extended%20SAX%20Filter%20Processing%20with%20STX-Dateien/schematron-stx.png" alt="" border="0" width="900" height="500"></a>
+             
+      </div>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+              (This graphic is linked to an animated SVG. Click on this SVG
+              to proceed to the next step; altogether four times.
+</font></blockquote>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>21 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Schematron via STX: the Code</h3>
+          
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>&lt;stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               version="1.0"&gt;
+
+  &lt;stx:param name="schema" required="yes" /&gt;
+
+  &lt;stx:buffer name="schematron"&gt;
+    &lt;stx:process-document
+            filter-src="url('schematron-basic.xsl')"
+            filter-method="http://www.w3.org/1999/XSL/Transform"
+            href="$schema" /&gt;
+  &lt;/stx:buffer&gt;
+  
+  &lt;stx:template match="/"&gt;
+    &lt;stx:process-self
+            filter-src="buffer(schematron)"
+            filter-method="http://www.w3.org/1999/XSL/Transform" /&gt;
+  &lt;/stx:template&gt;
+
+&lt;/stx:transform&gt;</pre></td>
+         </tr>
+      </tbody></table>
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            The contents of the buffer "schematron" is the result of applying an
+            XSLT transformation on the Schematron schema. This transformation produces
+            a validating XSLT stylesheet which will be applied to the input stream of 
+            the STX process afterwards. Using only XSLT and the metastylesheet
+            reference implementation "schematron-basic.xsl" requires the manual
+            execution of these two steps.
+                  </font></blockquote>
+      
+          
+              
+      <p>Invocation:</p>
+              
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>joost document.xml <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/schematron.stx" target="_blank">schematron.stx</a> schema=<a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/val.sch" target="_blank">val.sch</a></pre></td>
+         </tr>
+      </tbody></table>
+              
+      <blockquote><font style="font-family: sans-serif;" size="-1">In this example the file <code>val.sch</code> is a simple
+                        schema that checks if the root element of the input document is
+                        <code>stx:transform</code>. Running the example requires the two
+                        additional files <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/schematron-basic.xsl" target="_blank">schematron-basic.xsl</a> and
+                        <a href="http://www2.informatik.hu-berlin.de/%7Eobecker/Docs/EML2003/skeleton1-5.xsl" target="_blank">skeleton1-5.xsl</a> to be in the working
+                        directory.</font></blockquote>
+            
+      
+          
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>22 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <h3>Pluggable Filters in Joost</h3>
+          
+      <p>How to provide a custom filter implementation for a URI?</p>
+      
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+                    I've started this presentation with a motivation for SAX filter
+                    processing. After telling you that special transformation components
+                    (XSLT and STX-based) might be easier to develop and maintain, and
+                    that STX moreover allows the splitting of large documents into
+                    smaller fragments, one last question remains: how can I use
+                    existing custom filter implementations from an STX engine?
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">Using Joost it is very simple to plug in custom SAX filter
+                    implementations. The only prerequisites are
+                    
+            <ul>
+                         
+               <li> the filter implementation must support the 
+                              <code>javax.xml.transform.sax.TransformerHandler</code>
+                              interface
+               </li>
+                         
+               <li>the filter implementation must accept a
+                              <code>javax.xml.transform.sax.SAXResult</code>
+                              object for sending the result SAX event stream to.
+               </li>
+                       
+            </ul>
+                    (In the first JAXP example you've seen already both
+                    <code>TransformerHandler</code> and <code>SAXResult</code>
+                    as participants in a SAX filter chain.)</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">Actually Joost doesn't need a full implementation for this
+                    interface. In particular, the <code>getTransformer()</code> method
+                    won't be invoked by Joost, thus it's sufficient to provide an
+                    empty method.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">Registering such an implementation works in the same way as
+                    the familiar approach, when a custom
+                    <code>javax.xml.transform.Source</code> object for an URI
+                    appearing in the transformation may be provided via a 
+                    <code>javax.xml.transform.URIResolver</code>.</font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">Joost provides a special <code>TransformerHandlerResolver</code>
+                    interface for resolving <code>TransformerHandler</code> objects.
+                    Its method <code>resolve()</code> will be called when an
+                    <code>stx:process-</code>*** instruction bearing a
+                    <code>filter-method</code> attribute is encountered, 
+                    passing the filter URI, the source specification and the parameters as 
+                    arguments. It then returns either a <code>TransformerHandler</code>
+                    object, or <code>null</code> if such an object cannot be created.</font></blockquote>
+          
+          
+      <ol>
+               
+         <li>The filter has to implement the interface
+                    <strong><code>javax.xml.transform.sax.TransformerHandler</code></strong></li>
+               
+         <li>The new resolver interface
+                    <strong><code>TransformerHandlerResolver</code></strong> returns a
+                    filter object (similar to <code>URIResolver</code>)
+         </li>
+             
+      </ol>
+      
+          
+      <table border="1" cellpadding="7" cellspacing="0" width="100%">
+         <tbody><tr>
+            <td><pre>public interface TransformerHandlerResolver
+{
+   // <em>invoked for a url(...) source</em>
+   TransformerHandler resolve(String method, String href, String base,
+                              Hashtable params)
+      throws SAXException;
+
+   // <em>invoked for a buffer(...) source</em>
+   TransformerHandler resolve(String method, XMLReader reader, 
+                              Hashtable params)
+      throws SAXException;
+
+   // <em>implements the STX function filter-available()</em>
+   boolean available(String filter);
+}</pre></td>
+         </tr>
+      </tbody></table>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">Such a resolver can be registered using the
+                    <code>setAttribute</code> method of Joost's
+                    <code>TransformerFactory</code>, which is again
+                    specified already by JAXP 1.1.</font></blockquote>
+        
+      <hr noshade="noshade" size="1">
+      <table align="right" border="0" cellpadding="0" cellspacing="0">
+         <tbody><tr>
+            <td>23 / 23</td>
+         </tr>
+      </tbody></table>
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            This paper has demonstrated that the streaming transformation language STX 
+            may be used to split a SAX event stream into fragments and pass these 
+            fragments to other SAX filter components. This enables the transformation 
+            of very large XML documents that are on the one hand too big for XSLT, but 
+            on the other hand too complicated to transform solely an a stream basis with 
+            STX. Splitting the stream into fragments allows hybrid techniques, so that 
+            each of the fragments can be transformed independently, e.g. by an XSLT 
+            engine.
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            Furthermore, using the Java-based STX implementation Joost, it is very easy
+            to create custom SAX filters that can be invoked from an STX transformation.
+            The interface on the STX level is language-independent, the interfaces for
+            using Joost are standardized in the JAXP 1.1 package.
+                  </font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+                    [Closing note: the specification for using external filter components
+                    described here is currently under revision. Instead of sending the
+                    result of an external component directly to the current result
+                    stream, it might be redirected to the input stream. Thus, such a
+                    filter would act as a preprocessing step for the current
+                    <code>stx:process-</code>*** instruction.]
+                  </font></blockquote>
+          
+          
+      <div align="center">
+               
+         <h2>Thank you for your attention!</h2>
+               
+         <h2>Questions?</h2>
+             
+      </div>
+          
+          
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            <hr></font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1"><strong>Bibliography</strong></font></blockquote>
+      <blockquote><font style="font-family: sans-serif;" size="-1">
+            <table>
+                       
+               <tbody><tr>
+                            
+                  <td valign="top"><a name="bib1">[1]</a>&nbsp;
+                  </td>
+                            
+                  <td>Petr Cimprich, Oliver Becker et. al:
+                                 "<em>Streaming Transformations for XML (STX)</em>",
+                                 <a href="http://stx.sourceforge.net/documents/" target="_blank">http://stx.sourceforge.net/documents/</a></td>
+                          
+               </tr>
+                       
+               <tr>
+                            
+                  <td valign="top"><a name="bib2">[2]</a></td>
+                            
+                  <td>Oliver Becker, Paul Brown, Petr Cimprich: 
+                                 "<em>An Introduction to Streaming Transformations for XML</em>",
+                                 xml.com,
+                                 <a href="http://www.xml.com/pub/a/2003/02/26/stx.html" target="_blank">http://www.xml.com/pub/a/2003/02/26/stx.html</a></td>
+                          
+               </tr>
+                       
+               <tr>
+                            
+                  <td valign="top"><a name="bib3">[3]</a></td>
+                            
+                  <td>Oliver Becker: "<em>Transforming XML on the Fly</em>",
+                                 XML Europe 2003, Proceedings,
+                                 <a href="http://www.idealliance.org/papers/dx_xmle03/papers/04-02-02/04-02-02.html" target="_blank">http://www.idealliance.org/papers/dx_xmle03/papers/04-02-02/04-02-02.html</a></td>
+                          
+               </tr>
+                       
+               <tr>
+                            
+                  <td valign="top"><a name="bib4">[4]</a></td>
+                            
+                  <td><em>Joost, A Java-based STX processor</em>,
+                                 <a href="http://joost.sourceforge.net/" target="_blank">http://joost.sourceforge.net/</a></td>
+                          
+               </tr>
+                       
+               <tr>
+                            
+                  <td valign="top"><a name="bib5">[5]</a></td>
+                            
+                  <td>Rick Jelliffe: "<em>The Schematron – An XML Structure
+                                      Validation Language using Patterns in Trees</em>",
+                                 <a href="http://xml.ascc.net/xml/resource/schematron/schematron.html" target="_blank">http://xml.ascc.net/xml/resource/schematron/schematron.html</a></td>
+                          
+               </tr>
+                     
+            </tbody></table></font></blockquote>
+        
+      <hr noshade="noshade" size="1">
+      <p class="footer"><font size="-1">
+                <em>Extended SAX Filter Processing with STX</em>,
+                &nbsp;&nbsp;
+                Extreme Markup Languages 2003–08–06,
+                &nbsp;&nbsp;
+                © Oliver Becker
+              </font></p>
+   
+</body></html>

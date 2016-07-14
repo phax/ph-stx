@@ -1,0 +1,1949 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="EN"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><title>Streaming Transformations for XML (STX) Version 1.0</title><style type="text/css">
+code           { font-family: monospace; }
+
+div.constraint,
+div.note,
+div.notice     { margin-left: 2em; }
+
+div.issue { padding-left: 5px; padding-right: 5px; margin-top: 5px;
+            padding-top: 1px; padding-bottom: 1px;
+            background-color: #f0f0d0 }
+
+li p           { margin-top: 0.3em;
+                 margin-bottom: 0.3em; }
+
+div.exampleInner pre { margin-left: 1em;
+                       margin-top: 0em; margin-bottom: 0em}
+div.exampleOuter {border: 4px double gray;
+                  margin: 0em; padding: 0em}
+div.exampleInner { background-color: #d5dee3;
+                   border-top-width: 4px;
+                   border-top-style: double;
+                   border-top-color: #d3d3d3;
+                   border-bottom-width: 4px;
+                   border-bottom-style: double;
+                   border-bottom-color: #d3d3d3;
+                   padding: 4px; margin: 0em }
+div.exampleWrapper { margin: 4px }
+div.exampleHeader { font-weight: bold;
+                    margin: 4px}
+</style><link rel="stylesheet" type="text/css" href="Streaming%20Transformations%20for%20XML%20%28STX%29%20Version%201.0-Dateien/base.css"></head><body><div class="head"><p><a href="http://stx.sourceforge.net/"><img src="Streaming%20Transformations%20for%20XML%20%28STX%29%20Version%201.0-Dateien/stx_home.gif" alt="STX" width="88" height="35"></a></p>
+<h1><a name="title" id="title"></a>Streaming Transformations for XML (STX)<br>Version 1.0</h1>
+<h2><a name="w3c-doctype" id="w3c-doctype"></a>Working Draft 27 April 2007</h2><dl><dt>This version:</dt><dd>
+      <a href="http://stx.sourceforge.net/documents/spec-stx-20040701.html">http://stx.sourceforge.net/documents/spec-stx-20070427.html</a>
+    </dd><dt>Latest version:</dt><dd>
+      <a href="http://stx.sourceforge.net/documents/">http://stx.sourceforge.net/documents/</a>
+    </dd><dt>Authors and Contributors:</dt><dd>Petr Cimprich <a href="mailto:n/a">&lt;petr at NO-SPAM.gingerall.cz&gt;</a></dd><dd>Oliver Becker <a href="mailto:n/a">&lt;obecker at NO-SPAM.informatik.hu-berlin.de&gt;</a></dd><dd>Christian Nentwich <a href="mailto:n/a">&lt;c.nentwich at NO-SPAM.cs.ucl.ac.uk&gt;</a></dd><dd>Honza Jiroušek <a href="mailto:n/a">&lt;honza.jirousek at NO-SPAM.ecn.cz&gt;</a></dd><dd>Manos Batsis <a href="mailto:n/a">&lt;mbatsis at NO-SPAM.humanmarkup.org&gt;</a></dd><dd>Paul Brown <a href="mailto:n/a">&lt;prb at NO-SPAM.fivesight.com&gt;</a></dd><dd>Michael Kay <a href="mailto:n/a">&lt;michael.h.kay at NO-SPAM.ntlworld.com&gt;</a></dd></dl><p class="copyright">Copyright © 2002-2005 authors and contributors. All rights 
+      reserved.</p></div><hr><div>
+<h2><a name="abstract" id="abstract"></a>Abstract</h2><p>STX is an XML-based language for transforming XML documents into 
+      other XML documents without building a tree in memory. An STX processor 
+      transforms one or more source streams of XML events according to rules 
+      given in an XML document called STX transformation sheet and generates one 
+      or more result XML streams. Each incoming event invokes one or more rules, 
+      that can e.g. emit events to a result stream or access a working 
+      storage.</p></div><div>
+<h2><a name="status" id="status"></a>Status of this Document</h2><p>This document is a working draft of the STX transformation language 
+      specification.</p></div><div class="toc">
+<h2><a name="contents" id="contents"></a>Table of Contents</h2><p class="toc">1 <a href="#introduction">Introduction</a><br>2 <a href="#concepts">Concepts</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#initiating-a-transformation">Initiating a Transformation</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.2 <a href="#context">Context</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.3 <a href="#precedence-categories">Precedence Categories</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.4 <a href="#expressions">Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.5 <a href="#match-patterns">Match Patterns</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.6 <a href="#avt">Attribute Value Templates</a><br>&nbsp;&nbsp;&nbsp;&nbsp;2.7 <a href="#stx-errors">Errors</a><br>3 <a href="#data-model">Data Model</a><br>&nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="#xml-schemas-and-types">XML Schemas and Types</a><br>&nbsp;&nbsp;&nbsp;&nbsp;3.2 <a href="#accessors">Accessors</a><br>&nbsp;&nbsp;&nbsp;&nbsp;3.3 <a href="#nodes">Nodes</a><br>&nbsp;&nbsp;&nbsp;&nbsp;3.4 <a href="#atomic-values">Atomic Values</a><br>&nbsp;&nbsp;&nbsp;&nbsp;3.5 <a href="#whitespace-stripping">Whitespace Stripping</a><br>4 <a href="#sheet-structure">STX Transformation Sheet Structure</a><br>&nbsp;&nbsp;&nbsp;&nbsp;4.1 <a href="#stx-namespace">STX Namespace</a><br>&nbsp;&nbsp;&nbsp;&nbsp;4.2 <a href="#transform-element">Transform Element</a><br>&nbsp;&nbsp;&nbsp;&nbsp;4.3 <a href="#grouping-of-templates">Grouping of Templates</a><br>&nbsp;&nbsp;&nbsp;&nbsp;4.4 <a href="#sheet-inclusion">STX Transformation Sheet Inclusion</a><br>5 <a href="#generating-output">Generating Output</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.1 <a href="#namespace-aliasing">Namespace Aliasing</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.2 <a href="#templates">Templates</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.3 <a href="#procedures">Procedures</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.4 <a href="#Parameters">Parameters</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.5 <a href="#copying-the-current-node">Copying the Current Node</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.6 <a href="#processing-nested-events">Processing Nested Events</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.7 <a href="#processing-attributes">Processing Attributes</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.8 <a href="#processing-siblings">Processing Siblings</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.9 <a href="#running-overridden-templates">Running Overridden Templates</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.10 <a href="#outputting-strings">Outputting Strings</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.11 <a href="#outputting-elements-and-attributes">Outputting Elements and Attributes</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.12 <a href="#outputting-other-nodes">Outputting Other Nodes</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.13 <a href="#conditions">Conditions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.14 <a href="#loops">Loops</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.15 <a href="#multiple-input-documents">Multiple Input Documents</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.16 <a href="#multiple-output-documents">Multiple Output Documents</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.17 <a href="#buffers">Buffers</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.18 <a href="#external-filters">Using external filters</a><br>&nbsp;&nbsp;&nbsp;&nbsp;5.19 <a href="#messages">Messages</a><br>6 <a href="#stxpath-lang">STXPath</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.1 <a href="#literals">Literals</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.2 <a href="#variables">Variables</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.3 <a href="#parenthesized-expressions">Parenthesized Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.4 <a href="#context-item-expression">Context Item Expression</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.5 <a href="#functions">Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.1 <a href="#sequence-functions">Sequence Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.2 <a href="#node-functions">Node Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.3 <a href="#boolean-functions">Boolean Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.4 <a href="#string-functions">String Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.5 <a href="#numerical-functions">Numerical Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.6 <a href="#aggregate-functions">Aggregate Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.7 <a href="#conversion-functions">Conversion Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.8 <a href="#other-functions">Other Functions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.6 <a href="#path-expressions">Path Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.7 <a href="#predicate">Predicate</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.8 <a href="#sequence-expressions">Sequence Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.9 <a href="#arithmetic-expressions">Arithmetic Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.10 <a href="#comparison-expressions">Comparison Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.11 <a href="#logical-expressions">Logical Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.12 <a href="#for-expressions">For Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.13 <a href="#conditional-expressions">Conditional Expressions</a><br>&nbsp;&nbsp;&nbsp;&nbsp;6.14 <a href="#quantified-expressions">Quantified Expressions</a><br></p>
+<h3><a name="appendices" id="appendices"></a>Appendices</h3><p class="toc">A <a href="#references">References</a><br>&nbsp;&nbsp;&nbsp;&nbsp;A.1 <a href="#normative-references">Normative References</a><br>&nbsp;&nbsp;&nbsp;&nbsp;A.2 <a href="#other-references">Other References</a><br>B <a href="#element-syntax-summary">List of STX Instructions and Declarations</a><br>C <a href="#stxpath">STXPath Grammar</a><br>D <a href="#filter-uris">Recommended filter URIs</a> (Non-Normative)<br>E <a href="#acknowledgments">Acknowledgments</a> (Non-Normative)<br>F <a href="#changehistory">Draft Change History since WD 1 July 2004</a> (Non-Normative)<br></p></div><hr><div class="body"><div class="div1">
+<h2><a name="introduction" id="introduction"></a>1 Introduction</h2><p>This document defines the syntax and semantics of the STX transformation 
+	language. Transformation rules in STX are expressed as well-formed XML 
+	documents. These documents, called STX transformation sheets (abbreviated 
+	as stx-sheets), may include both elements that are defined by STX (STX 
+	declarations and instructions) and other elements (literals). STX-defined 
+	elements are identified by a specific XML namespace, which is referred to 
+	in this specification as the STX namespace. This document uses the 'stx' 
+	prefix as a shortcut for referring to elements from the STX 
+	namespace.</p><p>An STX transformation describes rules for transforming one or more 
+	source XML documents into one or more result XML documents. The STX 
+	language is designed in a way which allows transformations to have a 
+	streaming character. This means that it does not need to build a tree 
+	representing the source documents in memory. Result events are generated 
+	as soon as source events appear and are processed. Because of the 
+	streaming character of STX transformations, source XML documents are 
+	supposed to be provided as streams of XML events. This is why the source 
+	documents are also referred to as source streams of XML events. The same 
+	is true for result XML documents that may be referred to as result 
+	streams of XML events.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The term 'XML events' used within this specification refers to any 
+	sequence of events describing a structure of XML document. The STX 
+	language does not require any particular set of such events (like SAX2, 
+	StAX or Expat events). Implementations are free to support any APIs to 
+	communicate with source stream providers and result stream handlers.
+	</p></div><p>The transformation is achieved by associating events with templates. 
+	A template <a href="#NT-pattern">pattern</a> is matched against events 
+	and their context. The best matching template is then instantiated to 
+	create a part of the result stream. A template is always instantiated 
+	with respect to the current context, a set of additional information 
+	maintained during the transformation. In constructing the result stream, 
+	events from the source stream can be filtered and arbitrary events can be 
+	added. Events can also be reordered using a working storage.</p><p>On the surface, the syntax of STX is similar to the syntax of 
+        <a href="#XSLT2">[XSLT 2.0]</a>. STX also employs a compact expression language 
+	embedded in certain attributes. This expression language, called STXPath, 
+	is syntactically similar to <a href="#XPath2">[XPath 2.0]</a>. This should allow XSLT 
+	users to easily adapt to the STX syntax.</p></div><div class="div1">
+<h2><a name="concepts" id="concepts"></a>2 Concepts</h2><p>The software responsible for running an STX transformation is referred 
+	to as an <b>STX processor</b>. An STX processor transforms one or more 
+	source XML documents according to rules given in an STX transformation 
+	sheet and generates one or more result XML documents.</p><p>The source documents are supplied in the form of streams of XML events. 
+	These streams are referred to as the <b>source streams</b>. The stream 
+	whose events are currently processed is referred to as the 
+	<b>current source stream</b>. The current source stream at the time 
+	when the transformation is initiated is referred to as the 
+	<b>principal source stream</b>.</p><p>A possibly empty set of external values for stx-sheet
+        parameters is supplied. These values are available for use within 
+	expressions in the stx-sheet.</p><p>No tree representation of the source document is constructed. 
+	However, when processing each event, a limited amount of contextual 
+	information is available from the system.</p><p>Data arriving with source events form nodes of a data model for source 
+	documents (see <a href="#data-model"><b>3 Data Model</b></a>). The data model is a tree of 
+	nodes. However, a processor does not build the complete tree; just a 
+	limited set of nodes is available at each time of processing.</p><p>The stx-sheet is a well-formed XML document that may be precompiled to 
+	some kind of executable representation that can be reused to perform 
+	multiple transformations. The stx-sheet can consist of several stx-sheet 
+	modules contained in different files. One of these modules is the 
+	<b>principal stx-sheet module</b>. The complete stx-sheet is assembled 
+	by finding the stx-sheet modules referenced directly or indirectly from 
+	the principal stx-sheet module using the <code>stx:include</code>
+	declaration.</p><p>The output of a transformation consists of one or more sequences of XML 
+	events. These sequences of events are referred to as 
+	<b>result streams</b>. The stream where events are currently emitted to 
+	is referred to as the <b>current result stream</b>. The current result 
+	stream at the time when the transformation is initiated is 
+	referred to as the <b>principal result stream</b>.</p><p>Each incoming event can cause an invocation of one or more rules within 
+	the stx-sheet by means of a match <a href="#NT-pattern">pattern</a>. The 
+	actions such a rule may perform include emitting XML events to result 
+	streams, saving working data to a working storage, accessing data written 
+	to the working storage by previously executed rules, and invoking other 
+	rules.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>Source and result streams are abstract constructs that function
+	  as input or output channels for STX transformations. Each source or 
+	  result stream is identified with a URI. This URI must not be confused
+	  with a URI of physical document that may be parsed to generate the
+	  source stream or a URI of document the result stream may be serialized 
+	  to. Stream URIs are passed to a resolver that maps abstract streams to 
+	  physical resources.</p></div><div class="div2">
+<h3><a name="initiating-a-transformation" id="initiating-a-transformation"></a>2.1 Initiating a Transformation</h3><p>This document does not specify interfaces for initiating 
+	  an STX transformation. Instead, these interfaces are 
+	  implementation defined. This section describes the minimum amount 
+          of information that must be supplied to execute a transformation:</p><ul><li><p>An identification of the stx-sheet module that is to act as
+              the principal stx-sheet module for the transformation.</p></li><li><p>A possibly empty set of values for stx-sheet parameters 
+	      (name-value pairs). External parameter values are matched against 
+	      global stx-sheet parameters.</p></li><li><p>An identification of the stream that is to act as the
+              principal source stream.</p></li><li><p>An identification of the stream that is to act as the
+              principal result stream.</p></li></ul></div><div class="div2">
+<h3><a name="context" id="context"></a>2.2 Context</h3><p>There is a contextual information available at each point during 
+	  processing. It includes the data arriving with the current event and 
+	  other data related to the state of processing. The contextual 
+	  information at any particular instant during the processing 
+	  is called the <b>current context</b>. The context information 
+	  consists of the following parts:
+	</p><ul><li><p><em>current node data</em> - The node which is the subject 
+	      of the current event is called the <b>current node</b>. The 
+	      information available for the current node depends on the node 
+	      kind; see <a href="#data-model"><b>3 Data Model</b></a> for details.</p></li><li><p><em>ancestor stack</em> - All ancestor nodes of the 
+	      current node with all their properties are stored in the ancestor 
+	      stack.</p></li><li><p><em>position within siblings</em> - Information about 
+	      the position relative to other siblings is kept. The position is 
+	      available for the current node and all its ancestors.</p><p>A position number is available for all node kind tests such as 
+	      <code>node()</code>, <code>text()</code>, <code>cdata()</code>, 
+	      <code>processing-instruction()</code>, <code>comment()</code>, 
+	      and <code>doctype()</code>. For elements, the position is 
+	      available for all qualified names or names 
+	      containing * shortcut: <code>pre:lname</code>, <code>lname</code>, 
+	      <code>pre:*</code>, <code>*:lname</code>, <code>*</code>. For 
+	      processing instructions, the position is also available for each 
+	      target. The position of attribute nodes is undefined.</p></li></ul></div><div class="div2">
+<h3><a name="precedence-categories" id="precedence-categories"></a>2.3 Precedence Categories</h3><p>Each incoming event can invoke a template within the stx-sheet by 
+	  means of precedence categories and a match pattern (see 
+	  <a href="#match-patterns"><b>2.5 Match Patterns</b></a>). The template that is used to process 
+	  the current node is called the <b>current template</b>. Templates 
+	  can be separated into groups (see 
+	  <a href="#grouping-of-templates"><b>4.3 Grouping of Templates</b></a>). Top-level templates are 
+	  considered to be members of the default group. The group containing
+	  the current template is referred to as the <b>current group</b>.</p><p>Templates are classed into the precedence categories according to 
+	  their visibility from a <b>base group</b>. The base group can be 
+	  either the current group or the group explicitly specified in the 
+	  <code>group</code> attribute of current process statement. The 
+	  visibility is defined using the <code>visibility</code> and 
+	  <code>public</code> attributes for each template 
+	  (see <a href="#templates"><b>5.2 Templates</b></a>).</p><p>There are three precedence categories (listed with decreasing 
+	  precedence):</p><ol type="1"><li><p>templates from the base group and public templates 
+	      (<code>public="yes"</code>) from groups that are children of the 
+	      base group</p></li><li><p>group templates (<code>visibility="group"</code>) and global 
+	      templates (<code>visibility="global"</code>) from all groups that 
+	      are ancestors of the base group</p></li><li><p>all global templates 
+	      (<code>visibility="global")</code></p></li></ol><p>The first precedence category is searched for the best matching 
+	  template by means of a match pattern (see 
+	  <a href="#match-patterns"><b>2.5 Match Patterns</b></a>). If there is no matching template in 
+	  the first precedence category, the second category is searched. If 
+	  neither the first nor the second category contain a matching template, 
+	  the third category is searched.</p></div><div class="div2">
+<h3><a name="expressions" id="expressions"></a>2.4 Expressions</h3><p>STX uses an expression language called <b>STXPath</b> that is 
+	  defined later in this specification (see 
+	  <a href="#stxpath-lang"><b>6 STXPath</b></a>).</p><p>Expressions are used in match patterns, to specify conditions for 
+	  different ways of processing of the current node, to generate text to 
+	  be inserted to an output stream, or to access data from the ancestor 
+	  stack.</p><p>An STXPath expression may occur as the value of certain attributes 
+	  on STX elements, and also within curly braces in attribute value 
+	  templates (see <a href="#avt"><b>2.6 Attribute Value Templates</b></a>). The context within an stx-sheet 
+	  where an STXPath expression appears may specify a required data type; 
+	  the type of value that the expression is expected to return.</p><p>STXPath expressions can include built-in functions whose expanded
+	  names are identified by a specific namespace which is referred to as 
+	  the STX function namespace. This document uses the 'sf' prefix as a 
+	  shortcut for referring to the built-in STXPath functions</p><p>It is a static error if the value of an expression attribute does not 
+	  match the STXPath production <a href="#NT-expression">expression</a>. 
+	  It is a dynamic error if any STXPath expression is evaluated and 
+	  raises an error, or when it raises an error when converting to the 
+	  required data type.</p><p>The attribute <code>stxpath-default-namespace</code> of the
+	  <code>stx:transform</code> element (see 
+	  <a href="#transform-element"><b>4.2 Transform Element</b></a>) may be used to define the 
+	  namespace that will be used for an unprefixed name used as a 
+	  <a href="#prod-NameTest">name test</a> within a step of an
+	  STXPath <a href="#NT-expression">expression</a> or 
+	  <a href="#NT-pattern">pattern</a>. The value of the attribute is the 
+	  namespace URI to be used.</p><p>This default namespace URI applies only to elements; it does not 
+	  apply to attributes. In the absence of this attribute, an unqualified 
+	  <a href="#prod-NameTest">name test</a> matches an element whose 
+	  namespace URI is null: the default namespace of XML document (as 
+	  defined by an <code>xmlns="some-uri"</code> declaration) is not 
+	  used.</p></div><div class="div2">
+<h3><a name="match-patterns" id="match-patterns"></a>2.5 Match Patterns</h3><p>
+	  A match <a href="#NT-pattern">pattern</a> specifies a set of 
+	  conditions on the current context. If the current context satisfies 
+	  the conditions the current node matches the pattern; if the current 
+	  context does not satisfy the conditions the current node does not 
+	  match the pattern. The syntax for STX 
+	  <a href="#NT-pattern">patterns</a> is a subset of the syntax for 
+	  STXPath <a href="#NT-expression">expressions</a>. In particular, 
+	  patterns are in form of location paths that meet certain 
+	  restrictions.</p><p>Here are some examples of patterns:</p><ul><li><p><code>item</code> - matches any 'item' element from the 
+	      namespace used for unprefixed STXPath path patterns (defined with 
+	      'stxpath-default-namespace' attribute, no namespace by 
+	      default)</p></li><li><p><code>list/item</code> - matches any 'item' element with a
+	      'list' parent, where both elements are from the namespace used for 
+	      unprefixed STXPath path patterns</p></li><li><p><code>chapter//list/item</code> - matches any 'item' element 
+	      with a 'list' parent and a 'chapter' ancestor, where all three 
+	      elements are from the namespace used for unprefixed STXPath path 
+	      patterns</p></li><li><p><code>/root/list/*</code> - matches any element with a 'list' 
+	      parent and a 'root' grand parent which is the document element, where 
+	      both 'root' and 'list' elements are from the namespace used for 
+	      unprefixed STXPath path patterns</p></li><li><p><code>pre:list[@id=5]/pre:item</code> - matches any
+	      'item' element with a 'list' parent having an 'id'
+	      attribute with a value of 5, where both elements are
+	      from the namespace which is bound to the 'pre' prefix in
+	      the stx-sheet for this rule</p></li><li><p><code>*[sf:position()=1]</code> - matches any element that is 
+	      the first element child of its parent</p></li><li><p><code>node()</code> - matches any child node</p></li><li><p><code>text()</code> - matches any text node (including CDATA 
+	      text node)</p></li><li><p><code>cdata()</code> - matches any CDATA text node</p></li><li><p><code>processing-instruction()</code> -  matches any 
+	      processing instruction</p></li></ul><p>A match <a href="#NT-pattern">pattern</a> is a set of location path 
+	  patterns separated with <code>|</code>. A location path pattern is a 
+	  location path whose steps are separated either by the <code>/</code> 
+	  (child axis) operator or by the <code>//</code> operator (descendant 
+	  axis). Up to one predicate is allowed in each step. Predicate 
+	  expressions are STXPath <a href="#NT-expression">expressions</a> 
+	  (see <a href="#expressions"><b>2.4 Expressions</b></a>).</p><p>Predicate expressions are evaluated using the current
+	  context. If the result is a number, the result will be converted to 
+	  true if the number is equal to the context position and will be 
+	  converted to false otherwise. Thus a location path <code>p[3]</code> 
+	  is equivalent to <code>p[sf:position()=3]</code>. Otherwise the
+	  result will be converted to a boolean using the type
+	  conversion rules described in <a href="#stxpath-lang"><b>6 STXPath</b></a>.
+	  If the result of evaluating and converting the predicate
+	  expression is false, the pattern does not match the current node.</p><p>If there is no matching template available a <b>default rule</b> 
+	  is applied. One of three default rules, specified in the
+	  <code>pass-through</code> attribute of <code>stx:transform</code>
+	  or <code>stx:group</code> element can be used: "none" (to skip 
+	  the current node), "all" (to pass through the current 
+	  node), and "text" (to pass through the current node 
+	  only if it is a text node). All these three default rules process 
+	  all children of the current node, thus the processing does not stop
+	  when a default rule is applied. The default rule can be set for the
+	  stx-sheet (see <a href="#transform-element"><b>4.2 Transform Element</b></a>) or for a group 
+	  (see <a href="#grouping-of-templates"><b>4.3 Grouping of Templates</b></a>). This feature enables 
+	  copying of documents with only a few changes, and to 
+	  straightforwardly select just a few items from a document. The 
+	  default behavior is to ignore all not matching events (value 
+	  "none") on the stx-sheet level. Groups inherit the
+	  pass-through behavior from their parent group when not specified 
+	  explicitly.</p><p>It is possible that the current context matches more than one rule 
+	  within a precedence category. Each rule has a computed priority 
+	  value. The computed priority can be overridden with a 'priority' 
+	  attribute value (see <a href="#templates"><b>5.2 Templates</b></a>).</p><ol type="1"><li><p>If the <a href="#NT-pattern">pattern</a> contains multiple 
+	      alternatives separated with <code>|</code>, then it is treated 
+	      equivalently to a set of template rules, one for each 
+	      alternative.</p></li><li><p>If the pattern has the form of a <em>qualified name</em> 
+	      or has the form either of 
+	      <em>processing-instruction(target)</em> or 
+	      <em>cdata()</em>, then the priority is 
+	      <em>0</em>.</p></li><li><p>If the pattern has the form <em>pre:*</em> or 
+	      <em>*:lname</em>, then the priority is 
+	      <em>-0.25</em>.</p></li><li><p>If the pattern consists of just a <em>node test</em> 
+	      other than cdata(), then the priority is 
+	      <em>-0.5</em>.</p></li><li><p>Otherwise, the priority is <em>0.5</em>.</p></li></ol><p>
+	  The rule with the highest priority is used. If there is more than one 
+	  matching template rule with the highest priority, an STX processor  
+	  must select the rule that occurs the last in the stx-sheet.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The rules to determine an STX template to be instantiated are, 
+	  with the exception of cdata(), the same as in XSLT 1.0 (see 
+	  <a href="#XSLT">[XSLT 1.0]</a>, 5.5).</p></div></div><div class="div2">
+<h3><a name="avt" id="avt"></a>2.6 Attribute Value Templates</h3><p>In an attribute that is designated as an attribute value template an 
+	  STXPath expression can be used by surrounding the expression with 
+	  curly braces ({}).</p><p>An attribute value template consists of an alternating sequence of 
+	  fixed parts and variable parts. A variable part consists of an STXPath 
+	  expression enclosed in curly braces ({}). A fixed part may contain any 
+	  characters, except that a left curly brace must be written as {{ and 
+	  a right curly brace must be written as }}.</p><p>The result of evaluating an attribute value template is obtained by 
+	  concatenating the expansions of the fixed and variable parts. The 
+	  expansion of a fixed part is obtained by replacing any double curly 
+	  braces ({{ or }}) by the corresponding single curly brace. The 
+	  expansion of a variable part is obtained by evaluating the enclosed 
+	  STXPath expression and converting the resulting value to a string.</p><p>If a left curly brace appears in an attribute value template without 
+	  a matching right curly brace, or if a right curly brace occurs in an 
+	  attribute value template outside an expression without being followed 
+	  by a second right curly brace, a processor must signal a static error.</p></div><div class="div2">
+<h3><a name="stx-errors" id="stx-errors"></a>2.7 Errors</h3><p>All errors that can occur during an STX transformation belong to one
+	  of the following categories:</p><ul><li><p><em>warnings</em> - The processor may issue a warning; the 
+	      transformation must not be stopped.</p></li><li><p><em>errors</em> - The processor
+	      must exit the transformation and issue an error message.</p></li></ul><p>This specification does not define how to issue a warning or an error. 
+	  Implementations are free to use either the standard output or standard 
+	  error output, or any convenient error handler.</p></div></div><div class="div1">
+<h2><a name="data-model" id="data-model"></a>3 Data Model</h2><p>STX operates on a transformation sheet document and one or more source
+	and result documents. The stx-sheet document uses the 
+	<a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a>. The source and result documents use a specific 
+	STX Data Model which is derived from the XQuery 1.0 and XPath 2.0 Data Model. This section describes 
+	additions, restrictions and modifications to the XQuery 1.0 and XPath 2.0 Data Model to derive the 
+	STX Data Model. Additions describe information that is required for STX 
+	processing but that is not contained in the XQuery 1.0 and XPath 2.0 Data Model. Restrictions 
+	describe features of the XQuery 1.0 and XPath 2.0 Data Model that are never used in STX. 
+	Modifications describe rules about the way in which trees in the STX Data 
+	Model are constructed that are different from the rules of the XQuery 1.0 and XPath 2.0 Data Model. 
+	Each item is marked as either addition, restriction or modification in 
+	this section.</p><div class="div2">
+<h3><a name="xml-schemas-and-types" id="xml-schemas-and-types"></a>3.1 XML Schemas and Types</h3><b>[Restriction]</b><p>The aspects of the <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a> that are dependent on W3C 
+	  XML Schema are not used in STX.</p><ul><li><em>Validity assessments:</em> STX does not expect parsers to 
+	    validate source documents; it does not work with any PSVI 
+	    information.</li><li><em>Type assessment:</em> All elements and attributes are 
+	    treated as untyped in STX.</li></ul></div><div class="div2">
+<h3><a name="accessors" id="accessors"></a>3.2 Accessors</h3><p>A set of accessors is defined on all nodes in <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a>.
+	  These accessors are shown with the prefix 'dm'. Additional, STX 
+	  specific, accessors are shown with the prefix 'stxdm'. The prefixes 
+	  are not bound to namespaces as both kinds of accessor are abstract, 
+	  not directly accessible functions.</p><b>[Restriction]</b><p>The following accessors are never used during STX transformations on 
+	  any node:</p><ul><li>dm:typed-value</li><li>dm:type</li><li>dm:children</li><li>dm:nilled</li></ul><b>[Modification]</b><p>The dm:string-value accessor defined in <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a> is 
+	  replaced with an STX specific accessor stxdm:string-value. The way in 
+	  which the string value accessor of different kinds of nodes is computed 
+	  is the following: </p><ul><li>documents - the empty string.</li><li>elements - if the very first child of an element happens 
+	      to be a text node, the string-value of the element is the 
+	      string-value of this text node. Otherwise, the string-value of the
+	      element is the empty string.</li><li>attributes - the same as dm:string-value.</li><li>text nodes - the same as dm:string-value.</li><li>processing instructions - the same as dm:string-value.</li><li>comments - the same as dm:string-value.</li></ul></div><div class="div2">
+<h3><a name="nodes" id="nodes"></a>3.3 Nodes</h3><b>[Addition]</b><p>In addition to the kinds of nodes defined in 
+	  <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a> STX recognizes two more kinds: document type 
+	  nodes and cdata nodes.</p><p><em>Document type (doctype) nodes</em> represent an information 
+	  contained in document type declarations. Doctype has the following 
+	  properties:</p><ul><li>base-uri, possibly empty</li><li>node-name</li><li>parent</li><li>system-id, possibly empty</li><li>public-id, possibly empty</li></ul><p>Doctype nodes must satisfy these constrains:</p><ol type="1"><li>Every doctype node must have a unique identity, distinct from 
+	    all other nodes.</li><li>Parent property must contain the document element.</li></ol><p>The properties of doctype nodes are exposed by the following accessors 
+	  defined in <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a>.</p><ul><li>dm:base-uri - the value of base-uri property</li><li>dm:node-kind - "doctype"</li><li>dm:node-name - the name of doctype</li><li>dm:parent - the document node</li><li>dm:attributes - the empty sequence</li><li>dm:namespaces - the empty sequence</li></ul><p>Moreover, two extra STX accessors are defined for doctype nodes:</p><ul><li>stxdm:system-id - doctype system identifier</li><li>stxdm:public-id - doctype public identifier</li></ul><p><em>Cdata nodes</em> encapsulate XML character content enclosed 
+	  within CDATA boundaries. Cdata nodes have the same properties and 
+	  accessors as text nodes defined in <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a> with the only 
+	  exception of the dm:node-kind accessor which returns "cdata" for cdata 
+	  nodes.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The recognition of CDATA boundaries is optional in STX.
+	    When these boundaries are ignored the data model of source documents 
+	    contains no cdata nodes.</p></div><b>[Restriction]</b><p>Namespace nodes are not directly accessible in STX; they are not 
+	  exposed as nodes. The information held in namespace nodes is instead 
+	  made available using two functions: 
+	  <a href="#F-sf:get-in-scope-namespaces">sf:get-in-scope-namespaces</a> and
+	  <a href="#F-sf:get-namespace-uri-for-prefix">sf:get-namespace-uri-for-prefix</a>. Properties of 
+	  namespace nodes that are not exposed by these two functions can not 
+	  be accessed by STX processors.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The same restriction is applied in XPath 2.0.</p></div></div><div class="div2">
+<h3><a name="atomic-values" id="atomic-values"></a>3.4 Atomic Values</h3><b>[Modification]</b><p>In <a href="#XQXPDM">[XQuery 1.0 and XPath 2.0 Data Model]</a>, atomic values belong to the value space of 
+	  W3C XML Schema atomic types; this is, primitive simple types or types
+	  derived by restriction from a primitive simple type. The STX data 
+	  model recognizes only three atomic types:</p><ul><li><p>string</p></li><li><p>number</p></li><li><p>boolean</p></li></ul></div><div class="div2">
+<h3><a name="whitespace-stripping" id="whitespace-stripping"></a>3.5 Whitespace Stripping</h3><b>[Restriction]</b><p>Source documents and an stx-sheet may contain whitespace 
+	  nodes (text nodes consisting solely of whitespace characters: #x20, 
+	  #x9, #xD or #xA). Such whitespace nodes may be removed according to 
+	  the following rules. This process is referred to as whitespace
+          stripping.</p><p>Whitespace nodes are stripped from source documents if the 
+	  <code>strip-space</code> attribute of <code>stx:transform</code> (see 
+	  <a href="#transform-element"><b>4.2 Transform Element</b></a>) or <code>stx:group</code> 
+	  (see <a href="#grouping-of-templates"><b>4.3 Grouping of Templates</b></a>) is set to 
+	  "yes". Otherwise they are preserved and treated as 
+	  any other text nodes.</p><p>For stx-sheets, whitespace text nodes are preserved only if an 
+	  ancestor element of this text node has the <code>xml:space</code>
+          attribute set to "preserve", and no closer ancestor 
+	  element has <code>xml:space</code> set to "default". All 
+	  other whitespace nodes are removed from the stx-sheet.</p><p>The STX elements <code>stx:text</code> and <code>stx:cdata</code> have the 
+	  default <code>xml:space</code> attribute set to "preserve" 
+	  which may be overridden in the stx-sheet. <code>xml:space</code> 
+	  attributes on literal result elements will not be stripped from these 
+	  elements.</p></div></div><div class="div1">
+<h2><a name="sheet-structure" id="sheet-structure"></a>4 STX Transformation Sheet Structure</h2><div class="div2">
+<h3><a name="stx-namespace" id="stx-namespace"></a>4.1 STX Namespace</h3><p>The STX namespace has the URI 
+	  <code>http://stx.sourceforge.net/2002/ns</code>.</p><p>The STX functions namespace has the URI 
+	  <code>http://stx.sourceforge.net/2003/functions</code>.</p><p>These two namespaces are recognized as reserved namespaces in STX 
+	  transformation sheets, and may be used only for purposes specified in 
+	  this document.</p></div><div class="div2">
+<h3><a name="transform-element" id="transform-element"></a>4.2 Transform Element</h3><p><b>stx:transform</b></p><div class="exampleInner"><pre>&lt;!-- Category: root --&gt;
+&lt;stx:transform
+  version = number
+  pass-through = "none"|"all"|"text"
+  recognize-cdata = "yes"|"no"
+  stxpath-default-namespace = uri-reference
+  strip-space = "yes"|"no"
+  output-method = "xml"|"text"|qname-but-not-ncname
+  output-encoding = string
+  exclude-result-prefixes = tokens
+  &lt;!-- Content: top-level-elements --&gt;
+&lt;/stx:transform&gt;
+</pre></div><p>STX transformation sheets are required to use the root element  
+	  <code>stx:transform</code>.</p><p>The <code>version</code> attribute contains a version number to 
+	  distinguish language versions; this attribute is mandatory and its 
+	  value must be "1.0" for this version of STX.</p><p>The other attributes make it possible to set global properties of 
+	  the transformation. Some of these properties (pass-through, 
+	  recognize-cdata, strip-space) can also be set on the group level.</p><ul><li><p><code>pass-through</code> - This optional attribute specifies a 
+	      default rule how to treat events no matching template is found for. 
+	      These events are either ignored ("none", default) or 
+	      passed to the output without modification ("all"). 
+	      For the "text" value, only text nodes are passed 
+	      through to the output.</p></li><li><p><code>recognize-cdata</code> - This optional attribute 
+	      specifies whether CDATA boundaries are recognized during the 
+	      transformation. If so (<code>recognize-cdata="yes"</code>), 
+	      every CDATA section forms a single cdata node (see 
+	      <a href="#nodes"><b>3.3 Nodes</b></a>). Otherwise 
+	      (<code>recognize-cdata="no"</code>), CDATA boundaries 
+	      are ignored and all consequent character data form a single text 
+	      node. The default value is "yes".</p></li><li><p><code>stxpath-default-namespace</code> - This optional attribute
+	      specifies a namespace used for unprefixed name tests in STXPath 
+	      expressions and patterns. See <a href="#expressions"><b>2.4 Expressions</b></a> for 
+	      details. No namespace is used by default.</p></li><li><p><code>strip-space</code> - This optional attribute specifies 
+	      whether whitespace text nodes are stripped from source streams. 
+	      See <a href="#whitespace-stripping"><b>3.5 Whitespace Stripping</b></a> for details. The default 
+	      value is "no".</p></li><li><p><code>output-method</code> - This optional attribute
+              specifies the preferred serialization method into a byte
+              stream. The value "xml" (which is the default
+              value) indicates to serialize the result as a well-formed XML
+              fragment. The value "text" indicates to
+              serialize only text and cdata nodes without any escaping
+              and without any markup, especially without an XML declaration.
+              An implementation may provide additionally serialization
+              methods that have to be indicated by a valid QName in a
+              non-empty namespace.</p></li><li><p><code>output-encoding</code> - This optional attribute specifies 
+	      the preferred output encoding of the resulting byte stream. The 
+	      value of this attribute should be treated case-insensitively; the 
+	      value must contain only printable ASCII characters (#x21 - #x7E); 
+	      the value must be a charset registered with the Internet 
+	      Assigned Numbers Authority 
+	      (see <a href="#IANA-CS">[IANA Character Sets]</a>).</p><p>If the attribute is not present, the output encoding is UTF-8.
+	      A compliant STX processor is not required to support any particular 
+	      encoding other than UTF-8.</p></li><li><p><code>exclude-result-prefixes</code> - This optional
+              attribute contains a whitespace-separated list of tokens,
+              each of which is either a namespace prefix or the value
+              "#default". The namespace bound to each of the
+              prefixes is designated as an excluded namespace,
+              "#default" indicates the default namespace.
+              It is a static error if there is no namespace
+              declared for a specified prefix (or the default namespace
+              for "#default").</p><p>The special value "#all" indicates that all
+              namespaces declared for this <code>stx:transform</code> element
+              are designated as excluded namespaces. It is a static
+              error if "#all" is used together with other 
+              tokens.</p><p>A result stream element that was copied from the stx-sheet as 
+	      a literal result element must be preceded by all necessary 
+	      namespace declarations that are in scope for this element in the 
+	      stx-sheet, unless the namespace is designated as an excluded 
+	      namespace. By default the STX namespace (<code>http://stx.sourceforge.net/2002/ns</code>) is 
+	      designated as an excluded namespace.</p><p>However, a namespace that is in use for a result element name
+              or an attribute name must be declared in any case, regardless
+              of its designation as an excluded namespace.</p></li></ul><p>An <code>stx:transform</code> element can contain the following children 
+	  from the STX namespace. These elements are called top-level 
+	  elements:</p><ul><li><p>stx:include</p></li><li><p>stx:variable</p></li><li><p>stx:param</p></li><li><p>stx:buffer</p></li><li><p>stx:namespace-alias</p></li><li><p>stx:group</p></li><li><p>stx:template</p></li><li><p>stx:procedure</p></li></ul><p>All top-level elements may occur multiple times. 
+	  <code>stx:namespace-alias</code> element is allowed as top-level 
+	  element only.</p></div><div class="div2">
+<h3><a name="grouping-of-templates" id="grouping-of-templates"></a>4.3 Grouping of Templates</h3><p>Templates can be organized into groups using the <code>stx:group</code> 
+	  element. Groups of templates play a role in template matching 
+	  (precedence categories are defined for groups) and determine 
+	  the scoping of variables.</p><p>Each stx-sheet has a virtual <b>default group</b> (represented 
+	  by <code>stx:transform</code>) that is considered to be the parent 
+	  of top-level groups. Explicit groups represented by <code>stx:group</code>
+	  are not mandatory; many transformations can be done without grouping 
+	  templates. On the other hand, templates separated to groups make it 
+	  possible to define more precise transformation rules and to run safer 
+	  complex transformations, especially on a well-known, regular input 
+	  data.</p><p><b>stx:group</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group --&gt;
+&lt;stx:group
+  name = qname
+  pass-through = "none"|"all"|"text"|"inherit"
+  recognize-cdata = "yes"|"no"|"inherit"
+  strip-space = "yes"|"no"|"inherit"&gt;
+  &lt;!-- Content: group-elements --&gt;
+&lt;/stx:group&gt;
+</pre></div><p>This element must be a child of either the <code>stx:transform</code> 
+	  or the <code>stx:group</code> element. The optional <code>name</code> 
+	  attribute contains a qualified name that must be unique in the 
+	  stx-sheet. The name can be referenced by the <code>group</code> 
+	  attribute of any of <code>stx:process-children</code>, 
+	  <code>stx:process-attributes</code>, 
+	  <code>stx:process-self</code>, <code>stx:process-siblings</code>, 
+	  <code>stx:process-document</code> or <code>stx:process-buffer</code> 
+	  instructions. In this event, the referenced group is used instead of 
+	  the current group for matching. It is not possible to
+	  reference the default group.</p><p>It is a static error if an stx-sheet contains more than one group of 
+	  the same name.</p><p>The attributes <code>pass-through</code>, <code>recognize-cdata</code>,
+          and <code>strip-space</code> are optional, and they set transformation 
+	  properties specific for this group. Their meaning is exactly the 
+	  same as the meaning of global properties of the same name
+          specified on the <code>stx:transform</code> element (see 
+	  <a href="#transform-element"><b>4.2 Transform Element</b></a>). The only difference is that the
+          group attributes have the additional value "inherit". 
+	  This is the default value; it specifies that the value of the same 
+	  property of the nearest ancestor group should be used. In other words,
+          the value of the property stems from the nearest ancestor group
+          that has the corresponding attribute set to a value distinct from
+          "inherit", or from the default value of the
+          <code>stx:transform</code> element, if no such attribute was specified.
+	  At each point of the processing, properties of the current base group
+          apply.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The last sentence means, that for a visible template from a
+            different group, the properties of this different group do not take
+            effect untill this template is instantiated. Thus, the different
+            properties do not apply during the matching process.</p></div></div><div class="div2">
+<h3><a name="sheet-inclusion" id="sheet-inclusion"></a>4.4 STX Transformation Sheet Inclusion</h3><p>An stx-sheet may include another stx-sheet using the 
+	  <code>stx:include</code> element.</p><p><b>stx:include</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group --&gt;
+&lt;stx:include
+  href = uri-reference/&gt;
+</pre></div><p>This declaration is used to insert additional stx-sheet modules into
+	  the principal stx-sheet module. A circular inclusion is prohibited.</p><p>This element must be top-level or a child of the <code>stx:group</code> 
+	  element. <code>stx:include</code> is replaced with the 
+	  <code>stx:transform</code> element of the included stx-sheet whereupon the 
+	  included <code>stx:transform</code> then becomes an <code>stx:group</code> 
+	  element. There is one exception: an <code>stx:namespace-alias</code> 
+	  instruction from the included stx-sheet is always inserted as 
+	  a top-level element. The resulting stx-sheet must meet the criteria for 
+	  being a valid STX transformation sheet (for example concerning unique 
+	  group and procedure names).</p><p>The rules for attributes of the imported <code>stx:transform</code>
+          element are as follows:</p><ul><li><p>The <code>version</code>, <code>output-method</code>, and
+              <code>output-encoding</code> attributes will not affect the
+              including stx-sheet. However, the included stx-sheet must
+              be valid, that means its <code>version</code> attribute must
+              be "1.0".</p></li><li><p>The <code>stxpath-default-namespace</code> and
+              <code>exclude-result-prefixes</code> attributes will be used for the 
+	      included stx-sheet. The <code>stxpath-default-namespace</code> and
+              <code>exclude-result-prefixes</code> attributes of the
+              <code>stx:transform</code> element of the principal stx-sheet
+              module never affects included stx-sheet modules.</p></li><li><p>The <code>pass-through</code>, <code>recognize-cdata</code>, and
+              <code>strip-space</code> attributes become attributes of the
+              new <code>stx:group</code> element. If one of these attributes is 
+	      missing the <code>stx:group</code> element has an attribute of the 
+	      same name with the default value defined for the 
+	      <code>stx:transform</code> element. It never can have the value 
+	      "inherit".</p></li></ul><p>There is no difference between templates from the principal
+          stx-sheet module and included templates in terms of matching
+          precedence.</p></div></div><div class="div1">
+<h2><a name="generating-output" id="generating-output"></a>5 Generating Output</h2><p>STX templates are called sequentially for each incoming node rather 
+	than from other templates. Pair events for the document and elements 
+	match only one template, which is broken into two parts; the first part 
+	is executed when the start event appears and the second one at the end 
+	event. The two parts can be separated by the <code>stx:process-children</code> 
+	element.</p><div class="div2">
+<h3><a name="namespace-aliasing" id="namespace-aliasing"></a>5.1 Namespace Aliasing</h3><p><b>stx:namespace-alias</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level --&gt;
+&lt;stx:namespace-alias
+  sheet-prefix = ncname|"#default"
+  result-prefix = ncname|"#default"/&gt;
+</pre></div><p>Namespaces of literal elements and attributes in stx-sheets can be 
+	  mapped to different namespaces in result streams using the 
+	  <code>stx:namespace-alias</code> element. Both attributes are mandatory 
+	  and can contain either a prefix bound to a namespace or the 
+	  "#default" keyword for the default namespace.</p></div><div class="div2">
+<h3><a name="templates" id="templates"></a>5.2 Templates</h3><p><b>stx:template</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group --&gt;
+&lt;stx:template
+  match = <a href="#NT-pattern">pattern</a>
+  priority = number
+  visibility = "local"|"group"|"global"
+  public = "yes"|"no"
+  new-scope = "yes"|"no"&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:template&gt;
+</pre></div><p>Rules to process input events are written in templates. The
+	  <code>stx:template</code> element must be a child of either the
+	  <code>stx:transform</code> or the <code>stx:group</code> element.
+          Templates match to the events by means of precedence categories and 
+	  a <a href="#NT-pattern">pattern</a> in the mandatory <code>match</code>
+          attribute. The optional <code>priority</code> attribute can contain 
+	  an explicit priority value used for matching (see 
+	  <a href="#match-patterns"><b>2.5 Match Patterns</b></a>).</p><p>Two optional attributes; <code>visibility</code> and <code>public</code>; 
+	  control whether the template is visible from other groups (and thus can 
+	  match to the next event) or not. See 
+	  <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a> for meaning of the two 
+	  attributes. The default value of the <code>visibility</code> attribute is
+	  "local". The default value of the <code>public</code>
+	  attribute for top-level templates is "yes", for
+          group templates it is "no". Whether a top-level
+          template is public or not is important only when the stx-sheet
+          is included into another stx-sheet, because every top-level
+          template then becomes a group template, see <a href="#sheet-inclusion"><b>4.4 STX Transformation Sheet Inclusion</b></a>.</p><p>The optional <code>new-scope</code> attribute specifies whether the 
+	  template creates new instances of group variables. The default value 
+	  is "no". A new set of group variables is created for 
+	  each instantiated template with <code>new-scope="yes"</code>. 
+	  These variables shadow their former values and exist as long as the 
+	  template is being processed.</p><p>The content of templates may include both STX instructions and 
+	  declarations, and literal elements. Literal elements are simply copied 
+	  to the output.</p><p>A <b>text template</b> is defined as the content of some elements 
+	  (<code>stx:attribute</code>, <code>stx:variable</code>, 
+	  <code>stx:param</code>, <code>stx:assign</code>, <code>stx:with-param</code>,
+	  <code>stx:cdata</code>, 
+	  <code>stx:processing-instruction</code>, <code>stx:comment</code>, 
+	  <code>stx:message</code>). This is a part of template that is supposed to
+	  generate nothing but character events to the current output stream.
+	  If an event of another type is emitted, an STX processor is required 
+	  either (1) to issue a run-time error or (2) to serialize the event or 
+	  (3) to ignore the event according to the value of <code>markup</code>
+	  attribute. See <a href="#outputting-strings"><b>5.10 Outputting Strings</b></a> for details.</p></div><div class="div2">
+<h3><a name="procedures" id="procedures"></a>5.3 Procedures</h3><p><b>stx:procedure</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group --&gt;
+&lt;stx:procedure
+  visibility = "local"|"group"|"global"
+  public = "yes"|"no"
+  new-scope = "yes"|"no"
+  name = qname&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:procedure&gt;
+</pre></div><p>Procedures are sub-templates that can be called by names (with the
+	  <code>stx:call-procedure</code> instruction). The optional 
+	  <code>visibility</code>, <code>public</code>, and <code>new-scope</code> 
+	  attributes have the same meaning and default values as for
+          templates. Only visible procedures can be called by name, the 
+	  <code>new-scope</code> must be set to "yes" to create 
+	  new copies of group variables. It is a static error if an stx-sheet 
+	  contains more than one visible procedure with the same name within the 
+	  same precedence category.</p><p>The content of procedures may be the same as the content of 
+	  templates.</p><p><b>stx:call-procedure</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:call-procedure
+  name = qname
+  group = qname&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;stx:call-procedure&gt;
+</pre></div><p>The <code>stx:call-procedure</code> element makes it possible to invoke 
+	  a procedure by its name. The <code>name</code> attribute is mandatory. 
+	  The optional <code>group</code> attribute allows to use the specified 
+	  group instead of the current group as a base group for calling 
+	  the procedure.</p><p>The target procedure will be determined according to the
+          precedence categories described in
+          <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>. If the first category
+          does not contain a procedure with the requested name, then the
+          second category will be searched. If neither the first nor the second
+	  category contain such procedure, the third category is searched. 
+	  It is a static error if none of the three precedence categories contain 
+	  the requested procedure.</p></div><div class="div2">
+<h3><a name="Parameters" id="Parameters"></a>5.4 Parameters</h3><p>Values can be passed to stx-sheets or to their templates and 
+	  procedures as parameters. Parameters are variables (see 
+	  <a href="#variables"><b>6.2 Variables</b></a>) with the additional property that their 
+	  value can be set by the caller of the stx-sheet, the template, or 
+	  the procedure. Stx-sheet parameters behave in the same way
+	  as group variables, they may be shadowed by variables or parameters
+          of the same name in descendant groups. Note that a parameter that
+          is only visible in a certain group will be initialized with the
+          value passed to the stx-sheet anyway, regardless whether there
+          is a shadowed parameter of the same name or not.
+          Template/procedure parameters behave 
+	  in the same way as local variables; thus they are only visible within 
+	  the template or procedure they are passed to. There are two elements 
+	  available to work with parameters:</p><p><b>stx:with-param</b></p><div class="exampleInner"><pre>&lt;!-- Category: process-xxx, call-procedure --&gt;
+&lt;stx:with-param
+  name = qname
+  select = <a href="#NT-expression">expression</a>
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:with-param&gt;
+</pre></div><p>Parameters are passed to templates or procedures using the 
+	  <code>stx:with-param</code> element. The required <code>name</code> 
+	  attribute specifies the name of the parameter. The value of the 
+	  parameter is either the result returned by the 
+	  <a href="#NT-expression">expression</a> located in the optional
+	  <code>select</code> attribute or the content of this element if the
+	  <code>select</code> attribute is missing. If neither the 
+	  <code>select</code> attribute nor the content is present the parameter 
+	  value is the empty string.</p><p>The <code>stx:with-param</code> instruction is allowed as a child of 
+          the elements
+	  <code>stx:process-children</code>, <code>stx:process-attributes</code>, 
+	  <code>stx:process-self</code>, <code>stx:process-siblings</code>, 
+	  <code>stx:process-document</code>, <code>stx:process-buffer</code>, or
+	  <code>stx:call-procedure</code>, and must not have any of
+          these elements in its content.</p><p><b>stx:param</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group or template --&gt;
+&lt;stx:param
+  name = qname
+  select = <a href="#NT-expression">expression</a>
+  required = "yes" | "no"&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:param&gt;
+</pre></div><p>The <code>stx:param</code> element is allowed as a top-level or group
+          element (indicating an stx-sheet parameter) and in templates or
+          procedures (as a child of <code>stx:template</code> or 
+	  <code>stx:procedure</code>). The required <code>name</code> attribute 
+	  specifies the name of the parameter. The optional <code>select</code> 
+	  attribute or the content of this element specifies a default value, 
+	  which is both evaluated and used only when there is no value
+          specified using the 
+	  <code>select</code> attribute or the content of the appropriate 
+	  <code>stx:with-param</code> element. Should both the <code>select</code>
+	  attribute and the content be missing, the parameter defaults to the 
+	  empty string.</p><p>Stx-sheet parameters are statically initialized while parsing 
+	  the stx-sheet; only the <em>static context</em> information is 
+	  available during the initialization. Template/procedure parameters  
+	  are initialized at run-time. Since there is no current
+	  source stream available during the static initialization,
+          it is an error if an stx-sheet parameter has an 
+	  <code>stx:process-children</code>,
+          <code>stx:process-attributes</code>, <code>stx:process-self</code>, or 
+	  <code>stx:process-siblings</code> instruction in its content.</p><p>The optional <code>required</code> attribute may be used to indicate
+          that a parameter is mandatory. The default value is 
+	  "no", indicating that the parameter is optional. If the 
+	  value of the <code>required</code> attribute is "yes",
+          the <code>stx:param</code> element must be empty, and must have no 
+	  <code>select</code> attribute. It is a dynamic error if the caller 
+	  does not supply a value with <code>stx:with-param</code> for a required 
+	  parameter.</p></div><div class="div2">
+<h3><a name="copying-the-current-node" id="copying-the-current-node"></a>5.5 Copying the Current Node</h3><p><b>stx:copy</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:copy
+  attributes = <a href="#NT-pattern">pattern</a>&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:copy&gt;
+</pre></div><p>The <code>stx:copy</code> element is used to copy the current node to the 
+	  output. The optional <code>attributes</code> attribute contains a 
+	  <a href="#NT-pattern">pattern</a>. These attributes of the current node 
+	  that match the pattern are copied to the output. If the 
+	  <code>attributes</code> attribute is not present no attributes are copied 
+	  with the current node.</p><p>Thus, <code>attributes="@*"</code> copies all attributes, 
+	  <code>attributes="@foo|@bar"</code> copies the <code>foo</code> 
+	  and <code>bar</code> attributes only, 
+	  <code>attributes="@*[not(name()='foo')]"</code> copies all 
+	  but the <code>foo</code> attribute, and 
+	  <code>attributes="@*[false()]"</code> does not copy any 
+	  attributes as if the <code>attributes</code> attribute is missing at 
+	  all.</p><p>If the <code>stx:copy</code> instruction applies to a node other than 
+	  element the <code>attributes</code> attribute is ignored.</p></div><div class="div2">
+<h3><a name="processing-nested-events" id="processing-nested-events"></a>5.6 Processing Nested Events</h3><p><b>stx:process-children</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:process-children
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;/stx:process-children&gt;
+</pre></div><p>The instruction <code>stx:process-children</code> suspends the
+          processing of the current template by processing the children
+          of the current node.
+	</p>
+xxx
+	<div class="note"><p class="prefix"><b>Note:</b></p><p>STX processors are not required to use any particular API. Any 
+	    event-base API providing information about all events needed for 
+	    an STX processor, such as <a href="#SAX2">[SAX2]</a> or <a href="#StAX">[StAX]</a>, 
+	    can be used. However, sometimes it makes sense to illustrate the 
+	    functionality of an STX processor in terms 
+	    of a specific well-known API.</p><p>Using SAX2 terms: the <code>stx:process-children</code> instruction splits 
+	    a template into two parts such that a SAX2 <code>startElement</code>
+	    event causes the execution of the first part and the
+	    corresponding SAX2 <code>endElement</code> event causes the
+	    execution of the second part.</p></div><p>There must be always at most one <code>stx:process-children</code>
+          instruction executed during the processing of a template. Moreover, it 
+	  is an error if <code>stx:process-children</code> is encountered after an 
+	  <code>stx:process-self</code> instruction or an 
+	  <code>stx:process-siblings</code> instruction.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>If a template does not contain any <code>stx:process-children</code> 
+	    instruction, the children of this element will be skipped. The 
+	    default rule applies only to nodes that are processed and no matching 
+	    template is found.</p></div><div class="note"><p class="prefix"><b>Note:</b></p><p>If the current node is neither an element node nor the document root 
+	    then the <code>stx:process-children</code> instruction simply does
+	    nothing.</p></div><p>The optional <code>group</code> attribute makes it possible to use the
+	  specified group instead of the current group as the base for 
+	  matching (see <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>). It is a static 
+	  error if the group of the specified name is not available.</p><p>The optional <code>filter-method</code> and <code>filter-src</code>
+          attributes can be used to direct the processing of children
+          to an external filter, see <a href="#external-filters"><b>5.18 Using external filters</b></a>.</p></div><div class="div2">
+<h3><a name="processing-attributes" id="processing-attributes"></a>5.7 Processing Attributes</h3><p><b>stx:process-attributes</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:process-attributes
+  group = qname&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;/stx:process-attributes&gt;
+</pre></div><p>This instruction is used to apply templates to attributes of 
+	  an element node.</p><p>The optional <code>group</code> attribute makes it possible to use the
+	  specified group instead of the current group as the base for 
+	  matching (see <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>). It is a static 
+	  error if the group of the specified name is not available.</p></div><div class="div2">
+<h3><a name="processing-siblings" id="processing-siblings"></a>5.8 Processing Siblings</h3><p><b>stx:process-siblings</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:process-siblings
+  while = <a href="#NT-pattern">pattern</a>
+  until = <a href="#NT-pattern">pattern</a>
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;/stx:process-siblings&gt;
+</pre></div><p>The <code>stx:process-siblings</code> instruction suspends the
+          processing of the current template and processes the following
+          siblings of the current node. The processing can be terminated
+          by one of <code>while</code> or <code>until</code> conditions,
+          or because of the end of the parent element or the current
+          buffer (see <code>stx:process-buffer</code>).</p><div class="note"><p class="prefix"><b>Note:</b></p><p>If the current node is an attribute node or the document root
+          node the <code>stx:process-siblings</code> instruction does nothing.</p></div><p>The optional <code>while</code> attribute contains a
+          <a href="#NT-pattern">pattern</a>. The next siblings are processed 
+	  as long as they match the specified pattern. The first non-matching 
+	  node stops the processing; this node is not processed by this 
+	  <code>stx:process-siblings</code> instruction.. The <code>while</code> 
+	  attribute defaults to <code>node()</code>.</p><p>The optional <code>until</code> attribute contains a
+          <a href="#NT-pattern">pattern</a>. The next siblings are processed
+	  until a node matching the pattern is encountered; this node is not
+          processed by this <code>stx:process-siblings</code> instruction.
+          The <code>until</code> attribute defaults to
+          <code>node()[false()]</code>.</p><p>If both <code>while</code> and <code>until</code> attributes have been
+          specified then both conditions have to be met. For example
+          <code>&lt;stx:process-siblings while="foo" until="foo"/&gt;</code>
+          does not process any siblings. Variable bindings used within the
+          patterns will be interpreted with regard to the current context.
+          That means changed group variables affect the evaluation, whereas
+          new instances of group variables or local variables are not
+          visible.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>Whitespace text nodes not stripped from the document must be
+          considered in the patterns, particularly when using the
+          <code>while</code> attribute. A typical attribute specification
+          would be <code>while="foo | text()"</code> which processes
+          all following <code>foo</code> elements and potential text
+          nodes between these <code>foo</code> elements.</p></div><p>The optional <code>group</code> attribute makes it possible to use the
+	  specified group instead of the current group as the base for 
+	  matching (see <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>). It is a static 
+	  error if the group of the specified name is not available.</p><p>The optional <code>filter-method</code> and <code>filter-src</code>
+          attributes can be used to direct the processing of siblings
+          to an external filter, see <a href="#external-filters"><b>5.18 Using external filters</b></a>.</p><p>An <code>stx:process-siblings</code> instruction encountered during
+          the processing of siblings does not affect the <code>while</code> and 
+	  <code>until</code> conditions of the previous 
+	  <code>stx:process-siblings</code>. In other words: nested
+          <code>stx:process-siblings</code> instructions process at most the
+          siblings chosen in the preceding <code>stx:process-siblings</code>.
+          That means
+          <code>stx:process-siblings</code> also returns if there are no more
+          siblings in the input available or a preceding
+          <code>stx:process-siblings</code> terminates.</p><p>Though multiple <code>stx:process-siblings</code> instructions may
+          appear within the same template it is an error if an 
+	  <code>stx:process-children</code> or <code>stx:process-self</code>
+          instruction will be encountered after <code>stx:process-siblings</code>.</p></div><div class="div2">
+<h3><a name="running-overridden-templates" id="running-overridden-templates"></a>5.9 Running Overridden Templates</h3><p><b>stx:process-self</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:process-self
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;/stx:process-self&gt;
+</pre></div><p>This instruction is used to process the current node using the 
+	  template that would have been chosen if the current template was 
+	  not present in the stx-sheet. The current template will not be
+          instantiated again for this node, even in a chain of calls to
+          <code>stx:process-self</code>. There must be always at most one 
+	  <code>stx:process-self</code> instruction executed during the
+          processing of a template.
+          Moreover it is an error if an <code>stx:process-self</code> 
+	  instruction is encountered after an <code>stx:process-children</code> or 
+	  an <code>stx:process-siblings</code> instruction in a template.</p><p>The optional <code>group</code> attribute makes it possible to use the
+	  specified group instead of the current group as the base for 
+	  matching (see <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>). It is a static 
+	  error if the group of the specified name is not available.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>If no <code>group</code> attribute has been specified then
+            the current group will be used for choosing the next best
+            matching template. This is also true if the current group
+            has been automatically entered via a public template.</p></div><p>The optional <code>filter-method</code> and <code>filter-src</code>
+          attributes can be used to direct the processing of the context
+          node to an external filter, see
+          <a href="#external-filters"><b>5.18 Using external filters</b></a>.</p></div><div class="div2">
+<h3><a name="outputting-strings" id="outputting-strings"></a>5.10 Outputting Strings</h3><p><b>stx:value-of</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:value-of
+  select = <a href="#NT-expression">expression</a>
+  separator = { string } /&gt;
+</pre></div><p>This instructions emits characters to the result stream. The
+          mandatory <code>select</code> attribute contains an STXPath
+          <a href="#NT-expression">expression</a> whose value may be any
+          sequence of items. The optional <code>separator</code> attribute
+          defaults to a single space character.
+          This element is always empty.</p><p>The result of this instruction is the concatenation of the
+          string values of the items in the sequence from the
+          <code>select</code> attribute, with each of these string values
+          except the last being followed by the string that is the effective
+          value of the <code>separator</code> attribute. If the effective
+          value of the <code>separator</code> attribute is a zero-length
+          string, then all items in the sequence are processed and the
+          results are concatenated with no separator.</p><p><b>stx:text</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:text
+  markup = "error"|"ignore"|"serialize"&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:text&gt;
+</pre></div><p>This instruction emits literal character data to the result
+          stream.</p><p>The optional <code>markup</code> attribute determines how non-text 
+	  nodes in the content of <code>stx:text</code> should be handled: 
+	  "error" causes the processor to raise a run-time
+          error for such nodes, "ignore" ignores any markup by 
+	  emitting only the string value of the contents to the result stream, 
+	  "serialize" emits any markup serialized as text. The 
+	  default value is "error".</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The string created by <code>markup="serialize"</code> may
+          vary in different STX implementations, because some of the
+          lexical representation is not relevant for the information coded
+          in XML. For example every STX implementation may choose its own
+          order for serializing attributes.</p></div><p>The <code>stx:text</code> element has an implicit <code>xml:space</code>
+          attribute with the default value "preserve". Thus
+          the content is normally neither normalized nor stripped should it
+          contain whitespace characters only.</p><p><b>stx:cdata</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:cdata&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:cdata&gt;
+</pre></div><p>This instructions emits literal data as a CDATA section to the
+          result stream.</p><p>The <code>stx:cdata</code> element has an implicit <code>xml:space</code>
+          attribute with the default value "preserve". Thus
+          the content is normally neither normalized nor stripped should it
+          contain whitespace characters only.</p></div><div class="div2">
+<h3><a name="outputting-elements-and-attributes" id="outputting-elements-and-attributes"></a>5.11 Outputting Elements and Attributes</h3><p><b>stx:element</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:element
+  name = {qname}
+  namespace = {uri-reference}&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:element&gt;
+</pre></div><p>This instruction is used to generate an element. It has the same 
+	  meaning as in <a href="#XSLT">[XSLT 1.0]</a>.</p><p><b>stx:start-element</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:start-element
+  name = {qname}
+  namespace = {uri-reference}/&gt;
+</pre></div><p><b>stx:end-element</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:end-element
+  name = {qname}
+  namespace = {uri-reference}/&gt;
+</pre></div><p>There are separate instructions available to output an element start 
+	  tag and end tag. The <code>name</code> attribute is required 
+	  for both instructions. The both elements must be empty.</p><p>A compliant STX processor is required to produce a well-formed XML 
+	  output. An attempt to create an end-tag without a matching start-tag 
+	  must be reported as an error by the STX processor.</p><p><b>stx:attribute</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:attribute
+  name = {qname}
+  namespace = {uri-reference}
+  select = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:attribute&gt;
+</pre></div><p>This instruction is used to generate an attribute. It has the same 
+	  meaning as in <a href="#XSLT">[XSLT 1.0]</a>. Alternatively, the value of the
+          generated attribute may be specified in the optional
+          <code>select</code> attribute. It is a static error if this
+          instruction has a <code>select</code> attribute and is not empty.</p><p><code>stx:attribute</code> must follow an element-starting instruction
+          (<code>stx:element</code>, <code>stx:start-element</code>,
+          <code>stx:copy</code>, or a literal element) and no other
+          output-generating instructions are allowed between the 
+          element-starting instruction and <code>stx:attribute</code>.
+	  Otherwise, an STX processor is required to issues an error.</p></div><div class="div2">
+<h3><a name="outputting-other-nodes" id="outputting-other-nodes"></a>5.12 Outputting Other Nodes</h3><p><b>stx:processing-instruction</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:processing-instruction
+  name = {ncname}
+  select = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:processing-instruction&gt;
+</pre></div><p>This instruction is used to generate a processing
+          instruction. It has the same meaning as in <a href="#XSLT">[XSLT 1.0]</a>.
+	  Alternatively, the value of the generated processing instruction may 
+	  be specified in the optional <code>select</code> attribute. It is 
+	  a static error if this instruction has a <code>select</code> attribute 
+	  and is not empty.</p><p><b>stx:comment</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:comment
+  select = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:comment&gt;
+</pre></div><p>This instruction is used to generate a comment. It has the same 
+	  meaning as in <a href="#XSLT">[XSLT 1.0]</a>. Alternatively, the value of the 
+	  generated comment may be specified in the optional <code>select</code> 
+	  attribute. It is a static error if this instruction has 
+	  a <code>select</code> attribute and is not empty.</p><p><b>stx:doctype</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:doctype
+  system-id = {system-literal}
+  public-id = {pubid-literal}&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:doctype&gt;
+</pre></div><p>This instruction is used to generate a document type declaration that
+	  contains or points to markup declarations. The <code>system-id</code> 
+	  attribute contains a system identifier. The <code>public-id</code> 
+	  attribute contains a public identifier. Both attributes are optional.
+	  This element must be either empty or it must contain a valid internal 
+	  subset of markup declarations (see <a href="#XML1">[XML 1.0;]</a>).</p></div><div class="div2">
+<h3><a name="conditions" id="conditions"></a>5.13 Conditions</h3><p><b>stx:if</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:if
+  test = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:if&gt;
+</pre></div><p>The mandatory <code>test</code> attribute contains an STXPath
+          <a href="#NT-expression">expression</a> evaluating to boolean.
+          The content template is instantiated if and only 
+	  if the <code>test</code> attribute has evaluated to true.</p><p><b>stx:else</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:else&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:else&gt;
+</pre></div><p>This instruction must follow immediately after <code>stx:if</code>; 
+	  a static error must be reported otherwise. The content template is 
+	  instantiated if and only if the <code>test</code> attribute of the 
+	  preceding <code>stx:if</code> instruction has evaluated to false.</p><p><b>stx:choose</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:choose&gt;
+  &lt;stx:when
+    test = <a href="#NT-expression">expression</a>&gt;
+    &lt;!-- Content: template --&gt;
+  &lt;/stx:when&gt;+
+  &lt;stx:otherwise&gt;
+    &lt;!-- Content: template --&gt;
+  &lt;/stx:otherwise&gt;?
+&lt;/stx:choose&gt;
+</pre></div><p>The same meaning as in <a href="#XSLT">[XSLT 1.0]</a>.</p></div><div class="div2">
+<h3><a name="loops" id="loops"></a>5.14 Loops</h3><p><b>stx:for-each-item</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:for-each-item
+  name = qname
+  select = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:for-each-item&gt;
+</pre></div><p>The <code>stx:for-each-item</code> instruction contains a template that 
+	  is instantiated for each item of the sequence specified by the 
+	  mandatory <code>select</code> attribute.</p><p>The mandatory <code>name</code> attribute specifies a name of local 
+	  variable that is declared automatically for each item, and that 
+	  contains the current item.</p><p>Neither the current node (accessed with <code>.</code>) nor 
+	  sf:position() change inside <code>stx:for-each-item</code>.</p><p><b>stx:while</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:while
+  test = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:while&gt;
+</pre></div><p>The mandatory <code>test</code> attribute contains an STXPath
+          <a href="#NT-expression">expression</a> evaluating to boolean.
+          The contents of the <code>stx:while</code> element is instantiated
+          repeatedly as long as the <code>test</code> attribute evaluates to
+          true.</p></div><div class="div2">
+<h3><a name="multiple-input-documents" id="multiple-input-documents"></a>5.15 Multiple Input Documents</h3><p><b>stx:process-document</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:process-document
+  href = <a href="#NT-expression">expression</a>
+  base = {uri-reference}|"#input"|"#sheet"
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;/stx:process-document&gt;
+</pre></div><p>An stx-sheet can process further source streams in addition to this 
+	  supplied when the transformation is invoked (the principal source 
+	  stream). The current source stream can be changed with the 
+	  <code>stx:process-document</code> instruction. When this instruction is
+          instantiated the <a href="#NT-expression">expression</a> in the
+          mandatory <code>href</code> attribute will be evaluated, each
+          item in the resulting sequence will be converted sequentially to
+          a string (a URI), and its value will be used to identify and to
+          process a new source stream. When new source streams for all items are
+	  processed, the execution of the template containing the 
+	  <code>stx:process-document</code> instruction continues with the original 
+	  source stream.</p><p>If a URI is a relative URI then the base URI will be derived
+          from the type of item in the sequence that represents this
+          URI. In case this item is a node then its base URI will be used,
+          otherwise the base URI of the stx-sheet will be used.
+          Alternatively, the optional <code>base</code> attribute can be used
+          to specify explicitly which base URI should be used. Its value
+          must be either an absolute URI, the string
+          "#input" in which case the base URI of the
+          current input stream will be used, or the string
+          "#stylesheet" in which case the base URI of the
+          principal stx-sheet will be used.</p><p>The optional <code>group</code> attribute makes it possible to use the
+	  specified group instead of the current group as the base for matching 
+	  (see <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>). It is a static error if 
+	  the group of the specified name is not available.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>When processing a new document, the ancestor stack of the original 
+	    document is not available for matching and navigation. Each
+	    new document has an ancestor stack of its own.</p></div><p>The optional <code>filter-method</code> and <code>filter-src</code>
+          attributes can be used to direct the processing of document
+          to an external filter, see <a href="#external-filters"><b>5.18 Using external filters</b></a>.</p></div><div class="div2">
+<h3><a name="multiple-output-documents" id="multiple-output-documents"></a>5.16 Multiple Output Documents</h3><p><b>stx:result-document</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:result-document
+  href = {uri-reference}
+  output-method = "xml"|"text"|qname-but-not-ncname
+  output-encoding = string&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:result-document&gt;
+</pre></div><p>An stx-sheet can produce further result streams in addition to the 
+          principal result stream. The current result stream can be changed
+          with the <code>stx:result-document</code> instruction. Events generated
+          as the result of executing instructions contained within the 
+	  <code>stx:result-document</code> element are emitted to a new current 
+	  result stream identified with the URI which is specified by an 
+	  attribute value template in the required <code>href</code> attribute.
+          Then, the execution of instructions behind the end of the
+          <code>stx:result-document</code> element continues to emit events into
+	  the original result stream.</p><p>If the <code>href</code> attribute contains a relative URI, the 
+	  <b>base output URI</b> is used to resolve the URI. The base output
+	  URI is implementation defined; it can be provided through an 
+	  interface or otherwise specified by an STX processor.</p><p>The optional attributes <code>output-method</code> and
+          <code>output-encoding</code> can be used to specify a preferred
+          output method and an output encoding for the new result stream.
+          Their semantics is the same as for <code>stx:transform</code>,
+          see <a href="#transform-element"><b>4.2 Transform Element</b></a>.
+          If one of these attributes is not present then the values will
+          be used that are in effect for the principal result stream.</p></div><div class="div2">
+<h3><a name="buffers" id="buffers"></a>5.17 Buffers</h3><p>A sequence of events can be stored into an object called a buffer. The 
+	  stored events can be emitted and processed later, in the same way as 
+	  events emitted from a source stream. The events are emitted from 
+	  a buffer in the same order as they were stored in. In other words, the
+	  buffers are temporary storages of the 'first in first out' type. The
+	  events stored in a buffer must represent a well-formed external general 
+	  parsed entity (the restriction on a single root node is relaxed).</p><p>There are two types of buffers:</p><ul><li><p><em>group buffers</em> - <code>stx:buffer</code> is child 
+	      of either <code>stx:transform</code> or <code>stx:group</code>. Top-level 
+	      buffers are considered members of the top-most default group 
+	      that exists for each stx-sheet.</p></li><li><p><em>local buffers</em> - Declared within 
+	      templates.</p></li></ul><p>A buffer must be declared before it can be used. The same rules as for 
+	  variables (see <a href="#variables"><b>6.2 Variables</b></a>) apply for the the visibility 
+	  of buffers, their shadowing, and the creating of new instances for 
+	  new-scope templates (see <a href="#templates"><b>5.2 Templates</b></a>).</p><p><b>stx:buffer</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level, group or template--&gt;
+&lt;stx:buffer
+  name = qname&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:buffer&gt;
+</pre></div><p>The <code>stx:buffer</code> element declares a buffer. The mandatory 
+	  <code>name</code> attribute contains a qualified name identifying the 
+	  declared buffer. The buffer is initialized with events generated as
+	  a result of evaluation of the content of the <code>stx:buffer</code> 
+	  declaration. If the content is empty (<code>stx:buffer</code> element has 
+	  no children) the buffer is empty.</p><p>For group buffers, the content of <code>stx:buffer</code> element is 
+	  evaluated statically. It is a static error if the element
+	  <code>stx:buffer</code> declaring a <em>group buffer</em> contains 
+	  an <code>stx:process-children</code>, <code>stx:process-self</code>,
+	  <code>stx:process-siblings</code>, <code>stx:process-attributes</code>, 
+	  <code>stx:process-document</code>, <code>stx:process-buffer</code>, or 
+	  <code>call-procedure</code> instruction in its content.</p><p><b>stx:result-buffer</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:result-buffer
+  name = qname
+  clear = "yes"|"no"&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:result-buffer&gt;
+</pre></div><p>The <code>stx:result-buffer</code> instruction directs events emitted by
+	  its content into the buffer specified with the mandatory <code>name</code> 
+	  attribute rather than to the current result stream. The buffer must be
+	  declared with <code>stx:buffer</code> before it can be employed in 
+	  <code>stx:result-buffer</code>.</p><p>If the buffer specified with the <code>name</code> attribute already 
+	  contains a sequence of events, the new sequence of events is appended
+	  behind the last event in the previously stored sequence normally. If 
+	  the <code>stx:result-buffer</code> element has the optional 
+	  <code>clear</code> attribute with the value of "yes", the 
+	  previously stored events are removed from the buffer before the new 
+	  sequence of events is stored in. The <code>clear</code> attribute 
+	  defaults to "no".</p><div class="note"><p class="prefix"><b>Note:</b></p><p>To clear a buffer without storing a new sequence of events, use the
+	    <code>stx:result-buffer</code> instruction with no content:<code>
+	    &lt;stx:result-buffer name="my-buffer" clear="yes"/&gt;</code></p></div><p>The events stored in a buffer will not be available for a following
+          <code>stx:process-buffer</code> before the <code>stx:result-buffer</code> 
+	  instruction has terminated. Until then the previous contents is accessible. 
+	  Thus for processing a buffer and storing the result in the same buffer 
+	  again use <code>&lt;stx:result-buffer name="b" clear="yes"&gt;
+          &lt;stx:process-buffer name="b"/&gt; &lt;/stx:result-buffer&gt;</code></p><p>It is an error if this instruction is executed for a buffer that acts 
+	  already as (current or suspended) result buffer.</p><p><b>stx:process-buffer</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:process-buffer
+  name = qname
+  group = qname
+  filter-method = {uri-reference}
+  filter-src = uri-specification | buffer-specification&gt;
+  &lt;!-- Content: stx:with-param* --&gt;
+&lt;/stx:process-buffer&gt;
+</pre></div><p>The <code>stx:process-buffer</code> instruction emits the events
+          currently stored in the buffer specified by the mandatory
+          <code>name</code> attribute to the STX processor. The events are 
+	  processed in the same way as events supplied by source streams. When 
+	  the very last event from the buffer is processed, the processing in the 
+	  current template continues with an instruction, declaration or literal
+	  next to the <code>stx:process-buffer</code> instruction.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>Changes to the contents of a buffer that is currently processed
+            will not affect this processing. The <code>stx:process-buffer</code>
+            instruction creates an internal copy of the contained events
+            and emits them afterwards.</p></div><p>The optional <code>group</code> attribute makes it possible to use the
+	  specified group instead of the current group as the base for matching 
+	  (see <a href="#precedence-categories"><b>2.3 Precedence Categories</b></a>). It is a static error if 
+	  the group of the specified name is not available.</p><p>The optional <code>filter-method</code> and <code>filter-src</code>
+          attributes can be used to direct the processing of buffer's
+          contents to an external filter, see
+          <a href="#external-filters"><b>5.18 Using external filters</b></a>.</p><p>The processing of events from a buffer does not mean the emptying of 
+	  this buffer. Once a sequence of events is stored in the buffer, it can
+	  be processed repeatedly.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>A buffer is not treated as a new document, but rather as
+	    if events emitted from the buffer originate from the
+	    current source stream. The ancestor stack of the current
+	    source stream remains available for matching and 
+	    navigation when processing nodes from the buffer.</p></div></div><div class="div2">
+<h3><a name="external-filters" id="external-filters"></a>5.18 Using external filters</h3><p>The main task of an STX processor is to transform a stream of
+          source XML events into a stream of result XML events (see
+          <a href="#concepts"><b>2 Concepts</b></a>). Using this paradigm, an STX processor
+          can be seen as a typical representative of a filter of XML events.</p><p>Moreover, STX can as well direct any XML event stream to an
+          external filter process and incorporate the result of
+          this processing into the current result stream. Thus an
+          STX process may split a large XML document into smaller fragments,
+          pass each of these fragments to an external filter (for example
+          an XSLT processor), and combine the results into a large XML result
+          document.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>The term <em>external</em> refers to a processing outside of
+            the STX scope. An actual filter might be as well a built-in part
+            of an STX processor implementation.</p></div><p>Each event stream directed to an external filter represents
+          a well-formed XML fragment.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>In terms of SAX2, that means the stream starts with 
+	    a <code>startDocument</code> event, followed by a sequence of
+	    <code>startPrefixMapping</code> events, one for each namespace
+	    in scope, followed by the SAX2 representation of the piece of
+	    XML to be processed. The stream will be completed by the
+	    matching <code>endPrefixMapping</code> and <code>endDocument</code>
+	    events. Before incorporating the SAX2 stream resulting from the
+	    filter into the current result stream, its enclosing
+	    <code>startDocument</code> and <code>endDocument</code> events
+	    will be discarded.</p></div><p>STX provides two attributes for identifying the external filter:
+          <code>filter-method</code> and <code>filter-src</code>. Both attributes
+          can be used on <code>stx:process-children</code>
+          (<a href="#processing-nested-events"><b>5.6 Processing Nested Events</b></a>),
+          <code>stx:process-siblings</code>
+          (<a href="#processing-siblings"><b>5.8 Processing Siblings</b></a>),
+          <code>stx:process-self</code> (<a href="#running-overridden-templates"><b>5.9 Running Overridden Templates</b></a>),
+          <code>stx:process-document</code>
+          (<a href="#multiple-input-documents"><b>5.15 Multiple Input Documents</b></a>), and
+          <code>stx:process-buffer</code> (<a href="#buffers"><b>5.17 Buffers</b></a>).</p><p>The optional <code>filter-method</code> attribute contains a URI that
+          identifies a filter method to be used. This specification cannot
+          provide a complete list of filters and their URIs. However,
+          if a filter method is described using an XML vocabulary in a
+          well-known namespace, its namespace URI is the recommended value
+          for the <code>filter-method</code> attribute, see
+          <a href="#filter-uris"><b>D Recommended filter URIs</b></a> for a list of currently recommended
+          URIs. A conformant STX processor does not have to support any
+          external filters. The function
+          <a href="#F-sf:filter-available">sf:filter-available</a> may be used to check,
+          whether the current STX processor supports the requested filter.</p><p>It is a static error to specify both <code>filter-method</code> and 
+	  <code>group</code> attributes. It is a run-time error if the requested 
+	  filter is not supported by the processor.</p><p>The optional <code>filter-src</code> attribute provides additional
+          information about the source to initialize the desired filter.
+          There are two kinds of values allowed for this attribute:</p><ul><li><p>A &lt;uri-specification&gt;, as defined in
+              <a href="#XSLFO">[XSL-FO]</a>, repeated here for convenience:</p><p>A sequence of characters that is "url(", followed by
+              optional white space, followed by an optional single quote
+              (') or double quote (") character, followed by a URI
+              reference as defined in <a href="#RFC2396">[RFC 2396]</a>, followed
+              by an optional single quote (') or double quote (")
+              character, followed by optional white space, followed by ")".
+              The two quote characters must be the same and must both be
+              present or absent. If the URI reference contains a single
+              quote, the two quote characters must be present and be double
+              quotes.</p><p>The document identified by that URI provides the source
+              for the external filter.</p></li><li><p>A &lt;buffer-specification&gt;: A sequence of characters that
+              is "buffer(" followed by optional white space, followed by a
+              QName as defined in <a href="#XMLNAMES">[XML Names]</a>, followed by
+              optional white space, followed by ")".</p><p>The contents of the specified buffer provides the source for the 
+	      external filter. This implies, that this source can be supplied as 
+	      an XML event stream to the filter. It is an error, if there's no such 
+	      buffer declared at this scope.</p></li></ul><p>It is a static error, if the <code>filter-src</code>
+          attribute is present without a <code>filter-method</code> attribute.
+          However, the specification of a <code>filter-method</code> attribute
+          does not require necessarily a <code>filter-src</code> attribute.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>A typical use case would be an embedded XSLT transformation,
+            that could be invoked like this:</p><div class="exampleInner"><pre>&lt;stx:variable name="xslt" select="'http://www.w3.org/1999/XSL/Transform'" /&gt;
+&lt;stx:if test="filter-available($xslt)"&gt;
+  &lt;stx:process-self filter-method="{$xslt}" filter-src="buffer(xslt-code)" /&gt;
+&lt;/stx:if&gt;
+&lt;stx:else&gt;
+  &lt;stx:message&gt;Cannot invoke an XSLT transformation&lt;/stx:message&gt;
+&lt;/stx:else&gt;</pre></div><p></p><p>This instruction passes the current node and all its children
+            to an XSLT processor, using an XSLT stylesheet that is the
+            contents of the buffer named <code>xslt-code</code>.</p></div></div><div class="div2">
+<h3><a name="messages" id="messages"></a>5.19 Messages</h3><p><b>stx:message</b></p><div class="exampleInner"><pre>&lt;!-- Category: template --&gt;
+&lt;stx:message
+  select = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: template --&gt;
+&lt;/stx:message&gt;
+</pre></div><p>The <code>stx:message</code> instruction generates a separate result 
+	  stream whose handling is implementation dependent. It can be 
+	  directed to a log, or to a special message resolver, etc. However,
+	  all instructions of the content of the <code>stx:message</code> element
+	  must processed even if the message stream is ignored.
+	  Alternatively, the value of the generated message may 
+	  be specified in the optional <code>select</code> attribute. It is 
+	  a static error if this instruction has a <code>select</code> attribute 
+	  and is not empty.</p></div></div><div class="div1">
+<h2><a name="stxpath-lang" id="stxpath-lang"></a>6 STXPath</h2><p>STXPath is an expression language for STX; STXPath expressions are 
+	embeded in specific attributes of STX instructions and declarations.
+	STXPath is similar to <a href="#XPath2">[XPath 2.0]</a> on the first sight. 
+	Syntactically, STXPath is a subset of <a href="#XPath2">[XPath 2.0]</a>.
+	However, as STX has a different notion of context, the meaning of some 
+	expressions may be different in STXPath and in XPath 2.0. Consider the 
+	following example:</p><p>In XPath 2.0, the expression <code>/node1/node2</code> returns a sequence
+	containing all <code>node2</code> elements, whose parent <code>node1</code> is 
+	the document element. In STXPath, on contrary, the same expression 
+	returns a sequence containing a single node from this node-set; the one 
+	which is an ancestor of the current node.</p><p>Each expression has its <b>static context</b> - the information that 
+	is available during static analysis of the expression, prior to its 
+	evaluation. The static context includes in-scope namespaces, default 
+	namespace for element names, default function namespace, and in-scope 
+	variables. The information that is available at the time when the 
+	expression is evaluated is the <b>current context</b> as defined in 
+	<a href="#context"><b>2.2 Context</b></a>.</p><p>Each STXPath expressions evaluate always to a sequence (see 
+	<a href="http://www.w3.org/TR/xpath20/#id-sequence-expressions">XPath 2.0 definition 
+	  of a sequence</a>).</p><p>Certain operators, functions, and syntactic constructs expect a value 
+	of a particular type to be supplied: this type is referred to as a 
+	<em>required type</em>. In such an event, a general sequence is 
+	converted to the required type according to the <em>conversion 
+	  rules</em>.</p><p>The empty sequence is converted to required types as defined in the
+	following table:</p><table border="1"><thead><tr><th>required type</th><th>result</th></tr></thead><tbody><tr><td>boolean</td><td><code>false</code></td></tr><tr><td>string</td><td>empty string</td></tr><tr><td>number</td><td><code>NaN</code></td></tr><tr><td>node</td><td>ERROR</td></tr></tbody></table><p>A singleton sequence is converted to a required type according to the 
+	type of the only item in the sequence. An attempt to convert boolean,
+	string, or number to node causes an error.</p><table border="1"><thead><tr><th>item type</th><th>boolean required</th><th>string required</th><th>number required</th></tr></thead><tbody><tr><td>boolean</td><td></td><td><code>false</code> is converted to 'false', <code>true</code> 
+	      is converted to 'true'</td><td><code>false</code> is converted to 0, <code>true</code> is 
+	      converted to 1</td></tr><tr><td>string</td><td>the empty string is converted to 
+	      <code>false</code>, other strings are converted to 
+	      <code>true</code></td><td></td><td>a string that consists of optional whitespace followed by an 
+	      optional minus sign followed by a numeric literal (see 
+	      <a href="#literals"><b>6.1 Literals</b></a>) followed by whitespace is converted to 
+	      the number that is nearest to the mathematical value represented 
+	      by the string; any other string is converted to 
+	      <code>NaN</code>.</td></tr><tr><td>number</td><td>0, +0, -0, <code>NaN</code> are converted to 
+	      <code>false</code>, other numbers are converted to 
+	      <code>true</code></td><td><code>NaN</code> is converted to 'NaN', +0 and  -0 are 
+	      converted to '0', positive infinity is converted to 'Infinity', 
+	      negative infinity is converted to '-Infinity'. Other numbers are 
+	      represented in decimal form as numeric literal (see 
+	      <a href="#literals"><b>6.1 Literals</b></a>) with no leading zeros (apart possibly 
+	      from the one required digit immediately before the decimal 
+	      point), preceded by a minus sign (-) if the number is 
+	      negative.</td><td></td></tr><tr><td>node</td><td>a node is converted to <code>true</code></td><td>a node is converted to its string value (see 
+	      <a href="#expressions"><b>2.4 Expressions</b></a>)</td><td>a node is converted to its string value (see 
+	      <a href="#expressions"><b>2.4 Expressions</b></a>); then the rules to convert strings 
+	      to numbers are applied to convert the string value to a 
+	      number</td></tr></tbody></table><p>A sequence containing more than one item is converted according to its 
+	very first item; all other items are ignored. The same conversion rules 
+	as for singleton sequences are applied (see the table above).</p><p>The following sections discuss basic kinds of expression. Each kind of
+	expression has a name such as expression 
+	<a href="#prod-PathExpr">PathExpr</a>, which is introduced on the left 
+	side of the grammar production that defines the expression. Each kind of 
+	expression is defined in terms of other expressions whose operators have 
+	a higher precedence. In this way, the precedence of operators is 
+	represented explicitly in the grammar. For the complete grammar, see 
+	<a href="#stxpath"><b>C STXPath Grammar</b></a>.</p><div class="div2">
+<h3><a name="literals" id="literals"></a>6.1 Literals</h3><p>A literal is a direct syntactic representation of an atomic value. 
+	  STXPath supports two kinds of literals: <em>string literals</em> 
+	  and <em>numeric literals</em>.</p><p>The value of a string literal is a singleton sequence containing an 
+	  item whose atomic type is string and whose value is the string denoted 
+	  by the characters between the delimiting quotation marks.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-StringLiteral" id="prod-StringLiteral"></a><code>StringLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>('"' (('"' '"') | [^"])* '"') | ("'" (("'" "'") | [^'])* "'")</code></td></tr></tbody></table>
+</pre></div><p>The value of a numeric literal is a singleton sequence containing an 
+	  item whose type is number and whose value is obtained by parsing the 
+	  numeric literal according to the rules for string to numbers 
+	  conversion (see <a href="#stxpath-lang"><b>6 STXPath</b></a>).</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-NumericLiteral" id="prod-NumericLiteral"></a><code>NumericLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-IntegerLiteral">IntegerLiteral</a>
+              | <a href="#prod-DecimalLiteral">DecimalLiteral</a>
+              | <a href="#prod-DoubleLiteral">DoubleLiteral</a>
+            </code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-IntegerLiteral" id="prod-IntegerLiteral"></a><code>IntegerLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-Digits">Digits</a>
+            </code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-DecimalLiteral" id="prod-DecimalLiteral"></a><code>DecimalLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>("." <a href="#prod-Digits">Digits</a>)
+              | (<a href="#prod-Digits">Digits</a> "." [0-9]*)</code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-DoubleLiteral" id="prod-DoubleLiteral"></a><code>DoubleLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>(("." <a href="#prod-Digits">Digits</a>)
+              | (<a href="#prod-Digits">Digits</a>
+              ("." [0-9]*)?)) ("e" | "E") ("+" | "-")?
+              <a href="#prod-Digits">Digits</a>
+            </code></td></tr></tbody></table>
+</pre></div></div><div class="div2">
+<h3><a name="variables" id="variables"></a>6.2 Variables</h3><p>STX has full-featured re-assignable variables. The STX elements 
+	  <code>stx:variable</code> and <code>stx:assign</code> are used to declare 
+	  and initialize variables, and to assign new values to them. Visible 
+	  variables can be referenced in STXPath expressions.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-VarRef" id="prod-VarRef"></a><code>VarRef</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"$" <a href="#prod-VarName">VarName</a>
+            </code></td></tr></tbody></table>
+</pre></div><p>STX variables are scoped statically according to the literal structure 
+	  of stx-sheets. The grouping of templates is used to make the sharing 
+	  of other than global variables possible.</p><p>There are two types of variables:</p><ul><li><p><em>group variables</em> - <code>stx:variable</code> is child 
+	      of either <code>stx:transform</code> or <code>stx:group</code>. Top-level 
+	      variables are considered to be members of the top-most default 
+	      group that exists for each stx-sheet.</p></li><li><p><em>local variables</em> - Declared within 
+	      templates.</p></li></ul><p>A group variable is visible for the group where the variable is 
+	  declared, for all descendant groups and for all templates belonging to 
+	  these groups. A local variable is visible for all following siblings of 
+	  the variable declaration and their descendants. Group variables may be 
+	  shadowed (another variable with the same name is visible) by descendant 
+	  group variables and by local variables. It is a static error to 
+	  redeclare a variable with the same name in the same group or 
+	  template.</p><p>Variables always contain a sequence. STX instructions 
+	  <code>stx:variable</code> and <code>stx:assign</code> are used to evaluate an 
+	  expression and store its value into a variable.</p><p>Since variables are re-assignable, each variable must be declared
+	  using the <code>stx:variable</code> element before it is used (assigned, 
+	  referenced). Group variables are statically initialized while parsing 
+	  an stx-sheet. Only the <em>static context</em> information is 
+	  available during the initialization of group variables. Local variables 
+	  are initialized at run-time. A variable declared with no value is 
+	  initialized with a singleton sequence containing the empty 
+	  string.</p><p><b>stx:variable</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group or template --&gt;
+&lt;stx:variable
+  name = qname
+  select = <a href="#NT-expression">expression</a>
+  keep-value = "yes"|"no"&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:variable&gt;
+</pre></div><p>This instruction is used to declare and initialize a variable. The 
+	  mandatory <code>name</code> attribute contains the name of
+	  the variable. An <a href="#NT-expression">expression</a> in
+	  the <code>select</code> attribute is evaluated and the 
+	  variable is initialized with its result. The <code>select</code> 
+	  attribute is optional; a variable is initialized with the string 
+	  resulting from the content of the <code>stx:variable</code> element if 
+	  the <code>select</code> attribute is missing. If the content is empty 
+	  (<code>stx:variable</code> element has no children) the variable is 
+	  initialized with the empty string.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>Thus, &lt;stx:variable name="var"/&gt; is equal to
+	  &lt;stx:variable name="var" select="''"/&gt;.</p></div><p>It is a static error if the element <code>stx:variable</code> declaring 
+	  a <em>group variable</em> contains an 
+	  <code>stx:process-children</code>, <code>stx:process-self</code>,
+	  <code>stx:process-siblings</code>, <code>stx:process-attributes</code>,
+	  <code>stx:process-document</code>, <code>stx:process-buffer</code>, or
+	  <code>call-procedure</code> instruction in its content.</p><p>The optional <code>keep-value</code> attribute specifies whether a
+          new instance of the variable created by instantiating a template
+	  having its <code>new-scope</code> attribute set to
+          "yes" is initialized with the value of 
+	  the shadowed variable (<code>yes</code>) or not
+	  (<code>no</code>). This attribute is allowed only for group
+	  variables. The default value is <code>no</code>. If there is no 
+	  shadowed variable (a variable with the same name declared in 
+	  an ancestor group) yet, the <code>keep-value</code> attribute is 
+	  ignored.</p><p><b>stx:assign</b></p><div class="exampleInner"><pre>&lt;!-- Category: top-level or group or template --&gt;
+&lt;stx:assign
+  name = qname
+  select = <a href="#NT-expression">expression</a>&gt;
+  &lt;!-- Content: text template --&gt;
+&lt;/stx:assign&gt;
+</pre></div><p>This instruction is used to assign a new value to a previously 
+	  declared variable. The mandatory <code>name</code> attribute contains the 
+	  name of the variable. The <a href="#NT-expression">expression</a> in 
+	  the optional <code>select</code> attribute is evaluated and its result is 
+	  assigned to the variable. The string resulting from the content of the 
+	  <code>stx:assign</code> element is assigned to the variable if the 
+	  <code>select</code> attribute is missing. If the content is empty, the empty 
+	  string is assigned to the variable.</p><div class="note"><p class="prefix"><b>Note:</b></p><p>Thus, &lt;stx:assign name="var"/&gt; is equal to
+	  &lt;stx:assign name="var" select="''"/&gt;.</p></div></div><div class="div2">
+<h3><a name="parenthesized-expressions" id="parenthesized-expressions"></a>6.3 Parenthesized Expressions</h3><p>Parentheses may be used to enforce a particular evaluation order in 
+	  expressions that contain multiple operators.</p><p>Parentheses are also used as delimiters in constructing a sequence, 
+	  as described in <a href="#sequence-expressions"><b>6.8 Sequence Expressions</b></a>.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-ParenthesizedExpr" id="prod-ParenthesizedExpr"></a><code>ParenthesizedExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"(" <a href="#prod-Expr">Expr</a>? ")"</code></td></tr></tbody></table>
+</pre></div><p>Parenthesized Expressions in STXPath are equivalent to
+	  <a href="http://www.w3.org/TR/xpath20/#id-paren-expressions">Parenthesized 
+	    Expressions</a> in <a href="#XPath2">[XPath 2.0]</a>.</p></div><div class="div2">
+<h3><a name="context-item-expression" id="context-item-expression"></a>6.4 Context Item Expression</h3><p>The context item expression evaluates to the current node.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-ContextItemExpr" id="prod-ContextItemExpr"></a><code>ContextItemExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"."</code></td></tr></tbody></table>
+</pre></div></div><div class="div2">
+<h3><a name="functions" id="functions"></a>6.5 Functions</h3><p>A <a href="#prod-FunctionCall">function call</a> consists of a function 
+	  <a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">qualified name</a> followed by 
+	  a parenthesized list 
+	  of zero or more <a href="#NT-expression">expressions</a>. The 
+	  expressions inside the parentheses provide arguments of the 
+	  function call. The number of arguments must be equal to the number of 
+	  function parameters; otherwise a static error is raised.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-FunctionCall" id="prod-FunctionCall"></a><code>FunctionCall</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code><a href="#prod-QName">QName</a> "("
+              (<a href="#prod-ExprSingle">ExprSingle</a>
+              ("," <a href="#prod-ExprSingle">ExprSingle</a>)*)? ")"</code></td></tr></tbody></table>
+</pre></div><p>A function call is evaluated as follows:</p><ol type="1"><li><p>Each argument expression is evaluated, producing an argument 
+	      value (sequence).</p></li><li><p>If the corresponding function parameter has a required 
+	      type, the argument value is converted to this type.</p></li><li><p>The function is executed using the converted argument values. 
+	      The result is a value of the function's declared return 
+	      type.</p></li></ol><p>STXPath function names are contained in the reserved namespace
+	  <code>http://stx.sourceforge.net/2003/functions</code>. The 
+	  <code>sf:</code> prefix is used to refer to this namespace in this
+	  document. The default function namespace is assigned to this 
+	  reserved namespace in STX. Thus, the functions namespace does not 
+	  need to be declared in stx-sheets and STXPath functions can be 
+	  invoked without any namespace prefix.</p><p>Some STXPath functions have the same definitions as their 
+	  counterparts (functions with the same local name) in XPath 2.0. These
+	  functions are not re-defined in this section. Instead, original 
+	  definitions in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a> are 
+	  referenced. Other STXPath functions are either different from their 
+	  XPath 2.0 counterparts or have no such counterparts; these functions
+	  are defined in this section.</p><div class="div3">
+<h4><a name="sequence-functions" id="sequence-functions"></a>6.5.1 Sequence Functions</h4><p></p><div class="exampleInner"><a name="F-sf:empty"></a> <b>sf:empty</b>(<var>sequence</var>) as <em>boolean</em></div><p></p><p>Indicates whether or not the provided sequence is empty.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-empty">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:exists"></a> <b>sf:exists</b>(<var>sequence</var>) as <em>boolean</em></div><p></p><p>Indicates whether or not the provided sequence is not empty.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-exists">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:item-at"></a> <b>sf:item-at</b>(<var>sequence</var>, <var>number</var>) as <em>item</em></div><p></p><p>Returns the item at the given index. The first position is 1.</p><p></p><div class="exampleInner"><a name="F-sf:index-of"></a> <b>sf:index-of</b>(<var>sequence</var>, <var>item</var>) as <em>number</em></div><p></p><p>Returns a sequence of integer numbers, each of which is the index 
+	    of a member of the specified sequence that is equal to the item that 
+	    is the value of the second argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-index-of">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:subsequence"></a> <b>sf:subsequence</b>(<var>sequence</var>, <var>number</var>, <var>number</var>?) as <em>sequence</em></div><p></p><p>Returns the subsequence of a given sequence identified by 
+	    location.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-subsequence">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:insert-before"></a> <b>sf:insert-before</b>(<var>sequence</var>, <var>number</var>, <var>sequence</var>) as <em>sequence</em></div><p></p><p>Inserts an item or sequence of items into a specified position 
+	    of a sequence.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-insert-before">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:remove"></a> <b>sf:remove</b>(<var>sequence</var>, <var>number</var>) as <em>sequence</em></div><p></p><p>Removes an item from a specified position of a sequence.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-remove">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p></div><div class="div3">
+<h4><a name="node-functions" id="node-functions"></a>6.5.2 Node Functions</h4><p></p><div class="exampleInner"><a name="F-sf:name"></a> <b>sf:name</b>(<var>node</var>?) as <em>string</em></div><p></p><p>Returns the name of the current node or the specified node.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-xpath-name">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:namespace-uri"></a> <b>sf:namespace-uri</b>(<var>node</var>?) as <em>string</em></div><p></p><p>Returns the namespace URI for the QName of the argument 
+	    node or the current node if the argument is omitted.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-namespace-uri">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:local-name"></a> <b>sf:local-name</b>(<var>node</var>?) as <em>string</em></div><p></p><p>Returns the local name of the current node or the specified node.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-local-name">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:position"></a> <b>sf:position</b>() as <em>number</em></div><p></p><p>The <a href="#F-sf:position">sf:position</a> function returns a number equal 
+	    to the position of the current node relative to other siblings. 
+	    See <a href="#context"><b>2.2 Context</b></a> for details of 
+	    <a href="#F-sf:position%28%29">sf:position()</a> semantics.</p><p></p><div class="exampleInner"><a name="F-sf:has-child-nodes"></a> <b>sf:has-child-nodes</b>() as <em>boolean</em></div><p></p><p>The <a href="#F-sf:has-child-nodes">sf:has-child-nodes</a> function returns true 
+	    if and only if the current node is the document node or an element 
+	    node and has child nodes (it is not empty). It returns false 
+	    otherwise.</p><p></p><div class="exampleInner"><a name="F-sf:node-kind"></a> <b>sf:node-kind</b>(<var>node</var>) as <em>string</em></div><p></p><p>The <a href="#F-sf:node-kind">sf:node-kind</a> function returns a string 
+	    value representing the node's kind: either "document", "element", 
+	    "attribute", "text", "cdata", "processing-instruction", or 
+	    "comment".</p><p></p><div class="exampleInner"><a name="F-sf:get-in-scope-prefixes"></a> <b>sf:get-in-scope-prefixes</b>(<var>node</var>) as <em>sequence</em></div><p></p><p>Returns the prefixes of the in-scope namespaces for the given 
+	    element.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-get-in-scope-prefixes">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:get-namespace-uri-for-prefix"></a> <b>sf:get-namespace-uri-for-prefix</b>(<var>string</var>, <var>node</var>) as <em>string</em></div><p></p><p>Returns a namespace URI of one of the in-scope namespaces for 
+	    the given element, identified by its namespace prefix.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-get-namespace-uri-for-prefix">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:lang"></a> <b>sf:lang</b>(<var>string</var>) as <em>boolean</em></div><p></p><p>Returns true or false depending on whether the language of the 
+	    current node, as defined using the xml:lang attribute, is the same 
+	    as, or a sub-language of, the language specified by the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-lang">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p></div><div class="div3">
+<h4><a name="boolean-functions" id="boolean-functions"></a>6.5.3 Boolean Functions</h4><p></p><div class="exampleInner"><a name="F-sf:true"></a> <b>sf:true</b>() as <em>boolean</em></div><p></p><p>Returns the boolean value TRUE.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-true">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:false"></a> <b>sf:false</b>() as <em>boolean</em></div><p></p><p>Returns the boolean value FALSE.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-false">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:not"></a> <b>sf:not</b>(<var>sequence</var>) as <em>boolean</em></div><p></p><p>Inverts the boolean value of the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-not">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p></div><div class="div3">
+<h4><a name="string-functions" id="string-functions"></a>6.5.4 String Functions</h4><p></p><div class="exampleInner"><a name="F-sf:concat"></a> <b>sf:concat</b>(<var>string</var>, <var>string</var>, ...
+	  ) as <em>string</em></div><p></p><p>Concatenates two or more character strings.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-concat">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:string-join"></a> <b>sf:string-join</b>(<var>sequence</var>, <var>string</var>) as <em>string</em></div><p></p><p>Accepts a sequence of strings and returns the strings concatenated 
+	    together with an optional separator.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-string-join">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:starts-with"></a> <b>sf:starts-with</b>(<var>string</var>, <var>string</var>) as <em>boolean</em></div><p></p><p>Indicates whether the value of one string begins with characters 
+	    of the value of another string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-starts-with">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:ends-with"></a> <b>sf:ends-with</b>(<var>string</var>, <var>string</var>) as <em>boolean</em></div><p></p><p>Indicates whether the value of one string ends with characters 
+	    of the value of another string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-ends-with">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:contains"></a> <b>sf:contains</b>(<var>string</var>, <var>string</var>) as <em>boolean</em></div><p></p><p>Indicates whether the value of one string contains characters 
+	    of the value of another string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-contains">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:substring"></a> <b>sf:substring</b>(<var>string</var>, <var>number</var>, <var>number</var>?) as <em>string</em></div><p></p><p>Returns a string located at a specified place in the value of 
+	    a string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-substring">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:substring-before"></a> <b>sf:substring-before</b>(<var>string</var>, <var>string</var>) as <em>string</em></div><p></p><p>Returns characters of one string that precede in that string 
+	    the characters in the value of another string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-substring-before">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:substring-after"></a> <b>sf:substring-after</b>(<var>string</var>, <var>string</var>) as <em>string</em></div><p></p><p>Returns characters of one string that succeed in that string 
+	    the characters in the value of another string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-substring-after">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:string-length"></a> <b>sf:string-length</b>(<var>string</var>) as <em>number</em></div><p></p><p>Returns the length of the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-string-length">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:normalize-space"></a> <b>sf:normalize-space</b>(<var>string</var>) as <em>string</em></div><p></p><p>Returns the whitespace-normalized value of the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-normalize-space">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:normalize-unicode"></a> <b>sf:normalize-unicode</b>(<var>string</var>, <var>string</var>?) as <em>string</em></div><p></p><p>Returns the normalized value of the first argument in the 
+	    normalization form specified by the second argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-normalize-unicode">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:upper-case"></a> <b>sf:upper-case</b>(<var>string</var>) as <em>string</em></div><p></p><p>Returns the upper-cased value of the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-upper-case">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:lower-case"></a> <b>sf:lower-case</b>(<var>string</var>) as <em>string</em></div><p></p><p>Returns the lower-cased value of the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-lower-case">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:translate"></a> <b>sf:translate</b>(<var>string</var>, <var>string</var>, <var>string</var>) as <em>string</em></div><p></p><p>Returns the first argument string with occurrences of characters 
+	    in the second argument replaced by the character at the corresponding 
+	    position in the third string.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-translate">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:string-pad"></a> <b>sf:string-pad</b>(<var>string</var>, <var>number</var>) as <em>string</em></div><p></p><p>Returns a string composed of as many copies of its first argument 
+	    as specified in its second argument.</p><p></p><div class="exampleInner"><a name="F-sf:matches"></a> <b>sf:matches</b>(<var>string</var>, <var>string</var>, <var>string</var>?) as <em>boolean</em></div><p></p><p>Returns a boolean value that indicates whether the value of the 
+	    first argument is matched by the regular expression that is the value 
+	    of the second argument, using the flags in the optional third
+            argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-matches">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:replace"></a> <b>sf:replace</b>(<var>string</var>, <var>string</var>, <var>string</var>, <var>string</var>?) as <em>string</em></div><p></p><p>Returns the value of the first argument with every substring matched 
+	    by the regular expression that is the value of the second argument 
+	    replaced by the replacement string that is the value of the third 
+	    argument, using the flags in the optional fourth argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-replace">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:tokenize"></a> <b>sf:tokenize</b>(<var>string</var>, <var>string</var>, <var>string</var>?) as <em>sequence</em></div><p></p><p>Returns a sequence of zero or more strings whose values are 
+	    substrings of the value of the first argument separated by substrings 
+	    that match the regular expression that is the value of the second 
+	    argument, using the flags in the optional third argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-tokenize">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:escape-uri"></a> <b>sf:escape-uri</b>(<var>string</var>, <var>boolean</var>) as <em>string</em></div><p></p><p>Returns the string representing a URI value with certain characters 
+	    escaped.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-escape-uri">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p></div><div class="div3">
+<h4><a name="numerical-functions" id="numerical-functions"></a>6.5.5 Numerical Functions</h4><p></p><div class="exampleInner"><a name="F-sf:floor"></a> <b>sf:floor</b>(<var>number</var>) as <em>number</em></div><p></p><p>Returns the largest integer less than or equal to the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-floor">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:ceiling"></a> <b>sf:ceiling</b>(<var>number</var>) as <em>number</em></div><p></p><p>Returns the smallest integer greater than or equal to the argument.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-ceiling">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:round"></a> <b>sf:round</b>(<var>number</var>) as <em>number</em></div><p></p><p>Rounds to the nearest integer.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-round">definition</a>
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p></div><div class="div3">
+<h4><a name="aggregate-functions" id="aggregate-functions"></a>6.5.6 Aggregate Functions</h4><p></p><div class="exampleInner"><a name="F-sf:count"></a> <b>sf:count</b>(<var>sequence</var>) as <em>number</em></div><p></p><p>Returns the number of items in the sequence.</p><p>See the <a href="http://www.w3.org/TR/xpath-functions/#func-count">definition</a> 
+	    in <a href="#XQXPFO">[XQuery 1.0 and XPath 2.0 Functions and Operators]</a>.</p><p></p><div class="exampleInner"><a name="F-sf:sum"></a> <b>sf:sum</b>(<var>sequence</var>) as <em>number</em></div><p></p><p>The <a href="#F-sf:sum">sf:sum</a> function returns the sum, for each 
+	    item in the argument sequence, of the result of converting the item 
+	    to a number. If the argument is the empty sequence, 
+	    the function returns zero. </p><p></p><div class="exampleInner"><a name="F-sf:avg"></a> <b>sf:avg</b>(<var>sequence</var>) as <em>number</em></div><p></p><p>The <a href="#F-sf:avg">sf:avg</a> function returns the average of all 
+	    items in the argument sequence converted to numbers. If the argument
+	    is the empty sequence, the empty sequence is returned. </p><p></p><div class="exampleInner"><a name="F-sf:max"></a> <b>sf:max</b>(<var>sequence</var>) as <em>number</em></div><p></p><p>The <a href="#F-sf:max">sf:max</a> function converts all items of the 
+	    argument sequence to numbers and returns the item whose value is greater 
+	    than or equal to the value of every other item in the argument sequence. 
+            If the argument contains the value NaN, the value NaN is returned.
+            If the argument is the empty sequence, the empty sequence is
+            returned.</p><p></p><div class="exampleInner"><a name="F-sf:min"></a> <b>sf:min</b>(<var>sequence</var>) as <em>number</em></div><p></p><p>The <a href="#F-sf:min">sf:min</a> function converts all items of the 
+	    argument sequence to numbers and returns the item whose value is less 
+	    than or equal to the value of every other item in the argument sequence.
+            If the argument contains the value NaN, the value NaN is returned.
+            If the argument is the empty sequence, the empty sequence is
+            returned.</p></div><div class="div3">
+<h4><a name="conversion-functions" id="conversion-functions"></a>6.5.7 Conversion Functions</h4><p></p><div class="exampleInner"><a name="F-sf:string"></a> <b>sf:string</b>(<var>sequence</var>) as <em>string</em></div><p></p><p>The <a href="#F-sf:string">sf:string</a> function returns the result of 
+	    converting the argument to a string. See 
+	    <a href="#stxpath-lang"><b>6 STXPath</b></a> for details.</p><p></p><div class="exampleInner"><a name="F-sf:number"></a> <b>sf:number</b>(<var>sequence</var>) as <em>number</em></div><p></p><p>The <a href="#F-sf:number">sf:number</a> function returns the result of 
+	    converting the argument to a number. See 
+	    <a href="#stxpath-lang"><b>6 STXPath</b></a> for details.</p><p></p><div class="exampleInner"><a name="F-sf:boolean"></a> <b>sf:boolean</b>(<var>sequence</var>) as <em>boolean</em></div><p></p><p>The <a href="#F-sf:boolean">sf:boolean</a> function returns the result of 
+	    converting the argument to a boolean. See 
+	    <a href="#stxpath-lang"><b>6 STXPath</b></a> for details.</p></div><div class="div3">
+<h4><a name="other-functions" id="other-functions"></a>6.5.8 Other Functions</h4><p></p><div class="exampleInner"><a name="F-sf:filter-available"></a> <b>sf:filter-available</b>(<var>string</var>) as <em>boolean</em></div><p></p><p>The <a href="#F-sf:filter-available">sf:filter-available</a> function returns
+            <code>true</code> if the STX processor supports the external
+            filter identified by its argument, and <code>false</code>
+            otherwise (see <a href="#external-filters"><b>5.18 Using external filters</b></a>).</p></div></div><div class="div2">
+<h3><a name="path-expressions" id="path-expressions"></a>6.6 Path Expressions</h3><p>A <a href="#prod-PathExpr">path expression</a> can be used to locate 
+	  nodes within the ancestor stack. It evaluates to a sequence of nodes 
+	  from the stack. A path expression consists of a series of one or more 
+	  <a href="#prod-AxisStep">axis steps</a>, separated by <code>/</code> or 
+	  <code>//</code>, and optionally beginning with <code>/</code> or 
+	  <code>//</code>.</p><p>This sequence of axis steps is evaluated from left to right. Each 
+	  operation <code>E1/E2</code> is evaluated as follows: Expression E1 is 
+	  evaluated into a sequence of nodes. Each node resulting from the 
+	  evaluation of E1 then serves to provide an inner context for
+	  evaluation of E2. Each evaluation of E2 results in a (possibly empty) 
+	  sequence of nodes. The sequences of nodes resulting from all the 
+	  evaluations of E2 are combined, eliminating duplicate nodes based on 
+	  node identity and sorting the result in document order.</p><p>A <code>/</code> at the beginning of a path expression is an 
+	  abbreviation for the initial step. The effect of this initial step is 
+	  to begin the path at the root node of the current ancestor stack.</p><p>A <code>//</code> at the beginning of a path expression is an 
+	  abbreviation for the initial steps. The effect of these initial steps 
+	  is to establish an initial node sequence that contains the root of the 
+	  current ancestor stack, plus all nodes descended from this root. This 
+	  node sequence is used as an input to subsequent steps in the path 
+	  expression.</p><p>An axis step generates a sequence of nodes from the ancestor stack and 
+	  then filters the sequence using up to one predicate. The value of the 
+	  step consists of those nodes that satisfy the predicate. Predicates are 
+	  described in <a href="#predicate"><b>6.7 Predicate</b></a>. Nodes are always returned 
+	  in the document order. An axis step may be either an 
+	  <a href="#prod-AbbrevForwardStep">abbreviated forward step</a> or an 
+	  <a href="#prod-AbbrevReverseStep">abbreviated reverse step</a>, 
+	  followed by no or one predicate. An axis step might be thought of as 
+	  beginning at the context node and navigating to those nodes that are 
+	  reachable from the context node via a specified axis. STXPath has 
+	  abbreviated syntax only. The result of an abbreviated forward step 
+	  consists of the nodes reachable from the context node via the specified 
+	  axis (either child or attribute) that have the 
+	  <a href="#prod-KindTest">node kind</a> or 
+	  <a href="#prod-NameTest">name</a> specified by 
+	  a <a href="#prod-NodeTest">node test</a>.</p><p>In addition to common names (<a href="#prod-QName">QNames</a> and 
+	  <a href="#prod-Wildcard">wildcards</a>) and kind tests known from
+	  <a href="#XPath2">[XPath 2.0]</a>, STXPath has two more kind tests:</p><ul><li><code>doctype()</code> - matches the doctype node (see 
+	    <a href="#nodes"><b>3.3 Nodes</b></a>).</li><li><code>cdata()</code> - matches cdata nodes (see 
+	    <a href="#nodes"><b>3.3 Nodes</b></a>).</li></ul><p>Here are some examples of path expressions:</p><ul><li><p><code>..</code> - returns the parent node of the 
+	      current node</p></li><li><p><code>//foo</code> - returns a sequence whose items are
+              all <code>foo</code> element on the ancestor stack</p></li><li><p><code>@foo</code> - returns the <code>foo</code> attribute of 
+	      the current node</p></li><li><p><code>../../@bar</code> - returns the <code>bar</code>
+              attribute of the grand parent of the current node</p></li><li><p><code>/aaa/bbb</code> - returns a <code>bbb</code> element from 
+	      the ancestor stack which is a child of <code>aaa</code> element which 
+	      is the root element of the ancestor stack (and hence the root 
+	      element of the input document)</p></li><li><p><code>/*//node()</code> - returns all nodes from the
+              ancestor stack except for the first one</p></li></ul></div><div class="div2">
+<h3><a name="predicate" id="predicate"></a>6.7 Predicate</h3><p>A predicate consists of an expression enclosed in square brackets. 
+	  A predicate serves to filter a sequence, retaining some items and 
+	  discarding others. For each item in the sequence to be filtered, the 
+	  predicate expression is evaluated using an inner focus derived from 
+	  that item. The result of the predicate expression is coerced to a 
+	  boolean value (see <a href="#stxpath-lang"><b>6 STXPath</b></a> for conversion rules).
+	  Those items for which the predicate results to true are retained, and 
+	  those for which the predicate results to false are discarded.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-Predicate" id="prod-Predicate"></a><code>Predicate</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"[" <a href="#prod-Expr">Expr</a> "]"</code></td></tr></tbody></table>
+</pre></div></div><div class="div2">
+<h3><a name="sequence-expressions" id="sequence-expressions"></a>6.8 Sequence Expressions</h3><p>STXPath supports operators to construct sequences of items. Sequences
+	  are never nested - for example, combining the values 1, (2, 3), and ( )
+	  into a single sequence results in the sequence (1, 2, 3).</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-Expr" id="prod-Expr"></a><code>Expr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-ExprSingle">ExprSingle</a>
+              ("," <a href="#prod-ExprSingle">ExprSingle</a>)*</code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-RangeExpr" id="prod-RangeExpr"></a><code>RangeExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-AdditiveExpr">AdditiveExpr</a>
+              ( "to" <a href="#prod-AdditiveExpr">AdditiveExpr</a> )?</code></td></tr></tbody></table>
+</pre></div><p>The constructing of sequences in STXPath is equivalent to
+	  <a href="http://www.w3.org/TR/xpath20/##id-sequence-expressions">Constructing
+	    Sequences</a> in <a href="#XPath2">[XPath 2.0]</a>.</p></div><div class="div2">
+<h3><a name="arithmetic-expressions" id="arithmetic-expressions"></a>6.9 Arithmetic Expressions</h3><p>STXPath provides arithmetic operators for addition, subtraction, 
+	  multiplication, division, and modulus, in their usual binary and unary 
+	  forms.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-AdditiveExpr" id="prod-AdditiveExpr"></a><code>AdditiveExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-MultiplicativeExpr">MultiplicativeExpr</a> (
+              ("+" | "-")
+              <a href="#prod-MultiplicativeExpr">MultiplicativeExpr</a>
+              )*</code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-MultiplicativeExpr" id="prod-MultiplicativeExpr"></a><code>MultiplicativeExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-UnaryExpr">UnaryExpr</a>
+              ( ("*" | "div" | "idiv" | "mod")
+              <a href="#prod-UnaryExpr">UnaryExpr</a> )*</code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-UnaryExpr" id="prod-UnaryExpr"></a><code>UnaryExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>("-" | "+")* <a href="#prod-ValueExpr">ValueExpr</a>
+            </code></td></tr></tbody></table>
+</pre></div><p>The binary subtraction operator must be preceded by a whitespace in 
+	  order to distinguish it from a hyphen, which is a valid name 
+	  character.</p><p>An arithmetic expression is evaluated by applying the following 
+	  rules:</p><ul><li><p>If either operand is the empty sequence, the result of the 
+	      operation is the empty sequence.</p></li><li><p>Operands other than empty sequences are converted 
+	      (<a href="#stxpath-lang"><b>6 STXPath</b></a>) to numbers before the 
+	      expression is evaluated. If the conversion fails (returns 
+	      <code>NaN</code>) it returns <code>NaN</code>.</p></li></ul></div><div class="div2">
+<h3><a name="comparison-expressions" id="comparison-expressions"></a>6.10 Comparison Expressions</h3><p>Comparison expressions allow two values to be compared. STXPath 
+	  provides the following general comparison operators: =, !=, &lt;, 
+	  &lt;=, &gt;, &gt;=. The result of a comparison is always true or false 
+	  (a singleton sequence containing one boolean item).</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-GeneralComp" id="prod-GeneralComp"></a><code>GeneralComp</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"=" | "!=" | "&lt;" | "&lt;=" | "&gt;" | "&gt;="</code></td></tr></tbody></table>
+</pre></div><p>The result of a comparison of sequences is defined by applying the 
+	  following rules, in order:</p><ol type="1"><li><p>If either operand is the empty sequence, the result is 
+	      false.</p></li><li><p>The comparison <code>A operator B</code> is true for 
+	      sequences <code>A</code> and <code>B</code> if and only if there 
+	      is a pair of items <code>a</code> and <code>b</code>, one belonging
+	      to the sequence <code>A</code> and the other belonging to the 
+	      sequence <code>B</code>, for which the comparison 
+	      <code>a operator b</code> is true.</p></li></ol><p>The result of a comparison of items is defined by applying the 
+	  following rules. The rules defined in <a href="#stxpath-lang"><b>6 STXPath</b></a> 
+	  apply for conversions:</p><ul><li><p>If both items to be compared are nodes, then the comparison 
+	      will be true if and only if the result of performing the comparison 
+	      on the string-values of the two nodes is true.</p></li><li><p>If one item to be compared is a node and the other is a 
+	      number, then the comparison will be true if and only if the result 
+	      of performing the comparison on the number and on the result of 
+	      converting the string-value of that node to a number is 
+	      true.</p></li><li><p>If one item to be compared is a node and the other is a 
+	      string, then the comparison will be true if and only if the result 
+	      of performing the comparison on the string-value of the node and 
+	      the other string is true.</p></li><li><p>If one item to be compared is a node and the other is a 
+	      boolean, then the comparison will be true if and only if the result 
+	      of performing the comparison of true and the boolean value 
+	      is true.</p></li><li><p>When neither item to be compared is node and the operator is = 
+	      or !=, then the items are compared by converting them to a common 
+	      type as follows and then comparing them. If at least one item to be 
+	      compared is a boolean, then each item to be compared is converted 
+	      to a boolean. Otherwise, if at least one item to be compared is a 
+	      number, then each item to be compared is converted to a number. 
+	      Otherwise, both items to be compared are converted to 
+	      strings.</p></li><li><p>When neither item to be compared is node and the operator is 
+	      &lt;=, &lt;, &gt;= or &gt;, then the items are compared by 
+	      converting both items to numbers and comparing the 
+	      numbers.</p></li><li><p>A numerical comparison that involves the 'NaN' value always 
+	      returns false.</p></li></ul></div><div class="div2">
+<h3><a name="logical-expressions" id="logical-expressions"></a>6.11 Logical Expressions</h3><p>A logical expression is either an <b>and-expression</b> or 
+	  an <b>or-expression</b>.  The value of a logical expression is always 
+	  one of the boolean values <code>true</code> or <code>false</code> 
+	  (a singleton sequence containing a boolean item).</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-AndExpr" id="prod-AndExpr"></a><code>AndExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-ComparisonExpr">ComparisonExpr</a> ( "and"
+              <a href="#prod-ComparisonExpr">ComparisonExpr</a> )*</code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-OrExpr" id="prod-OrExpr"></a><code>OrExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-AndExpr">AndExpr</a>
+              ( "or" <a href="#prod-AndExpr">AndExpr</a> )*</code></td></tr></tbody></table>
+</pre></div><p>Logical expressions are evaluated by reducing each of its operands to 
+	  an <em>effective boolean value</em> by applying the following 
+	  rules, in order:</p><ol type="1"><li><p>If the operand is the empty sequence, its effective boolean 
+	      value is <code>false</code>.</p></li><li><p>If the operand is a singleton sequence containing a boolean 
+	      item, this item serves as the effective boolean value.</p></li><li><p>If the operand is a sequence that contains at least one node, 
+	      its effective boolean value is <code>true</code>.</p></li><li><p>In any other case, operands are converted to boolean 
+	      (see <a href="#stxpath-lang"><b>6 STXPath</b></a>) to get effective boolean 
+	      values.</p></li></ol><p>An <em>AND</em> expression returns <code>true</code> if the 
+	  effective boolean values of both of its operands are <code>true</code>; 
+	  otherwise it returns <code>false</code>.</p><p>An <em>OR</em> expression returns <code>false</code> if the 
+	  effective boolean values of both of its operands are 
+	  <code>false</code>; otherwise it returns <code>true</code>.</p><p>In addition to logical expressions, STXPath provides a function
+	  <b>not()</b> that takes a general sequence as parameter and returns 
+	  a boolean value (see <a href="#boolean-functions"><b>6.5.3 Boolean Functions</b></a>).</p></div><div class="div2">
+<h3><a name="for-expressions" id="for-expressions"></a>6.12 For Expressions</h3><p>STXPath provides an iteration facility called a for expression.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-ForExpr" id="prod-ForExpr"></a><code>ForExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-SimpleForClause">SimpleForClause</a> "return"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+            </code></td></tr></tbody><tbody><tr valign="baseline"><td></td><td><a name="prod-SimpleForClause" id="prod-SimpleForClause"></a><code>SimpleForClause</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"for" "$" <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+              ("," "$" <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>)*</code></td></tr></tbody></table>
+</pre></div><p>The evaluation of a for expression in STXPath is equivalent to
+	  <a href="http://www.w3.org/TR/xpath20/##id-for-expressions">For 
+	    Expressions</a> in <a href="#XPath2">[XPath 2.0]</a>.</p></div><div class="div2">
+<h3><a name="conditional-expressions" id="conditional-expressions"></a>6.13 Conditional Expressions</h3><p>STXPath supports a conditional expression based on the keywords if, 
+	  then, and else.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-IfExpr" id="prod-IfExpr"></a><code>IfExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"if" "(" <a href="#prod-Expr">Expr</a> ")" "then"
+              <a href="#prod-ExprSingle">ExprSingle</a> "else"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+            </code></td></tr></tbody></table>
+</pre></div><p>The expression following the <code>if</code> keyword is called the 
+	  <b>test expression</b>, and the expressions following the 
+	  <code>then</code> and <code>else</code> keywords are called the 
+	  <b>then-expression</b> and <b>else-expression</b>, 
+	  respectively.</p><p>The first step in processing a conditional expression is to find the 
+	  effective boolean value of the test expression, as defined in 
+	  <a href="#logical-expressions"><b>6.11 Logical Expressions</b></a>.</p><p>The rest of processing of a conditional expression and the rules to 
+	  raise dynamic errors and evaluate the then-expression and the 
+	  else-expression in STXPath are equivalent to those in 
+	  <a href="#XPath2">[XPath 2.0]</a>. See 
+	  <a href="http://www.w3.org/TR/xpath20/#id-conditionals">Conditional 
+	    Expressions</a> for details.</p></div><div class="div2">
+<h3><a name="quantified-expressions" id="quantified-expressions"></a>6.14 Quantified Expressions</h3><p>Quantified expressions support existential and universal 
+	  quantification. The value of a quantified expression is always 
+	  <code>true</code> or <code>false</code>.</p><div class="exampleInner"><pre>  <table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td></td><td><a name="prod-QuantifiedExpr" id="prod-QuantifiedExpr"></a><code>QuantifiedExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>("some" "$" | "every" "$")
+              <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+              ("," "$" <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>)* "satisfies"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+            </code></td></tr></tbody></table>
+</pre></div><p>A quantified expression begins with a <b>quantifier</b>, which is 
+	  the keyword <code>some</code> or <code>every</code>, followed by one 
+	  or more <b>in-clauses</b> that are used to bind variables, followed 
+	  by the keyword <code>satisfies</code> and a <b>test 
+	    expression</b>.</p><p>Results depend on the effective boolean values of the test 
+	  expressions, as defined in <a href="#logical-expressions"><b>6.11 Logical Expressions</b></a>.</p><p>The rest of processing of a quantified expression and the rules to 
+	  raise dynamic errors in STXPath are equivalent to those in 
+	  <a href="#XPath2">[XPath 2.0]</a>. See 
+	  <a href="http://www.w3.org/TR/xpath20/#id-quantified-expressions">Quantified
+	    Expressions</a> for details.</p></div></div></div><div class="back"><div class="div1">
+<h2><a name="references" id="references"></a>A References</h2><div class="div2">
+<h3><a name="normative-references" id="normative-references"></a>A.1 Normative References</h3><dl><dt class="label"><a name="XML1" id="XML1"></a>XML 1.0;</dt><dd>
+          World Wide Web Consortium. 
+          <cite>Extensible Markup Language (XML) 1.0.</cite> 
+	    W3C Recommendation.
+	  See <a href="http://www.w3.org/TR/REC-xml/">http://www.w3.org/TR/REC-xml/</a>.</dd><dt class="label"><a name="XQXPDM" id="XQXPDM"></a>XQuery 1.0 and XPath 2.0 Data Model</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XQuery 1.0 and XPath 2.0 Data Model.</cite>
+            W3C Recommendation.
+	  See <a href="http://www.w3.org/TR/xpath-datamodel/">http://www.w3.org/TR/xpath-datamodel/</a>.</dd><dt class="label"><a name="XQXPFO" id="XQXPFO"></a>XQuery 1.0 and XPath 2.0 Functions and Operators</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XQuery 1.0 and XPath 2.0 Functions and Operators.</cite>
+            W3C Recommendation.
+	  See <a href="http://www.w3.org/TR/xpath-functions/">http://www.w3.org/TR/xpath-functions/</a>.</dd><dt class="label"><a name="XPath2" id="XPath2"></a>XPath 2.0</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XPath 2.0.</cite>
+            W3C Recommendation.
+	  See <a href="http://www.w3.org/TR/xpath20/">http://www.w3.org/TR/xpath20/</a>.</dd><dt class="label"><a name="XSLT" id="XSLT"></a>XSLT 1.0</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XSL Transformations (XSLT) Version 1.0.</cite>
+            W3C Recommendation. 
+	  See <a href="http://www.w3.org/TR/xslt">http://www.w3.org/TR/xslt</a>.</dd><dt class="label"><a name="XSD2" id="XSD2"></a>XML Schema Part 2: Datatypes</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XML Schema Part 2: Datatypes.</cite>
+	    W3C Recommendation. 
+	  See <a href="http://www.w3.org/TR/xmlschema-2/">http://www.w3.org/TR/xmlschema-2/</a>.</dd><dt class="label"><a name="XMLNAMES" id="XMLNAMES"></a>XML Names</dt><dd>
+          World Wide Web Consortium. 
+          <cite>Namespaces in XML.</cite>
+	    W3C Recommendation. 
+          See <a href="http://www.w3.org/TR/REC-xml-names/">http://www.w3.org/TR/REC-xml-names/</a>.</dd><dt class="label"><a name="XSLFO" id="XSLFO"></a>XSL-FO</dt><dd>
+          World Wide Web Consortium.
+          <cite>Extensible Stylesheet Language (XSL). Version 1.0.</cite>
+	    W3C Recommendation.
+          See <a href="http://www.w3.org/TR/xsl/">http://www.w3.org/TR/xsl/</a>.</dd><dt class="label"><a name="IANA-CS" id="IANA-CS"></a>IANA Character Sets</dt><dd>
+          <cite>IANA Character Sets assignment.</cite> 
+	  See <a href="http://www.iana.org/assignments/character-sets">http://www.iana.org/assignments/character-sets</a>.</dd><dt class="label"><a name="RFC2396" id="RFC2396"></a>RFC 2396</dt><dd>IETF.
+          <cite>RFC 2396. Uniform Resource Identifiers (URI): Generic
+          Syntax</cite>.
+          See <a href="http://www.ietf.org/rfc/rfc2396.txt">http://www.ietf.org/rfc/rfc2396.txt</a>.</dd></dl></div><div class="div2">
+<h3><a name="other-references" id="other-references"></a>A.2 Other References</h3><dl><dt class="label"><a name="SAX2" id="SAX2"></a>SAX2</dt><dd>
+          <cite>SAX 2.0, the Simple API for XML.</cite> 
+	  See <a href="http://www.saxproject.org/">http://www.saxproject.org/</a>.</dd><dt class="label"><a name="StAX" id="StAX"></a>StAX</dt><dd>
+          <cite>JSR-000173 Streaming API for XML (StAX) 1.0.</cite> 
+	  See <a href="http://jcp.org/aboutJava/communityprocess/final/jsr173/index.html">http://jcp.org/aboutJava/communityprocess/final/jsr173/index.html</a>.</dd><dt class="label"><a name="XSLT2" id="XSLT2"></a>XSLT 2.0</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XSL Transformations (XSLT) Version 2.0.</cite>
+	    W3C Recommendation
+	  See <a href="http://www.w3.org/TR/xslt20/">http://www.w3.org/TR/xslt20/</a>.</dd><dt class="label"><a name="XPath" id="XPath"></a>XPath 1.0</dt><dd>
+          World Wide Web Consortium. 
+          <cite>XPath 1.0.</cite> 
+	    W3C Recommendation. 
+	  See <a href="http://www.w3c.org/TR/xpath">http://www.w3c.org/TR/xpath</a>.</dd></dl></div></div><div class="div1">
+<h2><a name="element-syntax-summary" id="element-syntax-summary"></a>B List of STX Instructions and Declarations</h2><p>
+	Plain list only so far:
+      </p><div class="exampleInner"><pre>	stx:transform
+	stx:include
+	stx:namespace-alias
+	stx:template
+	stx:procedure
+	stx:group
+	stx:call-procedure
+	stx:copy
+	stx:process-children
+	stx:process-attributes
+	stx:process-siblings
+	stx:process-self
+	stx:value-of
+	stx:text
+	stx:cdata
+	stx:element
+	stx:start-element
+	stx:end-element
+	stx:processing-instruction
+	stx:comment
+	stx:attribute
+	stx:if
+	stx:else
+	stx:choose
+	stx:when
+	stx:otherwise
+	stx:variable
+	stx:assign
+	stx:with-param
+	stx:param
+	stx:for-each-item
+        stx:while
+	stx:process-document
+	stx:result-document
+	stx:buffer
+	stx:process-buffer
+	stx:result-buffer
+	stx:process-siblings
+	</pre></div></div><div class="div1">
+<h2><a name="stxpath" id="stxpath"></a>C STXPath Grammar</h2><p>The following is the complete grammar for STXPath in EBNF notation.</p>
+<h5><a name="i__153999192_10047" id="i__153999192_10047"></a>Main Constructs</h5><table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td><a name="NT-expression" id="NT-expression"></a>[1]&nbsp;&nbsp;&nbsp;</td><td><code>expression</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code><a href="#prod-STXPath">STXPath</a></code></td></tr><tr valign="baseline"><td><a name="NT-pattern" id="NT-pattern"></a>[2]&nbsp;&nbsp;&nbsp;</td><td><code>pattern</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code><a href="#prod-Pattern">Pattern</a></code></td></tr></tbody></table>
+<h5><a name="i__153999192_10103" id="i__153999192_10103"></a>Named Terminals</h5><table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td><a name="prod-ExprComment" id="prod-ExprComment"></a>[3]&nbsp;&nbsp;&nbsp;</td><td><code>ExprComment</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"(:" (<a href="#prod-ExprCommentContent">ExprCommentContent</a> | <a href="#prod-ExprComment">ExprComment</a>)* ":)"</code></td></tr><tr valign="baseline"><td><a name="prod-ExprCommentContent" id="prod-ExprCommentContent"></a>[4]&nbsp;&nbsp;&nbsp;</td><td><code>ExprCommentContent</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-Char">Char</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-IntegerLiteral" id="prod-IntegerLiteral"></a>[5]&nbsp;&nbsp;&nbsp;</td><td><code>IntegerLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-Digits">Digits</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-DecimalLiteral" id="prod-DecimalLiteral"></a>[6]&nbsp;&nbsp;&nbsp;</td><td><code>DecimalLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>("." <a href="#prod-Digits">Digits</a>)
+              | (<a href="#prod-Digits">Digits</a> "." [0-9]*)</code></td></tr><tr valign="baseline"><td><a name="prod-DoubleLiteral" id="prod-DoubleLiteral"></a>[7]&nbsp;&nbsp;&nbsp;</td><td><code>DoubleLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>(("." <a href="#prod-Digits">Digits</a>)
+              | (<a href="#prod-Digits">Digits</a>
+              ("." [0-9]*)?)) ("e" | "E") ("+" | "-")?
+              <a href="#prod-Digits">Digits</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-StringLiteral" id="prod-StringLiteral"></a>[8]&nbsp;&nbsp;&nbsp;</td><td><code>StringLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>('"' (('"' '"') | [^"])* '"') | ("'" (("'" "'") | [^'])* "'")</code></td></tr><tr valign="baseline"><td><a name="prod-Digits" id="prod-Digits"></a>[9]&nbsp;&nbsp;&nbsp;</td><td><code>Digits</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>[0-9]+</code></td></tr><tr valign="baseline"><td><a name="prod-NCName" id="prod-NCName"></a>[10]&nbsp;&nbsp;&nbsp;</td><td><code>NCName</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="http://www.w3.org/TR/REC-xml-names/#NT-NCName">[http://www.w3.org/TR/REC-xml-names/#NT-NCName]</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-VarName" id="prod-VarName"></a>[11]&nbsp;&nbsp;&nbsp;</td><td><code>VarName</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-QName">QName</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-QName" id="prod-QName"></a>[12]&nbsp;&nbsp;&nbsp;</td><td><code>QName</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="http://www.w3.org/TR/REC-xml-names/#NT-QName">[http://www.w3.org/TR/REC-xml-names/#NT-QName]</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-Char" id="prod-Char"></a>[13]&nbsp;&nbsp;&nbsp;</td><td><code>Char</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="http://www.w3.org/TR/REC-xml/#NT-Char">[http://www.w3.org/TR/REC-xml/#NT-Char]</a>
+            </code></td></tr></tbody></table>
+<h5><a name="i__153999192_10376" id="i__153999192_10376"></a>Non-Terminals</h5><table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td><a name="prod-STXPath" id="prod-STXPath"></a>[14]&nbsp;&nbsp;&nbsp;</td><td><code>STXPath</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-Expr">Expr</a>?</code></td></tr><tr valign="baseline"><td><a name="prod-Expr" id="prod-Expr"></a>[15]&nbsp;&nbsp;&nbsp;</td><td><code>Expr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-ExprSingle">ExprSingle</a>
+              ("," <a href="#prod-ExprSingle">ExprSingle</a>)*</code></td></tr><tr valign="baseline"><td><a name="prod-ExprSingle" id="prod-ExprSingle"></a>[16]&nbsp;&nbsp;&nbsp;</td><td><code>ExprSingle</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-ForExpr">ForExpr</a>
+              | <a href="#prod-QuantifiedExpr">QuantifiedExpr</a>
+              | <a href="#prod-IfExpr">IfExpr</a>
+              | <a href="#prod-OrExpr">OrExpr</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-ForExpr" id="prod-ForExpr"></a>[17]&nbsp;&nbsp;&nbsp;</td><td><code>ForExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-SimpleForClause">SimpleForClause</a> "return"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-SimpleForClause" id="prod-SimpleForClause"></a>[18]&nbsp;&nbsp;&nbsp;</td><td><code>SimpleForClause</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"for" "$" <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+              ("," "$" <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>)*</code></td></tr><tr valign="baseline"><td><a name="prod-QuantifiedExpr" id="prod-QuantifiedExpr"></a>[19]&nbsp;&nbsp;&nbsp;</td><td><code>QuantifiedExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>("some" "$" | "every" "$")
+              <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+              ("," "$" <a href="#prod-VarName">VarName</a> "in"
+              <a href="#prod-ExprSingle">ExprSingle</a>)* "satisfies"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-IfExpr" id="prod-IfExpr"></a>[20]&nbsp;&nbsp;&nbsp;</td><td><code>IfExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"if" "(" <a href="#prod-Expr">Expr</a> ")" "then"
+              <a href="#prod-ExprSingle">ExprSingle</a> "else"
+              <a href="#prod-ExprSingle">ExprSingle</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-OrExpr" id="prod-OrExpr"></a>[21]&nbsp;&nbsp;&nbsp;</td><td><code>OrExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-AndExpr">AndExpr</a>
+              ( "or" <a href="#prod-AndExpr">AndExpr</a> )*</code></td></tr><tr valign="baseline"><td><a name="prod-AndExpr" id="prod-AndExpr"></a>[22]&nbsp;&nbsp;&nbsp;</td><td><code>AndExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-ComparisonExpr">ComparisonExpr</a> ( "and"
+              <a href="#prod-ComparisonExpr">ComparisonExpr</a> )*</code></td></tr><tr valign="baseline"><td><a name="prod-ComparisonExpr" id="prod-ComparisonExpr"></a>[23]&nbsp;&nbsp;&nbsp;</td><td><code>ComparisonExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-RangeExpr">RangeExpr</a> (
+              <a href="#prod-GeneralComp">GeneralComp</a>
+              <a href="#prod-RangeExpr">RangeExpr</a> )?</code></td></tr><tr valign="baseline"><td><a name="prod-RangeExpr" id="prod-RangeExpr"></a>[24]&nbsp;&nbsp;&nbsp;</td><td><code>RangeExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-AdditiveExpr">AdditiveExpr</a>
+              ( "to" <a href="#prod-AdditiveExpr">AdditiveExpr</a> )?</code></td></tr><tr valign="baseline"><td><a name="prod-AdditiveExpr" id="prod-AdditiveExpr"></a>[25]&nbsp;&nbsp;&nbsp;</td><td><code>AdditiveExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-MultiplicativeExpr">MultiplicativeExpr</a> (
+              ("+" | "-")
+              <a href="#prod-MultiplicativeExpr">MultiplicativeExpr</a>
+              )*</code></td></tr><tr valign="baseline"><td><a name="prod-MultiplicativeExpr" id="prod-MultiplicativeExpr"></a>[26]&nbsp;&nbsp;&nbsp;</td><td><code>MultiplicativeExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-UnaryExpr">UnaryExpr</a>
+              ( ("*" | "div" | "idiv" | "mod")
+              <a href="#prod-UnaryExpr">UnaryExpr</a> )*</code></td></tr><tr valign="baseline"><td><a name="prod-UnaryExpr" id="prod-UnaryExpr"></a>[27]&nbsp;&nbsp;&nbsp;</td><td><code>UnaryExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>("-" | "+")* <a href="#prod-ValueExpr">ValueExpr</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-ValueExpr" id="prod-ValueExpr"></a>[28]&nbsp;&nbsp;&nbsp;</td><td><code>ValueExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-PathExpr">PathExpr</a>
+              | <a href="#prod-FilterStep">FilterStep</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-PathExpr" id="prod-PathExpr"></a>[29]&nbsp;&nbsp;&nbsp;</td><td><code>PathExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"/" <a href="#prod-RelativePathExpr">RelativePathExpr</a>?</code></td></tr><tr valign="baseline"><td></td><td></td><td></td><td><code>| "//" <a href="#prod-RelativePathExpr">RelativePathExpr</a></code></td></tr><tr valign="baseline"><td></td><td></td><td></td><td><code>| <a href="#prod-RelativePathExpr">RelativePathExpr</a></code></td></tr><tr valign="baseline"><td><a name="prod-RelativePathExpr" id="prod-RelativePathExpr"></a>[30]&nbsp;&nbsp;&nbsp;</td><td><code>RelativePathExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-AxisStep">AxisStep</a> (("/" | "//")
+              <a href="#prod-AxisStep">AxisStep</a>)*</code></td></tr><tr valign="baseline"><td><a name="prod-AxisStep" id="prod-AxisStep"></a>[31]&nbsp;&nbsp;&nbsp;</td><td><code>AxisStep</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>(<a href="#prod-AbbrevForwardStep">AbbrevForwardStep</a>
+             | <a href="#prod-AbbrevReverseStep">AbbrevReverseStep</a>)
+              <a href="#prod-Predicate">Predicate</a>?
+            </code></td></tr><tr valign="baseline"><td><a name="prod-FilterStep" id="prod-FilterStep"></a>[32]&nbsp;&nbsp;&nbsp;</td><td><code>FilterStep</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-PrimaryExpr">PrimaryExpr</a>
+              <a href="#prod-Predicate">Predicate</a>*
+            </code></td></tr><tr valign="baseline"><td><a name="prod-ContextItemExpr" id="prod-ContextItemExpr"></a>[33]&nbsp;&nbsp;&nbsp;</td><td><code>ContextItemExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"."</code></td></tr><tr valign="baseline"><td><a name="prod-PrimaryExpr" id="prod-PrimaryExpr"></a>[34]&nbsp;&nbsp;&nbsp;</td><td><code>PrimaryExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-Literal">Literal</a>
+              | <a href="#prod-VarRef">VarRef</a>
+              | <a href="#prod-ParenthesizedExpr">ParenthesizedExpr</a>
+              | <a href="#prod-ContextItemExpr">ContextItemExpr</a>
+              | <a href="#prod-FunctionCall">FunctionCall</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-VarRef" id="prod-VarRef"></a>[35]&nbsp;&nbsp;&nbsp;</td><td><code>VarRef</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"$" <a href="#prod-VarName">VarName</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-Predicate" id="prod-Predicate"></a>[36]&nbsp;&nbsp;&nbsp;</td><td><code>Predicate</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"[" <a href="#prod-Expr">Expr</a> "]"</code></td></tr><tr valign="baseline"><td><a name="prod-GeneralComp" id="prod-GeneralComp"></a>[37]&nbsp;&nbsp;&nbsp;</td><td><code>GeneralComp</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"=" | "!=" | "&lt;" | "&lt;=" | "&gt;" | "&gt;="</code></td></tr><tr valign="baseline"><td><a name="prod-AbbrevForwardStep" id="prod-AbbrevForwardStep"></a>[38]&nbsp;&nbsp;&nbsp;</td><td><code>AbbrevForwardStep</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"@"? <a href="#prod-NodeTest">NodeTest</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-AbbrevReverseStep" id="prod-AbbrevReverseStep"></a>[39]&nbsp;&nbsp;&nbsp;</td><td><code>AbbrevReverseStep</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>".."</code></td></tr><tr valign="baseline"><td><a name="prod-NodeTest" id="prod-NodeTest"></a>[40]&nbsp;&nbsp;&nbsp;</td><td><code>NodeTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-KindTest">KindTest</a>
+              | <a href="#prod-NameTest">NameTest</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-NameTest" id="prod-NameTest"></a>[41]&nbsp;&nbsp;&nbsp;</td><td><code>NameTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-QName">QName</a>
+              | <a href="#prod-Wildcard">Wildcard</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-Wildcard" id="prod-Wildcard"></a>[42]&nbsp;&nbsp;&nbsp;</td><td><code>Wildcard</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"*"
+              | <a href="#prod-NCName">NCName</a> ":" "*"
+              | "*" ":" <a href="#prod-NCName">NCName</a></code></td></tr><tr valign="baseline"><td><a name="prod-Literal" id="prod-Literal"></a>[43]&nbsp;&nbsp;&nbsp;</td><td><code>Literal</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-NumericLiteral">NumericLiteral</a>
+              | <a href="#prod-StringLiteral">StringLiteral</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-NumericLiteral" id="prod-NumericLiteral"></a>[44]&nbsp;&nbsp;&nbsp;</td><td><code>NumericLiteral</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-IntegerLiteral">IntegerLiteral</a>
+              | <a href="#prod-DecimalLiteral">DecimalLiteral</a>
+              | <a href="#prod-DoubleLiteral">DoubleLiteral</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-ParenthesizedExpr" id="prod-ParenthesizedExpr"></a>[45]&nbsp;&nbsp;&nbsp;</td><td><code>ParenthesizedExpr</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"(" <a href="#prod-Expr">Expr</a>? ")"</code></td></tr><tr valign="baseline"><td><a name="prod-FunctionCall" id="prod-FunctionCall"></a>[46]&nbsp;&nbsp;&nbsp;</td><td><code>FunctionCall</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code><a href="#prod-QName">QName</a> "("
+              (<a href="#prod-ExprSingle">ExprSingle</a>
+              ("," <a href="#prod-ExprSingle">ExprSingle</a>)*)? ")"</code></td></tr><tr valign="baseline"><td><a name="prod-KindTest" id="prod-KindTest"></a>[47]&nbsp;&nbsp;&nbsp;</td><td><code>KindTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-PITest">PITest</a>
+              | <a href="#prod-CommentTest">CommentTest</a>
+              | <a href="#prod-TextTest">TextTest</a>
+              | <a href="#prod-AnyKindTest">AnyKindTest</a>
+              | <a href="#prod-CdataTest">CdataTest</a>
+              | <a href="#prod-DoctypeTest">DoctypeTest</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-PITest" id="prod-PITest"></a>[48]&nbsp;&nbsp;&nbsp;</td><td><code>PITest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"processing-instruction" "("
+              (<a href="#prod-NCName">NCName</a>
+              | <a href="#prod-StringLiteral">StringLiteral</a>)? ")"</code></td></tr><tr valign="baseline"><td><a name="prod-CommentTest" id="prod-CommentTest"></a>[49]&nbsp;&nbsp;&nbsp;</td><td><code>CommentTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"comment" "(" ")"</code></td></tr><tr valign="baseline"><td><a name="prod-TextTest" id="prod-TextTest"></a>[50]&nbsp;&nbsp;&nbsp;</td><td><code>TextTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"text" "(" ")"</code></td></tr><tr valign="baseline"><td><a name="prod-AnyKindTest" id="prod-AnyKindTest"></a>[51]&nbsp;&nbsp;&nbsp;</td><td><code>AnyKindTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"node" "(" ")"</code></td></tr><tr valign="baseline"><td><a name="prod-CdataTest" id="prod-CdataTest"></a>[52]&nbsp;&nbsp;&nbsp;</td><td><code>CdataTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"cdata" "(" ")"</code></td></tr><tr valign="baseline"><td><a name="prod-DoctypeTest" id="prod-DoctypeTest"></a>[53]&nbsp;&nbsp;&nbsp;</td><td><code>DoctypeTest</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>"doctype" "(" ")"</code></td></tr></tbody></table>
+<h5><a name="i__153999192_11506" id="i__153999192_11506"></a>Patterns</h5><table class="scrap" summary="Scrap"><tbody><tr valign="baseline"><td><a name="prod-Pattern" id="prod-Pattern"></a>[54]&nbsp;&nbsp;&nbsp;</td><td><code>Pattern</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-PathPattern">PathPattern</a>
+            </code></td></tr><tr valign="baseline"><td></td><td></td><td></td><td><code>| <a href="#prod-Pattern">Pattern</a>
+              '|' <a href="#prod-PathPattern">PathPattern</a>
+            </code></td></tr><tr valign="baseline"><td><a name="prod-PathPattern" id="prod-PathPattern"></a>[55]&nbsp;&nbsp;&nbsp;</td><td><code>PathPattern</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-RelativePathPattern">RelativePathPattern</a>
+            </code></td></tr><tr valign="baseline"><td></td><td></td><td></td><td><code>| '/' <a href="#prod-RelativePathPattern">RelativePathPattern</a>?</code></td></tr><tr valign="baseline"><td><a name="prod-RelativePathPattern" id="prod-RelativePathPattern"></a>[56]&nbsp;&nbsp;&nbsp;</td><td><code>RelativePathPattern</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-PatternStep">PatternStep</a> (('/' | '//')
+              <a href="#prod-RelativePathPattern">RelativePathPattern</a>)?</code></td></tr><tr valign="baseline"><td><a name="prod-PatternStep" id="prod-PatternStep"></a>[57]&nbsp;&nbsp;&nbsp;</td><td><code>PatternStep</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code>
+              <a href="#prod-PatternAxis">PatternAxis</a>?
+              <a href="#prod-NodeTest">NodeTest</a>
+              <a href="#prod-Predicate">Predicate</a>?</code></td></tr><tr valign="baseline"><td><a name="prod-PatternAxis" id="prod-PatternAxis"></a>[58]&nbsp;&nbsp;&nbsp;</td><td><code>PatternAxis</code></td><td>&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td><td><code> '@' </code></td></tr></tbody></table></div><div class="div1">
+<h2><a name="filter-uris" id="filter-uris"></a>D Recommended filter URIs (Non-Normative)</h2><p>See <a href="#external-filters"><b>5.18 Using external filters</b></a> for a detailed description
+      on how to use these values.</p><table border="1" cellpadding="5" cellspacing="0"><tbody><tr><th>Filter method&nbsp;&nbsp;</th><th>uri-reference for the <code>filter-method</code> attribute</th></tr><tr><td>STX</td><td>http://stx.sourceforge.net/2002/ns</td></tr><tr><td>XSLT</td><td>http://www.w3.org/1999/XSL/Transform</td></tr></tbody></table></div><div class="div1">
+<h2><a name="acknowledgments" id="acknowledgments"></a>E Acknowledgments (Non-Normative)</h2><p>These people have contributed to this specification as they sent 
+	their comments to the stx@gingerall.cz mailing list:</p><blockquote><p>Tom Kaiser<br>Aristotle Pagaltzis<br>Tolja Zubow<br>Pavel Hlavni&#269;ka<br>Niko Matsakis<br>Cyrus Dolph<br>Norman Wiechmann<br>David Perez Carmona<br>Eric van der Vlist<br>Barrie Slaymaker<br>Alain Frisch<br>Tatu Saloranta<br>Nikolay Fiykov</p></blockquote></div><div class="div1">
+<h2><a name="changehistory" id="changehistory"></a>F Draft Change History since WD 1 July 2004 (Non-Normative)</h2><blockquote><p>2005-01-04 : PC : Fixed typo in <a href="#external-filters"><b>5.18 Using external filters</b></a>.
+	  (XSLT stx-sheet changed to XSLT stylesheet).
+	<br>2007-04-19 : PC : References to XPath 2.0 family specifications 
+	  changed to final W3C Recommendations. Consecutive Text Nodes chapter
+	  (3.6) removed. Minor wording changes.
+	<br>2007-04-26 : PC : @text-by-lines removed from stx:transform and 
+	  stx:process-document. Processing Text chapter (5.10) removed. Direct 
+	  references to SAX2 reworded. Function sf:regex-group removed. Wording 
+	  changes and clarifications.
+	</p></blockquote></div></div>
+</body></html>
