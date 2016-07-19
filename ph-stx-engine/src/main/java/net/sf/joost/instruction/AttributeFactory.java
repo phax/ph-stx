@@ -50,12 +50,11 @@ import net.sf.joost.stx.ParseContext;
 public final class AttributeFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public AttributeFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
     attrNames.add ("namespace");
@@ -206,10 +205,10 @@ public final class AttributeFactory extends AbstractFactoryBase
       if (m_aSelect != null)
       {
         context.m_aEmitter.addAttribute (attUri,
-                                      attName,
-                                      attLocal,
-                                      m_aSelect.evaluate (context, this).getStringValue (),
-                                      this);
+                                         attName,
+                                         attLocal,
+                                         m_aSelect.evaluate (context, this).getStringValue (),
+                                         this);
       }
       else
       {

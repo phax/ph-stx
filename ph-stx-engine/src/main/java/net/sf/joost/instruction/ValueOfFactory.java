@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -48,12 +49,11 @@ import net.sf.joost.stx.Value;
 public final class ValueOfFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ValueOfFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("select");
     attrNames.add ("separator");
   }
@@ -82,7 +82,8 @@ public final class ValueOfFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>value-of</code> element. */
   public static final class Instance extends AbstractNodeBase
   {
-    private AbstractTree select, separator;
+    private AbstractTree m_aSelect;
+    private AbstractTree m_aSeparator;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -91,8 +92,8 @@ public final class ValueOfFactory extends AbstractFactoryBase
                         final AbstractTree separator)
     {
       super (qName, parent, context, false);
-      this.select = select;
-      this.separator = separator;
+      this.m_aSelect = select;
+      this.m_aSeparator = separator;
     }
 
     /**
@@ -102,7 +103,7 @@ public final class ValueOfFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      Value v = select.evaluate (context, this);
+      Value v = m_aSelect.evaluate (context, this);
       String s;
       if (v.next == null)
         s = v.getStringValue ();
@@ -110,10 +111,10 @@ public final class ValueOfFactory extends AbstractFactoryBase
       {
         // create a string from a sequence
         // evaluate separator
-        final String sep = (separator != null) ? separator.evaluate (context, this).getString () : " "; // default
-                                                                                                        // value
+        final String sep = m_aSeparator != null ? m_aSeparator.evaluate (context, this).getString () : " "; // default
+        // value
         // use a string buffer for creating the result
-        final StringBuffer sb = new StringBuffer ();
+        final StringBuilder sb = new StringBuilder ();
         Value nextVal = v.next;
         v.next = null;
         sb.append (v.getStringValue ());
@@ -136,10 +137,10 @@ public final class ValueOfFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
-      if (separator != null)
-        theCopy.separator = separator.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
+      if (m_aSeparator != null)
+        theCopy.m_aSeparator = m_aSeparator.deepCopy (copies);
     }
   }
 }

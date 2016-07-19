@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -47,12 +48,11 @@ import net.sf.joost.stx.ParseContext;
 public final class MatchFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public MatchFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("regex");
     attrNames.add ("flags");
   }
@@ -88,16 +88,16 @@ public final class MatchFactory extends AbstractFactoryBase
      * The AVT in the <code>regex</code> attribute; it will be evaluated in the
      * <code>stx:analyze-text</code> parent
      */
-    protected AbstractTree regex;
+    protected AbstractTree m_aRegex;
 
     /**
      * The AVT in the <code>flags</code> attribute; it will be evaluated in the
      * <code>stx:analyze-text</code> parent
      */
-    protected AbstractTree flags;
+    protected AbstractTree m_aFlags;
 
     /** The parent */
-    private AnalyzeTextFactory.Instance analyzeText;
+    private AnalyzeTextFactory.Instance m_aAnalyzeText;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -106,15 +106,15 @@ public final class MatchFactory extends AbstractFactoryBase
                         final AbstractTree flags)
     {
       super (qName, parent, context, true);
-      this.regex = regex;
-      this.flags = flags;
-      analyzeText = (AnalyzeTextFactory.Instance) parent;
+      this.m_aRegex = regex;
+      this.m_aFlags = flags;
+      m_aAnalyzeText = (AnalyzeTextFactory.Instance) parent;
     }
 
     @Override
     public boolean compile (final int pass, final ParseContext context) throws SAXException
     {
-      m_aNodeEnd.next = analyzeText.m_aNodeEnd; // back to stx:analyze-text
+      m_aNodeEnd.next = m_aAnalyzeText.m_aNodeEnd; // back to stx:analyze-text
       return false;
     }
 
@@ -123,7 +123,7 @@ public final class MatchFactory extends AbstractFactoryBase
     {
       super.process (context);
       // store value for the regex-group function
-      context.localRegExGroup.push (analyzeText.capSubstr);
+      context.localRegExGroup.push (m_aAnalyzeText.capSubstr);
       return CSTX.PR_CONTINUE;
     }
 
@@ -139,12 +139,12 @@ public final class MatchFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (analyzeText != null)
-        theCopy.analyzeText = (AnalyzeTextFactory.Instance) analyzeText.deepCopy (copies);
-      if (flags != null)
-        theCopy.flags = flags.deepCopy (copies);
-      if (regex != null)
-        theCopy.regex = regex.deepCopy (copies);
+      if (m_aAnalyzeText != null)
+        theCopy.m_aAnalyzeText = (AnalyzeTextFactory.Instance) m_aAnalyzeText.deepCopy (copies);
+      if (m_aFlags != null)
+        theCopy.m_aFlags = m_aFlags.deepCopy (copies);
+      if (m_aRegex != null)
+        theCopy.m_aRegex = m_aRegex.deepCopy (copies);
     }
 
     //
@@ -153,7 +153,7 @@ public final class MatchFactory extends AbstractFactoryBase
     @Override
     public String toString ()
     {
-      return "stx:match regex='" + regex + "'";
+      return "stx:match regex='" + m_aRegex + "'";
     }
   }
 }

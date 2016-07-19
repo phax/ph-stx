@@ -48,11 +48,10 @@ import net.sf.joost.stx.ParseContext;
 public class DoctypeFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   public DoctypeFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("public-id");
     attrNames.add ("system-id");
@@ -109,9 +108,11 @@ public class DoctypeFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       context.m_aEmitter.createDTD (this,
-                                 m_aNameAVT.evaluate (context, this).getStringValue (),
-                                 m_aPublicAVT != null ? m_aPublicAVT.evaluate (context, this).getStringValue () : null,
-                                 m_aSystemAVT != null ? m_aSystemAVT.evaluate (context, this).getStringValue () : null);
+                                    m_aNameAVT.evaluate (context, this).getStringValue (),
+                                    m_aPublicAVT != null ? m_aPublicAVT.evaluate (context, this).getStringValue ()
+                                                         : null,
+                                    m_aSystemAVT != null ? m_aSystemAVT.evaluate (context, this).getStringValue ()
+                                                         : null);
       return CSTX.PR_CONTINUE;
     }
 

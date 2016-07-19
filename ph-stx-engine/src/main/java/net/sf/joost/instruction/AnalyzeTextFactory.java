@@ -53,11 +53,10 @@ import net.sf.joost.util.regex.JRegularExpression;
 public final class AnalyzeTextFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   public AnalyzeTextFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("select");
   }
 
@@ -243,12 +242,12 @@ public final class AnalyzeTextFactory extends AbstractFactoryBase
         matchers = new Matcher [matchChildren.length];
         for (int i = 0; i < matchChildren.length; i++)
         {
-          final String re = matchChildren[i].regex.evaluate (context, matchChildren[i]).getString ();
+          final String re = matchChildren[i].m_aRegex.evaluate (context, matchChildren[i]).getString ();
 
-          final String flags = matchChildren[i].flags != null ? matchChildren[i].flags.evaluate (context,
-                                                                                                 matchChildren[i])
-                                                                                      .getString ()
-                                                              : "";
+          final String flags = matchChildren[i].m_aFlags != null ? matchChildren[i].m_aFlags.evaluate (context,
+                                                                                                       matchChildren[i])
+                                                                                            .getString ()
+                                                                 : "";
           try
           {
             matchers[i] = new JRegularExpression (re, true, flags).matcher (text);

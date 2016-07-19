@@ -55,19 +55,22 @@ import net.sf.joost.trax.SourceLocatorImpl;
 
 public final class MessageFactory extends AbstractFactoryBase
 {
-  /** allowed attributes for this element */
-  private final Set <String> attrNames;
-
   /** enumerated values for the level attribute */
   private static final String [] LEVEL_VALUES = { "trace", "debug", "info", "warn", "error", "fatal" };
 
   /** index in {@link #LEVEL_VALUES} */
-  private static final int TRACE_LEVEL = 0, DEBUG_LEVEL = 1, INFO_LEVEL = 2, WARN_LEVEL = 3, ERROR_LEVEL = 4,
-      FATAL_LEVEL = 5;
+  private static final int TRACE_LEVEL = 0;
+  private static final int DEBUG_LEVEL = 1;
+  private static final int INFO_LEVEL = 2;
+  private static final int WARN_LEVEL = 3;
+  private static final int ERROR_LEVEL = 4;
+  private static final int FATAL_LEVEL = 5;
+
+  /** allowed attributes for this element */
+  private final Set <String> attrNames = new HashSet<> ();
 
   public MessageFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("select");
     attrNames.add ("terminate");
     attrNames.add ("level");
@@ -106,13 +109,16 @@ public final class MessageFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>message</code> element. */
   public static final class Instance extends AbstractNodeBase
   {
-    private AbstractTree select, terminate;
+    private AbstractTree m_aSelect;
+    private AbstractTree m_aTerminate;
     private Logger log;
-    private final int level;
+    private final int m_nLevel;
 
-    private StringBuffer buffer; // used only when log != null
+    // used only when log != null
+    private StringBuffer m_aBuffer;
 
-    private IStxEmitter emitter; // initialized on first processing
+    // initialized on first processing
+    private IStxEmitter m_aEmitter;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -128,9 +134,9 @@ public final class MessageFactory extends AbstractFactoryBase
              // this element must be empty if there is a select attribute
              select == null);
 
-      this.select = select;
-      this.terminate = terminate;
-      this.level = level;
+      this.m_aSelect = select;
+      this.m_aTerminate = terminate;
+      this.m_nLevel = level;
       if (logger != null)
         log = LoggerFactory.getLogger (logger);
     }
@@ -145,7 +151,7 @@ public final class MessageFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      if (emitter == null)
+      if (m_aEmitter == null)
       {
         // create proper StreamEmitter only once
         try
@@ -154,13 +160,13 @@ public final class MessageFactory extends AbstractFactoryBase
           {
             // Create emitter with a StringWriter
             final StringWriter writer = new StringWriter ();
-            buffer = writer.getBuffer ();
+            m_aBuffer = writer.getBuffer ();
             // Note: encoding parameter is irrelevant here
             final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (writer,
                                                                                CSTX.DEFAULT_ENCODING,
                                                                                context.currentProcessor.m_aOutputProperties);
             se.setOmitXmlDeclaration (true);
-            emitter = se;
+            m_aEmitter = se;
           }
           else
             if (context.messageEmitter == null)
@@ -169,11 +175,11 @@ public final class MessageFactory extends AbstractFactoryBase
               final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (System.err,
                                                                                  context.currentProcessor.m_aOutputProperties);
               se.setOmitXmlDeclaration (true);
-              context.messageEmitter = emitter = se;
+              context.messageEmitter = m_aEmitter = se;
             }
             else
-                                                // use global message emitter
-                                                emitter = context.messageEmitter;
+              // use global message emitter
+              m_aEmitter = context.messageEmitter;
         }
         catch (final java.io.IOException ex)
         {
@@ -182,18 +188,18 @@ public final class MessageFactory extends AbstractFactoryBase
         }
       }
 
-      if (select == null)
+      if (m_aSelect == null)
       {
         super.process (context);
-        emitter.startDocument ();
-        context.pushEmitter (emitter);
+        m_aEmitter.startDocument ();
+        context.pushEmitter (m_aEmitter);
       }
       else
       {
-        emitter.startDocument ();
-        final String msg = select.evaluate (context, this).getStringValue ();
-        emitter.characters (msg.toCharArray (), 0, msg.length ());
-        emitter.endDocument ();
+        m_aEmitter.startDocument ();
+        final String msg = m_aSelect.evaluate (context, this).getStringValue ();
+        m_aEmitter.characters (msg.toCharArray (), 0, msg.length ());
+        m_aEmitter.endDocument ();
         processMessage (context);
       }
 
@@ -229,8 +235,8 @@ public final class MessageFactory extends AbstractFactoryBase
                                                               .append (':')
                                                               .append (colNo)
                                                               .append (": ")
-                                                              .append (buffer);
-        switch (level)
+                                                              .append (m_aBuffer);
+        switch (m_nLevel)
         {
           case TRACE_LEVEL:
             log.trace (sb.toString ());
@@ -251,13 +257,13 @@ public final class MessageFactory extends AbstractFactoryBase
             log.error (sb.toString ());
             break;
         }
-        buffer.setLength (0);
+        m_aBuffer.setLength (0);
       }
 
-      if (terminate == null)
+      if (m_aTerminate == null)
         return;
 
-      final String terminateValue = terminate.evaluate (context, this).getString ();
+      final String terminateValue = m_aTerminate.evaluate (context, this).getString ();
       if (terminateValue.equals ("yes"))
         throw new SAXException (new TransformerException ("Transformation terminated",
                                                           new SourceLocatorImpl (m_sPublicID,
@@ -282,12 +288,12 @@ public final class MessageFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      theCopy.buffer = null;
-      theCopy.emitter = null;
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
-      if (terminate != null)
-        theCopy.terminate = terminate.deepCopy (copies);
+      theCopy.m_aBuffer = null;
+      theCopy.m_aEmitter = null;
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
+      if (m_aTerminate != null)
+        theCopy.m_aTerminate = m_aTerminate.deepCopy (copies);
     }
 
   }

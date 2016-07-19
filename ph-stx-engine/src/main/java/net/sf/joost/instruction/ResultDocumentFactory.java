@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -57,12 +58,11 @@ import net.sf.joost.trax.TrAXHelper;
 public final class ResultDocumentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ResultDocumentFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("href");
     attrNames.add ("output-encoding");
     attrNames.add ("output-method");
@@ -110,10 +110,10 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>result-document</code> element. */
   public static final class Instance extends AbstractNodeBase
   {
-    private AbstractTree href;
-    private String encoding;
-    private final String method;
-    private final boolean append;
+    private AbstractTree m_aHref;
+    private String m_sEncoding;
+    private final String m_sMethod;
+    private final boolean m_bAppend;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -124,10 +124,10 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
                         final boolean append)
     {
       super (qName, parent, context, true);
-      this.href = href;
-      this.encoding = encoding;
-      this.method = method;
-      this.append = append;
+      this.m_aHref = href;
+      this.m_sEncoding = encoding;
+      this.m_sMethod = method;
+      this.m_bAppend = append;
     }
 
     /**
@@ -137,23 +137,23 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
     public short process (final Context context) throws SAXException
     {
       super.process (context);
-      if (encoding == null) // no encoding attribute specified
+      if (m_sEncoding == null) // no encoding attribute specified
         // use global encoding att
-        encoding = context.currentProcessor.getOutputEncoding ();
+        m_sEncoding = context.currentProcessor.getOutputEncoding ();
 
-      final String filename = href.evaluate (context, this).getString ();
+      final String filename = m_aHref.evaluate (context, this).getString ();
 
       final Properties props = (Properties) context.currentProcessor.m_aOutputProperties.clone ();
-      props.setProperty (OutputKeys.ENCODING, encoding);
-      if (method != null)
-        props.setProperty (OutputKeys.METHOD, method);
+      props.setProperty (OutputKeys.ENCODING, m_sEncoding);
+      if (m_sMethod != null)
+        props.setProperty (OutputKeys.METHOD, m_sMethod);
 
       IStxEmitter emitter = null;
       try
       {
         if (context.outputUriResolver != null)
         {
-          final Result result = context.outputUriResolver.resolve (filename, m_sSystemID, props, append);
+          final Result result = context.outputUriResolver.resolve (filename, m_sSystemID, props, m_bAppend);
           if (result != null)
           {
             emitter = TrAXHelper.initStxEmitter (result, context.currentProcessor, props);
@@ -166,7 +166,7 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
                                            lineNo,
                                            colNo);
             }
-            if (append && (emitter instanceof AbstractStreamEmitter))
+            if (m_bAppend && (emitter instanceof AbstractStreamEmitter))
             {
               ((AbstractStreamEmitter) emitter).setOmitXmlDeclaration (true);
             }
@@ -178,15 +178,15 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
         {
           // either there's no outputUriResolver or it returned null
           final Writer osw = context.m_aEmitter.getResultWriter (filename,
-                                                              encoding,
-                                                              m_sPublicID,
-                                                              m_sSystemID,
-                                                              lineNo,
-                                                              colNo,
-                                                              append);
+                                                                 m_sEncoding,
+                                                                 m_sPublicID,
+                                                                 m_sSystemID,
+                                                                 lineNo,
+                                                                 colNo,
+                                                                 m_bAppend);
 
-          final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (osw, encoding, props);
-          if (append)
+          final AbstractStreamEmitter se = AbstractStreamEmitter.newEmitter (osw, m_sEncoding, props);
+          if (m_bAppend)
             se.setOmitXmlDeclaration (true);
           m_aLocalFieldStack.push (osw);
           emitter = se;
@@ -255,8 +255,8 @@ public final class ResultDocumentFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (href != null)
-        theCopy.href = href.deepCopy (copies);
+      if (m_aHref != null)
+        theCopy.m_aHref = m_aHref.deepCopy (copies);
     }
 
   }

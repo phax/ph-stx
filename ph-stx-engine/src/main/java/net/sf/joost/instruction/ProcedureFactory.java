@@ -48,12 +48,11 @@ import net.sf.joost.stx.Value;
 public final class ProcedureFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ProcedureFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("visibility");
     attrNames.add ("public");

@@ -47,12 +47,11 @@ import net.sf.joost.stx.ParseContext;
 public final class TemplateFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public TemplateFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("match");
     attrNames.add ("priority");
     attrNames.add ("visibility");

@@ -57,12 +57,11 @@ public final class CopyFactory extends AbstractFactoryBase
   private static Attributes emptyAttList = new AttributesImpl ();
 
   /** allowed attributes for this element. */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public CopyFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("attributes");
   }
 
@@ -148,11 +147,11 @@ public final class CopyFactory extends AbstractFactoryBase
           super.process (context);
           final Attributes attList = attrWildcard ? event.m_aAttrs : emptyAttList;
           context.m_aEmitter.startElement (event.m_sURI,
-                                        event.m_sLocalName,
-                                        event.m_sQName,
-                                        attList,
-                                        event.m_aNamespaces,
-                                        this);
+                                           event.m_sLocalName,
+                                           event.m_sQName,
+                                           attList,
+                                           event.m_aNamespaces,
+                                           this);
           if (m_aAttPattern != null && !attrWildcard)
           {
             // attribute pattern present, but no wildcard (@*)
@@ -165,10 +164,10 @@ public final class CopyFactory extends AbstractFactoryBase
               {
                 final SAXEvent attrEvent = context.ancestorStack.peek ();
                 context.m_aEmitter.addAttribute (attrEvent.m_sURI,
-                                              attrEvent.m_sQName,
-                                              attrEvent.m_sLocalName,
-                                              attrEvent.m_sValue,
-                                              this);
+                                                 attrEvent.m_sQName,
+                                                 attrEvent.m_sLocalName,
+                                                 attrEvent.m_sValue,
+                                                 this);
               }
               // remove attribute
               context.ancestorStack.pop ();

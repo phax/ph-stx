@@ -49,12 +49,10 @@ import net.sf.joost.stx.SAXEvent;
 public class PSiblingsFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
-  // Constructor
   public PSiblingsFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("group");
     attrNames.add ("while");
     attrNames.add ("until");

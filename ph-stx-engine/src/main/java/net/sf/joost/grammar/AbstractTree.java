@@ -110,10 +110,10 @@ public abstract class AbstractTree implements Cloneable
   /** The most general constructor */
   private AbstractTree (final int type, final AbstractTree left, final AbstractTree right, final Object value)
   {
-    this.m_nType = type;
-    this.m_aLeft = left;
-    this.m_aRight = right;
-    this.m_aValue = value;
+    m_nType = type;
+    m_aLeft = left;
+    m_aRight = right;
+    m_aValue = value;
   }
 
   /** Constructs a Tree object as a node with two subtrees. */

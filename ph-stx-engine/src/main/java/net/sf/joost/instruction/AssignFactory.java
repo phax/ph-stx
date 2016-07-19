@@ -53,12 +53,11 @@ import net.sf.joost.util.VariableUtils;
 public final class AssignFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public AssignFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }

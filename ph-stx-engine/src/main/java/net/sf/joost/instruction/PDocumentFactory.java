@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -63,7 +64,7 @@ import net.sf.joost.trax.TrAXHelper;
 public class PDocumentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Logger initialization
   private static final Logger log = LoggerFactory.getLogger (PDocumentFactory.class);
@@ -73,7 +74,6 @@ public class PDocumentFactory extends AbstractFactoryBase
   //
   public PDocumentFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("href");
     attrNames.add ("base");
     attrNames.add ("group");

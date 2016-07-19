@@ -46,12 +46,11 @@ import net.sf.joost.stx.ParseContext;
 public class PSelfFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public PSelfFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("group");
     attrNames.add ("filter-method");
     attrNames.add ("filter-src");

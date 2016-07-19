@@ -54,12 +54,11 @@ public final class GroupFactory extends AbstractFactoryBase
   private static final String [] YESNO_INHERIT_VALUES = { "yes", "no", "inherit" };
 
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public GroupFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("pass-through");
     attrNames.add ("recognize-cdata");

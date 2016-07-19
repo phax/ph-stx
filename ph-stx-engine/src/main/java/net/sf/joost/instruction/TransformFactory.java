@@ -51,15 +51,14 @@ public class TransformFactory extends AbstractFactoryBase
   /** allowed values for the <code>pass-through</code> attribute */
   private static final String [] PASS_THROUGH_VALUES = { "none", "text", "all" };
 
-  /** allowed attributes for this element. */
-  private final HashSet <String> attrNames;
-
   private static final String EXCLUDE_RESULT_PREFIXES = "exclude-result-prefixes";
+
+  /** allowed attributes for this element. */
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public TransformFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("version");
     attrNames.add ("output-encoding");
     attrNames.add ("output-method");
@@ -138,7 +137,7 @@ public class TransformFactory extends AbstractFactoryBase
     final boolean recognizeCdata = getEnumAttValue ("recognize-cdata", attrs, YESNO_VALUES, context) != NO_VALUE;
 
     final String excludedPrefixes = attrs.getValue (EXCLUDE_RESULT_PREFIXES);
-    final HashSet <String> excludedNamespaces = new HashSet<> ();
+    final Set <String> excludedNamespaces = new HashSet<> ();
     excludedNamespaces.add (CSTX.STX_NS);
     if (excludedPrefixes != null)
     {
@@ -214,7 +213,7 @@ public class TransformFactory extends AbstractFactoryBase
     public List <AbstractNodeBase> m_aCompilableNodes;
 
     // Constructor
-    public Instance (AbstractNodeBase parent,
+    public Instance (final AbstractNodeBase aParent,
                      final String qName,
                      final ParseContext context,
                      final String outputEncoding,
@@ -225,8 +224,8 @@ public class TransformFactory extends AbstractFactoryBase
                      final boolean recognizeCdata,
                      final Set <String> excludedNamespaces)
     {
-      super (qName, parent, context, passThrough, stripSpace, recognizeCdata);
-      if (parent == null)
+      super (qName, aParent, context, passThrough, stripSpace, recognizeCdata);
+      if (aParent == null)
       {
         m_aNamedGroups = new Hashtable<> (); // shared with all sub-groups
         m_aGlobalProcedures = new Hashtable<> (); // also shared
@@ -238,6 +237,7 @@ public class TransformFactory extends AbstractFactoryBase
         // (have to do the following lookup, because
         // context.transformNode is still null
         // -> should be improved/fixed)
+        AbstractNodeBase parent = aParent;
         while (!(parent instanceof TransformFactory.Instance))
           parent = parent.m_aParent;
         m_aNamespaceAliases = ((TransformFactory.Instance) parent).m_aNamespaceAliases;
@@ -263,16 +263,16 @@ public class TransformFactory extends AbstractFactoryBase
     public void insert (final AbstractNodeBase node) throws SAXParseException
     {
       if (m_aCompilableNodes != null)
-                                  // will only happen after this transform
-                                  // element was inserted by
-                                  // an stx:include instruction
-                                  throw new SAXParseException ("'" +
-                                                               m_sQName +
-                                                               "' must be empty",
-                                                               node.m_sPublicID,
-                                                               node.m_sSystemID,
-                                                               node.lineNo,
-                                                               node.colNo);
+        // will only happen after this transform
+        // element was inserted by
+        // an stx:include instruction
+        throw new SAXParseException ("'" +
+                                     m_sQName +
+                                     "' must be empty",
+                                     node.m_sPublicID,
+                                     node.m_sSystemID,
+                                     node.lineNo,
+                                     node.colNo);
 
       if (node instanceof AbstractTemplateBase || // template, procedure
           node instanceof AbstractGroupBase || // group, transform (= include)

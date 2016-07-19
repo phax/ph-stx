@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -48,11 +49,10 @@ import net.sf.joost.stx.ParseContext;
 public class CommentFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   public CommentFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("select");
   }
 

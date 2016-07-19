@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -49,18 +50,17 @@ import net.sf.joost.stx.ParseContext;
 
 public class TextFactory extends AbstractFactoryBase
 {
-  /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
-
   private static final String [] MARKUP_VALUES = { "error", "ignore", "serialize" };
 
   private static final int NO_MARKUP = 0;
   private static final int IGNORE_MARKUP = 1;
   private static final int SERIALIZE_MARKUP = 2;
 
+  /** allowed attributes for this element */
+  private final Set <String> attrNames = new HashSet<> ();
+
   public TextFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("markup");
   }
 
@@ -119,15 +119,14 @@ public class TextFactory extends AbstractFactoryBase
       {
         // use our StringEmitter
         m_aBuffer = new StringBuffer ();
-        m_aSTXxEmitter = new StringEmitter (m_aBuffer,
-                                        m_nMarkup == NO_MARKUP ? "('" +
-                                                              m_sQName +
-                                                              "' with the 'markup' attribute set to '" +
-                                                              MARKUP_VALUES[NO_MARKUP] +
-                                                              "' started in line " +
-                                                              lineNo +
-                                                              ")"
-                                                            : null);
+        m_aSTXxEmitter = new StringEmitter (m_aBuffer, m_nMarkup == NO_MARKUP ? "('" +
+                                                                                m_sQName +
+                                                                                "' with the 'markup' attribute set to '" +
+                                                                                MARKUP_VALUES[NO_MARKUP] +
+                                                                                "' started in line " +
+                                                                                lineNo +
+                                                                                ")"
+                                                                              : null);
       }
       m_nRecursionLevel = 0;
     }

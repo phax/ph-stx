@@ -644,6 +644,9 @@ public class Processor extends XMLFilterImpl
 
   /**
    * Registers a declaration handler. Does nothing at the moment.
+   *
+   * @param handler
+   *        Handler to be registered
    */
   public void setDeclHandler (final DeclHandler handler)
   {}
@@ -692,11 +695,10 @@ public class Processor extends XMLFilterImpl
    * @param value
    *        the parameter value
    */
-  public void setParameter (String name, final Object value)
+  public void setParameter (final String name, final Object value)
   {
-    if (!name.startsWith ("{"))
-      name = "{}" + name;
-    m_aContext.globalParameters.put (name, new Value (value));
+    final String sRealName = name.startsWith ("{") ? name : "{}" + name;
+    m_aContext.globalParameters.put (sRealName, new Value (value));
   }
 
   /**
@@ -707,11 +709,10 @@ public class Processor extends XMLFilterImpl
    * @return the parameter value or <code>null</code> if this parameter isn't
    *         present
    */
-  public Object getParameter (String name)
+  public Object getParameter (final String name)
   {
-    if (!name.startsWith ("{"))
-      name = "{}" + name;
-    final Value param = m_aContext.globalParameters.get (name);
+    final String sRealName = name.startsWith ("{") ? name : "{}" + name;
+    final Value param = m_aContext.globalParameters.get (sRealName);
     try
     {
       if (param != null)
@@ -905,7 +906,7 @@ public class Processor extends XMLFilterImpl
    * condition was met. This method stores the last return value in the class
    * member variable {@link #processStatus}.
    *
-   * @param inst
+   * @param aInst
    *        the first instruction in the chain
    * @param event
    *        the current event
@@ -913,12 +914,13 @@ public class Processor extends XMLFilterImpl
    *        set if ProcessBase instructions shouldn't be reported
    * @return the last processed instruction
    */
-  private AbstractInstruction doProcessLoop (AbstractInstruction inst,
+  private AbstractInstruction doProcessLoop (final AbstractInstruction aInst,
                                              final SAXEvent event,
                                              final boolean skipProcessBase) throws SAXException
   {
     processStatus = CSTX.PR_CONTINUE;
 
+    AbstractInstruction inst = aInst;
     while (inst != null && processStatus == CSTX.PR_CONTINUE)
     {
       // check, if this is the original class: call process() directly
@@ -999,7 +1001,7 @@ public class Processor extends XMLFilterImpl
     {
       AbstractInstruction inst = temp;
       m_aContext.localVars.clear ();
-      final Hashtable currentParams = m_aContext.m_aPassedParameters;
+      final Hashtable <String, Value> currentParams = m_aContext.m_aPassedParameters;
 
       inst = doProcessLoop (inst, event, false);
 
@@ -1413,7 +1415,7 @@ public class Processor extends XMLFilterImpl
       topEvent = m_aEventStack.peek ();
     else
       topEvent = m_aEventStack.pop ();
-    final Hashtable storedVars = m_aContext.localVars;
+    final Hashtable <String, Value> storedVars = m_aContext.localVars;
     Data data;
     do
     {

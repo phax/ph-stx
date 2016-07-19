@@ -49,12 +49,11 @@ import net.sf.joost.stx.ParseContext;
 public final class ElementEndFactory extends AbstractFactoryBase
 {
   /** Allowed attributes for this element. */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ElementEndFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("namespace");
   }

@@ -926,13 +926,6 @@ public class JDK15RegexTranslator extends AbstractRegexTranslator
     }
   }
 
-  private boolean _isLastInGroup ()
-  {
-    // look ahead at the next character
-    final char c = m_aRegExp.charAt (m_nPos);
-    return (c == ']' || c == '[');
-  }
-
   private AbstractCharClass _parseCharClassEscOrXmlChar (final boolean firstOrLast) throws RegexSyntaxException
   {
     switch (m_cCurChar)

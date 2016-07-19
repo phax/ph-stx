@@ -48,12 +48,11 @@ import net.sf.joost.stx.ParseContext;
 public final class ResultBufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ResultBufferFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("clear");
   }

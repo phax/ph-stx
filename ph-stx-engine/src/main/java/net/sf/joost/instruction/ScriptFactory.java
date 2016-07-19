@@ -50,12 +50,11 @@ import net.sf.joost.stx.ParseContext;
 public final class ScriptFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ScriptFactory ()
   {
-    attrNames = new HashSet <> ();
     attrNames.add ("prefix");
     attrNames.add ("language");
     attrNames.add ("src");
@@ -123,19 +122,19 @@ public final class ScriptFactory extends AbstractFactoryBase
   public static final class Instance extends AbstractNodeBase
   {
     /** namespace prefix from prefix attribute of the script element */
-    private final String prefix;
+    private final String m_sPrefix;
 
     /** namespace URI for the prefix */
-    private final String scriptUri;
+    private final String m_sScriptUri;
 
     /** scripting language */
-    private final String lang;
+    private final String m_sLang;
 
     /** optional location of a source file */
-    private final String src;
+    private final String m_sSrc;
 
     /** the script content */
-    private String script;
+    private String m_sScript;
 
     // Constructor
     protected Instance (final String qName,
@@ -147,10 +146,10 @@ public final class ScriptFactory extends AbstractFactoryBase
                         final String lang)
     {
       super (qName, parent, context, false);
-      this.prefix = prefix;
-      this.scriptUri = scriptUri;
-      this.src = src;
-      this.lang = lang;
+      this.m_sPrefix = prefix;
+      this.m_sScriptUri = scriptUri;
+      this.m_sSrc = src;
+      this.m_sLang = lang;
     }
 
     // for debugging
@@ -180,7 +179,7 @@ public final class ScriptFactory extends AbstractFactoryBase
                                      node.colNo);
       }
 
-      if (src != null)
+      if (m_sSrc != null)
       {
         throw new SAXParseException ("'" +
                                      m_sQName +
@@ -192,7 +191,7 @@ public final class ScriptFactory extends AbstractFactoryBase
                                      node.colNo);
       }
 
-      script = ((TextNode) node).getContents ();
+      m_sScript = ((TextNode) node).getContents ();
 
       // no need to invoke super.insert(node) since this element won't be
       // processed in a template
@@ -202,17 +201,18 @@ public final class ScriptFactory extends AbstractFactoryBase
     public boolean compile (final int pass, final ParseContext context) throws SAXException
     {
       // read script's content
+      @SuppressWarnings ("unused")
       String data = null;
-      if (src == null)
+      if (m_sSrc == null)
       {
-        data = script;
+        data = m_sScript;
       }
       else
       {
         try
         {
           final BufferedReader in = new BufferedReader (new InputStreamReader (new URL (new URL (context.locator.getSystemId ()),
-                                                                                        src).openStream ()));
+                                                                                        m_sSrc).openStream ()));
           String l;
           final StringBuffer buf = new StringBuffer (4096);
           while ((l = in.readLine ()) != null)
@@ -225,7 +225,7 @@ public final class ScriptFactory extends AbstractFactoryBase
         catch (final IOException e)
         {
           throw new SAXParseException ("Exception while reading from " +
-                                       src,
+                                       m_sSrc,
                                        m_sPublicID,
                                        m_sSystemID,
                                        lineNo,
@@ -257,17 +257,17 @@ public final class ScriptFactory extends AbstractFactoryBase
 
     public String getLang ()
     {
-      return lang;
+      return m_sLang;
     }
 
     public String getPrefix ()
     {
-      return prefix;
+      return m_sPrefix;
     }
 
     public String getUri ()
     {
-      return scriptUri;
+      return m_sScriptUri;
     }
   }
 }

@@ -51,12 +51,11 @@ import net.sf.joost.stx.Value;
 public final class ParamFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public ParamFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("required");
     attrNames.add ("select");
@@ -106,10 +105,11 @@ public final class ParamFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>param</code> element. */
   public static final class Instance extends AbstractVariableBase
   {
-    private final String varName;
-    private AbstractTree select;
-    private final boolean required;
-    private AbstractInstruction contents, successor;
+    private final String m_sVarName;
+    private AbstractTree m_aSelect;
+    private final boolean m_bRequired;
+    private AbstractInstruction m_aContents;
+    private AbstractInstruction m_aSuccessor;
     // private Hashtable globalParams;
 
     protected Instance (final String qName,
@@ -128,9 +128,9 @@ public final class ParamFactory extends AbstractFactoryBase
              // this element may have children if there is no select
              // attribute and the parameter is not required
              select == null && !required);
-      this.varName = varName;
-      this.select = select;
-      this.required = required;
+      this.m_sVarName = varName;
+      this.m_aSelect = select;
+      this.m_bRequired = required;
     }
 
     @Override
@@ -139,8 +139,8 @@ public final class ParamFactory extends AbstractFactoryBase
       if (pass == 0)
         return true; // nodeEnd not available yet
 
-      contents = next;
-      successor = m_aNodeEnd != null ? m_aNodeEnd.next : next;
+      m_aContents = next;
+      m_aSuccessor = m_aNodeEnd != null ? m_aNodeEnd.next : next;
       return false;
     }
 
@@ -161,10 +161,10 @@ public final class ParamFactory extends AbstractFactoryBase
       if (v == null)
       {
         // no parameter passed
-        if (required)
+        if (m_bRequired)
         {
           context.m_aErrorHandler.error ("Missing value for required parameter '" +
-                                         varName +
+                                         m_sVarName +
                                          "'",
                                          m_sPublicID,
                                          m_sSystemID,
@@ -172,15 +172,15 @@ public final class ParamFactory extends AbstractFactoryBase
                                          colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
-        if (select != null)
+        if (m_aSelect != null)
         {
           // select attribute present
-          v = select.evaluate (context, this);
+          v = m_aSelect.evaluate (context, this);
         }
         else
         {
           // use contents
-          next = contents;
+          next = m_aContents;
           super.process (context);
           context.pushEmitter (new StringEmitter (new StringBuffer (),
                                                   "('" + m_sQName + "' started in line " + lineNo + ")"));
@@ -191,7 +191,7 @@ public final class ParamFactory extends AbstractFactoryBase
       if (m_aNodeEnd != null)
       {
         // skip contents, the parameter value is already available
-        next = successor;
+        next = m_aSuccessor;
       }
       return CSTX.PR_CONTINUE;
     }
@@ -216,7 +216,7 @@ public final class ParamFactory extends AbstractFactoryBase
       if (varTable.get (m_sExpName) != null)
       {
         context.m_aErrorHandler.error ("Param '" +
-                                       varName +
+                                       m_sVarName +
                                        "' already declared",
                                        m_sPublicID,
                                        m_sSystemID,
@@ -236,12 +236,12 @@ public final class ParamFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (contents != null)
-        theCopy.contents = contents.deepCopy (copies);
-      if (successor != null)
-        theCopy.successor = successor.deepCopy (copies);
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aContents != null)
+        theCopy.m_aContents = m_aContents.deepCopy (copies);
+      if (m_aSuccessor != null)
+        theCopy.m_aSuccessor = m_aSuccessor.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
 
   }

@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import org.xml.sax.Attributes;
@@ -50,12 +51,11 @@ import net.sf.joost.stx.Value;
 public final class WithParamFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public WithParamFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }

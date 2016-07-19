@@ -27,6 +27,7 @@ package net.sf.joost.instruction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -50,12 +51,11 @@ import net.sf.joost.stx.Value;
 public final class VariableFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public VariableFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
     attrNames.add ("keep-value");
@@ -93,10 +93,10 @@ public final class VariableFactory extends AbstractFactoryBase
   /** Represents an instance of the <code>variable</code> element. */
   public static final class Instance extends AbstractVariableBase
   {
-    private final String varName;
-    private AbstractTree select;
-    private final String errorMessage;
-    private final boolean isGroupVar;
+    private final String m_sVarName;
+    private AbstractTree m_aSelect;
+    private final String m_sErrorMessage;
+    private final boolean m_bIsGroupVar;
 
     protected Instance (final String qName,
                         final ParseContext context,
@@ -113,20 +113,20 @@ public final class VariableFactory extends AbstractFactoryBase
              keepValue,
              // this element must be empty if there is a select attribute
              select == null);
-      this.varName = varName;
-      this.select = select;
-      this.errorMessage = "('" + qName + "' started in line " + lineNo + ")";
-      this.isGroupVar = parent instanceof AbstractGroupBase;
+      this.m_sVarName = varName;
+      this.m_aSelect = select;
+      this.m_sErrorMessage = "('" + qName + "' started in line " + lineNo + ")";
+      this.m_bIsGroupVar = parent instanceof AbstractGroupBase;
     }
 
     @Override
     public short process (final Context context) throws SAXException
     {
       // does this variable have a select attribute?
-      if (select != null)
+      if (m_aSelect != null)
       {
         // select attribute present
-        final Value v = select.evaluate (context, this);
+        final Value v = m_aSelect.evaluate (context, this);
         processVar (v, context);
       }
       else
@@ -135,7 +135,7 @@ public final class VariableFactory extends AbstractFactoryBase
         super.process (context);
         // create a new StringEmitter for this instance and put it
         // on the emitter stack
-        context.pushEmitter (new StringEmitter (new StringBuffer (), errorMessage));
+        context.pushEmitter (new StringEmitter (new StringBuffer (), m_sErrorMessage));
       }
       return CSTX.PR_CONTINUE;
     }
@@ -155,7 +155,7 @@ public final class VariableFactory extends AbstractFactoryBase
     {
       // determine scope
       Hashtable <String, Value> varTable;
-      if (isGroupVar)
+      if (m_bIsGroupVar)
         varTable = context.groupVars.get (m_aParent).peek ();
       else
       {
@@ -166,7 +166,7 @@ public final class VariableFactory extends AbstractFactoryBase
       if (varTable.get (m_sExpName) != null)
       {
         context.m_aErrorHandler.error ("Variable '" +
-                                       varName +
+                                       m_sVarName +
                                        "' already declared",
                                        m_sPublicID,
                                        m_sSystemID,
@@ -182,8 +182,8 @@ public final class VariableFactory extends AbstractFactoryBase
     {
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
   }
 }

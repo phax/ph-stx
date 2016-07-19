@@ -47,12 +47,10 @@ import net.sf.joost.stx.SAXEvent;
 public class PChildrenFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
-  // Constructor
   public PChildrenFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("group");
     attrNames.add ("filter-method");
     attrNames.add ("filter-src");

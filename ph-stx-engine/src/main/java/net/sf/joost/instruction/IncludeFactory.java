@@ -26,6 +26,7 @@ package net.sf.joost.instruction;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
@@ -54,12 +55,11 @@ import net.sf.joost.trax.TrAXHelper;
 public final class IncludeFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final HashSet <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public IncludeFactory ()
   {
-    attrNames = new HashSet <String> ();
     attrNames.add ("href");
   }
 
@@ -73,15 +73,20 @@ public final class IncludeFactory extends AbstractFactoryBase
   /** Returns an instance of {@link TransformFactory.Instance} */
   @Override
   public AbstractNodeBase createNode (final AbstractNodeBase parent,
-                              final String qName,
-                              final Attributes attrs,
-                              final ParseContext pContext) throws SAXException
+                                      final String qName,
+                                      final Attributes attrs,
+                                      final ParseContext pContext) throws SAXException
   {
     // check parent
     if (parent == null)
       throw new SAXParseException ("'" + qName + "' not allowed as root element", pContext.locator);
     if (!(parent instanceof AbstractGroupBase))
-      throw new SAXParseException ("'" + qName + "' not allowed as child of '" + parent.m_sQName + "'", pContext.locator);
+      throw new SAXParseException ("'" +
+                                   qName +
+                                   "' not allowed as child of '" +
+                                   parent.m_sQName +
+                                   "'",
+                                   pContext.locator);
 
     final String hrefAtt = getRequiredAttribute (qName, attrs, "href", pContext);
 

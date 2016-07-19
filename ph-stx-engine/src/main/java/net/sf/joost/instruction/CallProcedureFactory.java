@@ -47,14 +47,13 @@ import net.sf.joost.stx.ParseContext;
 public class CallProcedureFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   //
   // Constructor
   //
   public CallProcedureFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("group");
   }

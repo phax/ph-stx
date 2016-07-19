@@ -49,12 +49,11 @@ import net.sf.joost.stx.ParseContext;
 public final class PIFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
   // Constructor
   public PIFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("select");
   }
@@ -85,10 +84,11 @@ public final class PIFactory extends AbstractFactoryBase
    */
   public static final class Instance extends AbstractNodeBase
   {
-    private AbstractTree name, select;
-    private StringEmitter strEmitter;
-    private StringBuffer buffer;
-    private String piName;
+    private AbstractTree m_aName;
+    private AbstractTree m_aSelect;
+    private StringEmitter m_aStrEmitter;
+    private StringBuffer m_aBuffer;
+    private String m_sPIName;
 
     protected Instance (final String qName,
                         final AbstractNodeBase parent,
@@ -101,15 +101,15 @@ public final class PIFactory extends AbstractFactoryBase
              context,
              // this element must be empty if there is a select attribute
              select == null);
-      this.name = name;
-      this.select = select;
+      this.m_aName = name;
+      this.m_aSelect = select;
       init ();
     }
 
     private void init ()
     {
-      buffer = new StringBuffer ();
-      strEmitter = new StringEmitter (buffer, "('" + m_sQName + "' started in line " + lineNo + ")");
+      m_aBuffer = new StringBuffer ();
+      m_aStrEmitter = new StringEmitter (m_aBuffer, "('" + m_sQName + "' started in line " + lineNo + ")");
     }
 
     /**
@@ -118,14 +118,14 @@ public final class PIFactory extends AbstractFactoryBase
     @Override
     public short process (final Context context) throws SAXException
     {
-      piName = name.evaluate (context, this).getString ();
+      m_sPIName = m_aName.evaluate (context, this).getString ();
       // TO DO: is this piName valid?
 
-      if (select == null)
+      if (m_aSelect == null)
       {
         super.process (context);
         // check for nesting of this stx:processing-instruction
-        if (context.m_aEmitter.isEmitterActive (strEmitter))
+        if (context.m_aEmitter.isEmitterActive (m_aStrEmitter))
         {
           context.m_aErrorHandler.error ("Can't create nested processing instruction here",
                                          m_sPublicID,
@@ -134,12 +134,12 @@ public final class PIFactory extends AbstractFactoryBase
                                          colNo);
           return CSTX.PR_CONTINUE; // if the errorHandler returns
         }
-        buffer.setLength (0);
-        context.pushEmitter (strEmitter);
+        m_aBuffer.setLength (0);
+        context.pushEmitter (m_aStrEmitter);
       }
       else
       {
-        String pi = select.evaluate (context, this).getStringValue ();
+        String pi = m_aSelect.evaluate (context, this).getStringValue ();
         int index = pi.lastIndexOf ("?>");
         if (index != -1)
         {
@@ -149,7 +149,7 @@ public final class PIFactory extends AbstractFactoryBase
           while ((index = pi.lastIndexOf ("?>", --index)) != -1);
           pi = piBuf.toString ();
         }
-        context.m_aEmitter.processingInstruction (piName, pi, this);
+        context.m_aEmitter.processingInstruction (m_sPIName, pi, this);
       }
       return CSTX.PR_CONTINUE;
     }
@@ -161,15 +161,15 @@ public final class PIFactory extends AbstractFactoryBase
     public short processEnd (final Context context) throws SAXException
     {
       context.popEmitter ();
-      int index = buffer.length ();
+      int index = m_aBuffer.length ();
       if (index != 0)
       {
         // are there any "?>" in the pi data?
-        final String str = buffer.toString ();
+        final String str = m_aBuffer.toString ();
         while ((index = str.lastIndexOf ("?>", --index)) != -1)
-          buffer.insert (index + 1, ' ');
+          m_aBuffer.insert (index + 1, ' ');
       }
-      context.m_aEmitter.processingInstruction (piName, buffer.toString (), this);
+      context.m_aEmitter.processingInstruction (m_sPIName, m_aBuffer.toString (), this);
       return super.processEnd (context);
     }
 
@@ -179,10 +179,10 @@ public final class PIFactory extends AbstractFactoryBase
       super.onDeepCopy (copy, copies);
       final Instance theCopy = (Instance) copy;
       theCopy.init ();
-      if (name != null)
-        theCopy.name = name.deepCopy (copies);
-      if (select != null)
-        theCopy.select = select.deepCopy (copies);
+      if (m_aName != null)
+        theCopy.m_aName = m_aName.deepCopy (copies);
+      if (m_aSelect != null)
+        theCopy.m_aSelect = m_aSelect.deepCopy (copies);
     }
 
   }

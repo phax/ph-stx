@@ -88,7 +88,7 @@ public final class ScriptFunction implements IInstance
     }
 
     // convert values to java objects
-    final Vector <Object> ret = new Vector <> ();
+    final Vector <Object> ret = new Vector<> ();
     while (!varr.isEmpty ())
     {
       final Value v = varr.pop ();
@@ -114,6 +114,7 @@ public final class ScriptFunction implements IInstance
                                                                                         EvalException
   {
     // convert input params
+    @SuppressWarnings ("unused")
     final Object [] scrArgs = convertInputArgs (context, top, args);
 
     final Object ret = null;

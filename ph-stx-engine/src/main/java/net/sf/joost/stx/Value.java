@@ -37,7 +37,7 @@ import net.sf.joost.grammar.EvalException;
  * @version $Revision: 1.26 $ $Date: 2009/08/21 14:58:42 $
  * @author Oliver Becker
  */
-public class Value implements Cloneable
+public final class Value implements Cloneable
 {
   // number format for number to string conversion
   private static NumberFormat numberFormat;
@@ -52,15 +52,20 @@ public class Value implements Cloneable
   }
 
   // value constants
-  public final static Value VAL_TRUE = new Value (true);
-  public final static Value VAL_FALSE = new Value (false);
-  public final static Value VAL_EMPTY = new Value ();
-  public final static Value VAL_EMPTY_STRING = new Value ("");
-  public final static Value VAL_ZERO = new Value (0);
-  public final static Value VAL_NAN = new Value (Double.NaN);
+  public static final Value VAL_TRUE = new Value (true);
+  public static final Value VAL_FALSE = new Value (false);
+  public static final Value VAL_EMPTY = new Value ();
+  public static final Value VAL_EMPTY_STRING = new Value ("");
+  public static final Value VAL_ZERO = new Value (0);
+  public static final Value VAL_NAN = new Value (Double.NaN);
 
   /** type constant */
-  public static final int EMPTY = 0, NODE = 1, BOOLEAN = 2, NUMBER = 3, STRING = 4, OBJECT = 5;
+  public static final int EMPTY = 0;
+  public static final int NODE = 1;
+  public static final int BOOLEAN = 2;
+  public static final int NUMBER = 3;
+  public static final int STRING = 4;
+  public static final int OBJECT = 5;
 
   /** type of this value */
   public int type;
@@ -145,29 +150,21 @@ public class Value implements Cloneable
   public Value (final Object obj)
   {
     if (obj == null)
-    {
       type = OBJECT;
-      return;
-    }
     else
       if (obj instanceof Void)
-      {
         type = EMPTY;
-        return;
-      }
       else
         if (obj instanceof CharSequence || obj instanceof Character)
         {
           type = STRING;
           string = obj.toString ();
-          return;
         }
         else
           if (obj instanceof Boolean)
           {
             type = BOOLEAN;
             bool = ((Boolean) obj).booleanValue ();
-            return;
           }
           else
             if (obj instanceof Number && obj.getClass ().getPackage ().getName ().equals ("java.lang"))
@@ -175,13 +172,11 @@ public class Value implements Cloneable
               // convert only base Number values
               type = NUMBER;
               number = ((Number) obj).doubleValue ();
-              return;
             }
             else
             {
               type = OBJECT;
               object = obj;
-              return;
             }
   }
 
@@ -407,8 +402,8 @@ public class Value implements Cloneable
     {
       case EMPTY:
         if (!target.isPrimitive ())
-                                   // target is a reference type
-                                   return 1;
+          // target is a reference type
+          return 1;
         break;
       case BOOLEAN:
         if (target == boolean.class)
@@ -552,87 +547,71 @@ public class Value implements Cloneable
           throw new RuntimeException ("Fatal: unexpected type " + type);
       }
     }
-    else
-      if (type == OBJECT && (object == null || target.isAssignableFrom (object.getClass ())))
-      {
-        // target is a superclass of object's class (or they are the same)
-        return object;
-      }
-      else
-        if (target == List.class)
-        {
-          if (type == EMPTY)
-            return new ArrayList<> (0);
-          final ArrayList <Object> list = new ArrayList<> ();
-          for (Value it = this; it != null; it = it.next)
-            list.add (it.toJavaObject (Object.class));
-          return list;
-        }
-        else
-          if (type == EMPTY && !target.isPrimitive ())
-          {
-            // target is a reference type
-            return null;
-          }
-          else
-            if (target == String.class)
-            {
-              return getStringValue ();
-            }
-            else
-              if (type == STRING && "".equals (string) && !target.isPrimitive ())
-              {
-                // convert the "" to null if the target is a non-string
-                // reference type
-                return null;
-              }
-              else
-                if (target == boolean.class || target == Boolean.class)
-                {
-                  return new Boolean (getBooleanValue ());
-                }
-                else
-                  if (target == double.class || target == Double.class)
-                  {
-                    return new Double (getNumberValue ());
-                  }
-                  else
-                    if (target == float.class || target == Float.class)
-                    {
-                      return new Float (getNumberValue ());
-                    }
-                    else
-                      if (target == int.class || target == Integer.class)
-                      {
-                        return new Integer ((int) getNumberValue ());
-                      }
-                      else
-                        if (target == long.class || target == Long.class)
-                        {
-                          return new Long ((long) getNumberValue ());
-                        }
-                        else
-                          if (target == short.class || target == Short.class)
-                          {
-                            return new Short ((short) getNumberValue ());
-                          }
-                          else
-                            if (target == byte.class || target == Byte.class)
-                            {
-                              return new Byte ((byte) getNumberValue ());
-                            }
-                            else
-                              if (target == char.class || target == Character.class)
-                              {
-                                final String s = getStringValue ();
-                                if (string.length () == 1)
-                                  return new Character (s.charAt (0));
-                                throw new EvalException ("Cannot convert string '" +
-                                                         string +
-                                                         "' to character (length is not 1)");
-                              }
-                              else
-                                throw new EvalException ("Conversion to " + target.getName () + " is not supported");
+    if (type == OBJECT && (object == null || target.isAssignableFrom (object.getClass ())))
+    {
+      // target is a superclass of object's class (or they are the same)
+      return object;
+    }
+    if (target == List.class)
+    {
+      if (type == EMPTY)
+        return new ArrayList<> (0);
+      final ArrayList <Object> list = new ArrayList<> ();
+      for (Value it = this; it != null; it = it.next)
+        list.add (it.toJavaObject (Object.class));
+      return list;
+    }
+    if (type == EMPTY && !target.isPrimitive ())
+    {
+      // target is a reference type
+      return null;
+    }
+    if (target == String.class)
+    {
+      return getStringValue ();
+    }
+    if (type == STRING && "".equals (string) && !target.isPrimitive ())
+    {
+      // convert the "" to null if the target is a non-string
+      // reference type
+      return null;
+    }
+    if (target == boolean.class || target == Boolean.class)
+    {
+      return Boolean.valueOf (getBooleanValue ());
+    }
+    if (target == double.class || target == Double.class)
+    {
+      return Double.valueOf (getNumberValue ());
+    }
+    if (target == float.class || target == Float.class)
+    {
+      return Float.valueOf ((float) getNumberValue ());
+    }
+    if (target == int.class || target == Integer.class)
+    {
+      return Integer.valueOf ((int) getNumberValue ());
+    }
+    if (target == long.class || target == Long.class)
+    {
+      return Long.valueOf ((long) getNumberValue ());
+    }
+    if (target == short.class || target == Short.class)
+    {
+      return Short.valueOf ((short) getNumberValue ());
+    }
+    if (target == byte.class || target == Byte.class)
+    {
+      return Byte.valueOf ((byte) getNumberValue ());
+    }
+    if (target == char.class || target == Character.class)
+    {
+      final String s = getStringValue ();
+      if (string.length () == 1)
+        return new Character (s.charAt (0));
+      throw new EvalException ("Cannot convert string '" + string + "' to character (length is not 1)");
+    }
+    throw new EvalException ("Conversion to " + target.getName () + " is not supported");
   }
 
   //

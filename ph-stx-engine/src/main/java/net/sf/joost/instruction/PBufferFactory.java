@@ -55,14 +55,10 @@ import net.sf.joost.util.VariableUtils;
 public class PBufferFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element */
-  private final Set <String> attrNames;
+  private final Set <String> attrNames = new HashSet<> ();
 
-  //
-  // Constructor
-  //
   public PBufferFactory ()
   {
-    attrNames = new HashSet<> ();
     attrNames.add ("name");
     attrNames.add ("group");
     attrNames.add ("filter-method");
