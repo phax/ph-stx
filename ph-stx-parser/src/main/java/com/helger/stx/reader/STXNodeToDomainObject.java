@@ -542,7 +542,7 @@ public final class STXNodeToDomainObject
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTRELATIVEPATHEXPR);
     final int nChildCount = aNode.jjtGetNumChildren ();
-    if (nChildCount < 1 || (nChildCount % 2) != 1)
+    if (nChildCount < 1 || (nChildCount % 2) == 0)
       _throwUnexpectedChildrenCount (aNode, "Expected 1 or an odd number of children!");
 
     if (nChildCount == 1)
@@ -714,7 +714,7 @@ public final class STXNodeToDomainObject
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTMULTIPLICATIVEEXPR);
     final int nChildCount = aNode.jjtGetNumChildren ();
-    if (nChildCount < 1 || (nChildCount % 2) != 1)
+    if (nChildCount < 1 || (nChildCount % 2) == 0)
       _throwUnexpectedChildrenCount (aNode, "Expected 1 or an odd number of children!");
 
     if (nChildCount == 1)
@@ -744,7 +744,7 @@ public final class STXNodeToDomainObject
   {
     _expectNodeType (aNode, ParserSTXTreeConstants.JJTADDITIVEEXPR);
     final int nChildCount = aNode.jjtGetNumChildren ();
-    if (nChildCount < 1 || (nChildCount % 2) != 1)
+    if (nChildCount < 1 || (nChildCount % 2) == 0)
       _throwUnexpectedChildrenCount (aNode, "Expected 1 or an odd number of children!");
 
     if (nChildCount == 1)
