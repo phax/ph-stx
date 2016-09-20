@@ -18,3 +18,7 @@ Todos:
 * Changed to a more convenient grammar
 * Modernize
 * Use scripting API
+---
+
+My personal [Coding Styleguide](https://github.com/phax/meta/blob/master/CodeingStyleguide.md) |
+On Twitter: <a href="https://twitter.com/philiphelger">@philiphelger</a>
