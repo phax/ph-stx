@@ -14,7 +14,7 @@
  *  The Initial Developer of the Original Code is Oliver Becker.
  *
  *  Portions created by Philip Helger
- *  are Copyright (C) 2016 Philip Helger
+ *  are Copyright (C) 2016-2017 Philip Helger
  *  All Rights Reserved.
  */
 package net.sf.joost.grammar.tree;
