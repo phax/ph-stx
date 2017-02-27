@@ -53,6 +53,6 @@ public class STXQNameTest extends AbstractSTXNameTest
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).appendIfNotNull ("QName", m_aQName).toString ();
+    return new ToStringGenerator (this).appendIfNotNull ("QName", m_aQName).getToString ();
   }
 }

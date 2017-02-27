@@ -76,6 +76,6 @@ public class STXBinaryExpression extends AbstractSTXExpression
     return new ToStringGenerator (this).append ("left", m_aLeft)
                                        .append ("operator", m_eOperator)
                                        .append ("right", m_aRight)
-                                       .toString ();
+                                       .getToString ();
   }
 }

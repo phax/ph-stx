@@ -59,6 +59,6 @@ public class STXUnaryExpression extends AbstractSTXExpression
   {
     return new ToStringGenerator (this).append ("operator", m_eOperator)
                                        .append ("expression", m_aExpression)
-                                       .toString ();
+                                       .getToString ();
   }
 }

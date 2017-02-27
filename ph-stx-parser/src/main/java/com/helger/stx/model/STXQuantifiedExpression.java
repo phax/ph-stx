@@ -45,7 +45,7 @@ public class STXQuantifiedExpression extends AbstractSTXExpression
   {
     ValueEnforcer.notNull (aClauses, "Clauses");
     m_eType = ValueEnforcer.notNull (eType, "Type");
-    m_aClauses = new CommonsArrayList <> (aClauses);
+    m_aClauses = new CommonsArrayList<> (aClauses);
     m_aSatisfyExpression = ValueEnforcer.notNull (aSatisfyExpression, "SatisfyExpression");
   }
 
@@ -90,7 +90,7 @@ public class STXQuantifiedExpression extends AbstractSTXExpression
     return new ToStringGenerator (this).append ("type", m_eType)
                                        .append ("clauses", m_aClauses)
                                        .append ("satisfyExpression", m_aSatisfyExpression)
-                                       .toString ();
+                                       .getToString ();
   }
 
 }

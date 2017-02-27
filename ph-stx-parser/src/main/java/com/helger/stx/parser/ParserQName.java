@@ -93,7 +93,7 @@ public class ParserQName implements Serializable
   {
     return new ToStringGenerator (null).appendIfNotNull ("prefix", m_sPrefix)
                                        .append ("localName", m_sLocalName)
-                                       .toString ();
+                                       .getToString ();
   }
 
   @Nonnull

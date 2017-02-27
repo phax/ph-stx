@@ -19,7 +19,7 @@
  */
 package net.sf.joost;
 
-import com.helger.commons.charset.CCharset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This interface contains constants shared between different classes.
@@ -56,7 +56,7 @@ public final class CSTX
   public static String FEAT_NSPREFIX = FEATURE_URI_PREFIX + "namespace-prefixes";
 
   /** The default encoding for XML */
-  public static String DEFAULT_ENCODING = CCharset.CHARSET_UTF_8;
+  public static String DEFAULT_ENCODING = StandardCharsets.UTF_8.name ();
 
   /**
    * Return value for

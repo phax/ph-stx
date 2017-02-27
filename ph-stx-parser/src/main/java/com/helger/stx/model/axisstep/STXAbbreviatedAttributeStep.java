@@ -49,6 +49,6 @@ public class STXAbbreviatedAttributeStep extends AbstractSTXSingleStep
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("nodeTest", m_aNodeTest).toString ();
+    return new ToStringGenerator (this).append ("nodeTest", m_aNodeTest).getToString ();
   }
 }

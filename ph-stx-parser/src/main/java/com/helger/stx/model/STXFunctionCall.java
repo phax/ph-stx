@@ -38,7 +38,7 @@ public class STXFunctionCall extends AbstractSTXPrimaryExpression
                           @Nullable final Iterable <? extends ISTXExpression> aExpressionList)
   {
     m_aFunctionName = ValueEnforcer.notNull (aFunctionName, "FunctionName");
-    m_aExpressions = new CommonsArrayList <> (aExpressionList);
+    m_aExpressions = new CommonsArrayList<> (aExpressionList);
   }
 
   @Nonnull
@@ -76,6 +76,6 @@ public class STXFunctionCall extends AbstractSTXPrimaryExpression
   {
     return new ToStringGenerator (this).append ("functionName", m_aFunctionName)
                                        .append ("expressions", m_aExpressions)
-                                       .toString ();
+                                       .getToString ();
   }
 }

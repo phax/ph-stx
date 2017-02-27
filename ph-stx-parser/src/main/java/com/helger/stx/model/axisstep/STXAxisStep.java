@@ -60,6 +60,6 @@ public class STXAxisStep extends AbstractSTXStepExpression
   {
     return new ToStringGenerator (this).append ("singleStep", m_aSingleStep)
                                        .append ("predicateList", m_aPredicateList)
-                                       .toString ();
+                                       .getToString ();
   }
 }

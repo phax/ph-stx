@@ -29,7 +29,8 @@ public class STXFilterExpression extends AbstractSTXStepExpression
   private final ISTXPrimaryExpression m_aExpression;
   private final STXPredicateList m_aPredicateList;
 
-  public STXFilterExpression (@Nonnull final ISTXPrimaryExpression aExpr, @Nonnull final STXPredicateList aPredicateList)
+  public STXFilterExpression (@Nonnull final ISTXPrimaryExpression aExpr,
+                              @Nonnull final STXPredicateList aPredicateList)
   {
     m_aExpression = ValueEnforcer.notNull (aExpr, "Expression");
     m_aPredicateList = ValueEnforcer.notNull (aPredicateList, "PredicateList");
@@ -58,6 +59,6 @@ public class STXFilterExpression extends AbstractSTXStepExpression
   {
     return new ToStringGenerator (this).append ("expression", m_aExpression)
                                        .append ("predicateList", m_aPredicateList)
-                                       .toString ();
+                                       .getToString ();
   }
 }

@@ -79,6 +79,6 @@ public class STXIfExpression extends AbstractSTXExpression
     return new ToStringGenerator (this).append ("testExprs", m_aTestExprs)
                                        .append ("thenExpr", m_aThenExpr)
                                        .append ("elseExpr", m_aElseExpr)
-                                       .toString ();
+                                       .getToString ();
   }
 }

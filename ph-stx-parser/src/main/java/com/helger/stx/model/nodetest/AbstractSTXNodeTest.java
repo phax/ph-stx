@@ -23,6 +23,6 @@ public abstract class AbstractSTXNodeTest implements ISTXNodeTest
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).toString ();
+    return new ToStringGenerator (this).getToString ();
   }
 }

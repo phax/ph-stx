@@ -219,6 +219,6 @@ public class STXNode implements Node, Iterable <STXNode>, Serializable
                                        .append ("childCound", m_aChildren == null ? 0 : m_aChildren.length)
                                        .appendIfNotNull ("firstToken", m_aFirstToken)
                                        .appendIfNotNull ("lastToken", m_aLastToken)
-                                       .toString ();
+                                       .getToString ();
   }
 }

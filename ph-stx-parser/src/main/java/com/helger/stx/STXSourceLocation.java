@@ -231,6 +231,6 @@ public class STXSourceLocation implements Serializable
   {
     return new ToStringGenerator (null).append ("firstTokenArea", m_aFirstTokenArea)
                                        .append ("lastTokenArea", m_aLastTokenArea)
-                                       .toString ();
+                                       .getToString ();
   }
 }

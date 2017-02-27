@@ -56,6 +56,6 @@ public class STXLocalNameIsWildcardTest extends AbstractSTXNameTest
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).appendIfNotNull ("namespaceURL", m_sNamespaceURL).toString ();
+    return new ToStringGenerator (this).appendIfNotNull ("namespaceURL", m_sNamespaceURL).getToString ();
   }
 }

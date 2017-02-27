@@ -55,6 +55,6 @@ public class STXPredicate implements ISTXObject
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("expressionList", m_aExpressionList).toString ();
+    return new ToStringGenerator (this).append ("expressionList", m_aExpressionList).getToString ();
   }
 }

@@ -28,7 +28,7 @@ import com.helger.commons.string.ToStringGenerator;
 public class STXStringLiteral extends AbstractSTXLiteralExpression
 {
   private static final char [] OLD_SQ = new char [] { '\'' };
-  private static final char [][] NEW_SQ = new char [] [] { new char [] { '\'', '\'' } };
+  private static final char [] [] NEW_SQ = new char [] [] { new char [] { '\'', '\'' } };
 
   private final String m_sValue;
 
@@ -57,6 +57,6 @@ public class STXStringLiteral extends AbstractSTXLiteralExpression
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("value", m_sValue).toString ();
+    return new ToStringGenerator (this).append ("value", m_sValue).getToString ();
   }
 }

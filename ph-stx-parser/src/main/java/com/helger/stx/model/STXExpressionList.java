@@ -34,7 +34,7 @@ public class STXExpressionList implements ISTXObject
   public STXExpressionList (@Nonnull final Iterable <? extends ISTXExpression> aExprs)
   {
     ValueEnforcer.notNull (aExprs, "Expressions");
-    m_aExpressions = new CommonsArrayList <> (aExprs);
+    m_aExpressions = new CommonsArrayList<> (aExprs);
   }
 
   @Nonnull
@@ -60,6 +60,6 @@ public class STXExpressionList implements ISTXObject
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("expressions", m_aExpressions).toString ();
+    return new ToStringGenerator (this).append ("expressions", m_aExpressions).getToString ();
   }
 }

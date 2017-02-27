@@ -60,6 +60,6 @@ public class STXPathExpression extends AbstractSTXValueExpression
   {
     return new ToStringGenerator (this).append ("operator", m_eOperator)
                                        .appendIfNotNull ("expression", m_aExpression)
-                                       .toString ();
+                                       .getToString ();
   }
 }

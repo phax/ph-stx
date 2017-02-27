@@ -43,7 +43,7 @@ public class STXForExpression extends AbstractSTXExpression
   {
     ValueEnforcer.notNull (aForClauses, "ForClauses");
     ValueEnforcer.notNull (aReturnExpression, "ReturnExpression");
-    m_aForClauses = new CommonsArrayList <> (aForClauses);
+    m_aForClauses = new CommonsArrayList<> (aForClauses);
     m_aReturnExpression = aReturnExpression;
   }
 
@@ -81,6 +81,6 @@ public class STXForExpression extends AbstractSTXExpression
   {
     return new ToStringGenerator (this).append ("forClauses", m_aForClauses)
                                        .append ("returnExpression", m_aReturnExpression)
-                                       .toString ();
+                                       .getToString ();
   }
 }

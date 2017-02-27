@@ -19,6 +19,7 @@ package com.helger.stx.reader;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,7 +28,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.annotation.PresentForCodeCoverage;
-import com.helger.commons.charset.CCharset;
 import com.helger.commons.io.IHasInputStream;
 import com.helger.commons.io.stream.StreamHelper;
 import com.helger.commons.io.streamprovider.StringInputStreamProvider;
@@ -169,8 +169,7 @@ public final class STXReader
   @Nullable
   public static STXPath readFromString (@Nonnull final String sData)
   {
-    return readFromStream (new StringInputStreamProvider (sData, CCharset.CHARSET_UTF_8_OBJ),
-                           CCharset.CHARSET_UTF_8_OBJ);
+    return readFromStream (new StringInputStreamProvider (sData, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
   }
 
   @Nullable

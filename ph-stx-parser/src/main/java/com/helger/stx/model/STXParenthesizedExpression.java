@@ -51,6 +51,6 @@ public class STXParenthesizedExpression extends AbstractSTXPrimaryExpression
   @Nonnull
   public String toString ()
   {
-    return new ToStringGenerator (this).appendIfNotNull ("expressionList", m_aExpressionList).toString ();
+    return new ToStringGenerator (this).appendIfNotNull ("expressionList", m_aExpressionList).getToString ();
   }
 }

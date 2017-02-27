@@ -64,6 +64,8 @@ public class STXVarNameAndExpression implements ISTXObject
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("varName", m_aVarName).append ("expression", m_aExpression).toString ();
+    return new ToStringGenerator (this).append ("varName", m_aVarName)
+                                       .append ("expression", m_aExpression)
+                                       .getToString ();
   }
 }

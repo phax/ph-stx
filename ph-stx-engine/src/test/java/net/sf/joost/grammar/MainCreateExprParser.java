@@ -22,8 +22,8 @@ package net.sf.joost.grammar;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-import com.helger.commons.charset.CCharset;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.string.StringHelper;
 
@@ -33,7 +33,7 @@ public class MainCreateExprParser
 {
   public static void main (final String [] args) throws internal_error, IOException, Exception
   {
-    final Charset aCharset = CCharset.CHARSET_ISO_8859_1_OBJ;
+    final Charset aCharset = StandardCharsets.ISO_8859_1;
     final String sBasePath = "src/main/resources/net/sf/joost/grammar/";
     java_cup.Main.main (new String [] { "-parser",
                                         "ExprParser",

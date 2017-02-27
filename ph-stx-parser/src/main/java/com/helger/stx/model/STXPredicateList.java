@@ -40,7 +40,7 @@ public class STXPredicateList implements ISTXObject
   public STXPredicateList (@Nonnull final Iterable <? extends STXPredicate> aPredicates)
   {
     ValueEnforcer.notNull (aPredicates, "Predicates");
-    m_aPredicates = new CommonsArrayList <> (aPredicates);
+    m_aPredicates = new CommonsArrayList<> (aPredicates);
   }
 
   public boolean hasAnyPredicate ()
@@ -64,6 +64,6 @@ public class STXPredicateList implements ISTXObject
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("predicates", m_aPredicates).toString ();
+    return new ToStringGenerator (this).append ("predicates", m_aPredicates).getToString ();
   }
 }

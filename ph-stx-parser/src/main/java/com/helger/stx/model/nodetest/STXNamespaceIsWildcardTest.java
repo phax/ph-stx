@@ -55,6 +55,6 @@ public class STXNamespaceIsWildcardTest extends AbstractSTXNameTest
   @Override
   public String toString ()
   {
-    return new ToStringGenerator (this).appendIfNotNull ("localName", m_sLocalName).toString ();
+    return new ToStringGenerator (this).appendIfNotNull ("localName", m_sLocalName).getToString ();
   }
 }

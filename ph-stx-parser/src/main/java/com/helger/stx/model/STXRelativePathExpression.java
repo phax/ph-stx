@@ -38,7 +38,7 @@ public class STXRelativePathExpression extends AbstractSTXValueExpression
       ValueEnforcer.isTrue (o instanceof ESTXPathOperator ||
                             o instanceof AbstractSTXStepExpression,
                             "Only operators or expressions may be contained. This is a " + o.getClass ().getName ());
-    m_aElements = new CommonsArrayList <> (aElements);
+    m_aElements = new CommonsArrayList<> (aElements);
   }
 
   @Nonnull
@@ -58,6 +58,6 @@ public class STXRelativePathExpression extends AbstractSTXValueExpression
   @Nonnull
   public String toString ()
   {
-    return new ToStringGenerator (this).append ("elements", m_aElements).toString ();
+    return new ToStringGenerator (this).append ("elements", m_aElements).getToString ();
   }
 }
