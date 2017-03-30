@@ -44,7 +44,7 @@ public final class MutableAttributesImpl implements IMutableAttributes
     this (attributes, attributes.getLength ());
   }
 
-  public MutableAttributesImpl (@Nonnull final Attributes attributes, @Nonnegative final int length)
+  public MutableAttributesImpl (final Attributes attributes, @Nonnegative final int length)
   {
     m_nLength = length;
     m_nMax = m_nLength + 2; // _max is initially at least 2
