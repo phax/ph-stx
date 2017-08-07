@@ -971,7 +971,7 @@ public class TestCases
 
         final javax.xml.parsers.SAXParser jaxpParser =
 
-            factory.newSAXParser ();
+                                                     factory.newSAXParser ();
 
         reader = jaxpParser.getXMLReader ();
 
@@ -1303,12 +1303,11 @@ public class TestCases
    * javax.xml.parsers to parse an XML file into a DOM, and create an output
    * DOM.
    */
-  public static Node exampleDOM2DOM (final String sourceID,
-                                     final String stxID) throws TransformerException,
-                                                         TransformerConfigurationException,
-                                                         SAXException,
-                                                         IOException,
-                                                         ParserConfigurationException
+  public static Node exampleDOM2DOM (final String sourceID, final String stxID) throws TransformerException,
+                                                                                TransformerConfigurationException,
+                                                                                SAXException,
+                                                                                IOException,
+                                                                                ParserConfigurationException
   {
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
@@ -1978,10 +1977,11 @@ public class TestCases
   /**
    * Show the Transformer using TemplatesHandler
    */
-  public static boolean exampleTemplatesHandler (final String sourceID, final String stxID) throws TransformerException,
-                                                                                            TransformerConfigurationException,
-                                                                                            SAXException,
-                                                                                            IOException
+  public static boolean exampleTemplatesHandler (final String sourceID,
+                                                 final String stxID) throws TransformerException,
+                                                                     TransformerConfigurationException,
+                                                                     SAXException,
+                                                                     IOException
   {
 
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
@@ -2107,7 +2107,7 @@ public class TestCases
     final TransformerFactory tfactory = TransformerFactory.newInstance ();
 
     final ByteArrayOutputStream baoStream = new ByteArrayOutputStream ();
-    final Map <StreamResult, ByteArrayOutputStream> resultMap = new HashMap<> ();
+    final Map <StreamResult, ByteArrayOutputStream> resultMap = new HashMap <> ();
     final IOutputURIResolver resolver = new IOutputURIResolver ()
     {
       public Result resolve (final String href,
@@ -2189,7 +2189,7 @@ public class TestCases
    */
   public static String serializeDOM2String (final Node node) throws IOException
   {
-    return XMLWriter.getXMLString (node);
+    return XMLWriter.getNodeAsString (node);
   }
 
   /**
