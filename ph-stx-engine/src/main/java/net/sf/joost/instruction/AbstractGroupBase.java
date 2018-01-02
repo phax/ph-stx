@@ -19,13 +19,9 @@
  */
 package net.sf.joost.instruction;
 
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
+import net.sf.joost.util.QuickSort;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -183,7 +179,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
       // create the groupTemplates array
       m_aGroupTemplates = new TemplateFactory.Instance [m_aContainedGroupTemplates.size ()];
       m_aContainedGroupTemplates.toArray (m_aGroupTemplates);
-      Arrays.sort (m_aGroupTemplates);
+      QuickSort.sort(m_aGroupTemplates);
       m_aContainedGroupTemplates = null; // for garbage collection
       return false; // done
     }
@@ -315,7 +311,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     // create sorted array of visible templates
     m_aVisibleTemplates = new TemplateFactory.Instance [tvec.size ()];
     tvec.toArray (m_aVisibleTemplates);
-    Arrays.sort (m_aVisibleTemplates); // in descending priority order
+    QuickSort.sort(m_aVisibleTemplates);
 
     if (m_sGroupName != null)
     {
