@@ -133,7 +133,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
   public String m_sGroupName;
 
   /** Vector of the children */
-  protected Vector <AbstractNodeBase> m_aChildren = new Vector<> ();
+  protected Vector <AbstractNodeBase> m_aChildren = new Vector <> ();
 
   // Constructor
   protected AbstractGroupBase (final String qName,
@@ -148,12 +148,12 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     this.m_nPassThrough = passThrough;
     this.m_bStripSpace = stripSpace;
     this.m_bRecognizeCdata = recognizeCdata;
-    m_aContainedPublicTemplates = new Vector<> ();
-    m_aContainedGroupTemplates = new Vector<> ();
-    m_aContainedGlobalTemplates = new Vector<> ();
-    m_aVisibleProcedures = new Hashtable<> ();
-    m_aContainedPublicProcedures = new Hashtable<> ();
-    m_aGroupProcedures = new Hashtable<> ();
+    m_aContainedPublicTemplates = new Vector <> ();
+    m_aContainedGroupTemplates = new Vector <> ();
+    m_aContainedGlobalTemplates = new Vector <> ();
+    m_aVisibleProcedures = new Hashtable <> ();
+    m_aContainedPublicProcedures = new Hashtable <> ();
+    m_aGroupProcedures = new Hashtable <> ();
     if (m_aParentGroup != null)
     {
       m_aNamedGroups = m_aParentGroup.m_aNamedGroups;
@@ -183,7 +183,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
       // create the groupTemplates array
       m_aGroupTemplates = new TemplateFactory.Instance [m_aContainedGroupTemplates.size ()];
       m_aContainedGroupTemplates.toArray (m_aGroupTemplates);
-      Arrays.sort (m_aGroupTemplates);
+      Arrays.sort (m_aGroupTemplates, (c1, c2) -> -Double.compare (c1.getPriority (), c2.getPriority ()));
       m_aContainedGroupTemplates = null; // for garbage collection
       return false; // done
     }
@@ -193,11 +193,11 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     final Object [] objs = m_aChildren.toArray ();
     final int length = m_aChildren.size ();
     // template vector
-    final Vector <TemplateFactory.Instance> tvec = new Vector<> ();
+    final Vector <TemplateFactory.Instance> tvec = new Vector <> ();
     // group vector
-    final Vector <AbstractGroupBase> gvec = new Vector<> ();
+    final Vector <AbstractGroupBase> gvec = new Vector <> ();
     // variable vector
-    final Vector <AbstractVariableBase> vvec = new Vector<> ();
+    final Vector <AbstractVariableBase> vvec = new Vector <> ();
 
     for (int i = 0; i < length; i++)
     {
@@ -315,7 +315,8 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     // create sorted array of visible templates
     m_aVisibleTemplates = new TemplateFactory.Instance [tvec.size ()];
     tvec.toArray (m_aVisibleTemplates);
-    Arrays.sort (m_aVisibleTemplates); // in descending priority order
+    // in descending priority order
+    Arrays.sort (m_aVisibleTemplates, (c1, c2) -> -Double.compare (c1.getPriority (), c2.getPriority ()));
 
     if (m_sGroupName != null)
     {
@@ -368,12 +369,12 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     // shadowed variables, needed if keep-value="yes"
     Hashtable <String, Value> shadowed = null;
     if (context.ancestorStack.isEmpty ())
-      context.groupVars.put (this, new Stack<> ());
+      context.groupVars.put (this, new Stack <> ());
     else
       shadowed = context.groupVars.get (this).peek ();
 
     // new variable instances
-    final Hashtable <String, Value> varTable = new Hashtable<> ();
+    final Hashtable <String, Value> varTable = new Hashtable <> ();
     context.groupVars.get (this).push (varTable);
 
     context.currentGroup = this;
