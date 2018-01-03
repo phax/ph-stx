@@ -1,10 +1,6 @@
 package net.sf.joost.util;
 
-import java.util.Random;
-
 public class QuickSort {
-
-    private static Random random = new Random();
 
     /* A nonstandard unstable in-place quicksort implementation based on Cormen et al.(1990) that does not
     *  require the caller to respect the invariants of compareTo in the Comparable interface.
