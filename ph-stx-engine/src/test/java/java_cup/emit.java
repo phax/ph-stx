@@ -169,7 +169,7 @@ public class emit
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** List of imports (Strings containing class names) to go with actions. */
-  public static Stack import_list = new Stack ();
+  public static Stack <String> import_list = new Stack <> ();
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
@@ -267,7 +267,7 @@ public class emit
     _locations = false;
     _lr_values = true;
     action_code = null;
-    import_list = new Stack ();
+    import_list = new Stack <> ();
     init_code = null;
     not_reduced = 0;
     num_conflicts = 0;
@@ -287,7 +287,7 @@ public class emit
 
   /**
    * Build a string with the standard prefix.
-   * 
+   *
    * @param str
    *        string to prefix.
    */
@@ -309,7 +309,7 @@ public class emit
 
   /**
    * Emit a package spec if the user wants one.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    */
@@ -328,7 +328,7 @@ public class emit
   /**
    * Emit code for the symbol constant class, optionally including non terms, if
    * they have been requested.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    * @param emit_non_terms
@@ -359,9 +359,9 @@ public class emit
     out.println ("  /* terminals */");
 
     /* walk over the terminals */ /* later might sort these */
-    for (final Enumeration e = terminal.all (); e.hasMoreElements ();)
+    for (final Enumeration <terminal> e = terminal.all (); e.hasMoreElements ();)
     {
-      term = (terminal) e.nextElement ();
+      term = e.nextElement ();
 
       /* output a constant decl for the terminal */
       out.println ("  public static final int " + term.name () + " = " + term.index () + ";");
@@ -389,9 +389,9 @@ public class emit
       out.println ("  /* non terminals */");
 
       /* walk over the non terminals */ /* later might sort these */
-      for (final Enumeration e = non_terminal.all (); e.hasMoreElements ();)
+      for (final Enumeration <non_terminal> e = non_terminal.all (); e.hasMoreElements ();)
       {
-        nt = (non_terminal) e.nextElement ();
+        nt = e.nextElement ();
 
         // ****
         // TUM Comment: here we could add a typesafe enumeration
@@ -415,7 +415,7 @@ public class emit
 
   /**
    * Emit code for the non-public class holding the actual action code.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    * @param start_prod
@@ -482,8 +482,7 @@ public class emit
       /* emit action code for each production as a separate case */
       int proditeration = instancecounter * UPPERLIMIT;
       prod = production.find (proditeration);
-      for (; proditeration < Math.min ((instancecounter + 1) *
-                                       UPPERLIMIT,
+      for (; proditeration < Math.min ((instancecounter + 1) * UPPERLIMIT,
                                        production.number ()); prod = production.find (++proditeration))
       {
         /* case label */
@@ -567,7 +566,9 @@ public class emit
         }
 
         /* if there is an action string, emit it */
-        if (prod.action () != null && prod.action ().code_string () != null && !prod.action ().equals (""))
+        if (prod.action () != null &&
+            prod.action ().code_string () != null &&
+            !prod.action ().code_string ().equals (""))
           out.println (prod.action ().code_string ());
 
         /*
@@ -730,7 +731,7 @@ public class emit
 
   /**
    * Emit the production table.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    */
@@ -743,9 +744,9 @@ public class emit
 
     /* collect up the productions in order */
     all_prods = new production [production.number ()];
-    for (final Enumeration p = production.all (); p.hasMoreElements ();)
+    for (final Enumeration <production> p = production.all (); p.hasMoreElements ();)
     {
-      prod = (production) p.nextElement ();
+      prod = p.nextElement ();
       all_prods[prod.index ()] = prod;
     }
 
@@ -778,7 +779,7 @@ public class emit
 
   /**
    * Emit the action table.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    * @param act_tab
@@ -889,7 +890,7 @@ public class emit
 
   /**
    * Emit the reduce-goto table.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    * @param red_tab
@@ -898,7 +899,6 @@ public class emit
   protected static void do_reduce_table (final PrintWriter out, final parse_reduce_table red_tab)
   {
     lalr_state goto_st;
-    final parse_action act;
 
     final long start_time = System.currentTimeMillis ();
 
@@ -966,11 +966,11 @@ public class emit
       nchar = do_newline (out, nchar, nbytes);
       nbytes += do_escaped (out, (char) (element.length & 0xFFFF));
       nchar = do_newline (out, nchar, nbytes);
-      for (int j = 0; j < element.length; j++)
+      for (final short aElement : element)
       {
         // contents of string are (value+2) to allow for common -1, 0 cases
         // (UTF-8 encoding is most efficient for 0<c<0x80)
-        nbytes += do_escaped (out, (char) (2 + element[j]));
+        nbytes += do_escaped (out, (char) (2 + aElement));
         nchar = do_newline (out, nchar, nbytes);
       }
     }
@@ -1030,7 +1030,7 @@ public class emit
 
   /**
    * Emit the parser subclass with embedded tables.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    * @param action_table
@@ -1197,7 +1197,7 @@ public class emit
 
   /**
    * Emit code for generic XML parsetree output.
-   * 
+   *
    * @param out
    *        stream to produce output on.
    * @param start_prod
@@ -1261,8 +1261,7 @@ public class emit
       /* emit action code for each production as a separate case */
       int proditeration = instancecounter * UPPERLIMIT;
       prod = production.find (proditeration);
-      for (; proditeration < Math.min ((instancecounter + 1) *
-                                       UPPERLIMIT,
+      for (; proditeration < Math.min ((instancecounter + 1) * UPPERLIMIT,
                                        production.number ()); prod = production.find (++proditeration))
       {
         /* case label */
@@ -1302,7 +1301,9 @@ public class emit
                       "xright)";
         }
 
-        if (prod.action () != null && prod.action ().code_string () != null && !prod.action ().equals (""))
+        if (prod.action () != null &&
+            prod.action ().code_string () != null &&
+            !prod.action ().code_string ().equals (""))
           out.println (prod.action ().code_string ());
 
         // determine the variant:
