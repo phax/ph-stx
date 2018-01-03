@@ -183,7 +183,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
       // create the groupTemplates array
       m_aGroupTemplates = new TemplateFactory.Instance [m_aContainedGroupTemplates.size ()];
       m_aContainedGroupTemplates.toArray (m_aGroupTemplates);
-      Arrays.sort (m_aGroupTemplates, (c1, c2) -> -Double.compare (c1.getPriority (), c2.getPriority ()));
+      Arrays.sort (m_aGroupTemplates);
       m_aContainedGroupTemplates = null; // for garbage collection
       return false; // done
     }
@@ -316,7 +316,7 @@ public abstract class AbstractGroupBase extends AbstractNodeBase
     m_aVisibleTemplates = new TemplateFactory.Instance [tvec.size ()];
     tvec.toArray (m_aVisibleTemplates);
     // in descending priority order
-    Arrays.sort (m_aVisibleTemplates, (c1, c2) -> -Double.compare (c1.getPriority (), c2.getPriority ()));
+    Arrays.sort (m_aVisibleTemplates);
 
     if (m_sGroupName != null)
     {

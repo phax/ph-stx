@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<stx:transform xmlns:stx="http://stx.sourceforge.net/2002/ns"
+               xmlns:aep="http://www.elsevier.com/xml/aep/dtd"
+               xmlns:ja="http://www.elsevier.com/xml/ja/dtd"
+               xmlns:bk="http://www.elsevier.com/xml/bk/dtd"
+               pass-through="all"
+               output-method="xml"
+               exclude-result-prefixes="#all"
+               strip-space="yes"
+               version="1.0">
+
+    <!--
+      == This is our root match. The transformation here will result in
+      == our index.xml document (it was the original output result we told
+      == the Java transformer to output to). None of the original S3 XML
+      == document will go here - that will all go to other documents.
+      -->
+    <stx:template match="/">
+        <!--
+          == Step 1. Stream through the *whole* document
+          ==         This will populate the variables we declared above to use in the remainder of this template!
+          ==
+          == NOTE: The variables like $eid will default to whatever you want initially, but be updated by the templates
+          ==       below after this call.
+          -->
+        <stx:process-children group="decomposition-elements"/>
+
+
+        <stx:if test="not(empty($attachment-ids-body))">
+            <stx:assign name="attachment-ids" select="$attachment-ids-body"/>
+        </stx:if>
+
+        <stx:if test="not(empty($float-ids-body))">
+            <stx:assign name="float-ids" select="$float-ids-body"/>
+        </stx:if>
+
+        <stx:if test="not(empty($attachment-ids-tail))">
+            <stx:assign name="attachment-ids" select="$attachment-ids-tail"/>
+        </stx:if>
+
+    </stx:template>
+
+    <!--
+      == Groups are funky, I need to do more reading on them. Basically, after much
+      == faffing about, these made my template "do what I thought I wanted". :)
+      -->
+    <stx:group xmlns:xocs="http://www.elsevier.com/xml/xocs/dtd"
+               xmlns:xoe="http://www.elsevier.com/xml/xoe/dtd"
+               xmlns:ja="http://www.elsevier.com/xml/ja/dtd"
+               xmlns:ce="http://www.elsevier.com/xml/common/dtd"
+               name="decomposition-elements"
+               pass-through="all">
+        <!-- Standard attachments requirements -->
+          <stx:variable name="float-ids" select="()" />
+          <stx:variable name="attachment-ids" select="()" />
+        <!-- End standard attachments requirements -->
+
+        <!-- The general "copy" node -->
+        <stx:template match="*" public="no">
+            <stx:copy attributes="@*">
+                <stx:process-attributes/>
+                <stx:process-children/>
+            </stx:copy>
+        </stx:template>
+
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  Document "scraps"                                                 -->
+        <!--                                                                    -->
+        <!--  Whatever is unhandled in the decomposition should appear in these -->
+        <!--  documents.                                                        -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+        <!-- Capture the left-overs in xoe:documents -->
+        <stx:template match="xoe:documents">
+            <stx:result-document href="scraps-xoe_documents.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:process-self/>
+            </stx:result-document>
+        </stx:template>
+
+        <!-- Capture the left-overs in xocs:doc -->
+        <stx:template match="xocs:doc">
+            <stx:result-document href="scraps-xocs_doc.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:process-self/>
+            </stx:result-document>
+        </stx:template>
+
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  xocs:meta elements                                                -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+        <!-- The shared decomposition elements -->
+        <stx:template match="xocs:meta">
+            <stx:result-buffer name="xocsMetaBuffer">
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <stx:result-document href="tmp_meta.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:process-buffer name="xocsMetaBuffer" group="copy-all"/>
+            </stx:result-document>
+        </stx:template>
+
+        <!-- when processing the meta section we need to capture whether any of the attachments are AAM related -->
+        <stx:template match="xocs:attachment-type">
+            <stx:if test="empty(index-of($features, 'aamAttachments')) and (. = 'AAM-PDF' or . = 'AAM-PAGE-IMAGE')">
+                <stx:assign name="features" select="($features, 'aamAttachments')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:group pass-through="all" name="copy-all"/>
+
+        <stx:template match="xocs:item-toc"/>
+
+        <stx:template match="xocs:content-family">
+            <stx:assign name="content-family" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:content-type">
+            <stx:assign name="content-type" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:document-type">
+            <stx:assign name="document-type" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:document-subtype">
+            <stx:assign name="document-subtype" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:cid">
+            <stx:assign name="cid" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:eid">
+            <stx:assign name="eid" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:pii-unformatted">
+            <stx:assign name="pii" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:doi">
+            <stx:assign name="doi" select="."/>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="xocs:refers-to">
+            <stx:if test="empty(index-of($features, 'refersTo'))">
+                <stx:assign name="features" select="($features, 'refersTo')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  Raw text (useful for crawlers like Bing                           -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+        <stx:template match="xocs:rawtext">
+            <stx:process-children group="rawtext-body"/>
+        </stx:template>
+
+        <stx:group name="rawtext-body">
+            <stx:template match="xocs:rawtext/text()">
+                <stx:if test="empty(index-of(fragments, 'rawtext'))">
+                    <stx:assign name="fragments" select="($fragments, 'rawtext')"/>
+                </stx:if>
+                <stx:if test="$outputRawText = 'true'">
+                    <stx:result-document href="rawtext.txt" output-method="text" output-encoding="UTF-8">
+                        <stx:process-self/>
+                    </stx:result-document>
+                </stx:if>
+            </stx:template>
+        </stx:group>
+
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  xocs:serial-item elements                                         -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+        <stx:template match="xocs:serial-item">
+            <stx:if test="empty(index-of(fragments, 'serial-item'))">
+                <stx:assign name="fragments" select="($fragments, 'serial-item')"/>
+            </stx:if>
+
+            <!-- We need to process the item section once to extract out all the floats -->
+            <stx:result-buffer name="itemBuffer" >
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <!-- Unfortunately we then need to process it again to get a reference to all nested floats -->
+            <stx:assign name="float-ids" select="()" />
+            <stx:assign name="attachment-ids" select="()" />
+            <stx:process-buffer name="itemBuffer"/>
+
+            <!-- now output floats, attachments and the original serial-item content -->
+            <stx:result-document href="tmp_serial-item.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:element name="aep:serial-item">
+                    <stx:if test="not(empty($attachment-ids))">
+                        <stx:element name="aep:attachments" >
+                            <stx:process-buffer name="xocsMetaBuffer"/>
+                        </stx:element>
+                    </stx:if>
+                    <stx:if test="not(empty($float-ids))">
+                        <stx:element name="aep:floats" >
+                            <stx:process-buffer name="floatsBuffer"/>
+                        </stx:element>
+                    </stx:if>
+
+                    <stx:process-buffer name="itemBuffer"/>
+                </stx:element>
+            </stx:result-document>
+        </stx:template>
+
+        <stx:template match="ja:tail | ja:simple-tail">
+            <stx:if test="empty(index-of(fragments, 'tail'))">
+                <stx:assign name="fragments" select="($fragments, 'tail')"/>
+            </stx:if>
+
+            <stx:assign name="float-ids" select="()" />
+            <stx:assign name="attachment-ids" select="()" />
+
+            <stx:result-buffer name="tail" >
+                <stx:process-children/>
+            </stx:result-buffer>
+
+            <stx:assign name="attachment-ids-tail" select="$attachment-ids"/>
+            <stx:assign name="float-ids-tail" select="$float-ids"/>
+
+            <stx:result-document href="tmp_tail.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:element name="aep:tmp-tail">
+                    <stx:process-buffer name="tail"/>
+                </stx:element>
+            </stx:result-document>
+        </stx:template>
+
+        <stx:template match="bk:chapter/ce:further-reading |
+                             bk:chapter/ce:bibliography">
+            <stx:if test="empty(index-of(fragments, 'tail'))">
+                <stx:assign name="fragments" select="($fragments, 'tail')"/>
+            </stx:if>
+
+            <stx:assign name="float-ids" select="()" />
+            <stx:assign name="attachment-ids" select="()" />
+
+            <stx:result-buffer name="tail" >
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <!-- Get the attachment ids if any and put them in attachment-ids-tail -->
+            <stx:if test="not(empty($attachment-ids))">
+                <stx:for-each-item name="attachment-id" select="$attachment-ids">
+                    <stx:if test="empty(index-of($attachment-ids-tail, $attachment-id))">
+                        <stx:assign name="attachment-ids-tail" select="($attachment-ids-tail, $attachment-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+            </stx:if>
+
+            <!-- Get the float ids if any and put them in float-ids-tail -->
+            <stx:if test="not(empty($float-ids))">
+                <stx:for-each-item name="float-id" select="$float-ids">
+                    <stx:if test="empty(index-of($float-ids-tail, $float-id))">
+                        <stx:assign name="float-ids-tail" select="($float-ids-tail, $float-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+            </stx:if>
+
+            <!-- Creating tmp_tail.xml instead of actual tail.xml for the following reasons
+            ==== exam section i.e. tmp_exam.xml needs to be added to the main tail.xml along with tmp_tail.xml if the exam section falls under tail fragment
+            ==== template match for the exam cannot be done here because in some cases exam section might fall in body fragment.
+             -->
+            <stx:result-document href="tmp_tail.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:element name="aep:tmp-tail">
+                    <stx:process-buffer name="tail"/>
+                </stx:element>
+            </stx:result-document>
+        </stx:template>
+
+        <stx:template match="bk:chapter/ce:footnote">
+
+                </stx:template>
+
+        <stx:template match="ja:body |
+                             bk:chapter/ce:sections |
+                             bk:chapter/ce:displayed-quote |
+                             bk:chapter/ce:nomenclature |
+                             bk:chapter/bk:poem |
+                             bk:chapter/bk:outline |
+                             bk:chapter/bk:objectives |
+                             bk:chapter/ce:acknowledgment |
+                             bk:chapter/ce:intro |
+                             bk:chapter/bk:subchapter |
+                             bk:simple-chapter/ce:displayed-quote |
+                             bk:simple-chapter/ce:nomenclature |
+                             bk:simple-chapter/ce:acknowledgment |
+                             bk:simple-chapter/bk:poem |
+                             bk:simple-chapter/bk:outline |
+                             bk:simple-chapter/bk:objectives |
+                             bk:simple-chapter/ce:acknowledgment |
+                             bk:simple-chapter/ce:intro |
+                             bk:simple-chapter/ce:sections |
+                             bk:simple-chapter/bk:subchapter |
+                             bk:examination/ce:intro |
+                             bk:examination/bk:exam |
+                             bk:fb-non-chapter/ce:nomenclature |
+                             bk:fb-non-chapter/ce:para |
+                             bk:fb-non-chapter/ce:section |
+                             bk:glossary/ce:glossary |
+                             bk:index/ce:index |
+                             bk:bibliography |
+                             bk:introduction/ce:sections">
+            <stx:if test="empty(index-of(fragments, 'body'))">
+                <stx:assign name="fragments" select="($fragments, 'body')"/>
+            </stx:if>
+
+            <stx:assign name="float-ids" select="()" />
+            <stx:assign name="attachment-ids" select="()" />
+
+            <stx:result-buffer name="body" >
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <!-- Get the attachment ids if any and put them in attachment-ids-body -->
+            <stx:if test="not(empty($attachment-ids))">
+                <stx:for-each-item name="attachment-id" select="$attachment-ids">
+                    <stx:if test="empty(index-of($attachment-ids-body, $attachment-id))">
+                        <stx:assign name="attachment-ids-body" select="($attachment-ids-body, $attachment-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+            </stx:if>
+
+            <!-- Get the float ids if any and put them in float-ids-body -->
+            <stx:if test="not(empty($float-ids))">
+                <stx:for-each-item name="float-id" select="$float-ids">
+                    <stx:if test="empty(index-of($float-ids-body, $float-id))">
+                        <stx:assign name="float-ids-body" select="($float-ids-body, $float-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+            </stx:if>
+
+            <stx:result-document href="tmp_body.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:element name="aep:tmp-body">
+                    <stx:process-buffer name="body" group="process-body" />
+                </stx:element>
+            </stx:result-document>
+        </stx:template>
+
+        <!-- Creating separate template match for book chapter exam in order to know if it falls
+        ==== under either body fragment or tail fragment
+        -->
+        <stx:template match="bk:chapter/bk:exam | bk:simple-chapter/bk:exam">
+            <!-- there might be multiple exam sections
+             ==== so float-ids and attachment-ids should be reset only for the first one
+            -->
+            <stx:if test="position()=1">
+                <stx:assign name="float-ids" select="()" />
+                <stx:assign name="attachment-ids" select="()" />
+            </stx:if>
+
+            <stx:result-buffer name="exam">
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <!-- fragments containing tail indicates
+             ==== already tail sections has been processed.
+             ==== exam section is after those tail sections and needs to be placed in tail fragment
+            -->
+            <stx:if test="not(empty(index-of($fragments, 'tail')))">
+                <stx:assign name="exam-body" select="'false'"/>
+
+                <!-- place all the attachments of the exam section into the $attachment-ids-tail which is processed later-->
+                <stx:for-each-item name="attachment-id" select="$attachment-ids">
+                    <stx:if test="empty(index-of($attachment-ids-tail, $attachment-id))">
+                        <stx:assign name="attachment-ids-tail" select="($attachment-ids-tail, $attachment-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+
+                <!-- place all the floats of the exam section into the $float-ids-tail which is processed later-->
+                <stx:for-each-item name="float-id" select="$float-ids">
+                    <stx:if test="empty(index-of($float-ids-tail, $float-id))">
+                        <stx:assign name="float-ids-tail" select="($float-ids-tail, $float-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+            </stx:if>
+            <!-- fragments does not contain tail indicates
+              ==== tail sections has not been processed yet.
+              ==== exam section is before those tail sections and needs to be placed in body fragment
+            -->
+            <stx:else>
+                <stx:assign name="exam-body" select="'true'"/>
+                <!-- checking fragments containing body as in some cases exam might be the only body section-->
+                <stx:if test="empty(index-of(fragments, 'body'))">
+                    <stx:assign name="fragments" select="($fragments, 'body')"/>
+                </stx:if>
+
+                <!-- place all the attachments of the exam section into the $attachment-ids-body which is processed later-->
+                <stx:for-each-item name="attachment-id" select="$attachment-ids">
+                    <stx:if test="empty(index-of($attachment-ids-body, $attachment-id))">
+                        <stx:assign name="attachment-ids-body" select="($attachment-ids-body, $attachment-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+
+                <!-- place all the floats of the exam section into the $float-ids-body which is processed later-->
+                <stx:for-each-item name="float-id" select="$float-ids">
+                    <stx:if test="empty(index-of($float-ids-body, $float-id))">
+                        <stx:assign name="float-ids-body" select="($float-ids-body, $float-id)"/>
+                    </stx:if>
+                </stx:for-each-item>
+            </stx:else>
+
+            <!-- process the exam buffer and save it under tmp_exam.xml
+            ==== which is later combined with tmp_body.xml or tmp_tail.xml
+            -->
+
+             <stx:result-document href="tmp_exam.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:element name="aep:exam">
+                     <stx:process-buffer name="exam" />
+                </stx:element>
+            </stx:result-document>
+        </stx:template>
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  xocs:nonserial-item elements                                         -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+        <stx:template match="xocs:nonserial-item">
+            <stx:if test="empty(index-of(fragments, 'nonserial-item'))">
+                <stx:assign name="fragments" select="($fragments, 'nonserial-item')"/>
+            </stx:if>
+
+            <!-- We need to process the item section once to extract out all the floats -->
+            <stx:result-buffer name="itemBuffer" >
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <!-- Unfortunately we then need to process it again to get a reference to all nested floats -->
+            <stx:assign name="float-ids" select="()" />
+            <stx:assign name="attachment-ids" select="()" />
+
+            <stx:process-buffer name="itemBuffer"/>
+
+            <!-- now output floats, attachments and the original serial-item content -->
+            <stx:result-document href="tmp_nonserial-item.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:element name="aep:nonserial-item">
+                    <stx:if test="not(empty($attachment-ids))">
+                        <stx:element name="aep:attachments" >
+                            <stx:process-buffer name="xocsMetaBuffer"/>
+                        </stx:element>
+                    </stx:if>
+                    <stx:if test="not(empty($float-ids))">
+                        <stx:element name="aep:floats" >
+                            <stx:process-buffer name="floatsBuffer"/>
+                        </stx:element>
+                    </stx:if>
+
+                    <stx:process-buffer name="itemBuffer"/>
+                </stx:element>
+            </stx:result-document>
+        </stx:template>
+
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  xocs:enhancement-fragment elements                                -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+
+        <stx:template match="xocs:enhancement-fragment">
+            <stx:if test="empty(index-of(fragments, 'enhancement-fragment'))">
+                <stx:assign name="fragments" select="($fragments, 'enhancement-fragment')"/>
+            </stx:if>
+            <stx:result-document href="tmp_enhancement-fragment.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:process-self/>
+            </stx:result-document>
+        </stx:template>
+
+        <!-- ================================================================== -->
+        <!--                                                                    -->
+        <!--  Common templates                                                  -->
+        <!--                                                                    -->
+        <!-- ================================================================== -->
+        <stx:template match="ce:bibliography|ce:further-reading">
+            <stx:process-self group="process-references"/>
+        </stx:template>
+
+        <stx:template match="ce:biography">
+            <stx:if test="empty(index-of($features, 'biography'))">
+                <stx:assign name="features" select="($features, 'biography')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <!--
+            STX seems to be having difficulties when all 3 exam matches are in a single template
+            Have split into two until we find a permanent solution...i.e. never
+        -->
+        <stx:template match="ce:exam-answers | ce:exam-questions">
+            <stx:if test="empty(index-of($features, 'exam'))">
+                <stx:assign name="features" select="($features, 'exam')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="ce:exam-reference">
+            <stx:if test="empty(index-of($features, 'exam'))">
+                <stx:assign name="features" select="($features, 'exam')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="ce:preprint">
+            <stx:if test="empty(index-of($features, 'preprint'))">
+                <stx:assign name="features" select="($features, 'preprint')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="ce:abstract">
+            <stx:if test="empty(index-of(abstracts, @class))">
+                <stx:assign name="abstracts" select="($abstracts, @class)"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+
+        <stx:template match="ce:floats">
+            <stx:if test="empty(index-of(fragments, 'floats'))">
+                <stx:assign name="fragments" select="($fragments, 'floats')"/>
+            </stx:if>
+            <stx:result-buffer name="floatsBuffer">
+                <stx:process-self/>
+            </stx:result-buffer>
+
+            <stx:result-document href="floats.xml" output-method="xml" output-encoding="UTF-8">
+                <stx:process-buffer name="floatsBuffer" group="copy-all"/>
+            </stx:result-document>
+        </stx:template>
+
+        <stx:template match="ce:keywords">
+            <stx:if test="empty(index-of(features, 'keywords'))">
+                <stx:assign name="features" select="($features, 'keywords')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+    </stx:group>
+
+    <stx:group name="process-references" pass-through="all" xmlns:ce="http://www.elsevier.com/xml/common/dtd"
+    xmlns:sb="http://www.elsevier.com/xml/common/struct-bib/dtd">
+        <!-- references are processed in multiple parts of the body. Added a single group so we're not duplicating the feature tracking code -->
+        <stx:template match="ce:bibliography|ce:further-reading">
+            <stx:if test="empty(index-of($features, 'references'))">
+                <stx:assign name="features" select="($features, 'references')"/>
+            </stx:if>
+            <stx:process-self/>
+        </stx:template>
+        <stx:template match="sb:reference|ce:other-ref">
+            <stx:assign name="referenceCount" select="$referenceCount + 1"/>
+            <stx:process-self/>
+        </stx:template>
+    </stx:group>
+
+    <stx:group name="process-body" pass-through="all" xmlns:ce="http://www.elsevier.com/xml/common/dtd">
+        <!-- we need a stupid copy group to capture when references appear in the body of a serial item -->
+        <stx:template match="ce:bibliography|ce:further-reading">
+            <stx:process-self group="process-references"/>
+        </stx:template>
+    </stx:group>
+
+    <stx:group name="document-aggregation" pass-through="all">
+        <stx:template match="aep:tmp-body">
+            <stx:process-children />
+        </stx:template>
+        <stx:template match="aep:tmp-tail">
+            <stx:process-children />
+        </stx:template>
+        <stx:template match="aep:exam">
+            <stx:process-children />
+        </stx:template>
+    </stx:group>
+
+</stx:transform>

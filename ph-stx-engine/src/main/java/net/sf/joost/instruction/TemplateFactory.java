@@ -42,7 +42,7 @@ import net.sf.joost.stx.ParseContext;
 public final class TemplateFactory extends AbstractFactoryBase
 {
   /** allowed attributes for this element. */
-  private final Set <String> attrNames = new HashSet<> ();
+  private final Set <String> attrNames = new HashSet <> ();
 
   // Constructor
   public TemplateFactory ()
@@ -68,10 +68,7 @@ public final class TemplateFactory extends AbstractFactoryBase
                                       final ParseContext context) throws SAXParseException
   {
     if (parent == null || !(parent instanceof AbstractGroupBase))
-      throw new SAXParseException ("'" +
-                                   qName +
-                                   "' must be a top level " +
-                                   "element or a child of stx:group",
+      throw new SAXParseException ("'" + qName + "' must be a top level " + "element or a child of stx:group",
                                    context.locator);
 
     final AbstractTree matchPattern = parseRequiredPattern (qName, attrs, "match", context);
@@ -221,10 +218,12 @@ public final class TemplateFactory extends AbstractFactoryBase
      * Compares two templates according to their inverse priorities. This
      * results in a descending natural order with java.util.Arrays.sort()
      */
-    public int compareTo (final Instance o)
+    public int compareTo (final Instance other)
     {
-      final double p = o.m_dPriority;
-      return (p < m_dPriority) ? -1 : ((p > m_dPriority) ? 1 : 0);
+      final double dOtherPrio = other.m_dPriority;
+      if (true)
+        return Double.compare (dOtherPrio, m_dPriority);
+      return dOtherPrio < m_dPriority ? -1 : dOtherPrio > m_dPriority ? 1 : 0;
     }
 
     @Override
