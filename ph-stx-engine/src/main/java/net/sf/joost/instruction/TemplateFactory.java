@@ -221,7 +221,7 @@ public final class TemplateFactory extends AbstractFactoryBase
     public int compareTo (final Instance other)
     {
       final double dOtherPrio = other.m_dPriority;
-      if (true)
+      if (false)
         return Double.compare (dOtherPrio, m_dPriority);
       return dOtherPrio < m_dPriority ? -1 : dOtherPrio > m_dPriority ? 1 : 0;
     }
